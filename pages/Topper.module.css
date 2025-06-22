@@ -1,0 +1,308 @@
+.topper {
+    background-color: white;
+    box-shadow: 4px 4px 12px -3px #00000033;
+    border-radius: 20px;
+    list-style-type: none;
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Modernist;
+    margin: 10px 0;
+    position: relative;
+    overflow: hidden;
+    align-items: center;
+    border: 1px solid #fff;
+}
+
+.ripple {
+    position: absolute;
+    left: -20%;
+    top: 50%;
+    transform: translateY(-50%) skewX(30deg);
+    width: 30px;
+    background-color: white;
+    height: 100%;
+    animation: slide 6s normal infinite linear;
+    animation-fill-mode: forwards;
+    opacity: 0.2;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(92deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+@keyframes slide {
+    0% {
+        left: -20%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.extra {
+    padding-left: 110px;
+}
+
+.toppers {
+    background-color: white;
+    border-radius: 10px;
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Modernist;
+    margin: 10px 0;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #999;
+    position: relative;
+    align-items: center;
+    border: 1px solid #ddd;
+}
+
+.logo {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px 0 30px 0;
+}
+
+.main * {
+    font-family: Modernist;
+}
+
+.topper * {
+    margin: 0;
+}
+
+.first {
+    background: rgb(242, 173, 0);
+    background: linear-gradient(122deg, rgba(242, 173, 0, 1) 0%, rgba(255, 198, 57, 1) 100%);
+    color: black;
+    box-shadow: 7px 7px 22px -3px rgba(242, 173, 0, 0.555);
+}
+
+.second {
+    background: rgb(158, 65, 152);
+    background: linear-gradient(122deg, rgba(158, 65, 152, 1) 0%, rgba(110, 42, 99, 1) 100%);
+    color: white;
+    box-shadow: 7px 7px 22px -3px rgba(158, 65, 152, 0.589);
+}
+
+.spbadge {
+    position: absolute;
+    font-size: 12px;
+    background-color: var(--brand-col2);
+    bottom: 0;
+    right: 20px;
+    border: 1px solid white;
+    border-radius: 10px 10px 0 0;
+    padding: 2px 20px;
+    box-shadow: -4px -4px 22px -5px var(--brand-col2);
+}
+
+.third {
+    background: rgb(179, 136, 176);
+    background: linear-gradient(122deg, rgb(255, 163, 249) 0%, rgb(204, 128, 191) 100%);
+    color: white;
+    box-shadow: 7px 7px 22px -3px rgb(255, 178, 250);
+}
+
+.first .ripple {
+    animation-delay: 100ms;
+}
+
+.second .ripple {
+    animation-delay: 400ms;
+}
+
+.third .ripple {
+    animation-delay: 600ms;
+}
+
+.main {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: center;
+    min-height: 100vh;
+    height: auto;
+}
+
+.award {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
+    width: 80px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    background-color: white;
+    height: 80%;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 4px 4px 12px -4px #00000033;
+    transform: translateY(-50%);
+}
+
+.award svg {
+    fill: black;
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+.left {
+    flex: 1;
+    background-color: #f5f5f5;
+    padding: 50px 50px;
+}
+
+.right {
+    max-width: 50%;
+    background-color: white;
+    width: 100%;
+    min-height: 50px;
+    overflow: hidden;
+    position: relative;
+}
+
+.topper p {
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.banner {
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid #999;
+    height: auto;
+    margin: 10px auto;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px;
+    background-color: white;
+    box-shadow: 4px 4px 22px -10px #00000022;
+}
+
+.banner .floating {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    bottom: 20px;
+    max-width: calc(100% - 50px);
+}
+
+.banner .floating button {
+    width: 100%;
+}
+
+.button {
+    background-color: var(--brand-col2);
+    padding: 10px 50px;
+    border-radius: 10px;
+    border: 0;
+    color: black;
+    cursor: pointer;
+    transition: all .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+    box-shadow: 4px 4px 22px -10px transparent;
+}
+
+.button:hover {
+    background-color: var(--brand-col1);
+    color: white;
+    box-shadow: 4px 4px 22px -6px var(--brand-col1);
+}
+
+.banner img {
+    width: 100%;
+    object-fit: contain;
+    object-position: top;
+    height: 100%;
+}
+
+.tools {
+    border-radius: 20px;
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto 50px auto;
+    border: 1px solid #999;
+    flex-direction: column;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: flex-start;
+    padding: 20px 30px;
+    background-color: white;
+    box-shadow: 4px 4px 22px -10px #00000022;
+}
+
+.tool {
+    background-color: #86326d2a;
+    border-radius: 5px;
+    padding: 0 20px;
+    margin: 5px 0;
+    transition: all .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.tool:hover {
+    background-color: #86326d83;
+}
+
+.tools h2 {
+    margin: 5px 0;
+    line-height: 26px;
+}
+
+.b1 {
+    color: var(--brand-col1);
+}
+
+@media only screen and (max-width:968px) {
+    .main {
+        flex-direction: column;
+    }
+    .tools {
+        max-width: 80%;
+    }
+    .left,
+    .right {
+        width: 100%;
+        max-width: unset;
+    }
+    .left {
+        flex: 0;
+        padding: 10px 20px;
+    }
+    .banner {
+        width: 100%;
+        max-width: 80%;
+        margin: 0px auto;
+    }
+    .button {
+        padding: 10px 20px;
+    }
+    .right {
+        flex: 1;
+        display: flex;
+        flex-direction: column-reverse;
+        padding-top: 50px;
+    }
+}
+
+@media only screen and (max-width:568px) {
+    .topper {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-content: flex-start;
+        align-items: flex-start;
+    }
+}

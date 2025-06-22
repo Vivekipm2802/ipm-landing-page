@@ -1,0 +1,128 @@
+.list {
+    max-height: 0px;
+    border-radius: 10px;
+    background-color: #fff;
+    width: 100%;
+    position: absolute;
+    border: 0px solid #ddd;
+    left: 0;
+    top: 55px;
+    height: 200px;
+    overflow-y: scroll;
+    transition: all .3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    list-style-type: none;
+    padding: 0px 0px;
+    box-shadow: 3px 3px 12px -3px #ddd;
+    font-family: Poppins;
+}
+
+.wrapper.small {
+    width: auto;
+    font-size: 12px;
+}
+
+.list li {
+    margin: 10px 0;
+    cursor: pointer;
+    padding: 10px 20px;
+    transition: all .3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.list li:hover,
+.activeLister {
+    background-color: #dddddd55;
+}
+
+.activeList {
+    border: 1px solid #ddd;
+    max-height: 200px;
+    padding: 0px 0px;
+}
+
+.list p,
+.list h2 {
+    font-size: 15px;
+    margin: 0;
+}
+
+.list h2 {
+    font-weight: 600;
+}
+
+.indicator {
+    cursor: pointer;
+    width: 100%;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-family: Poppins;
+    position: relative;
+    outline: 2px solid transparent;
+    transition: all .4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background-color: white;
+}
+
+.indicator:hover,
+.indicator:focus {
+    outline: 2px solid var(--brand-col2);
+    color: var(--brand-col2);
+}
+
+.wrapper span {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.activeArrow {
+    transform: rotate(180deg);
+}
+
+.activeArrow path {
+    fill: var(--brand-col2);
+}
+
+.indicator-arrow {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 24px;
+    width: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' fill='none' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.293 8.293a1 1 0 0 1 1.414 0L12 14.586l6.293-6.293a1 1 0 1 1 1.414 1.414l-7 7a1 1 0 0 1-1.414 0l-7-7a1 1 0 0 1 0-1.414Z' fill='%23212121'/%3E%3C/svg%3E");
+}
+
+.wrapper {
+    position: relative;
+    width: 400px;
+    padding: 10px;
+    width: 100%;
+}
+
+.full {
+    width: 100%;
+    padding: 10px 0px;
+}
+
+@media only screen and (max-width:968px) {
+    .wrapper {
+        width: 100%;
+    }
+    .indicator {
+        font-size: 12px;
+    }
+}
+
+@media only screen and (max-width:968px) {
+    .wrapper {
+        width: 100%;
+    }
+}

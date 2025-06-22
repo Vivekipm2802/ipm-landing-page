@@ -1,0 +1,230 @@
+.page {
+    display: flex;
+    width: 210mm;
+    height: 297mm;
+    background-color: white;
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    border: 1px solid #ddd;
+    margin: auto;
+    flex-direction: column;
+    padding: 6mm 10mm;
+    justify-content: start;
+}
+
+.footer {
+    width: 100%;
+    background-color: #f2f2f2;
+    border: 2px solid var(--brand-col1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.footer p {
+    margin: 5px 0;
+    font-family: Poppins;
+    color: var(--brand-col1);
+    font-weight: 500;
+}
+
+.footer h2 {
+    margin: 0;
+}
+
+.logosection {
+    width: 100%;
+    height: 20mm;
+}
+
+.logosection img {
+    width: auto;
+    height: 100%;
+}
+
+.profilesection {
+    margin: 5mm 0 0 0;
+    height: 50mm;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: flex-start;
+    list-style-type: none;
+}
+
+.page * {
+    font-family: Poppins;
+}
+
+.studentInfo {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: -5px;
+}
+
+.profilesection li {
+    background-color: white;
+    margin: 5px;
+    width: calc(50% -20px);
+    border: 1px solid #ddd;
+    box-shadow: 4px 4px 12px -4px #00000022;
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-family: Poppins;
+}
+
+.scoresection {
+    width: 100%;
+    margin: 10px auto;
+    flex: 1;
+}
+
+.resultItem h3 {
+    font-size: 12px;
+    margin: 0;
+    font-weight: 500;
+}
+
+.resultItem {
+    margin: 0px 10px;
+}
+
+.result {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    margin: 10px 0;
+}
+
+.result h2 {
+    margin: 5px 0;
+    color: var(--brand-col1);
+}
+
+.resultItem .incorrect {
+    color: red;
+}
+
+.resultItem .correct {
+    color: green;
+}
+
+.result ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.scorecard {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgb(158, 65, 152);
+    background: linear-gradient(122deg, rgba(158, 65, 152, 1) 0%, rgba(110, 42, 99, 1) 100%);
+    border-radius: 20px;
+    padding: 10px 20px;
+    justify-content: center;
+    align-content: center;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px 0 30px 0;
+}
+
+.scorewrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+    width: calc(100% - 55px);
+    margin: -5px;
+}
+
+.scorewrapper>div {
+    background-color: #ffffff23;
+    margin: 5px;
+    flex: 1;
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.scorewrapper>div p {
+    font-size: 3rem;
+    font-weight: 600;
+}
+
+.whitelogo {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: 44px;
+    height: 44px;
+}
+
+.circles {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: auto;
+    height: 100px;
+}
+
+.scorecard>div {
+    flex: 1;
+}
+
+.scorecard h3,
+.scorecard p {
+    margin: 5px 0 5px 0;
+}
+
+.scorecard h3 {
+    font-size: 16px;
+}
+
+.scorecard * {
+    color: white;
+}
+
+.profile {
+    background-color: white;
+    border-radius: 10px;
+    padding: 5px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-content: flex-start;
+}
+
+.profile p {
+    color: var(--brand-col2);
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+.profilesectionC {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: flex-start;
+}

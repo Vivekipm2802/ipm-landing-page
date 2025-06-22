@@ -1,0 +1,287 @@
+.responsive_iframe_container {
+    position: relative;
+    overflow: hidden;
+    padding-top: 56.25%;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.responsive_iframe_container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.extra {
+    padding-bottom: 200px;
+}
+
+.features {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    margin-top: -6%;
+    z-index: 9;
+}
+
+.features>div {
+    width: 70%;
+    background-color: white;
+    border-radius: 20px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    flex-wrap: nowrap;
+    padding: 40px;
+    box-shadow: 8px 8px 22px -8px #00000033;
+}
+
+.features .wr {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.featureblock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    max-width: 180px;
+    text-align: center;
+    margin: 0 20px;
+    position: relative;
+}
+
+.source {
+    background-color: var(--brand-col2);
+    border-radius: 200px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.features h2 {
+    width: 100%;
+    margin: 5px 0;
+    font-size: 2rem;
+}
+
+.featureblock img {
+    width: 100px;
+    border-radius: 0px;
+    height: 100px;
+    object-fit: contain;
+    padding: 15%;
+}
+
+.featureblock p {
+    font-size: 12px;
+    margin: 5px 0;
+    font-family: Poppins;
+}
+
+.list {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.under {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.list img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+.under {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 4px 4px 12px -5px #00000033;
+}
+
+.list {
+    border: 1px solid #ddd;
+    margin-top: -1px;
+}
+
+.list div {
+    border-left: 1px solid #ddd;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.list * {
+    flex: 1;
+    text-align: left;
+}
+
+.headtable {
+    background-color: var(--brand-col2);
+    text-align: center;
+}
+
+.headtable p {
+    text-align: center;
+    flex: 1;
+}
+
+.list p {
+    padding: 0 20px;
+}
+
+.comparison {
+    width: 100%;
+    height: auto;
+    z-index: 9;
+    position: relative;
+    display: flex;
+    padding: 40px 0;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+.personal {
+    flex: 1;
+    margin: 0 auto;
+    background-color: white;
+    padding-left: 50px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.personal h2 {
+    font-size: 5rem;
+    color: var(--brand-col1);
+    line-height: 5rem;
+}
+
+.personal h2,
+.personal p,
+.personal li {
+    margin: 5px 0;
+}
+
+.personal li img {
+    margin-right: 5px;
+}
+
+.personal ul img {
+    width: 14px;
+    height: 14px;
+}
+
+.personalmain {
+    display: flex;
+    width: 70%;
+    padding: 50px 0;
+    flex-direction: row;
+}
+
+.leftimage {
+    border-radius: 900px;
+    object-fit: cover;
+    object-position: top;
+    width: 25vw;
+    background: var(--brand-col2);
+    height: 25vw;
+    background: var(--brand-col2);
+}
+
+.personal ul {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: center;
+}
+
+.book {
+    cursor: pointer;
+}
+
+.comparison h2 {
+    font-family: Poppins;
+    font-size: 3rem;
+    text-align: center;
+    margin: 10px 0;
+}
+
+@media only screen and (max-width:968px) {
+    .personalmain {
+        width: 90%;
+    }
+    .features>div {
+        width: 90%;
+        padding: 20px;
+    }
+    .features {
+        margin-top: -20%;
+    }
+    .featureblock {
+        max-width: 110px;
+        margin: 0 10px;
+    }
+}
+
+@media only screen and (max-width:968px) {
+    .comparison>div {
+        width: 90%;
+    }
+    .comparison .list img {
+        width: 16px;
+        height: 16px;
+    }
+    .list {
+        font-size: 12px;
+    }
+    .comparison h2 {
+        font-family: Poppins;
+        font-size: 1.5rem;
+        text-align: center;
+        margin: 10px 0;
+    }
+    .personalmain {
+        flex-direction: column;
+    }
+    .leftimage {
+        width: 50%;
+        margin: 0 auto;
+        height: auto;
+    }
+    .personal {
+        padding: 20px 0;
+    }
+    .personalmain h2 {
+        font-size: 3rem;
+        line-height: 3rem;
+    }
+}

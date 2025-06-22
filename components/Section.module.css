@@ -1,0 +1,90 @@
+.section {
+    width: 100%;
+    height: auto;
+    /* padding: 0 3vw 50px 3vw; */
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    min-height: 30vh;
+    padding: 0 8vw 50px 8vw;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition-delay: 200ms;
+
+}
+.noMin{
+    min-height: unset !important;
+}
+.inner{
+    max-width: 1540px;
+    width: 100%;
+    margin: 0 auto;
+}
+.fullWidth .inner{
+    max-width: unset !important;
+}
+.section.fullWidth{
+    padding: 0;
+}
+.noMargin {
+    padding: 0;
+}
+.noSpacing{
+    padding-bottom: 0px;
+}
+
+.center {
+    text-align: center;
+    width: 100%;
+}
+
+.small {
+    margin: 35px 0 10px 0;
+}
+
+.container {
+    position: relative;
+}
+
+.visible {
+    overflow: visible;
+}
+
+.shead {
+    font-size: 46px;
+    line-height: 44px;
+    color: black;
+    font-family: Poppins, sans-serif;
+    font-weight: bold;
+    font-weight: 400;
+}
+
+.nomargin {
+    margin: 0;
+}
+.section.inview{
+    opacity: 1;
+    transform: translateY(0px);
+  }
+@media only screen and (max-width:968px) {
+    .section {
+        width: 100%;
+        padding: 15px 20px;
+        min-height: 20vh;
+    }
+    .shead {
+        font-size: 6vw;
+        line-height: 7vw;
+    }
+    .noMargin {
+        padding: 0;
+    }
+}
+
+@media only screen and (max-width:768px) {
+    .shead {
+        font-size: 7vw;
+        line-height: 7.5vw;
+    }
+}

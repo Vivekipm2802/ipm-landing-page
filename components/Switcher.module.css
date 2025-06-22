@@ -1,0 +1,45 @@
+.switcher {
+    height: auto;
+    width: 100%;
+    overflow: hidden;
+    text-align: left;
+    animation: slideup 1s normal cubic-bezier(0.165, 0.84, 0.44, 1);
+    animation-fill-mode: forwards;
+    padding: 15px 0;
+    font-size: 24px;
+    font-family: Poppins;
+}
+
+.switcher p {
+    animation: slideup 1s normal cubic-bezier(0.165, 0.84, 0.44, 1);
+    animation-fill-mode: forwards;
+}
+
+.switcher div {
+    transition: all 1s cubic-bezier(.87, .06, .18, .99);
+    transform: translateY(0%);
+}
+
+.switcher div.extra {
+    transform: translateY(-200%);
+}
+
+
+/* .switcher p.active {
+    transform: translateY(0%);
+} */
+
+.off {
+    transform: translateY(-100%);
+}
+
+@keyframes slideup {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
