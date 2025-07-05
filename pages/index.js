@@ -222,16 +222,16 @@ export default function Home() {
 
   const slides = [
     {
-      image: result,
-      alt: "IPM Careers IIM Indore Results",
-    },
-    {
       image: "/banners/slide1.jpg",
       alt: "IPM Careers",
     },
     {
       image: "/banners/slide2.jpg",
       alt: "IPM Careers",
+    },
+    {
+      image: result,
+      alt: "IPM Careers IIM Indore Results",
     },
   ];
   const faqs = [
@@ -846,7 +846,7 @@ export default function Home() {
                 <YouTube
                   className="embed-container"
                   title=""
-                  videoId="6ZsYsn-ykpk"
+                  videoId="GguKjh6un0U"
                   opts={opts}
                 />
               </div>
