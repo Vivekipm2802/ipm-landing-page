@@ -222,6 +222,10 @@ export default function Home() {
 
   const slides = [
     {
+      image: result,
+      alt: "IPM Careers IIM Indore Results",
+    },
+    {
       image: "/banners/slide1.jpg",
       alt: "IPM Careers",
     },
