@@ -238,6 +238,10 @@ export default function Home() {
       alt: "IPM Careers",
     },
     {
+      image: "/banners/slide5.jpg",
+      alt: "IPM Careers",
+    },
+    {
       image: result,
       alt: "IPM Careers IIM Indore Results",
     },
