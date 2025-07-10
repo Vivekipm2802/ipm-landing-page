@@ -1,37 +1,37 @@
-import Head from 'next/head';
-import Image from 'next/image';
-import { Inter } from '@next/font/google';
-import { useState, useEffect } from 'react';
-import styles from './Home.module.css';
-import FAQ from '../components/FAQ';
-import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
-import Notifications from '../components/Notification';
-import YouTube from 'react-youtube';
-import axios from 'axios';
-import Section from '../components/Section';
-import qs from 'qs';
-const inter = Inter({ subsets: ['latin'] });
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import 'swiper/css/autoplay';
-import Switcher from '../components/Switcher';
-import CustomSelect from '../components/CustomSelect';
-import { supabase } from '../utils/supabaseClient';
-import { years } from '../utils/years';
-import { reviews } from '../utils/testimonials';
-import { result } from '../utils/contants';
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "@next/font/google";
+import { useState, useEffect } from "react";
+import styles from "./Home.module.css";
+import FAQ from "../components/FAQ";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import Notifications from "../components/Notification";
+import YouTube from "react-youtube";
+import axios from "axios";
+import Section from "../components/Section";
+import qs from "qs";
+const inter = Inter({ subsets: ["latin"] });
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import "swiper/css/autoplay";
+import Switcher from "../components/Switcher";
+import CustomSelect from "../components/CustomSelect";
+import { supabase } from "../utils/supabaseClient";
+import { years } from "../utils/years";
+import { reviews } from "../utils/testimonials";
+import { result } from "../utils/contants";
 
 export default function Home() {
   const [isSubmitted, setSubmitted] = useState(false);
   const [scrolled, setScrolled] = useState();
-  const [favicon, setFavicon] = useState('/favicon_ipm.svg');
+  const [favicon, setFavicon] = useState("/favicon_ipm.svg");
   const [students, setStudents] = useState(5355);
   const [loader, setLoader] = useState(false);
-  const [currentSub, setSub] = useState('Register Now');
+  const [currentSub, setSub] = useState("Register Now");
   const [activePopup, setActivePopup] = useState(false);
   const [notificationText, setNotificationText] = useState();
   const [timeoutId, setTimeoutId] = useState(null);
@@ -40,36 +40,36 @@ export default function Home() {
 
   const testimonials = [
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/resutls-1.png',
-      heading: 'Best IPMAT Results',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/resutls-1.png",
+      heading: "Best IPMAT Results",
     },
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/professsor-1.png',
-      heading: 'Best IITs - IIMs Faculties',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/professsor-1.png",
+      heading: "Best IITs - IIMs Faculties",
     },
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/study-material-1.png',
-      heading: 'Excellent Study Material',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/study-material-1.png",
+      heading: "Excellent Study Material",
     },
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/ai-booked-1.png',
-      heading: 'AI based Test Series',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/ai-booked-1.png",
+      heading: "AI based Test Series",
     },
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/one-on-one-counselling-1.png',
-      heading: 'One-on-One Mentorship from IIMs Graduates',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/one-on-one-counselling-1.png",
+      heading: "One-on-One Mentorship from IIMs Graduates",
     },
     {
-      icon: 'https://ipmcareer.com/wp-content/uploads/2023/01/doubt-1.png',
-      heading: 'One-on-One Doubt Clearing Sessions',
+      icon: "https://ipmcareer.com/wp-content/uploads/2023/01/doubt-1.png",
+      heading: "One-on-One Doubt Clearing Sessions",
     },
   ];
 
   const heading = [
-    'Register Now',
-    'Its Free',
-    'Limited Seats',
-    'Best Coaching',
+    "Register Now",
+    "Its Free",
+    "Limited Seats",
+    "Best Coaching",
   ];
   function cronberryTrigger(
     username,
@@ -77,82 +77,82 @@ export default function Home() {
     u_mobile,
     u_year,
     u_city,
-    linke,
+    linke
   ) {
     console.log(arguments);
 
     var id = Date.now();
     var data = JSON.stringify({
-      projectKey: 'VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==',
+      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
       audienceId: id,
       name: username,
       email: u_email,
       mobile: u_mobile,
-      ios_fcm_token: '',
-      web_fcm_token: '',
-      android_fcm_token: '',
-      profile_path: '',
-      active: '',
-      audience_id: '',
+      ios_fcm_token: "",
+      web_fcm_token: "",
+      android_fcm_token: "",
+      profile_path: "",
+      active: "",
+      audience_id: "",
       paramList: [
         {
-          paramKey: 'source',
-          paramValue: '',
+          paramKey: "source",
+          paramValue: "",
         },
         {
-          paramKey: 'city',
+          paramKey: "city",
           paramValue: u_city,
         },
         {
-          paramKey: 'postcode',
-          paramValue: '',
+          paramKey: "postcode",
+          paramValue: "",
         },
         {
-          paramKey: 'total_amount',
-          paramValue: '',
+          paramKey: "total_amount",
+          paramValue: "",
         },
         {
-          paramKey: 'abondon_cart',
+          paramKey: "abondon_cart",
           paramValue: true,
         },
         {
-          paramKey: 'preparing_for_which_year',
+          paramKey: "preparing_for_which_year",
           paramValue: u_year,
         },
         {
-          paramKey: 'subject',
-          paramValue: '',
+          paramKey: "subject",
+          paramValue: "",
         },
         {
-          paramKey: 'formurl',
+          paramKey: "formurl",
           paramValue: linke,
         },
         {
-          paramKey: 'formname',
-          paramValue: 'Main Landing Page',
+          paramKey: "formname",
+          paramValue: "Main Landing Page",
         },
       ],
     });
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener('readystatechange', function () {
+    xhr.addEventListener("readystatechange", function () {
       if (this.readyState === 4) {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
-            event: 'registration_submitted',
+            event: "registration_submitted",
           });
         }
 
         setLoader(false);
-        setNotification('Submitted Successfully');
+        setNotification("Submitted Successfully");
         setSubmitted(true);
       }
     });
     xhr.open(
-      'POST',
-      'https://register.cronberry.com/api/campaign/register-audience-data',
+      "POST",
+      "https://register.cronberry.com/api/campaign/register-audience-data"
     );
-    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.send(data);
   }
@@ -160,82 +160,82 @@ export default function Home() {
   const mentors = [
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2023/01/Ashutosh-Sir-e1641723253112.webp',
-      fullname: 'Ashutosh Mishra',
-      role: 'Master IIM Ahmedabad',
-      role2: 'Bachelors Thapar University',
-      bg: 'https://www.ipmcareer.com/wp-content/uploads/2023/01/IIMA-LKP_0-1.webp',
+        "https://www.ipmcareer.com/wp-content/uploads/2023/01/Ashutosh-Sir-e1641723253112.webp",
+      fullname: "Ashutosh Mishra",
+      role: "Master IIM Ahmedabad",
+      role2: "Bachelors Thapar University",
+      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/IIMA-LKP_0-1.webp",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2016/11/deepak-kushwaha-350x350.jpg',
-      fullname: 'Deepak Kushwaha',
-      role: 'Master IIM Lucknow',
-      role2: 'Bachelors NIT Srinagar',
-      bg: 'https://www.ipmcareer.com/wp-content/uploads/2023/01/img-slider-4-1-1.webp',
+        "https://www.ipmcareer.com/wp-content/uploads/2016/11/deepak-kushwaha-350x350.jpg",
+      fullname: "Deepak Kushwaha",
+      role: "Master IIM Lucknow",
+      role2: "Bachelors NIT Srinagar",
+      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/img-slider-4-1-1.webp",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2023/01/Screen-Shot-2021-01-10-at-3.24.16-PM-283x350-1-1.png',
-      fullname: 'Taruna Khanna',
-      role: 'GCC UCLA Extension',
-      bg: 'https://www.ipmcareer.com/wp-content/uploads/2023/01/education-concept-student-studying-brainstorming-campus-concept-close-up-students-discussing-their-subject-books-textbooks-selective-focus-660x330-1.webp',
+        "https://www.ipmcareer.com/wp-content/uploads/2023/01/Screen-Shot-2021-01-10-at-3.24.16-PM-283x350-1-1.png",
+      fullname: "Taruna Khanna",
+      role: "GCC UCLA Extension",
+      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/education-concept-student-studying-brainstorming-campus-concept-close-up-students-discussing-their-subject-books-textbooks-selective-focus-660x330-1.webp",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2022/06/IMG_1848-350x350.jpg',
-      fullname: 'Dr. Swati A. Mishra',
-      role: 'Director Operations Lucknow Centre',
-      role2: 'Former Professor IIM Lucknow',
-      bg: 'https://cdn.britannica.com/85/13085-050-C2E88389/Corpus-Christi-College-University-of-Cambridge-England.jpg',
+        "https://www.ipmcareer.com/wp-content/uploads/2022/06/IMG_1848-350x350.jpg",
+      fullname: "Dr. Swati A. Mishra",
+      role: "Director Operations Lucknow Centre",
+      role2: "Former Professor IIM Lucknow",
+      bg: "https://cdn.britannica.com/85/13085-050-C2E88389/Corpus-Christi-College-University-of-Cambridge-England.jpg",
     },
     {
       image:
-        'https://ipmcareer.com/all-india-mock/wp-content/uploads/2023/06/manish.jpeg',
-      fullname: 'Manish Dixit',
-      role: 'IIT BHU Alumnus',
+        "https://ipmcareer.com/all-india-mock/wp-content/uploads/2023/06/manish.jpeg",
+      fullname: "Manish Dixit",
+      role: "IIT BHU Alumnus",
 
-      bg: 'https://www.ipmcareer.com/wp-content/uploads/2023/01/iit_bhu_slider_03-1.webp',
+      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/iit_bhu_slider_03-1.webp",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2022/01/WhatsApp-Image-2022-01-09-at-4.49.41-PM-e1641850793724-350x350.jpeg',
-      fullname: 'Rishabh Singh',
-      role: 'IIFM Bhopal Alumnus',
-      bg: 'https://www.careerindia.com/img/2013/10/24-indianinstituteofforestmanagement.jpg',
+        "https://www.ipmcareer.com/wp-content/uploads/2022/01/WhatsApp-Image-2022-01-09-at-4.49.41-PM-e1641850793724-350x350.jpeg",
+      fullname: "Rishabh Singh",
+      role: "IIFM Bhopal Alumnus",
+      bg: "https://www.careerindia.com/img/2013/10/24-indianinstituteofforestmanagement.jpg",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2022/12/WhatsApp-Image-2022-12-15-at-7.11.51-PM-e1671269681720.jpeg',
-      fullname: 'Divyansh Mishra',
-      role: 'IIM Raipur',
-      bg: 'https://www.ipmcareer.com/wp-content/uploads/2023/01/jpg-1.webp',
+        "https://www.ipmcareer.com/wp-content/uploads/2022/12/WhatsApp-Image-2022-12-15-at-7.11.51-PM-e1671269681720.jpeg",
+      fullname: "Divyansh Mishra",
+      role: "IIM Raipur",
+      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/jpg-1.webp",
     },
     {
       image:
-        'https://www.ipmcareer.com/wp-content/uploads/2022/01/Rishita-e1672914918610-350x350.jpg',
-      fullname: 'Rishita Gupta',
-      role: 'Multiple IIMs Call Getter',
-      bg: 'https://backend.insideiim.com/wp-content/uploads/2017/04/IIM_Collage.jpg',
+        "https://www.ipmcareer.com/wp-content/uploads/2022/01/Rishita-e1672914918610-350x350.jpg",
+      fullname: "Rishita Gupta",
+      role: "Multiple IIMs Call Getter",
+      bg: "https://backend.insideiim.com/wp-content/uploads/2017/04/IIM_Collage.jpg",
     },
   ];
 
   const slides = [
     {
-      image: '/banners/slide1.jpg',
-      alt: 'IPM Careers',
+      image: "/banners/slide1.jpg",
+      alt: "IPM Careers",
     },
     {
-      image: '/banners/slide2.jpg',
-      alt: 'IPM Careers',
+      image: "/banners/slide2.jpg",
+      alt: "IPM Careers",
     },
     {
-      image: '/banners/slide3.jpg',
-      alt: 'IPM Careers',
+      image: "/banners/slide3.jpg",
+      alt: "IPM Careers",
     },
     {
-      image: '/banners/slide5.jpg',
-      alt: 'IPM Careers',
+      image: "/banners/slide5.jpg",
+      alt: "IPM Careers",
     },
     // {
     //   image: '/banners/slide4.jpg',
@@ -248,32 +248,32 @@ export default function Home() {
   ];
   const faqs = [
     {
-      question: 'How will this IPMAT preparation help me?',
+      question: "How will this IPMAT preparation help me?",
       answer:
-        'Practicing IPMAT Mock Tests will help improve your time-management skills and build your confidence levels. So, it is advised to take up mock tests regularly and try to analyze your performance after completing each mock test.',
+        "Practicing IPMAT Mock Tests will help improve your time-management skills and build your confidence levels. So, it is advised to take up mock tests regularly and try to analyze your performance after completing each mock test.",
     },
     {
-      question: 'How many exams are covered under this preparation?',
+      question: "How many exams are covered under this preparation?",
       answer:
-        'IPM BBA/BMS prep cover aptitude tests conducted by IIM Indore (IPMAT – Indore), IIM Rohtak (IPMAT – Rohtak), IIM Bodh Gaya and IIM Jammu (JIPMAT) for  their 5-year integrated programs. The test prep program also cover entrance tests conducted by DU (DU JAT), NMIMS (NPAT), Symbiosis (SET), Christ University (CUET), IP University (IPUCET) and St. Xavier’s College – Mumbai for their BMS program',
+        "IPM BBA/BMS prep cover aptitude tests conducted by IIM Indore (IPMAT – Indore), IIM Rohtak (IPMAT – Rohtak), IIM Bodh Gaya and IIM Jammu (JIPMAT) for  their 5-year integrated programs. The test prep program also cover entrance tests conducted by DU (DU JAT), NMIMS (NPAT), Symbiosis (SET), Christ University (CUET), IP University (IPUCET) and St. Xavier’s College – Mumbai for their BMS program",
     },
     {
-      question: 'Can I avail one on one clearing doubt sessions?',
+      question: "Can I avail one on one clearing doubt sessions?",
       answer:
-        'Students should contact their IPM Careers center to book a one-on-one doubt clearing session with a mentor.',
+        "Students should contact their IPM Careers center to book a one-on-one doubt clearing session with a mentor.",
     },
     {
-      question: 'How do I access live classes?',
+      question: "How do I access live classes?",
       answer:
-        'On successful completion of enrolment process, students receive a IPM Careers Zoom id & password to join IPM Careers live platform and to attend live, online classes.',
+        "On successful completion of enrolment process, students receive a IPM Careers Zoom id & password to join IPM Careers live platform and to attend live, online classes.",
     },
     {
-      question: 'Is Fee Refundable?',
-      answer: 'Fee is neither Refundable nor transferable',
+      question: "Is Fee Refundable?",
+      answer: "Fee is neither Refundable nor transferable",
     },
     {
-      question: 'Is there any contact number to reach you?',
-      answer: 'For any queries contact @8299470392.',
+      question: "Is there any contact number to reach you?",
+      answer: "For any queries contact @8299470392.",
     },
   ];
 
@@ -284,7 +284,7 @@ export default function Home() {
 
     setNotificationText(de);
     const id = setTimeout(() => {
-      setNotificationText(), setTimeoutId(null), console.log('notcall');
+      setNotificationText(), setTimeoutId(null), console.log("notcall");
     }, 2500);
     setTimeoutId(id);
   }
@@ -305,7 +305,7 @@ export default function Home() {
       setActivePopup(true);
     }, 5000);
     setTimeout(() => {
-      setFavicon('/favicon_active.svg');
+      setFavicon("/favicon_active.svg");
     }, 1000);
 
     return () => {
@@ -330,11 +330,11 @@ export default function Home() {
     },
   };
   async function handleAPI(a, b, c) {
-    console.log('api');
+    console.log("api");
     await axios
-      .post('/api/hello', {
+      .post("/api/hello", {
         fullname: a,
-        event: 'Free Consultation',
+        event: "Free Consultation",
         user_id: c,
         recipient: b,
       })
@@ -361,28 +361,28 @@ export default function Home() {
       <span className={styles.blue}> Excellent Academic Performance</span>
     </>,
   ];
-  const [mobile, setMobile] = useState('desktop');
+  const [mobile, setMobile] = useState("desktop");
   useEffect(() => {
     function setWidth() {
       if (window.innerWidth < 768) {
-        setMobile('mobile');
+        setMobile("mobile");
       } else if (window.innerWidth < 968) {
-        setMobile('tablet');
+        setMobile("tablet");
       } else {
-        setMobile('desktop');
+        setMobile("desktop");
       }
     }
-    window.addEventListener('resize', (e) => {
+    window.addEventListener("resize", (e) => {
       setWidth();
     });
 
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       setWidth();
     });
   }, []);
 
   useEffect(() => {
-    window.addEventListener('scroll', () => {
+    window.addEventListener("scroll", () => {
       if (window.scrollY > 1080) {
         setScrolled(true);
       } else {
@@ -393,15 +393,15 @@ export default function Home() {
 
   async function triggerInterakt() {
     axios
-      .post('/api/interakt', {
+      .post("/api/interakt", {
         userId: Date.now(),
         phoneNumber: formData.phone,
-        countryCode: '+91',
-        event: 'Campaign Notification',
+        countryCode: "+91",
+        event: "Campaign Notification",
         name: formData.fullname,
         email: formData.email,
 
-        tag: 'Landing Page',
+        tag: "Landing Page",
       })
       .then((res) => {
         console.log(res);
@@ -412,56 +412,56 @@ export default function Home() {
   }
   async function SubmitContact() {
     if (formData == undefined) {
-      setNotification('All Fields are empty');
+      setNotification("All Fields are empty");
       return null;
     }
-    if (!formData.fullname || formData.fullname.trim() === '') {
-      setNotification('Fullname field is empty');
+    if (!formData.fullname || formData.fullname.trim() === "") {
+      setNotification("Fullname field is empty");
       return null;
     }
 
     // Check email
-    if (!formData.email || formData.email.trim() === '') {
-      setNotification('Email field is empty');
+    if (!formData.email || formData.email.trim() === "") {
+      setNotification("Email field is empty");
       return null;
     }
 
     // Validate the email format using a regular expression
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!emailRegex.test(formData.email)) {
-      setNotification('Email is not valid');
+      setNotification("Email is not valid");
       return null;
     }
 
     // Check phone
-    if (!formData.phone || formData.phone.trim() === '') {
-      setNotification('Phone field is empty');
+    if (!formData.phone || formData.phone.trim() === "") {
+      setNotification("Phone field is empty");
       return null;
     }
 
     // Validate the phone number
     const phoneRegex = /^[0-9]{10}$/; // Change the regex pattern as needed
     if (!phoneRegex.test(formData.phone)) {
-      setNotification('Phone number is not valid');
+      setNotification("Phone number is not valid");
       return null;
     }
 
     // Check year
-    if (!formData.year || formData.year.trim() === '') {
-      setNotification('Year field is empty');
+    if (!formData.year || formData.year.trim() === "") {
+      setNotification("Year field is empty");
       return null;
     }
 
     // Validate the year
     const year = parseInt(formData.year);
     if (isNaN(year) || year < 1900 || year > 2099) {
-      setNotification('Year is not valid');
+      setNotification("Year is not valid");
       return null;
     }
 
     // Check city
-    if (!formData.city || formData.city.trim() === '') {
-      setNotification('City field is empty');
+    if (!formData.city || formData.city.trim() === "") {
+      setNotification("City field is empty");
       return null;
     }
 
@@ -476,18 +476,18 @@ export default function Home() {
       formData.phone,
       formData.year,
       formData.city,
-      'https://register.ipmcareer.com',
+      "https://register.ipmcareer.com"
     );
-    const { error } = await supabase.from('ipm_leads').insert({
+    const { error } = await supabase.from("ipm_leads").insert({
       name: formData.fullname,
       email: formData.email,
       phone: formData.phone,
       city: formData.city,
       year: formData.year,
-      source: 'IPM Register Page',
+      source: "IPM Register Page",
     });
     if (!error) {
-      console.log('inserted');
+      console.log("inserted");
     } else if (error) {
       console.log(error);
     }
@@ -496,17 +496,17 @@ export default function Home() {
   async function TestApi() {
     const data = {
       client_id: 3158,
-      security_code: 'd1R9fF5mfiE=',
+      security_code: "d1R9fF5mfiE=",
       course_id: 35736,
       category_id: 835941,
-      action: 'coursedetail',
+      action: "coursedetail",
       full_name: formData.fullname,
       city: formData.city,
       mobile_number: formData.phone,
       email: formData.email,
     };
     await axios
-      .post('/api/tcy', data)
+      .post("/api/tcy", data)
       .then((res) => {
         handleAPI(formData.fullname, formData.email, res.data);
       })
@@ -518,20 +518,20 @@ export default function Home() {
   async function studentlogin(d) {
     await axios
       .post(
-        'https://www.tcyonline.com/api/erp_request.php',
+        "https://www.tcyonline.com/api/erp_request.php",
         qs.stringify({
           client_id: 3158,
-          security_code: 'd1R9fF5mfiE=',
+          security_code: "d1R9fF5mfiE=",
 
-          action: 'login',
+          action: "login",
           user_id: d,
         }),
         {
           headers: {
-            'Content-Type': 'application-x-www-form-urlencoded',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application-x-www-form-urlencoded",
+            "Access-Control-Allow-Origin": "*",
           },
-        },
+        }
       )
       .then((res) => {})
       .catch((res) => {
@@ -585,7 +585,7 @@ export default function Home() {
               <p>Our Executive will get back to you shortly.</p>
 
               <p>
-                For Quick Assitance you can call us on :{' '}
+                For Quick Assitance you can call us on :{" "}
                 <a href="tel:+919616383524">+91 96163 83524</a>
               </p>
               <a href="https://ipmcareer.com/courses" className={styles.submit}>
@@ -597,12 +597,12 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          ''
+          ""
         )}
         {notificationText && notificationText.length > 2 ? (
           <Notifications text={notificationText} />
         ) : (
-          ''
+          ""
         )}
         <Navbar scrolled={scrolled} />
         {loader ? (
@@ -626,7 +626,7 @@ export default function Home() {
             <p>Sending your wish to IIM Gods</p>
           </div>
         ) : (
-          ''
+          ""
         )}
         <div className={styles.hero}>
           <Swiper
@@ -644,8 +644,8 @@ export default function Home() {
               swiper.navigation.update();
             }}
             navigation={{
-              nextEl: '.next',
-              prevEl: '.prev',
+              nextEl: ".next",
+              prevEl: ".prev",
               clickable: true,
             }}
           >
@@ -696,21 +696,21 @@ export default function Home() {
                   className={styles.progress_inner}
                   style={{
                     width: formData
-                      ? (Object.keys(formData).length * 100) / 5 + '%'
-                      : '0%',
+                      ? (Object.keys(formData).length * 100) / 5 + "%"
+                      : "0%",
                   }}
                 >
                   <p>
-                    Form Progress :{' '}
+                    Form Progress :{" "}
                     {formData
-                      ? (Object.entries(formData).length * 100) / 5 + '%'
-                      : '0%'}
+                      ? (Object.entries(formData).length * 100) / 5 + "%"
+                      : "0%"}
                   </p>
                 </div>
                 {formData && (Object.keys(formData).length * 100) / 5 == 100 ? (
-                  <p style={{ right: '0', left: 'unset' }}>Done</p>
+                  <p style={{ right: "0", left: "unset" }}>Done</p>
                 ) : (
-                  ''
+                  ""
                 )}
               </div>
             </div>
@@ -722,52 +722,52 @@ export default function Home() {
                 Expert
               </h1>
               <input
-                name={'name'}
+                name={"name"}
                 className={styles.input}
-                placeholder={'Enter your Full Name'}
-                type={'text'}
+                placeholder={"Enter your Full Name"}
+                type={"text"}
                 value={formData && formData.fullname}
                 onChange={(e) => {
                   setFormData((res) => ({ ...res, fullname: e.target.value }));
                 }}
               />
               <input
-                name={'email'}
+                name={"email"}
                 className={
                   styles.input +
-                  ' ' +
-                  (validateEmail(formData ? formData.email : 'test@gm.co')
-                    ? ''
+                  " " +
+                  (validateEmail(formData ? formData.email : "test@gm.co")
+                    ? ""
                     : styles.fielderror)
                 }
-                placeholder={'Enter your Email Address'}
-                type={'text'}
+                placeholder={"Enter your Email Address"}
+                type={"text"}
                 value={formData && formData.email}
                 onChange={(e) => {
                   setFormData((res) => ({ ...res, email: e.target.value }));
                 }}
               />
               <input
-                name={'phone'}
+                name={"phone"}
                 className={
                   styles.input +
-                  ' ' +
-                  (validatePhone(formData ? formData.phone : '+918888888888')
-                    ? ''
+                  " " +
+                  (validatePhone(formData ? formData.phone : "+918888888888")
+                    ? ""
                     : styles.fielderror)
                 }
-                placeholder={'Enter your Phone Number'}
-                type={'text'}
+                placeholder={"Enter your Phone Number"}
+                type={"text"}
                 value={formData && formData.phone}
                 onChange={(e) => {
                   setFormData((res) => ({ ...res, phone: e.target.value }));
                 }}
               />
               <input
-                name={'city'}
+                name={"city"}
                 className={styles.input}
-                placeholder={'Enter your City'}
-                type={'text'}
+                placeholder={"Enter your City"}
+                type={"text"}
                 value={formData && formData.city}
                 onChange={(e) => {
                   setFormData((res) => ({ ...res, city: e.target.value }));
@@ -789,7 +789,7 @@ export default function Home() {
               formData.phone &&
               formData.email &&
               formData.year ? (
-                ''
+                ""
               ) : (
                 <p className={styles.error}>Please fill all the fields</p>
               )}
@@ -828,7 +828,7 @@ export default function Home() {
         </section>
 
         <Section
-          title={'Words by: Our Students'}
+          title={"Words by: Our Students"}
           color="var(--brand-col1)"
           align="left"
         >
@@ -867,7 +867,7 @@ export default function Home() {
         </Section>
 
         <Section
-          title={'Know : Your Mentors'}
+          title={"Know : Your Mentors"}
           color="var(--brand-col2)"
           align="right"
         >
@@ -879,12 +879,12 @@ export default function Home() {
                     <div
                       alt={i.role}
                       className={styles.bg}
-                      style={{ backgroundImage: 'url(' + i.bg + ')' }}
+                      style={{ backgroundImage: "url(" + i.bg + ")" }}
                     ></div>
                     <img alt={i.fullname} src={i.image} />
                     <h2>{i.fullname}</h2>
-                    {i.role ? <p className={styles.para}>{i.role}</p> : ''}
-                    {i.role2 ? <p className={styles.para}>{i.role2}</p> : ''}
+                    {i.role ? <p className={styles.para}>{i.role}</p> : ""}
+                    {i.role2 ? <p className={styles.para}>{i.role2}</p> : ""}
                   </div>
                 );
               })}
@@ -894,19 +894,19 @@ export default function Home() {
         {activePopup ? (
           <a
             href={
-              'https://wa.me/919616383524?text=Hi%20%2C%20Connected%20Here%20via%20Connect%20Button%20on%20Website'
+              "https://wa.me/919616383524?text=Hi%20%2C%20Connected%20Here%20via%20Connect%20Button%20on%20Website"
             }
             className={styles.popup}
           >
-            <img alt="IPM Careers WhatsApp" src={'/WhatsApp.svg'} />
+            <img alt="IPM Careers WhatsApp" src={"/WhatsApp.svg"} />
             Connect on WhatsApp
           </a>
         ) : (
-          ''
+          ""
         )}
 
         <Section
-          title={'Why choose: IPM Careers?'}
+          title={"Why choose: IPM Careers?"}
           color="var(--brand-col1)"
           align="left"
           visible="true"
@@ -915,14 +915,14 @@ export default function Home() {
             modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={10}
             slidesPerView={
-              mobile === 'mobile' ? 1.3 : mobile === 'tablet' ? 2.5 : 4.5
+              mobile === "mobile" ? 1.3 : mobile === "tablet" ? 2.5 : 4.5
             }
             loop={true}
             autoplay={true}
             loopFillGroupWithBlank={false}
             pagination={{ clickable: true }}
             centeredSlides={
-              mobile === 'desktop' || mobile === 'tablet' ? false : false
+              mobile === "desktop" || mobile === "tablet" ? false : false
             }
             onSlideChange={() => {}}
             onSwiper={(swiper) => console.log(swiper)}
@@ -930,8 +930,8 @@ export default function Home() {
               swiper.navigation.update();
             }}
             navigation={{
-              nextEl: '.next',
-              prevEl: '.prev',
+              nextEl: ".next",
+              prevEl: ".prev",
               clickable: true,
             }}
           >
@@ -953,7 +953,7 @@ export default function Home() {
           </Swiper>
         </Section>
         <Section
-          title={':Testimonials'}
+          title={":Testimonials"}
           color="var(--brand-col1)"
           align="left"
           visible="true"
@@ -982,7 +982,7 @@ export default function Home() {
           </div>
         </Section>
         <Section
-          title={'Our Promising:Results'}
+          title={"Our Promising:Results"}
           color="var(--brand-col2)"
           align="left"
           visible="true"
@@ -994,7 +994,7 @@ export default function Home() {
           />
         </Section>
         <Section
-          title={'Frequently:Asked Questions'}
+          title={"Frequently:Asked Questions"}
           color="var(--brand-col2)"
           align="left"
           visible="true"
@@ -1002,15 +1002,15 @@ export default function Home() {
           <FAQ items={faqs} />
         </Section>
         <Section
-          title={'Why you should join:a dedicated IPMAT Coaching?'}
+          title={"Why you should join:a dedicated IPMAT Coaching?"}
           color="var(--brand-col2)"
           align="left"
           visible="true"
         >
           <>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   That's a great decision if you're an IPMAT aspirant. Joining a
                   dedicated IPMAT coaching program can provide you with
                   structured preparation, expert guidance, and a competitive
@@ -1021,8 +1021,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Research Coaching Institutes:</strong> Look for
                   coaching institutes or online platforms that offer IPMAT
                   coaching. Some well-known coaching institutes in India offer
@@ -1032,8 +1032,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Check Reviews and Testimonials: </strong>Read reviews
                   and testimonials from previous students to get an idea of the
                   coaching institute's quality, teaching methods, and success
@@ -1042,8 +1042,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Attend Demo Classes:</strong> Many coaching institutes
                   offer demo classes to help you gauge their teaching style and
                   faculty. Attend these classes to see if you are comfortable
@@ -1052,8 +1052,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Assess the Faculty:</strong> It's important to have
                   experienced and qualified faculty who can guide you through
                   the IPMAT syllabus. Research the credentials of the faculty
@@ -1062,8 +1062,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Course Curriculum:</strong> Check the course structure
                   and curriculum. Ensure that it covers all the topics and
                   sections of the IPMAT exam.
@@ -1071,8 +1071,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Study Material:</strong> Ask about the study materials
                   provided by the coaching institute. Good study material is
                   crucial for your preparation.
@@ -1080,8 +1080,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Mock Tests:</strong> Frequent mock tests and practice
                   papers are essential for IPMAT preparation. Check if the
                   coaching institute offers a sufficient number of mock tests.
@@ -1089,8 +1089,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Personalized Attention:</strong> Smaller batch sizes
                   often mean more personalized attention. If you prefer
                   one-on-one interaction, consider a coaching center with
@@ -1099,8 +1099,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Location and Accessibility:</strong> Consider the
                   location of the coaching institute. It should be easily
                   accessible from your home or place of stay.
@@ -1108,8 +1108,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Fees and Scholarships:</strong> Understand the fee
                   structure and check if there are any scholarship options
                   available.
@@ -1117,8 +1117,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Online vs. Offline:</strong> Decide whether you want
                   to attend physical classes or prefer online coaching. Online
                   coaching can offer flexibility, but physical classes can
@@ -1127,16 +1127,16 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Time Management:</strong> Ensure that the coaching
                   class timings align with your daily schedule.
                 </span>
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Plan Your Study Schedule:</strong> Once you join the
                   coaching institute, make sure to create a study schedule that
                   combines both classroom learning and self-study. Consistency
@@ -1145,8 +1145,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Stay Committed:</strong> Stay dedicated and committed
                   to your preparation. Your success depends on your effort and
                   consistency.
@@ -1154,8 +1154,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   <strong>Stay Informed:</strong> Keep up with IPMAT updates and
                   any changes in the exam pattern. The IPMAT exam may evolve, so
                   make sure your coaching program adapts accordingly.
@@ -1163,8 +1163,8 @@ export default function Home() {
               </span>
             </p>
             <p>
-              <span style={{ fontSize: '11pt' }}>
-                <span style={{ color: '#000000' }}>
+              <span style={{ fontSize: "11pt" }}>
+                <span style={{ color: "#000000" }}>
                   Remember that coaching can be a valuable resource, but success
                   ultimately depends on your efforts and dedication. Make the
                   most of your coaching program and ensure that you also engage
