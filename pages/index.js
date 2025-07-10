@@ -226,6 +226,10 @@ export default function Home() {
       alt: "IPM Careers",
     },
     {
+      image: "/banners/slide6.jpg",
+      alt: "IPM Careers",
+    },
+    {
       image: "/banners/slide2.jpg",
       alt: "IPM Careers",
     },
@@ -234,16 +238,12 @@ export default function Home() {
       alt: "IPM Careers",
     },
     {
-      image: "/banners/slide5.jpg",
+      image: "/banners/slide0.jpg",
       alt: "IPM Careers",
     },
     {
       image: "/banners/slide4.jpg",
       alt: "IPM Careers",
-    },
-    {
-      image: result,
-      alt: "IPM Careers IIM Indore Results",
     },
   ];
   const faqs = [
