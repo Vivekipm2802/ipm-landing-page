@@ -222,6 +222,10 @@ export default function Home() {
 
   const slides = [
     {
+      image: "/banners/slide-1.png",
+      alt: "IPM Careers",
+    },
+    {
       image: "/banners/slide1.jpg",
       alt: "IPM Careers",
     },
