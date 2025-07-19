@@ -176,13 +176,6 @@ export default function Home() {
     },
     {
       image:
-        "https://www.ipmcareer.com/wp-content/uploads/2023/01/Screen-Shot-2021-01-10-at-3.24.16-PM-283x350-1-1.png",
-      fullname: "Taruna Khanna",
-      role: "GCC UCLA Extension",
-      bg: "https://www.ipmcareer.com/wp-content/uploads/2023/01/education-concept-student-studying-brainstorming-campus-concept-close-up-students-discussing-their-subject-books-textbooks-selective-focus-660x330-1.webp",
-    },
-    {
-      image:
         "https://www.ipmcareer.com/wp-content/uploads/2022/06/IMG_1848-350x350.jpg",
       fullname: "Dr. Swati A. Mishra",
       role: "Director Operations Lucknow Centre",
