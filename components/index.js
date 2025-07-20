@@ -68,13 +68,6 @@ export default function Home() {
     },
     {
       image:
-        "https://www.ipmcareer.com/files/2021/01/Screen-Shot-2021-01-10-at-3.24.16-PM-283x350.png",
-      fullname: "Taruna Khanna",
-      role: "GCC UCLA Extension",
-      bg: "https://www.startupnrise.com/wp-content/uploads/2021/02/education-concept-student-studying-brainstorming-campus-concept-close-up-students-discussing-their-subject-books-textbooks-selective-focus-660x330.jpg",
-    },
-    {
-      image:
         "https://www.ipmcareer.com/files/2022/01/WhatsApp-Image-2022-01-09-at-3.16.24-PM-350x350.jpeg",
       fullname: "Nishank Bani",
       role: "ISB Hyderabad",

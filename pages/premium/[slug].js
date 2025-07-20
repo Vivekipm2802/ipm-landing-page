@@ -1,589 +1,606 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import {useState,useEffect} from 'react'
-import {useRouter} from 'next/router'
-import styles from '.././Home.module.css'
-import styles2 from './Premium.module.css'
-import FAQ from '../../components/FAQ'
-import Footer from '../../components/Footer'
-import Navbar from '../../components/Navbar'
-import Notifications from '../../components/Notification'
-import YouTube from 'react-youtube';
-import axios from 'axios';
-import Section from '../../components/Section'
-import qs from 'qs';
-const inter = Inter({ subsets: ['latin'] })
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
-import 'swiper/css'
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import 'swiper/css/autoplay'
-import Switcher from '../../components/Switcher'
-import CustomSelect from '../../components/CustomSelect'
-import { years } from '../../utils/years'
-
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "@next/font/google";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import styles from ".././Home.module.css";
+import styles2 from "./Premium.module.css";
+import FAQ from "../../components/FAQ";
+import Footer from "../../components/Footer";
+import Navbar from "../../components/Navbar";
+import Notifications from "../../components/Notification";
+import YouTube from "react-youtube";
+import axios from "axios";
+import Section from "../../components/Section";
+import qs from "qs";
+const inter = Inter({ subsets: ["latin"] });
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import "swiper/css/autoplay";
+import Switcher from "../../components/Switcher";
+import CustomSelect from "../../components/CustomSelect";
+import { years } from "../../utils/years";
 
 const personal = {
-    title:'Personal Assistance',
-    description:"With this course, your child gets personal guidance by IIM Professionals who can focus only on your child's specific needs.",
-    points : ['Live Streaming','Whiteboard','Personalized Class Notes','Career Guidance & Mentorship']};
-const comparsion = "Individual Attention,Flexible Timing,1-1 Doubt Removal Sessions,Help with Assignment,Personalized Test & Exam,In-depth Test Analysis,Career Counseling Sessions,Top IIM Faculties";
+  title: "Personal Assistance",
+  description:
+    "With this course, your child gets personal guidance by IIM Professionals who can focus only on your child's specific needs.",
+  points: [
+    "Live Streaming",
+    "Whiteboard",
+    "Personalized Class Notes",
+    "Career Guidance & Mentorship",
+  ],
+};
+const comparsion =
+  "Individual Attention,Flexible Timing,1-1 Doubt Removal Sessions,Help with Assignment,Personalized Test & Exam,In-depth Test Analysis,Career Counseling Sessions,Top IIM Faculties";
 
 const ResponsiveIFrame = ({ src }) => {
-    return (
-      <div className={styles2.responsive_iframe_container}>
-        <iframe
-          src={src}
-          frameBorder={"0"}
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          autoplay
-        />
-      </div>
-    );
-  };
-  
-export default function Premium() {
-
-const [isSubmitted,setSubmitted] = useState(false)
-  const [scrolled,setScrolled] = useState();
-const [favicon,setFavicon] = useState('/favicon_ipm.svg');
-const [students,setStudents] = useState(5355)
-const [loader,setLoader] = useState(false);
-const [currentSub,setSub] = useState('Register Now')
-const [activePopup,setActivePopup] = useState(false);
-const [notificationText,setNotificationText] = useState();
-const [timeoutId, setTimeoutId] = useState(null);
-const [datahtml,setHtml] = useState();
-const [formData,setFormData] = useState();
-
-
-const testimonials =[{
-  icon:'https://ipmcareer.com/files/2023/01/resutls-1.png',
- heading:'Best IPMAT Results'
-
-},
-{
-  icon:'https://ipmcareer.com/files/2023/01/professsor-1.png',
- heading:'Best IITs - IIMs Faculties'
-
-}
-,
-{
-  icon:'https://ipmcareer.com/files/2023/01/study-material-1.png',
- heading:'Excellent Study Material'
-
-},
-{
-  icon:'https://ipmcareer.com/files/2023/01/ai-booked-1.png',
- heading:'AI based Test Series'
-
-},
-{
-  icon:'https://ipmcareer.com/files/2023/01/one-on-one-counselling-1.png',
- heading:'One-on-One Mentorship from IIMs Graduates'
-
-},
-{
-  icon:'https://ipmcareer.com/files/2023/01/doubt-1.png',
- heading:'One-on-One Doubt Clearing Sessions'
-
-}]
-
-const pages = [
-
-    {
-        title:'Platinum',
-        images:'/platinum-web.png:/platinum-web.png',
-        slug:'platinum',
-        badgetitle:'One-on-One Live Classes',
-        badgetwotitle:'Five One-on-One Sessions with Ashutosh Sir',
-        video:"https://www.youtube.com/embed/xtZ3ZAAnguI",
-        features:[{
-            title:'Live On to One Interactive Classes',
-            source:'http://cdn.onlinewebfonts.com/svg/img_520336.png'
-        },
-    {
-        title:'Flexible Timings',
-        source:'https://cdn-icons-png.flaticon.com/512/61/61227.png'
-    },
-    {
-        title:'Personalized Study Material',
-        source:'https://uxwing.com/wp-content/themes/uxwing/download/education-school/read-book-icon.png'
-    },
-    {
-title:'Top Faculties from IIM',
-source:'https://cdn-icons-png.flaticon.com/512/5351/5351063.png'
-
-    },
-    {
-
-        title:'5 One-on-One Sessions with Ashutosh Sir',
-        source:'https://cdn-icons-png.flaticon.com/512/3395/3395949.png',
-    },{
-        title:'Individual Attention',
-        source:'https://cdn-icons-png.flaticon.com/512/2344/2344579.png'
-    }
-    ]
-
-
-    },{
-
-        title:'High-Five',
-        images:'/high-five-web.png:/high-five-web.png',
-        slug:'high-five',
-        badgetitle:'Five on One Batch',
-        badgetwotitle:'Professional IIM Faculty',
-        video:"https://www.youtube.com/embed/YqGH5M7s60s",
-        features:[{
-            title:'Live Five on One Interactive Classes',
-            source:'http://cdn.onlinewebfonts.com/svg/img_520336.png'
-        },
-    {
-        title:'Flexible Timings',
-        source:'https://cdn-icons-png.flaticon.com/512/61/61227.png'
-    },
-    {
-        title:'Personalized Study Material',
-        source:'https://uxwing.com/wp-content/themes/uxwing/download/education-school/read-book-icon.png'
-    },
-    {
-title:'Top Faculties from IIM',
-source:'https://cdn-icons-png.flaticon.com/512/5351/5351063.png'
-
-    },
-    {
-
-        title:'5 One-on-One Sessions with Ashutosh Sir',
-        source:'https://cdn-icons-png.flaticon.com/512/3395/3395949.png',
-    },{
-        title:'Individual Attention',
-        source:'https://cdn-icons-png.flaticon.com/512/2344/2344579.png'
-    }
-    ]
-
-
-
-    }
-]
-const [pageData,setPageData] = useState();
-const router = useRouter();
-useEffect(()=>{
-
-    if(router.query.slug != undefined){
-        setPageData(pages.filter((i,d)=>{
-
-            if(router.query.slug == i.slug){
-                return i
-            }
-        })[0])
-
-
-    }
-},[router])
-useEffect(()=>{
-
-
-    pageData && pageData.images.split(':').map((i,d)=>{
-
-        setSlides(res=>([...res,{image:i,alt:pageData.title}]))
-    })
-
-},[pageData])
-const heading=['Register Now','Its Free','Limited Seats','Best Coaching']
-function cronberryTrigger(username, u_email, u_mobile, u_year, u_city, linke) {
-
-  
-
-  var id = Date.now();
-  var data = JSON.stringify({
-      "projectKey": "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
-      "audienceId": id,
-      "name": username,
-      "email": u_email,
-      "mobile": u_mobile,
-      "ios_fcm_token": "",
-      "web_fcm_token": "",
-      "android_fcm_token": "",
-      "profile_path": "",
-      "active": "",
-      "audience_id": "",
-      "paramList": [{
-              "paramKey": "source",
-              "paramValue": ""
-          },
-          {
-              "paramKey": "city",
-              "paramValue": u_city
-          },
-          {
-              "paramKey": "postcode",
-              "paramValue": ""
-          },
-          {
-              "paramKey": "total_amount",
-              "paramValue": ""
-          },
-          {
-              "paramKey": "abondon_cart",
-              "paramValue": true
-          },
-          {
-              "paramKey": "preparing_for_which_year",
-              "paramValue": ''
-          },
-          {
-              "paramKey": "subject",
-              "paramValue": ""
-          },
-          {
-              "paramKey": "formurl",
-              "paramValue": linke
-          },
-          {
-              "paramKey": "formname",
-              "paramValue": `${pageData.title} Batch Landing Page`
-          }
-      ]
-  });
-  var xhr = new XMLHttpRequest();
-  xhr.addEventListener("readystatechange", function() {
-
-      if (this.readyState === 4) {
-          
-          setLoader(false)
-          setNotification('Submitted Successfully')
-          setSubmitted(true)
-
-      }
-  });
-  xhr.open("POST", "https://register.cronberry.com/api/campaign/register-audience-data");
-  xhr.setRequestHeader("Content-Type", "application/json");
-
-
-  xhr.send(data);
-}
-
-const mentors=[
-  {
-
-    image:'https://www.ipmcareer.com/files/2023/01/Ashutosh-Sir-e1641723253112.webp',
-    fullname:'Ashutosh Mishra',
-    role:'Master IIM Ahmedabad',
-    role2:'Bachelors Thapar University',
-    bg:'https://www.ipmcareer.com/files/2023/01/IIMA-LKP_0-1.webp'
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2016/11/deepak-kushwaha-350x350.jpg',
-    fullname:'Deepak Kushwaha',
-    role:'Master IIM Lucknow',
-    role2:'Bachelors IIT Srinagar',
-    bg:'https://www.ipmcareer.com/files/2023/01/img-slider-4-1-1.webp'
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2023/01/Screen-Shot-2021-01-10-at-3.24.16-PM-283x350-1-1.png',
-    fullname:'Taruna Khanna',
-    role:'GCC UCLA Extension',
-    bg:'https://www.ipmcareer.com/files/2023/01/education-concept-student-studying-brainstorming-campus-concept-close-up-students-discussing-their-subject-books-textbooks-selective-focus-660x330-1.webp'
-    
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2022/06/IMG_1848-350x350.jpg',
-    fullname:'Dr. Swati A. Mishra',
-    role:'Director Operations Lucknow Centre',
-    role2:'Former Professor IIM Lucknow',
-    bg:'https://cdn.britannica.com/85/13085-050-C2E88389/Corpus-Christi-College-University-of-Cambridge-England.jpg'
-    
-  },
-  {
-
-    image:'https://ipmcareer.com/all-india-mock/files/manish.jpeg',
-    fullname:'Manish Dixit',
-    role:'IIT BHU Alumnus',
-    
-    bg:'https://www.ipmcareer.com/files/2023/01/iit_bhu_slider_03-1.webp'
-    
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2022/01/WhatsApp-Image-2022-01-09-at-4.49.41-PM-e1641850793724-350x350.jpeg',
-    fullname:'Rishabh Singh',
-    role:'IIFM Bhopal Alumnus',
-    bg:'https://www.careerindia.com/img/2013/10/24-indianinstituteofforestmanagement.jpg'
-    
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2022/12/WhatsApp-Image-2022-12-15-at-7.11.51-PM-e1671269681720.jpeg',
-    fullname:'Divyansh Mishra',
-    role:'IIM Raipur',
-    bg:'https://www.ipmcareer.com/files/2023/01/jpg-1.webp'
-    
-  },
-  {
-
-    image:'https://www.ipmcareer.com/files/2022/01/Rishita-e1672914918610-350x350.jpg',
-    fullname:'Rishita Gupta',
-    role:'Multiple IIMs Call Getter',
-    bg:'https://backend.insideiim.com/wp-content/uploads/2017/04/IIM_Collage.jpg'
-    
-  }
-]
-
-
-const [slides,setSlides] = useState([
-]);
-const faqs=[
-  {
-    question:"How will this IPMAT preparation help me?", 
-    answer:'Practicing IPMAT Mock Tests will help improve your time-management skills and build your confidence levels. So, it is advised to take up mock tests regularly and try to analyze your performance after completing each mock test.',   
-  },
-  {
-    question:"How many exams are covered under this preparation?", 
-    answer:'IPM BBA/BMS prep cover aptitude tests conducted by IIM Indore (IPMAT – Indore), IIM Rohtak (IPMAT – Rohtak), IIM Bodh Gaya and IIM Jammu (JIPMAT) for  their 5-year integrated programs. The test prep program also cover entrance tests conducted by DU (DU JAT), NMIMS (NPAT), Symbiosis (SET), Christ University (CUET), IP University (IPUCET) and St. Xavier’s College – Mumbai for their BMS program',   
-  },
-  {
-    question:"Can I avail one on one clearing doubt sessions?", 
-    answer:'Students should contact their IPM Careers center to book a one-on-one doubt clearing session with a mentor.',   
-  },
-  {
-    question:"How do I access live classes?", 
-    answer:'On successful completion of enrolment process, students receive a IPM Careers Zoom id & password to join IPM Careers live platform and to attend live, online classes.',   
-  },
-  {
-    question:"Is Fee Refundable?", 
-    answer:'Fee is neither Refundable nor transferable',   
-  },
-  {
-    question:"Is there any contact number to reach you?", 
-    answer:'For any queries contact @8299470392.',   
-  }
-
-
-]
-
-const reviews=[{
-  image:'https://www.ipmcareer.com/files/2022/08/WhatsApp-Image-2022-08-11-at-11.41.49-AM.jpeg',
-  fullname:'Jiya Kejriwal',
-  college:'IIM Indore   ',
-  title:'Expert Interview Panel',
-  review:' Faculty at IPM Career is extremely dedicated and hardworking. They make it a point for every student to be equally interactive in the classroom sessions. Mock interviews by experts from industry helped a lot.'
-},{
-
-  image:'https://www.ipmcareer.com/files/2022/08/WhatsApp-Image-2022-07-30-at-8.26.20-PM.jpeg',
-  fullname:'Juhi Mehra',
-  college:'IIM Indore',
-  title:'Supportive Faculty Team',
-  review:' My experience as an IPM aspirant was truly memorable, The faculty team was extremely supportive.They always made sure that all my doubts were cleared. It is for them that I have reached where I am now.'
-},
-{
-
-  image:'https://www.ipmcareer.com/files/2023/01/WhatsApp-Image-2023-01-06-at-1.54.33-PM-e1673093647344.jpeg',
-  fullname:'Akshita Maheshwari',
-  college:'IIM Indore',
-  title:'Game Changing Tips',
-  review:'I learned a lot of tips & tricks at IPM Careers which were really game changing and it boosted my perspective of learning along. Those little things are the key factors which help students like me achieve the goals.'
-}
-]
-
-function setNotification(de){
-  if(timeoutId){
-    clearTimeout(timeoutId)
-  }
-
-  setNotificationText(de);
-   const id = setTimeout(()=>{setNotificationText(),setTimeoutId(null),console.log('notcall')},2500);
-   setTimeoutId(id)
-}
-useEffect(()=>{
-var index = 0;
-
-const r = setInterval(()=>{
-  if(index < heading.length - 1){
-    index++;
-  setSub(heading[index])}else{
-    index = 0;
-    setSub(heading[0])
-  }
-},1000)
-
-setTimeout(()=>{
-  setActivePopup(true)
-},5000)
-setTimeout(()=>{
-setFavicon('/favicon_active.svg')
-
-
-
-},1000)
-
-return ()=>{
-  clearInterval(r);
-}
-},[])
-useEffect(() => {
-  const interval = setInterval(() => {
-    setStudents(students + 1);
-  }, 8000); // 60000 milliseconds = 1 minute
-  return () => clearInterval(interval);
-}, [students]);
-
-const opts ={
-  playerVars: {
-    // https://developers.google.com/youtube/player_parameters
-    autoplay: 1,
-    controls:0,
-    modestbranding:1,
-    rel:0,
-    loop:1,
-  },
-}
-async function handleAPI(a,b,c){
-console.log("api")
- await axios.post('/api/hello',{
-   fullname:a,
-   event:"Free Consulation",
-   user_id:c,
-   recipient:b,
- }).then(res=>{
-  setLoader(false)
- }).catch(res=>{
-  setLoader(false)
- })
-}
-
-const features = [<>Best & Promising<span className={styles.blue}>&nbsp;IPMAT Results</span></>,<>Mentoring by<span className={styles.blue}>&nbsp;IIM Alumni</span></>,<>Awarded #1<span className={styles.blue}> by ZEE News</span></>,<>Gained Media Exposure for<span className={styles.blue}> Excellent Academic Performance</span></>];
-const [mobile,setMobile] = useState("desktop");
-useEffect(()=>{
-  
-  function setWidth(){
-    
-    if(window.innerWidth < 768){
-      setMobile('mobile');
-    
-    }
-    else if(window.innerWidth < 968){
-      setMobile('tablet')
-    }
-    else{
-      setMobile('desktop');
-    }
-  }
-  window.addEventListener("resize",(e)=>{
-setWidth()
-  })
-
-  window.addEventListener('load',()=>{
-    setWidth();
-  })
-},[])
-
-
-useEffect(()=>{
-
-  window.addEventListener('scroll',()=>{
-  
-      if(window.scrollY > 1080){
-          setScrolled(true)
-      }else{
-          setScrolled(false)
-      }
-  })})
-
-
-async function triggerInterakt(){
-  axios.post('/api/interakt',{
-    userId: Date.now(),
-    phoneNumber: formData.phone,
-    countryCode: "+91",
-    event: "Campaign Notification",
-    name: formData.fullname,
-    email: formData.email,
-
-    tag: "Landing Page"
-  }).then(res=>{
-    console.log(res)
-  }).catch(res=>{
-    console.log(res)})
-}
-async function SubmitContact(){
-  console.log(formData && Object.values(formData).filter((i,d)=> i.length > 2).length)
-  if(formData && Object.values(formData).filter((i,d)=> i.length > 2).length > 3 && validateEmail(formData.email ? formData.email :'') && validatePhone(formData.phone ? formData.phone:'')){
-
-    setLoader(true)
-    
-    /* TestApi(); */
-    triggerInterakt();
-      /* await axios.post('/') */
-      cronberryTrigger(formData.fullname,formData.email,formData.phone,'0000',formData.city,'https://register.ipmcareer.com');
-  }
-  else if(!formData){
-    console.log('red')
-setNotification('Please fill all the fields')
-  }
-  else{
-    console.log(formData)
-setNotification('Please fill all the fields')
-  }
- 
-}
-
-async function TestApi(){
-const data = {
-  client_id:3158,
-  security_code:'d1R9fF5mfiE=',
- course_id:35736,
- category_id:835941,
-  action:'coursedetail',
-  full_name:formData.fullname,
-  city:formData.city,
-  mobile_number:formData.phone,
-  email:formData.email
-
+  return (
+    <div className={styles2.responsive_iframe_container}>
+      <iframe
+        src={src}
+        frameBorder={"0"}
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        autoplay
+      />
+    </div>
+  );
 };
-  await axios.post('/api/tcy',data
-    
-  ).then(res=>{
-    
-    handleAPI(formData.fullname,formData.email,res.data)
-  }).catch(res=>{
-    handleAPI(formData.fullname,formData.email,res.data)
-  })
-}
 
-async function studentlogin(d){
+export default function Premium() {
+  const [isSubmitted, setSubmitted] = useState(false);
+  const [scrolled, setScrolled] = useState();
+  const [favicon, setFavicon] = useState("/favicon_ipm.svg");
+  const [students, setStudents] = useState(5355);
+  const [loader, setLoader] = useState(false);
+  const [currentSub, setSub] = useState("Register Now");
+  const [activePopup, setActivePopup] = useState(false);
+  const [notificationText, setNotificationText] = useState();
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [datahtml, setHtml] = useState();
+  const [formData, setFormData] = useState();
 
-  await axios.post('https://www.tcyonline.com/api/erp_request.php',qs.stringify({
-    client_id: 3158,
-    security_code: 'd1R9fF5mfiE=',
-    
-    action: 'login',
-    user_id:d,
-  }
-  ),{
-    headers:{
-      'Content-Type':'application-x-www-form-urlencoded',
-      'Access-Control-Allow-Origin':'*'
+  const testimonials = [
+    {
+      icon: "https://ipmcareer.com/files/2023/01/resutls-1.png",
+      heading: "Best IPMAT Results",
+    },
+    {
+      icon: "https://ipmcareer.com/files/2023/01/professsor-1.png",
+      heading: "Best IITs - IIMs Faculties",
+    },
+    {
+      icon: "https://ipmcareer.com/files/2023/01/study-material-1.png",
+      heading: "Excellent Study Material",
+    },
+    {
+      icon: "https://ipmcareer.com/files/2023/01/ai-booked-1.png",
+      heading: "AI based Test Series",
+    },
+    {
+      icon: "https://ipmcareer.com/files/2023/01/one-on-one-counselling-1.png",
+      heading: "One-on-One Mentorship from IIMs Graduates",
+    },
+    {
+      icon: "https://ipmcareer.com/files/2023/01/doubt-1.png",
+      heading: "One-on-One Doubt Clearing Sessions",
+    },
+  ];
+
+  const pages = [
+    {
+      title: "Platinum",
+      images: "/platinum-web.png:/platinum-web.png",
+      slug: "platinum",
+      badgetitle: "One-on-One Live Classes",
+      badgetwotitle: "Five One-on-One Sessions with Ashutosh Sir",
+      video: "https://www.youtube.com/embed/xtZ3ZAAnguI",
+      features: [
+        {
+          title: "Live On to One Interactive Classes",
+          source: "http://cdn.onlinewebfonts.com/svg/img_520336.png",
+        },
+        {
+          title: "Flexible Timings",
+          source: "https://cdn-icons-png.flaticon.com/512/61/61227.png",
+        },
+        {
+          title: "Personalized Study Material",
+          source:
+            "https://uxwing.com/wp-content/themes/uxwing/download/education-school/read-book-icon.png",
+        },
+        {
+          title: "Top Faculties from IIM",
+          source: "https://cdn-icons-png.flaticon.com/512/5351/5351063.png",
+        },
+        {
+          title: "5 One-on-One Sessions with Ashutosh Sir",
+          source: "https://cdn-icons-png.flaticon.com/512/3395/3395949.png",
+        },
+        {
+          title: "Individual Attention",
+          source: "https://cdn-icons-png.flaticon.com/512/2344/2344579.png",
+        },
+      ],
+    },
+    {
+      title: "High-Five",
+      images: "/high-five-web.png:/high-five-web.png",
+      slug: "high-five",
+      badgetitle: "Five on One Batch",
+      badgetwotitle: "Professional IIM Faculty",
+      video: "https://www.youtube.com/embed/YqGH5M7s60s",
+      features: [
+        {
+          title: "Live Five on One Interactive Classes",
+          source: "http://cdn.onlinewebfonts.com/svg/img_520336.png",
+        },
+        {
+          title: "Flexible Timings",
+          source: "https://cdn-icons-png.flaticon.com/512/61/61227.png",
+        },
+        {
+          title: "Personalized Study Material",
+          source:
+            "https://uxwing.com/wp-content/themes/uxwing/download/education-school/read-book-icon.png",
+        },
+        {
+          title: "Top Faculties from IIM",
+          source: "https://cdn-icons-png.flaticon.com/512/5351/5351063.png",
+        },
+        {
+          title: "5 One-on-One Sessions with Ashutosh Sir",
+          source: "https://cdn-icons-png.flaticon.com/512/3395/3395949.png",
+        },
+        {
+          title: "Individual Attention",
+          source: "https://cdn-icons-png.flaticon.com/512/2344/2344579.png",
+        },
+      ],
+    },
+  ];
+  const [pageData, setPageData] = useState();
+  const router = useRouter();
+  useEffect(() => {
+    if (router.query.slug != undefined) {
+      setPageData(
+        pages.filter((i, d) => {
+          if (router.query.slug == i.slug) {
+            return i;
+          }
+        })[0]
+      );
     }
-  }).then(res=>{
-    
-  }).catch(res=>{
-    console.log(res)
-  })
-}
-function validatePhone(phone) {
-  const re =  /^(\+\d{1,4})?(?!0+\s+,?$)\d{10}\s*,?$/;
-  return re.test(phone);
-}
-function validateEmail(email) {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-}
+  }, [router]);
+  useEffect(() => {
+    pageData &&
+      pageData.images.split(":").map((i, d) => {
+        setSlides((res) => [...res, { image: i, alt: pageData.title }]);
+      });
+  }, [pageData]);
+  const heading = [
+    "Register Now",
+    "Its Free",
+    "Limited Seats",
+    "Best Coaching",
+  ];
+  function cronberryTrigger(
+    username,
+    u_email,
+    u_mobile,
+    u_year,
+    u_city,
+    linke
+  ) {
+    var id = Date.now();
+    var data = JSON.stringify({
+      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
+      audienceId: id,
+      name: username,
+      email: u_email,
+      mobile: u_mobile,
+      ios_fcm_token: "",
+      web_fcm_token: "",
+      android_fcm_token: "",
+      profile_path: "",
+      active: "",
+      audience_id: "",
+      paramList: [
+        {
+          paramKey: "source",
+          paramValue: "",
+        },
+        {
+          paramKey: "city",
+          paramValue: u_city,
+        },
+        {
+          paramKey: "postcode",
+          paramValue: "",
+        },
+        {
+          paramKey: "total_amount",
+          paramValue: "",
+        },
+        {
+          paramKey: "abondon_cart",
+          paramValue: true,
+        },
+        {
+          paramKey: "preparing_for_which_year",
+          paramValue: "",
+        },
+        {
+          paramKey: "subject",
+          paramValue: "",
+        },
+        {
+          paramKey: "formurl",
+          paramValue: linke,
+        },
+        {
+          paramKey: "formname",
+          paramValue: `${pageData.title} Batch Landing Page`,
+        },
+      ],
+    });
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("readystatechange", function () {
+      if (this.readyState === 4) {
+        setLoader(false);
+        setNotification("Submitted Successfully");
+        setSubmitted(true);
+      }
+    });
+    xhr.open(
+      "POST",
+      "https://register.cronberry.com/api/campaign/register-audience-data"
+    );
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.send(data);
+  }
+
+  const mentors = [
+    {
+      image:
+        "https://www.ipmcareer.com/files/2023/01/Ashutosh-Sir-e1641723253112.webp",
+      fullname: "Ashutosh Mishra",
+      role: "Master IIM Ahmedabad",
+      role2: "Bachelors Thapar University",
+      bg: "https://www.ipmcareer.com/files/2023/01/IIMA-LKP_0-1.webp",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2016/11/deepak-kushwaha-350x350.jpg",
+      fullname: "Deepak Kushwaha",
+      role: "Master IIM Lucknow",
+      role2: "Bachelors IIT Srinagar",
+      bg: "https://www.ipmcareer.com/files/2023/01/img-slider-4-1-1.webp",
+    },
+    {
+      image: "https://www.ipmcareer.com/files/2022/06/IMG_1848-350x350.jpg",
+      fullname: "Dr. Swati A. Mishra",
+      role: "Director Operations Lucknow Centre",
+      role2: "Former Professor IIM Lucknow",
+      bg: "https://cdn.britannica.com/85/13085-050-C2E88389/Corpus-Christi-College-University-of-Cambridge-England.jpg",
+    },
+    {
+      image: "https://ipmcareer.com/all-india-mock/files/manish.jpeg",
+      fullname: "Manish Dixit",
+      role: "IIT BHU Alumnus",
+
+      bg: "https://www.ipmcareer.com/files/2023/01/iit_bhu_slider_03-1.webp",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2022/01/WhatsApp-Image-2022-01-09-at-4.49.41-PM-e1641850793724-350x350.jpeg",
+      fullname: "Rishabh Singh",
+      role: "IIFM Bhopal Alumnus",
+      bg: "https://www.careerindia.com/img/2013/10/24-indianinstituteofforestmanagement.jpg",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2022/12/WhatsApp-Image-2022-12-15-at-7.11.51-PM-e1671269681720.jpeg",
+      fullname: "Divyansh Mishra",
+      role: "IIM Raipur",
+      bg: "https://www.ipmcareer.com/files/2023/01/jpg-1.webp",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2022/01/Rishita-e1672914918610-350x350.jpg",
+      fullname: "Rishita Gupta",
+      role: "Multiple IIMs Call Getter",
+      bg: "https://backend.insideiim.com/wp-content/uploads/2017/04/IIM_Collage.jpg",
+    },
+  ];
+
+  const [slides, setSlides] = useState([]);
+  const faqs = [
+    {
+      question: "How will this IPMAT preparation help me?",
+      answer:
+        "Practicing IPMAT Mock Tests will help improve your time-management skills and build your confidence levels. So, it is advised to take up mock tests regularly and try to analyze your performance after completing each mock test.",
+    },
+    {
+      question: "How many exams are covered under this preparation?",
+      answer:
+        "IPM BBA/BMS prep cover aptitude tests conducted by IIM Indore (IPMAT – Indore), IIM Rohtak (IPMAT – Rohtak), IIM Bodh Gaya and IIM Jammu (JIPMAT) for  their 5-year integrated programs. The test prep program also cover entrance tests conducted by DU (DU JAT), NMIMS (NPAT), Symbiosis (SET), Christ University (CUET), IP University (IPUCET) and St. Xavier’s College – Mumbai for their BMS program",
+    },
+    {
+      question: "Can I avail one on one clearing doubt sessions?",
+      answer:
+        "Students should contact their IPM Careers center to book a one-on-one doubt clearing session with a mentor.",
+    },
+    {
+      question: "How do I access live classes?",
+      answer:
+        "On successful completion of enrolment process, students receive a IPM Careers Zoom id & password to join IPM Careers live platform and to attend live, online classes.",
+    },
+    {
+      question: "Is Fee Refundable?",
+      answer: "Fee is neither Refundable nor transferable",
+    },
+    {
+      question: "Is there any contact number to reach you?",
+      answer: "For any queries contact @8299470392.",
+    },
+  ];
+
+  const reviews = [
+    {
+      image:
+        "https://www.ipmcareer.com/files/2022/08/WhatsApp-Image-2022-08-11-at-11.41.49-AM.jpeg",
+      fullname: "Jiya Kejriwal",
+      college: "IIM Indore   ",
+      title: "Expert Interview Panel",
+      review:
+        " Faculty at IPM Career is extremely dedicated and hardworking. They make it a point for every student to be equally interactive in the classroom sessions. Mock interviews by experts from industry helped a lot.",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2022/08/WhatsApp-Image-2022-07-30-at-8.26.20-PM.jpeg",
+      fullname: "Juhi Mehra",
+      college: "IIM Indore",
+      title: "Supportive Faculty Team",
+      review:
+        " My experience as an IPM aspirant was truly memorable, The faculty team was extremely supportive.They always made sure that all my doubts were cleared. It is for them that I have reached where I am now.",
+    },
+    {
+      image:
+        "https://www.ipmcareer.com/files/2023/01/WhatsApp-Image-2023-01-06-at-1.54.33-PM-e1673093647344.jpeg",
+      fullname: "Akshita Maheshwari",
+      college: "IIM Indore",
+      title: "Game Changing Tips",
+      review:
+        "I learned a lot of tips & tricks at IPM Careers which were really game changing and it boosted my perspective of learning along. Those little things are the key factors which help students like me achieve the goals.",
+    },
+  ];
+
+  function setNotification(de) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    setNotificationText(de);
+    const id = setTimeout(() => {
+      setNotificationText(), setTimeoutId(null), console.log("notcall");
+    }, 2500);
+    setTimeoutId(id);
+  }
+  useEffect(() => {
+    var index = 0;
+
+    const r = setInterval(() => {
+      if (index < heading.length - 1) {
+        index++;
+        setSub(heading[index]);
+      } else {
+        index = 0;
+        setSub(heading[0]);
+      }
+    }, 1000);
+
+    setTimeout(() => {
+      setActivePopup(true);
+    }, 5000);
+    setTimeout(() => {
+      setFavicon("/favicon_active.svg");
+    }, 1000);
+
+    return () => {
+      clearInterval(r);
+    };
+  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStudents(students + 1);
+    }, 8000); // 60000 milliseconds = 1 minute
+    return () => clearInterval(interval);
+  }, [students]);
+
+  const opts = {
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+      controls: 0,
+      modestbranding: 1,
+      rel: 0,
+      loop: 1,
+    },
+  };
+  async function handleAPI(a, b, c) {
+    console.log("api");
+    await axios
+      .post("/api/hello", {
+        fullname: a,
+        event: "Free Consulation",
+        user_id: c,
+        recipient: b,
+      })
+      .then((res) => {
+        setLoader(false);
+      })
+      .catch((res) => {
+        setLoader(false);
+      });
+  }
+
+  const features = [
+    <>
+      Best & Promising<span className={styles.blue}>&nbsp;IPMAT Results</span>
+    </>,
+    <>
+      Mentoring by<span className={styles.blue}>&nbsp;IIM Alumni</span>
+    </>,
+    <>
+      Awarded #1<span className={styles.blue}> by ZEE News</span>
+    </>,
+    <>
+      Gained Media Exposure for
+      <span className={styles.blue}> Excellent Academic Performance</span>
+    </>,
+  ];
+  const [mobile, setMobile] = useState("desktop");
+  useEffect(() => {
+    function setWidth() {
+      if (window.innerWidth < 768) {
+        setMobile("mobile");
+      } else if (window.innerWidth < 968) {
+        setMobile("tablet");
+      } else {
+        setMobile("desktop");
+      }
+    }
+    window.addEventListener("resize", (e) => {
+      setWidth();
+    });
+
+    window.addEventListener("load", () => {
+      setWidth();
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 1080) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    });
+  });
+
+  async function triggerInterakt() {
+    axios
+      .post("/api/interakt", {
+        userId: Date.now(),
+        phoneNumber: formData.phone,
+        countryCode: "+91",
+        event: "Campaign Notification",
+        name: formData.fullname,
+        email: formData.email,
+
+        tag: "Landing Page",
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((res) => {
+        console.log(res);
+      });
+  }
+  async function SubmitContact() {
+    console.log(
+      formData && Object.values(formData).filter((i, d) => i.length > 2).length
+    );
+    if (
+      formData &&
+      Object.values(formData).filter((i, d) => i.length > 2).length > 3 &&
+      validateEmail(formData.email ? formData.email : "") &&
+      validatePhone(formData.phone ? formData.phone : "")
+    ) {
+      setLoader(true);
+
+      /* TestApi(); */
+      triggerInterakt();
+      /* await axios.post('/') */
+      cronberryTrigger(
+        formData.fullname,
+        formData.email,
+        formData.phone,
+        "0000",
+        formData.city,
+        "https://register.ipmcareer.com"
+      );
+    } else if (!formData) {
+      console.log("red");
+      setNotification("Please fill all the fields");
+    } else {
+      console.log(formData);
+      setNotification("Please fill all the fields");
+    }
+  }
+
+  async function TestApi() {
+    const data = {
+      client_id: 3158,
+      security_code: "d1R9fF5mfiE=",
+      course_id: 35736,
+      category_id: 835941,
+      action: "coursedetail",
+      full_name: formData.fullname,
+      city: formData.city,
+      mobile_number: formData.phone,
+      email: formData.email,
+    };
+    await axios
+      .post("/api/tcy", data)
+      .then((res) => {
+        handleAPI(formData.fullname, formData.email, res.data);
+      })
+      .catch((res) => {
+        handleAPI(formData.fullname, formData.email, res.data);
+      });
+  }
+
+  async function studentlogin(d) {
+    await axios
+      .post(
+        "https://www.tcyonline.com/api/erp_request.php",
+        qs.stringify({
+          client_id: 3158,
+          security_code: "d1R9fF5mfiE=",
+
+          action: "login",
+          user_id: d,
+        }),
+        {
+          headers: {
+            "Content-Type": "application-x-www-form-urlencoded",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
+      .then((res) => {})
+      .catch((res) => {
+        console.log(res);
+      });
+  }
+  function validatePhone(phone) {
+    const re = /^(\+\d{1,4})?(?!0+\s+,?$)\d{10}\s*,?$/;
+    return re.test(phone);
+  }
+  function validateEmail(email) {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
   return (
     <>
       <Head>
@@ -592,112 +609,220 @@ function validateEmail(email) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href={favicon} />
       </Head>
-      {pageData? 
-      <main className={styles.main}>
-        <div className={styles.hd}><img src='/ipm_logo.svg'/></div>
-        {isSubmitted? <div className={styles.modal} >
-          <div className={styles.modalinner}>
-          <h2>Thank You !!</h2>
-          <h3>Choosing Us today is the best decision you could have made yet.</h3>
-          <p>We've received your details</p>
-          <p>Our Executive will get back to you shortly.
-          </p>
+      {pageData ? (
+        <main className={styles.main}>
+          <div className={styles.hd}>
+            <img src="/ipm_logo.svg" />
+          </div>
+          {isSubmitted ? (
+            <div className={styles.modal}>
+              <div className={styles.modalinner}>
+                <h2>Thank You !!</h2>
+                <h3>
+                  Choosing Us today is the best decision you could have made
+                  yet.
+                </h3>
+                <p>We've received your details</p>
+                <p>Our Executive will get back to you shortly.</p>
 
-          <p>For Quick Assitance you can call us on : <a href="tel:+919616383524">+91 96163 83524</a></p>
-          <a href="https://ipmcareer.com/courses" className={styles.submit}>Explore Our Courses</a><a className={styles.submit} href="https://ipmcareer.com">Visit Our Website</a>
-          </div></div>:''}
-      {notificationText && notificationText.length > 2 ? <Notifications text={notificationText} /> : ''}
-        <Navbar scrolled={scrolled}/>
-{loader? <div className={styles.loader}>
+                <p>
+                  For Quick Assitance you can call us on :{" "}
+                  <a href="tel:+919616383524">+91 96163 83524</a>
+                </p>
+                <a
+                  href="https://ipmcareer.com/courses"
+                  className={styles.submit}
+                >
+                  Explore Our Courses
+                </a>
+                <a className={styles.submit} href="https://ipmcareer.com">
+                  Visit Our Website
+                </a>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+          {notificationText && notificationText.length > 2 ? (
+            <Notifications text={notificationText} />
+          ) : (
+            ""
+          )}
+          <Navbar scrolled={scrolled} />
+          {loader ? (
+            <div className={styles.loader}>
+              <svg
+                width="197px"
+                height="197px"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid"
+              >
+                <circle
+                  cx="50"
+                  cy="50"
+                  fill="none"
+                  stroke="var(--brand-col2)"
+                  stroke-width="3"
+                  r="27"
+                  stroke-dasharray="127.23450247038662 44.411500823462205"
+                ></circle>
+              </svg>
+              <p>Sending your wish to IIM Gods</p>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className={styles.hero}>
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={10}
+              slidesPerView={1}
+              loop={true}
+              autoplay={true}
+              speed={1200}
+              pagination={{ clickable: true }}
+              centeredSlides={true}
+              onSlideChange={() => {}}
+              onSwiper={(swiper) => console.log(swiper)}
+              onInit={(swiper) => {
+                swiper.navigation.update();
+              }}
+              navigation={{
+                nextEl: ".next",
+                prevEl: ".prev",
+                clickable: true,
+              }}
+            >
+              {slides &&
+                slides.map((item, index) => {
+                  return (
+                    <>
+                      <SwiperSlide key={index}>
+                        <img
+                          onClick={() => {
+                            router.push("#form");
+                          }}
+                          alt={item.alt}
+                          className={styles.slideimage + " " + styles2.book}
+                          src={item.image}
+                        />
+                      </SwiperSlide>
+                    </>
+                  );
+                })}
+            </Swiper>
+          </div>
 
-<svg width="197px" height="197px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-<circle cx="50" cy="50" fill="none" stroke="var(--brand-col2)" stroke-width="3" r="27" stroke-dasharray="127.23450247038662 44.411500823462205">
-  
-</circle>
-</svg>
-<p>Sending your wish to IIM Gods</p>
-</div> :''}
-        <div className={styles.hero}>
-        <Swiper
-     modules={[Navigation, Pagination, Autoplay]}
-      spaceBetween={10}
-      slidesPerView={1}
-      loop={true}
-      autoplay={true}
-      speed={1200}
-      pagination={{ clickable: true }}
-      centeredSlides={true}
-      onSlideChange={() =>{}}
-      onSwiper={(swiper) => console.log(swiper)}
-      onInit={(swiper) => {
-       
-        swiper.navigation.update();
-      }}
-      navigation={{
-        nextEl: '.next',
-        prevEl: '.prev',
-        clickable:true,
-      }}
-   
-    >
-
-
-     
-      
-      {slides && slides.map((item,index)=>{
-
-return(<>
-
-<SwiperSlide key={index}><img onClick={()=>{router.push('#form')}} alt={item.alt} className={styles.slideimage + " " + styles2.book } src={item.image}/></SwiperSlide>
-
-</>)
-})} 
-
-
-    </Swiper>
-
-
-        </div>
-
-        
-
-          <section className={styles.maincont + " " + styles2.extra} id="form" >
-
+          <section className={styles.maincont + " " + styles2.extra} id="form">
             <div className={styles.grad1}></div>
             <div className={styles.grad2}></div>
-<div className={styles.c1}>
-<h2>Book a FREE Demo for Premium Batch {pageData.title} by IPM Careers</h2>
-{/* <p>You can now learn at India's Best IPMAT Coaching in Indore. Hurry Up, Register Now !!</p> */}
-{pageData.badgetitle? <div className={styles.trust}>{pageData.badgetitle}</div>:''}
-{pageData.badgetwotitle ?<div className={styles.trust}>{pageData.badgetwotitle}</div>:''}
-{/* <Switcher features={features}/> */}
-{/* <div className={styles.hold}>
+            <div className={styles.c1}>
+              <h2>
+                Book a FREE Demo for Premium Batch {pageData.title} by IPM
+                Careers
+              </h2>
+              {/* <p>You can now learn at India's Best IPMAT Coaching in Indore. Hurry Up, Register Now !!</p> */}
+              {pageData.badgetitle ? (
+                <div className={styles.trust}>{pageData.badgetitle}</div>
+              ) : (
+                ""
+              )}
+              {pageData.badgetwotitle ? (
+                <div className={styles.trust}>{pageData.badgetwotitle}</div>
+              ) : (
+                ""
+              )}
+              {/* <Switcher features={features}/> */}
+              {/* <div className={styles.hold}>
   <p>Students Enrolled <br/><span className={styles.numbers}>{students}</span></p>
   <p>Classes Completed<br/><span className={styles.numbers}>{students*2}</span></p>
   <p>Hours Taught<br/><span className={styles.numbers}>{students*33}</span></p>
 </div> */}
-{/* <div>
+              {/* <div>
   <div className={styles.progress}>
     <div className={styles.progress_inner} style={{width:formData ? Object.keys(formData).length*100/5 +"%" : '0%'}}><p>Form Progress : {formData ? Object.entries(formData).length*100/5 +"%" : '0%'}</p></div>
  {formData && Object.keys(formData).length*100/5 == 100 ?  <p style={{right:'0',left:'unset'}}>Done</p>:''}
   </div>
 </div> */}
 
-<ResponsiveIFrame src={pageData.video}></ResponsiveIFrame>
-
-</div>
-<div className={styles.c2}>
-  <div className={styles.formcont}>
-<h1 className={styles.team_heading}>Fill out the form to Book a FREE Demo for {pageData.title} Batch!!</h1>
-<input name={"name"} className={styles.input} placeholder={"Enter your Full Name"} type={"text"} value={formData && formData.fullname} onChange={(e)=>{setFormData(res=>({...res,fullname:e.target.value})) }}/>
-<input name={"email"} className={styles.input + " " + (validateEmail(formData ? formData.email : 'test@gm.co') ? '' : styles.fielderror)} placeholder={"Enter your Email Address"} type={"text"} value={formData && formData.email} onChange={(e)=>{setFormData(res=>({...res,email:e.target.value})) }}/>
-<input name={"phone"} className={styles.input + " " + (validatePhone(formData ? formData.phone : '+918888888888') ? '' : styles.fielderror)} placeholder={"Enter your Phone Number"} type={"text"} value={formData && formData.phone} onChange={(e)=>{setFormData(res=>({...res,phone:e.target.value})) }}/>
-<input name={"city"} className={styles.input} placeholder={"Enter your City"} type={"text"} value={formData && formData.city} onChange={(e)=>{setFormData(res=>({...res,city:e.target.value})) }}/>
-{/* <CustomSelect z={9} full="true" defaultText="When are you planning to take IPM?" noPadding={true} objects={years} setSelect={(r)=>{setFormData(res=>({...res,year:r}))}}/> */}
-{formData && formData.city && formData.fullname && formData.phone && formData.email ? '':<p className={styles.error}>Please fill all the fields</p>}
-{/* <div onClick={TestApi} className={styles.submit}>TEST</div> */}
-<div onClick={SubmitContact} className={styles.submit}>SUBMIT</div>
-{/* <div className={styles.encrypt}>
+              <ResponsiveIFrame src={pageData.video}></ResponsiveIFrame>
+            </div>
+            <div className={styles.c2}>
+              <div className={styles.formcont}>
+                <h1 className={styles.team_heading}>
+                  Fill out the form to Book a FREE Demo for {pageData.title}{" "}
+                  Batch!!
+                </h1>
+                <input
+                  name={"name"}
+                  className={styles.input}
+                  placeholder={"Enter your Full Name"}
+                  type={"text"}
+                  value={formData && formData.fullname}
+                  onChange={(e) => {
+                    setFormData((res) => ({
+                      ...res,
+                      fullname: e.target.value,
+                    }));
+                  }}
+                />
+                <input
+                  name={"email"}
+                  className={
+                    styles.input +
+                    " " +
+                    (validateEmail(formData ? formData.email : "test@gm.co")
+                      ? ""
+                      : styles.fielderror)
+                  }
+                  placeholder={"Enter your Email Address"}
+                  type={"text"}
+                  value={formData && formData.email}
+                  onChange={(e) => {
+                    setFormData((res) => ({ ...res, email: e.target.value }));
+                  }}
+                />
+                <input
+                  name={"phone"}
+                  className={
+                    styles.input +
+                    " " +
+                    (validatePhone(formData ? formData.phone : "+918888888888")
+                      ? ""
+                      : styles.fielderror)
+                  }
+                  placeholder={"Enter your Phone Number"}
+                  type={"text"}
+                  value={formData && formData.phone}
+                  onChange={(e) => {
+                    setFormData((res) => ({ ...res, phone: e.target.value }));
+                  }}
+                />
+                <input
+                  name={"city"}
+                  className={styles.input}
+                  placeholder={"Enter your City"}
+                  type={"text"}
+                  value={formData && formData.city}
+                  onChange={(e) => {
+                    setFormData((res) => ({ ...res, city: e.target.value }));
+                  }}
+                />
+                {/* <CustomSelect z={9} full="true" defaultText="When are you planning to take IPM?" noPadding={true} objects={years} setSelect={(r)=>{setFormData(res=>({...res,year:r}))}}/> */}
+                {formData &&
+                formData.city &&
+                formData.fullname &&
+                formData.phone &&
+                formData.email ? (
+                  ""
+                ) : (
+                  <p className={styles.error}>Please fill all the fields</p>
+                )}
+                {/* <div onClick={TestApi} className={styles.submit}>TEST</div> */}
+                <div onClick={SubmitContact} className={styles.submit}>
+                  SUBMIT
+                </div>
+                {/* <div className={styles.encrypt}>
 <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -723,165 +848,226 @@ return(<>
   </svg>
 <p>Your Data is End-to-End Encrypted!</p>
 </div> */}
-</div>
-</div>
-          </section>
-       <section className={styles2.features}>
-        
-        
-        <div>
-        <h2>About this Batch</h2>
-        <div className={styles2.wr}>
-        {pageData && pageData.features && pageData.features.map((i,d)=>{
-            return <div className={styles2.featureblock}><div className={styles2.source}><img src={i.source}/></div><p>{i.title}</p></div>
-        })}
-</div>
-        </div></section>
-<section className={styles2.personalmain}>
-    <img src='https://www.freepnglogos.com/uploads/student-png/student-png-international-pioneers-school-11.png' className={styles2.leftimage}/>
-<div className={styles2.personal}>
-<h2>{personal.title}</h2>
-<p>{personal.description}</p>
-<ul>
-{personal && personal.points.map((i,d)=>{
-    return <li><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/2048px-Eo_circle_green_checkmark.svg.png'/>{i}</li>
-})}</ul>
-
-</div>
-
-</section>
-<section className={styles2.comparison}>
-<h2>Main Features</h2>
-    <div className={styles2.under}>
-    <div className={styles2.list + " " + styles2.headtable}>
-                <p>Features</p>
-                <p>
-                    One to Many Courses
-                </p>
-                <p>
-                    One to One Class Premium Course
-                </p>
+              </div>
             </div>
-        {comparsion && comparsion.split(',').map((i,d)=>{
-return <>
-            <div className={styles2.list}>
-                <p>{i}</p>
-                <div className={styles2.cross}><img src={'https://cdn3d.iconscout.com/3d/premium/thumb/cross-5781473-4862957.png'} /></div>
-                <div className={styles2.check}><img src={'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/2048px-Eo_circle_green_checkmark.svg.png'} /></div>
-            </div></>
-        })}
-    </div>
-</section>
+          </section>
+          <section className={styles2.features}>
+            <div>
+              <h2>About this Batch</h2>
+              <div className={styles2.wr}>
+                {pageData &&
+                  pageData.features &&
+                  pageData.features.map((i, d) => {
+                    return (
+                      <div className={styles2.featureblock}>
+                        <div className={styles2.source}>
+                          <img src={i.source} />
+                        </div>
+                        <p>{i.title}</p>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </section>
+          <section className={styles2.personalmain}>
+            <img
+              src="https://www.freepnglogos.com/uploads/student-png/student-png-international-pioneers-school-11.png"
+              className={styles2.leftimage}
+            />
+            <div className={styles2.personal}>
+              <h2>{personal.title}</h2>
+              <p>{personal.description}</p>
+              <ul>
+                {personal &&
+                  personal.points.map((i, d) => {
+                    return (
+                      <li>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/2048px-Eo_circle_green_checkmark.svg.png" />
+                        {i}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </section>
+          <section className={styles2.comparison}>
+            <h2>Main Features</h2>
+            <div className={styles2.under}>
+              <div className={styles2.list + " " + styles2.headtable}>
+                <p>Features</p>
+                <p>One to Many Courses</p>
+                <p>One to One Class Premium Course</p>
+              </div>
+              {comparsion &&
+                comparsion.split(",").map((i, d) => {
+                  return (
+                    <>
+                      <div className={styles2.list}>
+                        <p>{i}</p>
+                        <div className={styles2.cross}>
+                          <img
+                            src={
+                              "https://cdn3d.iconscout.com/3d/premium/thumb/cross-5781473-4862957.png"
+                            }
+                          />
+                        </div>
+                        <div className={styles2.check}>
+                          <img
+                            src={
+                              "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/2048px-Eo_circle_green_checkmark.svg.png"
+                            }
+                          />
+                        </div>
+                      </div>
+                    </>
+                  );
+                })}
+            </div>
+          </section>
 
-       {/*    <img className={styles.rtop} src="/topers.png"/> */}
-        <Section title={"Know : Your Mentors"} color="var(--brand-col2)" align="right">
-        <div className={styles.parent2}>
+          {/*    <img className={styles.rtop} src="/topers.png"/> */}
+          <Section
+            title={"Know : Your Mentors"}
+            color="var(--brand-col2)"
+            align="right"
+          >
+            <div className={styles.parent2}>
+              {mentors &&
+                mentors.map((i, d) => {
+                  return (
+                    <div className={styles.card}>
+                      <div
+                        alt={i.role}
+                        className={styles.bg}
+                        style={{ backgroundImage: "url(" + i.bg + ")" }}
+                      ></div>
+                      <img alt={i.fullname} src={i.image} />
+                      <h2>{i.fullname}</h2>
+                      {i.role ? <p className={styles.para}>{i.role}</p> : ""}
+                      {i.role2 ? <p className={styles.para}>{i.role2}</p> : ""}
+                    </div>
+                  );
+                })}
+            </div>
+          </Section>
 
-        {mentors && mentors.map((i,d)=>{
-return <div className={styles.card}>
-  <div alt={i.role} className={styles.bg} style={{backgroundImage:"url("+i.bg+")"}}></div>
-  <img alt={i.fullname} src={i.image}/>
-  <h2>{i.fullname}</h2>
-  {i.role ? <p className={styles.para}>{i.role}</p>:''}
-  {i.role2 ? <p className={styles.para}>{i.role2}</p>:''}
-</div>
+          {activePopup ? (
+            <a
+              href={
+                "https://wa.me/919616383524?text=Hi%20%2C%20Connected%20Here%20via%20Connect%20Button%20on%20Website"
+              }
+              className={styles.popup}
+            >
+              <img alt="IPM Careers WhatsApp" src={"/WhatsApp.svg"} />
+              Connect on WhatsApp
+            </a>
+          ) : (
+            ""
+          )}
 
-})}
-         
-          
-          </div></Section>
-          
-        
-   {activePopup? <a href={"https://wa.me/919616383524?text=Hi%20%2C%20Connected%20Here%20via%20Connect%20Button%20on%20Website"} className={styles.popup}><img alt="IPM Careers WhatsApp" src={'/WhatsApp.svg'}/>Connect on WhatsApp</a>: ''    }
-   
-   <Section title={"Why choose: IPM Careers?"} color="var(--brand-col1)" align="left" visible="true">
-   <Swiper
-     modules={[Navigation, Pagination, Autoplay]}
-      spaceBetween={10}
-      slidesPerView={mobile === "mobile" ? 1.3 : mobile === "tablet" ? 2.5 : 4.5}
-      loop={true}
-      autoplay={true}
-      loopFillGroupWithBlank={false}
-      pagination={{ clickable: true }}
-      centeredSlides={mobile === "desktop" || mobile === "tablet" ? false : false}
-      onSlideChange={() =>{}}
-      onSwiper={(swiper) => console.log(swiper)}
-      onInit={(swiper) => {
-       
-        swiper.navigation.update();
-      }}
-      navigation={{
-        nextEl: '.next',
-        prevEl: '.prev',
-        clickable:true,
-      }}
-   
-    >
-
-
-     
-      
-      {testimonials && testimonials.map((i,index)=>{
-
-return(<>
-
-<SwiperSlide key={index}>
-<div className={styles.testimonial_card}>
-
-  <img alt={i.heading} src={i.icon}/>
-  <h2>{i.heading}</h2>
-  <div className={styles.grad1}></div>
-  <div className={styles.grad2}></div>
-</div>
-
-</SwiperSlide>
-
-</>)
-})} 
-
-
-    </Swiper>
-
-   </Section>
-   <Section title={":Testimonials"} color="var(--brand-col1)" align="left" visible="true">
-
-<div className={styles.reviewholder}>
-
-{reviews && reviews.map((i,d)=>{
-  return <div className={styles.rcard} >
-    <div className={styles.shape}></div>
-    <div className={styles.shape2}></div>
-<div className={styles.rcard_profile}>
-  <img alt={i.fullname} src={i.image}/>
-    <div>
-    <h2>{i.fullname}</h2>
-    <p>{i.college}</p>
-    </div>
-    </div>
-    <div className={styles.rcontent}>
-    <p className={styles.rtitle}>{i.title}</p>
-    <p>{i.review}</p></div>
-  </div>
-})}
-
-</div>
-  
-
-
-   </Section>
-   <Section title={"Our Promising:Results"} color="var(--brand-col2)" align="left" visible="true">
- <img alt="IPM Careers Rohtak Results"  className={styles.results} src={'https://www.ipmcareer.com/files/2023/01/Rohtak-Results-Template-ooo-scaled-_1_.webp'}/>
-
-   </Section>
-   {/* <Section title={"Frequently:Asked Questions"} color="var(--brand-col2)" align="left" visible="true">
+          <Section
+            title={"Why choose: IPM Careers?"}
+            color="var(--brand-col1)"
+            align="left"
+            visible="true"
+          >
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={10}
+              slidesPerView={
+                mobile === "mobile" ? 1.3 : mobile === "tablet" ? 2.5 : 4.5
+              }
+              loop={true}
+              autoplay={true}
+              loopFillGroupWithBlank={false}
+              pagination={{ clickable: true }}
+              centeredSlides={
+                mobile === "desktop" || mobile === "tablet" ? false : false
+              }
+              onSlideChange={() => {}}
+              onSwiper={(swiper) => console.log(swiper)}
+              onInit={(swiper) => {
+                swiper.navigation.update();
+              }}
+              navigation={{
+                nextEl: ".next",
+                prevEl: ".prev",
+                clickable: true,
+              }}
+            >
+              {testimonials &&
+                testimonials.map((i, index) => {
+                  return (
+                    <>
+                      <SwiperSlide key={index}>
+                        <div className={styles.testimonial_card}>
+                          <img alt={i.heading} src={i.icon} />
+                          <h2>{i.heading}</h2>
+                          <div className={styles.grad1}></div>
+                          <div className={styles.grad2}></div>
+                        </div>
+                      </SwiperSlide>
+                    </>
+                  );
+                })}
+            </Swiper>
+          </Section>
+          <Section
+            title={":Testimonials"}
+            color="var(--brand-col1)"
+            align="left"
+            visible="true"
+          >
+            <div className={styles.reviewholder}>
+              {reviews &&
+                reviews.map((i, d) => {
+                  return (
+                    <div className={styles.rcard}>
+                      <div className={styles.shape}></div>
+                      <div className={styles.shape2}></div>
+                      <div className={styles.rcard_profile}>
+                        <img alt={i.fullname} src={i.image} />
+                        <div>
+                          <h2>{i.fullname}</h2>
+                          <p>{i.college}</p>
+                        </div>
+                      </div>
+                      <div className={styles.rcontent}>
+                        <p className={styles.rtitle}>{i.title}</p>
+                        <p>{i.review}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </Section>
+          <Section
+            title={"Our Promising:Results"}
+            color="var(--brand-col2)"
+            align="left"
+            visible="true"
+          >
+            <img
+              alt="IPM Careers Rohtak Results"
+              className={styles.results}
+              src={
+                "https://www.ipmcareer.com/files/2023/01/Rohtak-Results-Template-ooo-scaled-_1_.webp"
+              }
+            />
+          </Section>
+          {/* <Section title={"Frequently:Asked Questions"} color="var(--brand-col2)" align="left" visible="true">
    <FAQ items={faqs}/>
    </Section> */}
 
-{/* <button onClick={()=>{handleAPI()}} >Test</button> */}
+          {/* <button onClick={()=>{handleAPI()}} >Test</button> */}
 
-<div dangerouslySetInnerHTML={{__html :datahtml}}></div>
-<Footer/>
-      </main>:''}
+          <div dangerouslySetInnerHTML={{ __html: datahtml }}></div>
+          <Footer />
+        </main>
+      ) : (
+        ""
+      )}
     </>
-  )
+  );
 }

@@ -226,8 +226,9 @@ function Response() {
     }
   }
   const config = {
-    banner:
-      "https://www.ipmcareer.com/wp-content/uploads/2024/05/Special-PI-batch.jpg",
+    // banner:
+    //   "https://www.ipmcareer.com/wp-content/uploads/2024/05/Special-PI-batch.jpg",
+    banner: "/banners/vs-1.jpg",
     bannerLink: "/pi-batch",
     bannerTitle: "Enroll Now",
     tools: [
@@ -707,7 +708,7 @@ function Response() {
         {vis == undefined ? (
           <div className={styles.rightcol}>
             <div className={styles.banner + " aspect-[0.56/1]"}>
-              <img src={config.banner} />
+              <img src={config.banner} style={{ objectFit: "inherit" }} />
               <a
                 className={styles.floating}
                 href={config.bannerLink}
