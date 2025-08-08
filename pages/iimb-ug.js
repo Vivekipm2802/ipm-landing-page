@@ -268,7 +268,7 @@ export default function IPM() {
                     rel="noopener noreferrer"
                     className="inline-block bg-[#833589] text-white text-xl font-bold py-2 px-6 rounded-full shadow-md hover:bg-[#6e2c73] transition duration-300"
                   >
-                    ₹25,000
+                    ₹35,000
                   </a>
                 </div>
               </div>
