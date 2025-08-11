@@ -420,7 +420,7 @@ export default function IPM() {
         <div className="container mx-auto px-4 max-w-7xl flex justify-end">
           <div className="flex items-center">
             <span>For Enquiry: </span>
-            <a href="tel:+919816383524" className="flex items-center ml-2">
+            <a href="tel:+919616383524" className="flex items-center ml-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 mr-1"
@@ -435,7 +435,7 @@ export default function IPM() {
                   d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                 />
               </svg>
-              +919816383524
+              +919616383524
             </a>
           </div>
         </div>
@@ -484,10 +484,11 @@ export default function IPM() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${currentSlide === index
-                ? "bg-[#F3B51A] scale-110"
-                : "bg-white/70 hover:bg-white"
-                }`}
+              className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                currentSlide === index
+                  ? "bg-[#F3B51A] scale-110"
+                  : "bg-white/70 hover:bg-white"
+              }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -547,8 +548,7 @@ export default function IPM() {
         <div className={styles.c2}>
           <div className={styles.formcont}>
             <h1 className={styles.team_heading}>
-              Fill out the form to Schedule FREE 1-1 Consultation with an
-              Expert
+              Fill out the form to Schedule FREE 1-1 Consultation with an Expert
             </h1>
             <input
               name={"name"}
@@ -613,11 +613,11 @@ export default function IPM() {
               }}
             />
             {formData &&
-              formData.city &&
-              formData.fullname &&
-              formData.phone &&
-              formData.email &&
-              formData.year ? (
+            formData.city &&
+            formData.fullname &&
+            formData.phone &&
+            formData.email &&
+            formData.year ? (
               ""
             ) : (
               <p className={styles.error}>Please fill all the fields</p>
@@ -1565,7 +1565,7 @@ export default function IPM() {
             </button>
             <div className="mt-10 flex items-center justify-center">
               <a
-                href="https://wa.me/919816383524"
+                href="https://wa.me/919616383524"
                 className="flex items-center bg-white text-[#833589] py-3 px-6 rounded-md hover:bg-gray-100 transition duration-300 font-medium"
               >
                 <svg
@@ -1643,10 +1643,10 @@ export default function IPM() {
                   <ul className="space-y-2">
                     <li>
                       <a
-                        href="tel:+919816383524"
+                        href="tel:+919616383524"
                         className="hover:text-[#F3B51A] transition-colors"
                       >
-                        +91 9816383524
+                        +91 9616383524
                       </a>
                     </li>
                     <li>
