@@ -2,6 +2,13 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import styles from "./Home.module.css";
+import Switcher from "../components/Switcher";
+import CustomSelect from "../components/CustomSelect";
+import { years } from "../utils/years";
+import Notifications from "../components/Notification";
+import axios from "axios";
+import { supabase } from "../utils/supabaseClient";
 
 // Simple utility to conditionally join class names (similar to clsx/cn)
 function cn(...inputs) {
@@ -64,6 +71,270 @@ export default function IPM() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [openFAQ, setOpenFAQ] = useState(null);
 
+  // Form section dependencies
+  const [formData, setFormData] = useState();
+  const [students, setStudents] = useState(5355);
+
+  // Notification state and handler (copied from index.js)
+  const [notificationText, setNotificationText] = useState();
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [loader, setLoader] = useState(false);
+
+  const [isSubmitted, setSubmitted] = useState(false);
+
+  function setNotification(de) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    setNotificationText(de);
+    const id = setTimeout(() => {
+      setNotificationText();
+      setTimeoutId(null);
+    }, 2500);
+    setTimeoutId(id);
+  }
+
+  // Features array (copied from index.js)
+  const features = [
+    <>
+      Best & Promising<span className={styles.blue}>&nbsp;IPMAT Results</span>
+    </>,
+    <>
+      Mentoring by<span className={styles.blue}>&nbsp;IIM Alumni</span>
+    </>,
+    <>
+      Awarded #1<span className={styles.blue}> by ZEE News</span>
+    </>,
+    <>
+      Gained Media Exposure for
+      <span className={styles.blue}> Excellent Academic Performance</span>
+    </>,
+  ];
+
+  // Validation functions (copied from index.js)
+  function validatePhone(phone) {
+    const re = /^(\+\d{1,4})?(?!0+\s+,?$)\d{10}\s*,?$/;
+    return re.test(phone);
+  }
+  function validateEmail(email) {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
+
+  // SubmitContact handler (adapted from index.js)
+  async function SubmitContact() {
+    if (formData == undefined) {
+      setNotification("All Fields are empty");
+      return null;
+    }
+    if (!formData.fullname || formData.fullname.trim() === "") {
+      setNotification("Fullname field is empty");
+      return null;
+    }
+    if (!formData.email || formData.email.trim() === "") {
+      setNotification("Email field is empty");
+      return null;
+    }
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(formData.email)) {
+      setNotification("Email is not valid");
+      return null;
+    }
+    if (!formData.phone || formData.phone.trim() === "") {
+      setNotification("Phone field is empty");
+      return null;
+    }
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setNotification("Phone number is not valid");
+      return null;
+    }
+    if (!formData.year || formData.year.trim() === "") {
+      setNotification("Year field is empty");
+      return null;
+    }
+    const year = parseInt(formData.year);
+    if (isNaN(year) || year < 1900 || year > 2099) {
+      setNotification("Year is not valid");
+      return null;
+    }
+    if (!formData.city || formData.city.trim() === "") {
+      setNotification("City field is empty");
+      return null;
+    }
+    setLoader(true);
+    TestApi();
+    triggerInterakt();
+    /* await axios.post('/') */
+    cronberryTrigger(
+      formData.fullname,
+      formData.email,
+      formData.phone,
+      formData.year,
+      formData.city,
+      "https://register.ipmcareer.com"
+    );
+    const { error } = await supabase.from("ipm_leads").insert({
+      name: formData.fullname,
+      email: formData.email,
+      phone: formData.phone,
+      city: formData.city,
+      year: formData.year,
+      source: "IPM Register Page",
+    });
+    if (!error) {
+      console.log("inserted");
+    } else if (error) {
+      console.log(error);
+    }
+  }
+
+  function cronberryTrigger(
+    username,
+    u_email,
+    u_mobile,
+    u_year,
+    u_city,
+    linke
+  ) {
+    console.log(arguments);
+
+    var id = Date.now();
+    var data = JSON.stringify({
+      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
+      audienceId: id,
+      name: username,
+      email: u_email,
+      mobile: u_mobile,
+      ios_fcm_token: "",
+      web_fcm_token: "",
+      android_fcm_token: "",
+      profile_path: "",
+      active: "",
+      audience_id: "",
+      paramList: [
+        {
+          paramKey: "source",
+          paramValue: "",
+        },
+        {
+          paramKey: "city",
+          paramValue: u_city,
+        },
+        {
+          paramKey: "postcode",
+          paramValue: "",
+        },
+        {
+          paramKey: "total_amount",
+          paramValue: "",
+        },
+        {
+          paramKey: "abondon_cart",
+          paramValue: true,
+        },
+        {
+          paramKey: "preparing_for_which_year",
+          paramValue: u_year,
+        },
+        {
+          paramKey: "subject",
+          paramValue: "",
+        },
+        {
+          paramKey: "formurl",
+          paramValue: linke,
+        },
+        {
+          paramKey: "formname",
+          paramValue: "Main Landing Page",
+        },
+      ],
+    });
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("readystatechange", function () {
+      if (this.readyState === 4) {
+        if (typeof window !== "undefined") {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: "registration_submitted",
+          });
+        }
+
+        setLoader(false);
+        setNotification("Submitted Successfully");
+        setSubmitted(true);
+      }
+    });
+    xhr.open(
+      "POST",
+      "https://register.cronberry.com/api/campaign/register-audience-data"
+    );
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.send(data);
+  }
+
+  async function triggerInterakt() {
+    axios
+      .post("/api/interakt", {
+        userId: Date.now(),
+        phoneNumber: formData.phone,
+        countryCode: "+91",
+        event: "Campaign Notification",
+        name: formData.fullname,
+        email: formData.email,
+
+        tag: "Landing Page",
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((res) => {
+        console.log(res);
+      });
+  }
+
+  async function TestApi() {
+    const data = {
+      client_id: 3158,
+      security_code: "d1R9fF5mfiE=",
+      course_id: 35736,
+      category_id: 835941,
+      action: "coursedetail",
+      full_name: formData.fullname,
+      city: formData.city,
+      mobile_number: formData.phone,
+      email: formData.email,
+    };
+    await axios
+      .post("/api/tcy", data)
+      .then((res) => {
+        handleAPI(formData.fullname, formData.email, res.data);
+      })
+      .catch((res) => {
+        handleAPI(formData.fullname, formData.email, res.data);
+      });
+  }
+
+  async function handleAPI(a, b, c) {
+    console.log("api");
+    await axios
+      .post("/api/hello", {
+        fullname: a,
+        event: "Free Consultation",
+        user_id: c,
+        recipient: b,
+      })
+      .then((res) => {
+        setLoader(false);
+      })
+      .catch((res) => {
+        setLoader(false);
+      });
+  }
+
   const totalSlides = 2;
   const images = [
     "https://res.cloudinary.com/duyo9pzxy/image/upload/v1752837703/76767657_dcdw8m.jpg",
@@ -88,6 +359,62 @@ export default function IPM() {
 
   return (
     <div className="font-sans overflow-x-hidden">
+      {notificationText && notificationText.length > 2 ? (
+        <Notifications text={notificationText} />
+      ) : (
+        ""
+      )}
+
+      {loader ? (
+        <div className={styles.loader}>
+          <svg
+            width="197px"
+            height="197px"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              fill="none"
+              stroke="var(--brand-col2)"
+              stroke-width="3"
+              r="27"
+              stroke-dasharray="127.23450247038662 44.411500823462205"
+            ></circle>
+          </svg>
+          <p>Sending your wish to IIM Gods</p>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {isSubmitted ? (
+        <div className={styles.modal}>
+          <div className={styles.modalinner}>
+            <h2>Thank You !!</h2>
+            <h3>
+              Choosing Us today is the best decision you could have made yet.
+            </h3>
+            <p>We've received your details</p>
+            <p>Our Executive will get back to you shortly.</p>
+
+            <p>
+              For Quick Assitance you can call us on :{" "}
+              <a href="tel:+919616383524">+91 96163 83524</a>
+            </p>
+            <a href="https://ipmcareer.com/courses" className={styles.submit}>
+              Explore Our Courses
+            </a>
+            <a className={styles.submit} href="https://ipmcareer.com">
+              Visit Our Website
+            </a>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
       {/* Header with contact info */}
       <div className="bg-[#833589] text-white p-3 flex items-center justify-end">
         <div className="container mx-auto px-4 max-w-7xl flex justify-end">
@@ -157,16 +484,178 @@ export default function IPM() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                currentSlide === index
-                  ? "bg-[#F3B51A] scale-110"
-                  : "bg-white/70 hover:bg-white"
-              }`}
+              className={`w-4 h-4 rounded-full transition-all duration-300 ${currentSlide === index
+                ? "bg-[#F3B51A] scale-110"
+                : "bg-white/70 hover:bg-white"
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       </div>
+
+      {/* --- Inserted Form Section --- */}
+      <section className={styles.maincont} id="form">
+        <div className={styles.grad1}></div>
+        <div className={styles.grad2}></div>
+        <div className={styles.c1}>
+          <h2>India's Premium IIMB-UG Course by IPM Careers</h2>
+          <p>Join now to grab the opportunity to learn from our experts</p>
+          <div className={styles.trust}>TRUSTED BY THOUSANDS OF STUDENTS</div>
+          <Switcher features={features} />
+          <div className={styles.hold}>
+            <p>
+              Students Enrolled <br />
+              <span className={styles.numbers}>{students}</span>
+            </p>
+            <p>
+              Classes Completed
+              <br />
+              <span className={styles.numbers}>{students * 2}</span>
+            </p>
+            <p>
+              Hours Taught
+              <br />
+              <span className={styles.numbers}>{students * 33}</span>
+            </p>
+          </div>
+          <div>
+            <div className={styles.progress}>
+              <div
+                className={styles.progress_inner}
+                style={{
+                  width: formData
+                    ? (Object.keys(formData).length * 100) / 5 + "%"
+                    : "0%",
+                }}
+              >
+                <p>
+                  Form Progress :{" "}
+                  {formData
+                    ? (Object.entries(formData).length * 100) / 5 + "%"
+                    : "0%"}
+                </p>
+              </div>
+              {formData && (Object.keys(formData).length * 100) / 5 == 100 ? (
+                <p style={{ right: "0", left: "unset" }}>Done</p>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        </div>
+        <div className={styles.c2}>
+          <div className={styles.formcont}>
+            <h1 className={styles.team_heading}>
+              Fill out the form to Schedule FREE 1-1 Consultation with an
+              Expert
+            </h1>
+            <input
+              name={"name"}
+              className={styles.input}
+              placeholder={"Enter your Full Name"}
+              type={"text"}
+              value={formData && formData.fullname}
+              onChange={(e) => {
+                setFormData((res) => ({ ...res, fullname: e.target.value }));
+              }}
+            />
+            <input
+              name={"email"}
+              className={
+                styles.input +
+                " " +
+                (validateEmail(formData ? formData.email : "test@gm.co")
+                  ? ""
+                  : styles.fielderror)
+              }
+              placeholder={"Enter your Email Address"}
+              type={"text"}
+              value={formData && formData.email}
+              onChange={(e) => {
+                setFormData((res) => ({ ...res, email: e.target.value }));
+              }}
+            />
+            <input
+              name={"phone"}
+              className={
+                styles.input +
+                " " +
+                (validatePhone(formData ? formData.phone : "+918888888888")
+                  ? ""
+                  : styles.fielderror)
+              }
+              placeholder={"Enter your Phone Number"}
+              type={"text"}
+              value={formData && formData.phone}
+              onChange={(e) => {
+                setFormData((res) => ({ ...res, phone: e.target.value }));
+              }}
+            />
+            <input
+              name={"city"}
+              className={styles.input}
+              placeholder={"Enter your City"}
+              type={"text"}
+              value={formData && formData.city}
+              onChange={(e) => {
+                setFormData((res) => ({ ...res, city: e.target.value }));
+              }}
+            />
+            <CustomSelect
+              z={9}
+              full="true"
+              defaultText="When are you planning to take IPM?"
+              noPadding={true}
+              objects={years}
+              setSelect={(r) => {
+                setFormData((res) => ({ ...res, year: r }));
+              }}
+            />
+            {formData &&
+              formData.city &&
+              formData.fullname &&
+              formData.phone &&
+              formData.email &&
+              formData.year ? (
+              ""
+            ) : (
+              <p className={styles.error}>Please fill all the fields</p>
+            )}
+            {/* <div onClick={TestApi} className={styles.submit}>TEST</div> */}
+            <div onClick={SubmitContact} className={styles.submit}>
+              SUBMIT
+            </div>
+            {/* <div className={styles.encrypt}>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    id="Layer_1"
+    data-name="Layer 1"
+    viewBox="0 0 93.63 122.88"
+    
+  >
+    <defs>
+      <style>{".cls-2{fill-rule:evenodd;fill:#36464e}"}</style>
+    </defs>
+    <title>{"padlock"}</title>
+    <path
+      d="M6 47.51h81.64a6 6 0 0 1 6 6v63.38a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6V53.5a6 6 0 0 1 6-6Z"
+      style={{
+        fillRule: "evenodd",
+        fill: "#fbd734",
+      }}
+    />
+    <path
+      className="cls-2"
+      d="m41.89 89.26-6.47 16.95h22.79l-6-17.21a11.79 11.79 0 1 0-10.32.24ZM83.57 47.51H72.22v-9.42a27.32 27.32 0 0 0-7.54-19 24.4 24.4 0 0 0-35.73 0 27.32 27.32 0 0 0-7.54 19v9.42H10.06v-9.42a38.73 38.73 0 0 1 10.72-26.81 35.69 35.69 0 0 1 52.07 0 38.67 38.67 0 0 1 10.72 26.81v9.42Z"
+    />
+  </svg>
+<p>Your Data is End-to-End Encrypted!</p>
+</div> */}
+          </div>
+        </div>
+      </section>
+
       {/* Course Overview Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 max-w-7xl">
