@@ -215,39 +215,15 @@ export default function Home() {
 
   const slides = [
     {
-      image: "/banners/slide-4.jpg",
-      alt: "IPM Careers",
-    },
-    {
-      image: "/banners/slide-3.jpg",
-      alt: "IPM Careers",
-    },
-    // {
-    //   image: "/banners/slide-2.jpg",
-    //   alt: "IPM Careers",
-    // },
-    // {
-    //   image: "/banners/slide-1.png",
-    //   alt: "IPM Careers",
-    // },
-    {
       image: "/banners/slide1.jpg",
       alt: "IPM Careers",
     },
-    // {
-    //   image: "/banners/slide6.jpg",
-    //   alt: "IPM Careers",
-    // },
     {
       image: "/banners/slide2.jpg",
       alt: "IPM Careers",
     },
     {
       image: "/banners/slide3.jpg",
-      alt: "IPM Careers",
-    },
-    {
-      image: "/banners/slide0.jpg",
       alt: "IPM Careers",
     },
     {
