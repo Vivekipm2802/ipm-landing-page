@@ -476,6 +476,20 @@ export default function Home() {
     } else if (error) {
       console.log(error);
     }
+
+    // Trigger notification email to devankit1994@gmail.com
+    try {
+      await axios.post("/api/contactEmail", {
+        fullname: formData.fullname,
+        email: formData.email,
+        phone: formData.phone,
+        year: formData.year,
+        city: formData.city,
+      });
+      console.log("Notification email sent");
+    } catch (err) {
+      console.error("Email sending failed", err);
+    }
   }
 
   async function TestApi() {
