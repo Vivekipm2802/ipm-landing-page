@@ -19,11 +19,12 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/autoplay";
 import Switcher from "../components/Switcher";
-import CustomSelect from "../components/CustomSelect";
 import { supabase } from "../utils/supabaseClient";
 import { years } from "../utils/years";
 import { reviews } from "../utils/testimonials";
 import { result } from "../utils/contants";
+import React from "react";
+import EnquiryForm from "../components/EnquiryForm";
 
 export default function Home() {
   const [isSubmitted, setSubmitted] = useState(false);
@@ -36,7 +37,13 @@ export default function Home() {
   const [notificationText, setNotificationText] = useState();
   const [timeoutId, setTimeoutId] = useState(null);
   const [datahtml, setHtml] = useState();
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    phone: "",
+    city: "",
+    year: "",
+  });
 
   const testimonials = [
     {
@@ -715,88 +722,15 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.c2}>
-            <div className={styles.formcont}>
-              <h1 className={styles.team_heading}>
-                Fill out the form to Schedule FREE 1-1 Consultation with an
-                Expert
-              </h1>
-              <input
-                name={"name"}
-                className={styles.input}
-                placeholder={"Enter your Full Name"}
-                type={"text"}
-                value={formData && formData.fullname}
-                onChange={(e) => {
-                  setFormData((res) => ({ ...res, fullname: e.target.value }));
-                }}
-              />
-              <input
-                name={"email"}
-                className={
-                  styles.input +
-                  " " +
-                  (validateEmail(formData ? formData.email : "test@gm.co")
-                    ? ""
-                    : styles.fielderror)
-                }
-                placeholder={"Enter your Email Address"}
-                type={"text"}
-                value={formData && formData.email}
-                onChange={(e) => {
-                  setFormData((res) => ({ ...res, email: e.target.value }));
-                }}
-              />
-              <input
-                name={"phone"}
-                className={
-                  styles.input +
-                  " " +
-                  (validatePhone(formData ? formData.phone : "+918888888888")
-                    ? ""
-                    : styles.fielderror)
-                }
-                placeholder={"Enter your Phone Number"}
-                type={"text"}
-                value={formData && formData.phone}
-                onChange={(e) => {
-                  setFormData((res) => ({ ...res, phone: e.target.value }));
-                }}
-              />
-              <input
-                name={"city"}
-                className={styles.input}
-                placeholder={"Enter your City"}
-                type={"text"}
-                value={formData && formData.city}
-                onChange={(e) => {
-                  setFormData((res) => ({ ...res, city: e.target.value }));
-                }}
-              />
-              <CustomSelect
-                z={9}
-                full="true"
-                defaultText="When are you planning to take IPM?"
-                noPadding={true}
-                objects={years}
-                setSelect={(r) => {
-                  setFormData((res) => ({ ...res, year: r }));
-                }}
-              />
-              {formData &&
-              formData.city &&
-              formData.fullname &&
-              formData.phone &&
-              formData.email &&
-              formData.year ? (
-                ""
-              ) : (
-                <p className={styles.error}>Please fill all the fields</p>
-              )}
-              {/* <div onClick={TestApi} className={styles.submit}>TEST</div> */}
-              <div onClick={SubmitContact} className={styles.submit}>
-                SUBMIT
-              </div>
-              {/* <div className={styles.encrypt}>
+            <EnquiryForm
+              formData={formData}
+              setFormData={setFormData}
+              validateEmail={validateEmail}
+              validatePhone={validatePhone}
+              years={years}
+              onSubmit={SubmitContact}
+            />
+             {/* <div className={styles.encrypt}>
 <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -822,7 +756,6 @@ export default function Home() {
   </svg>
 <p>Your Data is End-to-End Encrypted!</p>
 </div> */}
-            </div>
           </div>
         </section>
 
