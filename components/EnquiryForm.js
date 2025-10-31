@@ -2,8 +2,30 @@ import React, { useState } from "react";
 import CustomSelect from "./CustomSelect";
 import styles from "../pages/Home.module.css";
 
-const EnquiryForm = ({ formData, setFormData, validateEmail, validatePhone, years, onSubmit }) => {
+const EnquiryForm = ({ formData, setFormData, years, onSubmit }) => {
   const [touched, setTouched] = useState({ email: false, phone: false });
+  const [notification, setNotification] = useState("");
+
+  // local validators (moved here)
+  const validateEmail = (email) =>
+    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email);
+
+  const validatePhone = (phone) => /^[0-9]{10}$/.test(phone);
+
+  const handleSubmit = async () => {
+    if (!formData?.fullname?.trim()) return setNotification("Fullname field is empty");
+    if (!formData?.email?.trim()) return setNotification("Email field is empty");
+    if (!validateEmail(formData.email)) return setNotification("Email is not valid");
+    if (!formData?.phone?.trim()) return setNotification("Phone field is empty");
+    if (!validatePhone(formData.phone)) return setNotification("Phone number is not valid");
+    if (!formData?.year?.trim()) return setNotification("Year field is empty");
+    if (!formData?.city?.trim()) return setNotification("City field is empty");
+
+    setNotification(""); // clear
+
+    // ✅ call parent logic after successful validation
+    onSubmit(formData);
+  };
 
   return (
     <div>
@@ -57,14 +79,8 @@ const EnquiryForm = ({ formData, setFormData, validateEmail, validatePhone, year
           objects={years}
           setSelect={(value) => setFormData((prev) => ({ ...prev, year: value }))}
         />
-        {formData?.city &&
-        formData?.fullname &&
-        formData?.phone &&
-        formData?.email &&
-        formData?.year ? null : (
-          <p className={styles.error}>Please fill all the fields</p>
-        )}
-        <div onClick={onSubmit} className={styles.submit}>
+        {notification && <p className={styles.error}>{notification}</p>}
+        <div onClick={handleSubmit} className={styles.submit}>
           SUBMIT
         </div>
       </div>

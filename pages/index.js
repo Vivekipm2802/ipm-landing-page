@@ -402,102 +402,6 @@ export default function Home() {
         console.log(res);
       });
   }
-  async function SubmitContact() {
-    if (formData == undefined) {
-      setNotification("All Fields are empty");
-      return null;
-    }
-    if (!formData.fullname || formData.fullname.trim() === "") {
-      setNotification("Fullname field is empty");
-      return null;
-    }
-
-    // Check email
-    if (!formData.email || formData.email.trim() === "") {
-      setNotification("Email field is empty");
-      return null;
-    }
-
-    // Validate the email format using a regular expression
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    if (!emailRegex.test(formData.email)) {
-      setNotification("Email is not valid");
-      return null;
-    }
-
-    // Check phone
-    if (!formData.phone || formData.phone.trim() === "") {
-      setNotification("Phone field is empty");
-      return null;
-    }
-
-    // Validate the phone number
-    const phoneRegex = /^[0-9]{10}$/; // Change the regex pattern as needed
-    if (!phoneRegex.test(formData.phone)) {
-      setNotification("Phone number is not valid");
-      return null;
-    }
-
-    // Check year
-    if (!formData.year || formData.year.trim() === "") {
-      setNotification("Year field is empty");
-      return null;
-    }
-
-    // Validate the year
-    const year = parseInt(formData.year);
-    if (isNaN(year) || year < 1900 || year > 2099) {
-      setNotification("Year is not valid");
-      return null;
-    }
-
-    // Check city
-    if (!formData.city || formData.city.trim() === "") {
-      setNotification("City field is empty");
-      return null;
-    }
-
-    setLoader(true);
-
-    TestApi();
-    triggerInterakt();
-    /* await axios.post('/') */
-    cronberryTrigger(
-      formData.fullname,
-      formData.email,
-      formData.phone,
-      formData.year,
-      formData.city,
-      "https://register.ipmcareer.com"
-    );
-    const { error } = await supabase.from("ipm_leads").insert({
-      name: formData.fullname,
-      email: formData.email,
-      phone: formData.phone,
-      city: formData.city,
-      year: formData.year,
-      source: "IPM Register Page",
-    });
-    if (!error) {
-      console.log("inserted");
-    } else if (error) {
-      console.log(error);
-    }
-
-    // Trigger notification email to devankit1994@gmail.com
-    try {
-      await axios.post("/api/contactEmail", {
-        fullname: formData.fullname,
-        email: formData.email,
-        phone: formData.phone,
-        year: formData.year,
-        city: formData.city,
-      });
-      console.log("Notification email sent");
-    } catch (err) {
-      console.error("Email sending failed", err);
-    }
-  }
 
   async function TestApi() {
     const data = {
@@ -722,14 +626,43 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.c2}>
-            <EnquiryForm
-              formData={formData}
-              setFormData={setFormData}
-              validateEmail={validateEmail}
-              validatePhone={validatePhone}
-              years={years}
-              onSubmit={SubmitContact}
-            />
+          <EnquiryForm
+            formData={formData}
+            setFormData={setFormData}
+            years={years}
+            onSubmit={async (formData) => {
+              setLoader(true);
+
+              TestApi();
+              triggerInterakt();
+
+              cronberryTrigger(
+                formData.fullname,
+                formData.email,
+                formData.phone,
+                formData.year,
+                formData.city,
+                "https://register.ipmcareer.com"
+              );
+
+              const { error } = await supabase.from("ipm_leads").insert({
+                name: formData.fullname,
+                email: formData.email,
+                phone: formData.phone,
+                city: formData.city,
+                year: formData.year,
+                source: "IPM Register Page",
+              });
+
+              if (error) console.log(error);
+
+              try {
+                await axios.post("/api/contactEmail", formData);
+              } catch (err) {
+                console.error("Email sending failed", err);
+              }
+            }}
+          />
              {/* <div className={styles.encrypt}>
 <svg
     xmlns="http://www.w3.org/2000/svg"
