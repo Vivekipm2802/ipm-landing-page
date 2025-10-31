@@ -6,13 +6,25 @@ const EnquiryForm = ({ formData, setFormData, years, onSubmit }) => {
   const [touched, setTouched] = useState({ email: false, phone: false });
   const [notification, setNotification] = useState("");
 
-  // local validators (moved here)
   const validateEmail = (email) =>
     /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email);
 
   const validatePhone = (phone) => /^[0-9]{10}$/.test(phone);
 
   const handleSubmit = async () => {
+
+    // ✅ If ALL fields are empty — show one generic error
+    if (
+      !formData?.fullname?.trim() &&
+      !formData?.email?.trim() &&
+      !formData?.phone?.trim() &&
+      !formData?.city?.trim() &&
+      !formData?.year?.trim()
+    ) {
+      setNotification("Please fill all the fields");
+      return;
+    }
+
     if (!formData?.fullname?.trim()) return setNotification("Fullname field is empty");
     if (!formData?.email?.trim()) return setNotification("Email field is empty");
     if (!validateEmail(formData.email)) return setNotification("Email is not valid");
@@ -21,9 +33,9 @@ const EnquiryForm = ({ formData, setFormData, years, onSubmit }) => {
     if (!formData?.year?.trim()) return setNotification("Year field is empty");
     if (!formData?.city?.trim()) return setNotification("City field is empty");
 
-    setNotification(""); // clear
-
-    // ✅ call parent logic after successful validation
+    setNotification("");
+    
+ // ✅ call parent logic after successful validation
     onSubmit(formData);
   };
 
