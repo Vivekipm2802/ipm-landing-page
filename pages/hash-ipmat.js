@@ -77,6 +77,14 @@ export default function Home() {
       content:
         '<ul>\r\n<li><span style="font-weight: 400;">35 BBA + 20 IPM Mocks</span></li>\r\n<li><span style="font-weight: 400;">240 + Topic wise test</span></li>\r\n<li><span style="font-weight: 400;">In depth analysis for every mock</span></li>\r\n<li><span style="font-weight: 400;">Personalised online Resource Platform</span></li><li>Mentorship session by Ashutosh Sir (IIM A Alum)</li>\r\n</ul>',
     },
+    {
+      title: "IIM Bangalore UG Test series",
+      price: "₹999",
+      link: "https://pages.razorpay.com/pl_RZHG2RF0whyMrN/view",
+      image: "/iimbug.png",
+      content:
+        '<ul>\r\n<li><span style="font-weight: 400;">10 full length mock</span></li>\r\n<li><span style="font-weight: 400;">250 + topic wise tests</span></li>\r\n<li><span style="font-weight: 400;">Daily RCs, VA Quizzes & Articles</span></li>\r\n<li><span style="font-weight: 400;">In depth analysis for every mock</span></li></ul>',
+    },
   ];
 
   const testimonials = [
