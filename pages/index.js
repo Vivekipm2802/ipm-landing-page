@@ -626,42 +626,14 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.c2}>
-          <EnquiryForm
+          <EnquiryForm 
             formData={formData}
             setFormData={setFormData}
             years={years}
-            onSubmit={async (formData) => {
-              setLoader(true);
-
-              TestApi();
-              triggerInterakt();
-
-              cronberryTrigger(
-                formData.fullname,
-                formData.email,
-                formData.phone,
-                formData.year,
-                formData.city,
-                "https://register.ipmcareer.com"
-              );
-
-              const { error } = await supabase.from("ipm_leads").insert({
-                name: formData.fullname,
-                email: formData.email,
-                phone: formData.phone,
-                city: formData.city,
-                year: formData.year,
-                source: "IPM Register Page",
-              });
-
-              if (error) console.log(error);
-
-              try {
-                await axios.post("/api/contactEmail", formData);
-              } catch (err) {
-                console.error("Email sending failed", err);
-              }
-            }}
+            setLoader={setLoader}
+            TestApi={TestApi}
+            triggerInterakt={triggerInterakt}
+            cronberryTrigger={cronberryTrigger}
           />
              {/* <div className={styles.encrypt}>
 <svg
