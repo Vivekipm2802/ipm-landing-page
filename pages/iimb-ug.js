@@ -183,6 +183,8 @@ export default function IPM() {
       year: formData.year,
       source: "IPM Register Page",
     });
+    await axios.post("/api/contactEmail", formData);
+    setNotification("Submitted successfully!");
     if (!error) {
       console.log("inserted");
     } else if (error) {
@@ -337,7 +339,7 @@ export default function IPM() {
 
   const totalSlides = 2;
   const images = [
-    "https://res.cloudinary.com/duyo9pzxy/image/upload/v1752837703/76767657_dcdw8m.jpg",
+    "/web_flyer-20251103-085238.png",
     "https://res.cloudinary.com/duyo9pzxy/image/upload/v1752922547/INDORE-BANNER_2_hupw3s.jpg",
   ];
   const nextSlide = () => {
@@ -709,7 +711,7 @@ export default function IPM() {
             <div className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 max-w-sm w-full">
               <div className="relative h-auto aspect-square overflow-hidden">
                 <Image
-                  src="https://res.cloudinary.com/duyo9pzxy/image/upload/v1752841337/7876868769_tvuyss.jpg"
+                  src="/web_20251103-085229.png"
                   alt="IPMAT 2025 Online Course"
                   width={1080}
                   height={1080}
@@ -757,7 +759,7 @@ export default function IPM() {
                     rel="noopener noreferrer"
                     className="inline-block bg-[#833589] text-white text-xl font-bold py-2 px-6 rounded-full shadow-md hover:bg-[#6e2c73] transition duration-300"
                   >
-                    ₹35,000
+                   <s>₹20,000</s>  ₹15,000
                   </a>
                 </div>
               </div>
@@ -901,7 +903,7 @@ export default function IPM() {
                   <iframe
                     width="100%"
                     height="100%"
-                    src="https://www.youtube.com/embed/2C1ZXLdfMfw"
+                    src="https://www.youtube.com/embed/ZcSa6dUvsFU"
                     title="YouTube video player"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
