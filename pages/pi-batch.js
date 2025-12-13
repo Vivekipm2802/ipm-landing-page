@@ -472,6 +472,7 @@ export default function Home() {
               city: formData.city,
             });
             console.log("Notification email sent");
+                  window.location.href = "https://pages.razorpay.com/iimb-pi-batch"
           } catch (err) {
             console.error("Email sending failed", err);
           }
