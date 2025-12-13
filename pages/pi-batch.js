@@ -209,14 +209,14 @@ export default function Home() {
   const slides = [
     {
       image:
-        "https://www.ipmcareer.com/wp-content/uploads/2020/06/web-size-iim-sirmaur-copy.jpg",
-      alt: "IPM Careers IIM Indore Results ",
+        "banners/pi-1.png",
+      alt: "IPM Careers IIM Banglore UG Special Batch ",
     },
-    {
-      image:
-        "https://www.ipmcareer.com/wp-content/uploads/2020/06/web-size-iim-sirmaur-copy.jpg",
-      alt: "IPM Careers IIM Rohtak Results",
-    },
+    // {
+    //   image:
+    //     "https://www.ipmcareer.com/wp-content/uploads/2020/06/web-size-iim-sirmaur-copy.jpg",
+    //   alt: "IPM Careers IIM Rohtak Results",
+    // },
   ];
   const faqs = [
     {
@@ -461,6 +461,21 @@ export default function Home() {
         source: "PI Batch Landing Page",
       })
       .select();
+
+          // Trigger notification email
+          try {
+            await axios.post("/api/contactEmail", {
+              fullname: formData.fullname,
+              email: formData.email,
+              phone: formData.phone,
+              year: formData.year,
+              city: formData.city,
+            });
+            console.log("Notification email sent");
+          } catch (err) {
+            console.error("Email sending failed", err);
+          }
+
     if (data) {
       console.log("inserted");
     } else if (error) {
@@ -693,7 +708,7 @@ export default function Home() {
           <div className={styles.c2}>
             <div className={styles.formcont}>
               <h1 className={styles.team_heading}>
-                Fill out the form to register for Interview cum CV Preparation
+                Fill out the form to register for Interview Preparation
                 Batch
               </h1>
               <input
@@ -751,7 +766,7 @@ export default function Home() {
               <CustomSelect
                 z={9}
                 full="true"
-                defaultText="When are you planning to take IPM?"
+                defaultText="Target Year"
                 noPadding={true}
                 objects={years}
                 setSelect={(r) => {
@@ -943,7 +958,7 @@ export default function Home() {
                 <YouTube
                   className="embed-container"
                   title=""
-                  videoId="oeWMXP9YbvM"
+                  videoId="Vl35I3cRTj8"
                   opts={opts}
                 />
               </div>
