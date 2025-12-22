@@ -16,6 +16,7 @@ export default function ResponseAnalyzer() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   const fetchLeaderboard = async () => {
@@ -34,6 +35,24 @@ export default function ResponseAnalyzer() {
   useEffect(() => {
     fetchLeaderboard();
   }, []);
+
+  // Popup UX: close on ESC + lock body scroll while open
+  useEffect(() => {
+    if (!isHowItWorksOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsHowItWorksOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isHowItWorksOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -250,7 +269,7 @@ export default function ResponseAnalyzer() {
     container: {
       maxWidth: "1100px",
       margin: "40px auto",
-      padding: "0 20px",
+      padding: "0px 20px 42px 20px",
       position: "relative",
       zIndex: 1,
     },
@@ -487,12 +506,56 @@ export default function ResponseAnalyzer() {
       color: "var(--accent-orange)",
       flex: "0 0 auto",
     },
-    howItWorksList: {
+    howItWorksSteps: {
+      display: "grid",
+      gap: "12px",
+      marginTop: "14px",
+    },
+    howItWorksStep: {
+      display: "flex",
+      gap: "12px",
+      padding: "12px 14px",
+      borderRadius: "16px",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(10, 6, 20, 0.55)",
+    },
+    howItWorksStepNumWrap: {
+      width: "34px",
+      height: "34px",
+      borderRadius: "12px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background:
+        "linear-gradient(135deg, rgba(231, 152, 1, 0.22), rgba(131, 53, 137, 0.14))",
+      border: "1px solid rgba(231, 152, 1, 0.28)",
+      flex: "0 0 auto",
+      marginTop: "2px",
+    },
+    howItWorksStepNum: {
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 900,
+      color: "var(--accent-orange)",
+      fontSize: "0.95rem",
+      lineHeight: 1,
+    },
+    howItWorksStepBody: {
+      minWidth: 0,
+    },
+    howItWorksStepHeading: {
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 800,
+      fontSize: "0.92rem",
+      color: "var(--text-light)",
+      marginBottom: "4px",
+      letterSpacing: "0.2px",
+    },
+    howItWorksStepText: {
       margin: 0,
-      paddingLeft: "18px",
       color: "var(--text-dim)",
-      lineHeight: 1.6,
-      fontSize: "0.9rem",
+      lineHeight: 1.55,
+      fontSize: "0.88rem",
+      wordBreak: "break-word",
     },
     howItWorksLink: {
       color: "var(--accent-orange)",
@@ -510,6 +573,118 @@ export default function ResponseAnalyzer() {
       fontFamily:
         "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
       margin: "0 2px",
+    },
+
+    headerRight: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+
+    howItWorksHeaderBtn: {
+      background: "rgba(131, 53, 137, 0.18)",
+      color: "var(--text-light)",
+      border: "1px solid rgba(131, 53, 137, 0.55)",
+      padding: "10px 14px",
+      borderRadius: "12px",
+      fontWeight: 800,
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "10px",
+      boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+      whiteSpace: "nowrap",
+    },
+
+    modalOverlay: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.65)",
+      backdropFilter: "blur(10px)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "18px",
+    },
+
+    modalCard: {
+      width: "min(760px, 100%)",
+      maxHeight: "min(80vh, 740px)",
+      overflow: "auto",
+      background: "rgba(26, 17, 36, 0.92)",
+      border: "1px solid rgba(255,255,255,0.10)",
+      borderRadius: "18px",
+      boxShadow: "0 30px 70px rgba(0,0,0,0.55)",
+    },
+
+    modalHeader: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "12px",
+      padding: "16px 16px 12px 16px",
+      borderBottom: "1px solid rgba(255,255,255,0.08)",
+      position: "sticky",
+      top: 0,
+      background: "rgba(26, 17, 36, 0.96)",
+      backdropFilter: "blur(10px)",
+      zIndex: 1,
+    },
+
+    modalTitleWrap: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      minWidth: 0,
+    },
+
+    modalTitle: {
+      margin: 0,
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 900,
+      fontSize: "1.05rem",
+      color: "var(--text-light)",
+      letterSpacing: "0.2px",
+    },
+
+    modalCloseBtn: {
+      width: "40px",
+      height: "40px",
+      borderRadius: "12px",
+      border: "1px solid rgba(255,255,255,0.10)",
+      background: "rgba(10, 6, 20, 0.4)",
+      color: "var(--text-light)",
+      cursor: "pointer",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    modalBody: {
+      padding: "16px",
+    },
+
+    modalSection: {
+      display: "grid",
+      gap: "12px",
+    },
+
+    modalSectionTitle: {
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 900,
+      color: "var(--accent-orange)",
+      letterSpacing: "0.4px",
+      textTransform: "uppercase",
+      fontSize: "0.78rem",
+    },
+
+    modalDivider: {
+      height: "1px",
+      background: "rgba(255,255,255,0.08)",
+      margin: "16px 0",
     },
   };
 
@@ -553,7 +728,182 @@ export default function ResponseAnalyzer() {
             style={styles.logoImg}
           />
         </div>
+
+        <div style={styles.headerRight}>
+          <button
+            type="button"
+            className="no-print"
+            style={styles.howItWorksHeaderBtn}
+            onClick={() => setIsHowItWorksOpen(true)}
+          >
+            <i className="fas fa-circle-info"></i> How it works
+          </button>
+        </div>
       </header>
+
+      {isHowItWorksOpen && (
+        <div
+          style={styles.modalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="How it works"
+          onClick={() => setIsHowItWorksOpen(false)}
+        >
+          <div style={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <div style={styles.modalTitleWrap}>
+                <span style={styles.howItWorksTitleIcon}>
+                  <i className="fas fa-list-check"></i>
+                </span>
+                <h3 style={styles.modalTitle}>How it works</h3>
+              </div>
+
+              <button
+                type="button"
+                aria-label="Close"
+                style={styles.modalCloseBtn}
+                onClick={() => setIsHowItWorksOpen(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div style={styles.modalBody}>
+              <div style={styles.modalSection}>
+                <div style={styles.modalSectionTitle}>For Laptop</div>
+
+                <div style={styles.howItWorksSteps}>
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>1</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>
+                        Login and open your Answer Key
+                      </div>
+                      <p style={styles.howItWorksStepText}>
+                        Open:{" "}
+                        <a
+                          href="https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html"
+                          target="_blank"
+                          rel="noreferrer"
+                          style={styles.howItWorksLink}
+                        >
+                          https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>2</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>
+                        Save your Answer Key (don’t print)
+                      </div>
+                      <p style={styles.howItWorksStepText}>
+                        Press <span style={styles.kbd}>Ctrl</span>+
+                        <span style={styles.kbd}>S</span> and save your Answer
+                        Key <strong>(DO NOT PRESS PRINT)</strong>.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>3</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>Upload</div>
+                      <p style={styles.howItWorksStepText}>
+                        Upload the saved file here.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>4</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>Analyse</div>
+                      <p style={styles.howItWorksStepText}>
+                        Click on “Analyse Now”.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.modalDivider} />
+
+              <div style={styles.modalSection}>
+                <div style={styles.modalSectionTitle}>For Mobile</div>
+
+                <div style={styles.howItWorksSteps}>
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>1</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>
+                        Login and open your Answer Key
+                      </div>
+                      <p style={styles.howItWorksStepText}>
+                        Open:{" "}
+                        <a
+                          href="https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html"
+                          target="_blank"
+                          rel="noreferrer"
+                          style={styles.howItWorksLink}
+                        >
+                          https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>2</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>Download</div>
+                      <p style={styles.howItWorksStepText}>
+                        Click on the download option in the corner.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>3</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>Upload</div>
+                      <p style={styles.howItWorksStepText}>
+                        Upload the downloaded file.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={styles.howItWorksStep}>
+                    <div style={styles.howItWorksStepNumWrap}>
+                      <span style={styles.howItWorksStepNum}>4</span>
+                    </div>
+                    <div style={styles.howItWorksStepBody}>
+                      <div style={styles.howItWorksStepHeading}>Analyse</div>
+                      <p style={styles.howItWorksStepText}>Analyse now.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container" style={styles.container}>
         <main>
@@ -874,39 +1224,6 @@ export default function ResponseAnalyzer() {
               *Top 10 by total score
             </p>
           </div>
-
-          {/* <div
-            className="glass-card how-it-works-card"
-            style={{ ...styles.glassCard, padding: "24px", marginTop: "18px" }}
-          >
-            <h3 style={styles.howItWorksTitle}>
-              <span style={styles.howItWorksTitleIcon}>
-                <i className="fas fa-list-check"></i>
-              </span>
-              How this works
-            </h3>
-
-            <ol style={styles.howItWorksList}>
-              <li>
-                Login and open your Answer Key{" "}
-                <a
-                  href="https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={styles.howItWorksLink}
-                >
-                  https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html
-                </a>
-              </li>
-              <li>
-                Press <span style={styles.kbd}>Ctrl</span>+
-                <span style={styles.kbd}>S</span> and save your Answer Key{" "}
-                <strong>(DO NOT PRESS PRINT)</strong>
-              </li>
-              <li>Upload the saved file</li>
-              <li>Click on “Analyze Now”</li>
-            </ol>
-          </div> */}
         </aside>
       </div>
 
