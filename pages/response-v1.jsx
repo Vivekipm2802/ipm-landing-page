@@ -1083,6 +1083,20 @@ export default function ResponseAnalyzer() {
                       ? `${(selectedFile.size / 1024).toFixed(1)} KB`
                       : "Click to browse or drag and drop"}
                   </p>
+
+                  <p
+                    style={{
+                      ...styles.uploadBoxP,
+                      fontSize: "0.8rem",
+                      marginTop: "8px",
+                      fontWeight: 800,
+                      color: "var(--accent-orange)",
+                      letterSpacing: "0.2px",
+                    }}
+                  >
+                    DO NOT UPLOAD AS A PDF
+                  </p>
+
                   <input
                     type="file"
                     ref={fileInputRef}
