@@ -10,19 +10,29 @@ export default function ResponseAnalyzer() {
     email: "",
     category: "General",
     city: "",
-    link: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [currentStudent, setCurrentStudent] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    const savedLeads = localStorage.getItem("iim_leads");
-    if (savedLeads) {
-      setLeaderboard(JSON.parse(savedLeads));
+  const fetchLeaderboard = async () => {
+    setLeaderboardLoading(true);
+    try {
+      const res = await axios.get("/api/iimbLeaderboard");
+      setLeaderboard(res?.data?.leaderboard ?? []);
+    } catch (error) {
+      console.error("Failed to fetch leaderboard", error);
+      setLeaderboard([]);
+    } finally {
+      setLeaderboardLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
   }, []);
 
   const handleInputChange = (e) => {
@@ -95,50 +105,35 @@ export default function ResponseAnalyzer() {
   };
 
   const startProcess = async () => {
-    const { name, mobile, email, link } = formData;
+    const { name, mobile, email } = formData;
 
     if (!name || mobile.length < 10 || !email) {
       alert("Please enter Name, Email, and 10-digit Mobile.");
       return;
     }
 
-    if (!link && !selectedFile) {
-      alert("Please provide a link or upload a file.");
+    if (!selectedFile) {
+      alert("Please upload an HTML response file.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      let htmlContent = "";
-      let finalFileUrl = link;
+      // 1. Read HTML Content from uploaded file
+      const htmlContent = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsText(selectedFile);
+      });
 
-      // 1. Get HTML Content
-      if (link) {
-        try {
-          const res = await fetch(link);
-          htmlContent = await res.text();
-        } catch (e) {
-          setIsSubmitting(false);
-          alert("CORS Block. Please use 'Upload HTML' instead.");
-          return;
-        }
-      } else if (selectedFile) {
-        htmlContent = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = reject;
-          reader.readAsText(selectedFile);
-        });
-
-        // 2. Upload to Cloudinary
-        const uploadedUrl = await uploadToCloudinary(selectedFile);
-        if (!uploadedUrl) {
-          setIsSubmitting(false);
-          alert("Failed to upload file. Please try again.");
-          return;
-        }
-        finalFileUrl = uploadedUrl;
+      // 2. Upload to Cloudinary
+      const uploadedUrl = await uploadToCloudinary(selectedFile);
+      if (!uploadedUrl) {
+        setIsSubmitting(false);
+        alert("Failed to upload file. Please try again.");
+        return;
       }
 
       // 3. Calculate Scores
@@ -147,7 +142,7 @@ export default function ResponseAnalyzer() {
       // 4. Send Email & Save Data
       await axios.post("/api/sendScorecardIIMB", {
         ...formData,
-        fileUrl: finalFileUrl,
+        fileUrl: uploadedUrl,
         scores,
       });
 
@@ -161,22 +156,14 @@ export default function ResponseAnalyzer() {
       };
 
       setCurrentStudent(studentData);
-      updateLeaderboard(studentData);
       setView("results");
+      fetchLeaderboard();
     } catch (error) {
       console.error(error);
       alert("An error occurred during processing.");
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const updateLeaderboard = (student) => {
-    const list = [...leaderboard, student];
-    list.sort((a, b) => b.total - a.total);
-    const top10 = list.slice(0, 10);
-    setLeaderboard(top10);
-    localStorage.setItem("iim_leads", JSON.stringify(top10));
   };
 
   const resetAnalysis = () => {
@@ -187,7 +174,6 @@ export default function ResponseAnalyzer() {
       email: "",
       category: "General",
       city: "",
-      link: "",
     });
     setSelectedFile(null);
     setCurrentStudent(null);
@@ -475,6 +461,56 @@ export default function ResponseAnalyzer() {
       marginTop: "15px",
       fontStyle: "italic",
     },
+
+    howItWorksTitle: {
+      margin: 0,
+      marginBottom: "10px",
+      fontSize: "0.95rem",
+      fontWeight: 800,
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      color: "var(--text-light)",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      letterSpacing: "0.3px",
+    },
+    howItWorksTitleIcon: {
+      width: "34px",
+      height: "34px",
+      borderRadius: "10px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background:
+        "linear-gradient(135deg, rgba(231, 152, 1, 0.22), rgba(131, 53, 137, 0.12))",
+      border: "1px solid rgba(231, 152, 1, 0.35)",
+      color: "var(--accent-orange)",
+      flex: "0 0 auto",
+    },
+    howItWorksList: {
+      margin: 0,
+      paddingLeft: "18px",
+      color: "var(--text-dim)",
+      lineHeight: 1.6,
+      fontSize: "0.9rem",
+    },
+    howItWorksLink: {
+      color: "var(--accent-orange)",
+      textDecoration: "underline",
+      fontWeight: 700,
+    },
+    kbd: {
+      display: "inline-block",
+      padding: "2px 6px",
+      borderRadius: "6px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(26, 17, 36, 0.65)",
+      color: "var(--text-light)",
+      fontSize: "0.85em",
+      fontFamily:
+        "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+      margin: "0 2px",
+    },
   };
 
   return (
@@ -594,8 +630,6 @@ export default function ResponseAnalyzer() {
                     }}
                   />
                 </div>
-              </div>
-              <div className="input-grid">
                 <div>
                   <label style={styles.fieldLabel}>Category</label>
                   <select
@@ -629,6 +663,8 @@ export default function ResponseAnalyzer() {
                     <option>EWS</option>
                   </select>
                 </div>
+              </div>
+              <div className="input-grid">
                 <div>
                   <label style={styles.fieldLabel}>City</label>
                   <input
@@ -654,28 +690,7 @@ export default function ResponseAnalyzer() {
                 </div>
               </div>
               <div className="upload-area" style={styles.uploadArea}>
-                <label style={styles.fieldLabel}>Response Source</label>
-                <input
-                  type="url"
-                  name="link"
-                  placeholder="Paste link (may face CORS restriction)"
-                  style={{
-                    marginBottom: "15px",
-                    borderWidth: "1px",
-                    borderStyle: "solid",
-                    borderColor: "#2a1d35",
-                    padding: "12px 16px",
-                    borderRadius: "10px",
-                    color: "#ffffff",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "0.95rem",
-                    transition: "all 0.3s ease",
-                    width: "100%",
-                    backgroundColor: "rgba(10, 6, 20, 0.8)",
-                  }}
-                  value={formData.link}
-                  onChange={handleInputChange}
-                />
+                <label style={styles.fieldLabel}>Upload Response File</label>
                 <div
                   className="upload-box"
                   onClick={() => fileInputRef.current?.click()}
@@ -727,6 +742,7 @@ export default function ResponseAnalyzer() {
                   />
                 </div>
               </div>
+
               <button
                 className="btn-neon"
                 style={{ ...styles.btnNeon, marginTop: "25px" }}
@@ -822,36 +838,79 @@ export default function ResponseAnalyzer() {
           >
             <h3 style={styles.leaderboardH3}>
               <i className="fas fa-trophy" style={styles.leaderboardH3Icon}></i>
-              Local Leaderboard
+              Leaderboard (Top 10)
             </h3>
             <div id="leaderboard">
-              {leaderboard.map((student, index) => (
-                <div
-                  key={index}
-                  className="topper-row"
-                  style={{
-                    ...styles.topperRow,
-                    ...(index === leaderboard.length - 1
-                      ? { borderBottom: "none" }
-                      : null),
-                  }}
-                >
-                  <span style={styles.topperRowName}>
-                    <b style={styles.topperIndex}>{index + 1}.</b>{" "}
-                    {student.name}
-                  </span>
-                  <span style={styles.topperScore}>{student.total}</span>
-                </div>
-              ))}
+              {leaderboardLoading ? (
+                <p className="leaderboard-note" style={styles.leaderboardNote}>
+                  Loading...
+                </p>
+              ) : leaderboard.length === 0 ? (
+                <p className="leaderboard-note" style={styles.leaderboardNote}>
+                  No submissions yet
+                </p>
+              ) : (
+                leaderboard.map((student, index) => (
+                  <div
+                    key={index}
+                    className="topper-row"
+                    style={{
+                      ...styles.topperRow,
+                      ...(index === leaderboard.length - 1
+                        ? { borderBottom: "none" }
+                        : null),
+                    }}
+                  >
+                    <span style={styles.topperRowName}>
+                      <b style={styles.topperIndex}>{index + 1}.</b>{" "}
+                      {student.name}
+                    </span>
+                    <span style={styles.topperScore}>{student.total}</span>
+                  </div>
+                ))
+              )}
             </div>
             <p className="leaderboard-note" style={styles.leaderboardNote}>
-              *Stored on this device only
+              *Top 10 by total score
             </p>
           </div>
+
+          {/* <div
+            className="glass-card how-it-works-card"
+            style={{ ...styles.glassCard, padding: "24px", marginTop: "18px" }}
+          >
+            <h3 style={styles.howItWorksTitle}>
+              <span style={styles.howItWorksTitleIcon}>
+                <i className="fas fa-list-check"></i>
+              </span>
+              How this works
+            </h3>
+
+            <ol style={styles.howItWorksList}>
+              <li>
+                Login and open your Answer Key{" "}
+                <a
+                  href="https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={styles.howItWorksLink}
+                >
+                  https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html
+                </a>
+              </li>
+              <li>
+                Press <span style={styles.kbd}>Ctrl</span>+
+                <span style={styles.kbd}>S</span> and save your Answer Key{" "}
+                <strong>(DO NOT PRESS PRINT)</strong>
+              </li>
+              <li>Upload the saved file</li>
+              <li>Click on “Analyze Now”</li>
+            </ol>
+          </div> */}
         </aside>
       </div>
 
-      <style>{`
+      <style jsx global>{`
         :root {
           --primary-purple: #833589;
           --accent-orange: #e79801;
