@@ -194,6 +194,286 @@ export default function ResponseAnalyzer() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const styles = {
+    animatedBg: {
+      position: "fixed",
+      top: "-50%",
+      left: "-50%",
+      width: "200%",
+      height: "200%",
+      background:
+        "radial-gradient(circle at 20% 30%, rgba(131, 53, 137, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(231, 152, 1, 0.1) 0%, transparent 50%)",
+      animation: "gradientShift 20s ease infinite",
+      zIndex: -1,
+      pointerEvents: "none",
+    },
+
+    decoCircleBase: {
+      position: "fixed",
+      borderRadius: "50%",
+      pointerEvents: "none",
+      opacity: 0.4,
+      zIndex: 0,
+    },
+    decoCircle1: {
+      width: "400px",
+      height: "400px",
+      background:
+        "radial-gradient(circle, rgba(131, 53, 137, 0.2), transparent)",
+      top: "-200px",
+      right: "-200px",
+      animation: "rotate 20s linear infinite",
+    },
+    decoCircle2: {
+      width: "300px",
+      height: "300px",
+      background:
+        "radial-gradient(circle, rgba(231, 152, 1, 0.15), transparent)",
+      bottom: "-150px",
+      left: "-150px",
+      animation: "rotate 25s linear infinite reverse",
+    },
+
+    header: {
+      background: "rgba(26, 17, 36, 0.95)",
+      backdropFilter: "blur(20px)",
+      padding: "15px 5%",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderBottom: "2px solid rgba(131, 53, 137, 0.3)",
+      position: "sticky",
+      top: 0,
+      zIndex: 100,
+      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+    },
+
+    logo: {
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 800,
+      fontSize: "1.4rem",
+      color: "var(--text-light)",
+    },
+    logoAccent: {
+      color: "var(--accent-orange)",
+    },
+
+    container: {
+      maxWidth: "1100px",
+      margin: "40px auto",
+      padding: "0 20px",
+      position: "relative",
+      zIndex: 1,
+    },
+
+    glassCard: {
+      background: "rgba(26, 17, 36, 0.6)",
+      backdropFilter: "blur(20px)",
+      border: "1px solid var(--card-border)",
+      borderRadius: "20px",
+      padding: "30px",
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+      position: "relative",
+      overflow: "hidden",
+      animation: "fadeIn 0.5s ease",
+    },
+
+    h2: {
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontSize: "1.6rem",
+      fontWeight: 700,
+      marginBottom: "24px",
+      color: "var(--text-light)",
+    },
+
+    uploadArea: {
+      marginTop: "20px",
+    },
+
+    uploadBoxP: {
+      color: "var(--text-dim)",
+      fontSize: "0.9rem",
+      margin: 0,
+    },
+
+    btnNeon: {
+      background: "linear-gradient(135deg, var(--accent-orange), #f5a623)",
+      color: "#1a0a20",
+      border: "none",
+      padding: "15px 30px",
+      borderRadius: "10px",
+      fontWeight: 700,
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      width: "100%",
+      cursor: "pointer",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+      transition: "all 0.3s ease",
+      fontSize: "0.95rem",
+      position: "relative",
+      overflow: "hidden",
+      boxShadow: "0 10px 30px rgba(231, 152, 1, 0.3)",
+    },
+
+    btnNeonSecondary: {
+      background: "rgba(131, 53, 137, 0.2)",
+      color: "var(--text-light)",
+      border: "1px solid var(--primary-purple)",
+      boxShadow: "none",
+      marginTop: "20px",
+    },
+
+    resName: {
+      color: "var(--accent-orange)",
+      margin: "0 0 8px 0",
+      fontSize: "1.8rem",
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      fontWeight: 700,
+    },
+
+    resMeta: {
+      color: "var(--text-dim)",
+      fontSize: "0.9rem",
+      marginBottom: "20px",
+      paddingBottom: "20px",
+      borderBottom: "1px solid var(--card-border)",
+    },
+
+    statBox: {
+      background: "rgba(10, 6, 20, 0.6)",
+      padding: "24px",
+      borderRadius: "16px",
+      textAlign: "center",
+      border: "1px solid var(--card-border)",
+      transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+      position: "relative",
+      overflow: "hidden",
+    },
+
+    statBoxHighlight: {
+      border: "1px solid var(--accent-orange)",
+      background:
+        "linear-gradient(135deg, rgba(231, 152, 1, 0.15), rgba(131, 53, 137, 0.1))",
+      padding: "32px",
+    },
+
+    statIcon: {
+      width: "50px",
+      height: "50px",
+      margin: "0 auto 12px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "12px",
+      fontSize: "1.5rem",
+      background:
+        "linear-gradient(135deg, rgba(131, 53, 137, 0.2), rgba(131, 53, 137, 0.05))",
+      border: "1px solid rgba(131, 53, 137, 0.3)",
+      position: "relative",
+      zIndex: 1,
+    },
+
+    statIconHighlight: {
+      width: "70px",
+      height: "70px",
+      fontSize: "2rem",
+      background:
+        "linear-gradient(135deg, rgba(231, 152, 1, 0.3), rgba(131, 53, 137, 0.2))",
+      border: "1px solid var(--accent-orange)",
+      animation: "icon-float 3s ease infinite",
+    },
+
+    fieldLabel: {
+      display: "block",
+      fontSize: "0.75rem",
+      color: "var(--text-dim)",
+      marginBottom: "6px",
+      fontWeight: 600,
+      textTransform: "uppercase",
+      letterSpacing: "0.5px",
+    },
+
+    statLabel: {
+      fontSize: "0.8rem",
+      marginBottom: "12px",
+      display: "block",
+      fontWeight: 600,
+      letterSpacing: "0.5px",
+      position: "relative",
+      zIndex: 1,
+      textTransform: "uppercase",
+      color: "var(--text-dim)",
+    },
+
+    statVal: {
+      fontSize: "2.5rem",
+      fontWeight: 800,
+      color: "var(--accent-orange)",
+      display: "block",
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      position: "relative",
+      zIndex: 1,
+      textShadow: "0 2px 10px rgba(231, 152, 1, 0.3)",
+    },
+
+    statValHighlight: {
+      fontSize: "4rem",
+      background: "linear-gradient(135deg, var(--accent-orange), #f5a623)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+    },
+
+    leaderboardH3: {
+      marginTop: 0,
+      fontSize: "1.1rem",
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      marginBottom: "20px",
+    },
+
+    leaderboardH3Icon: {
+      color: "var(--accent-orange)",
+      fontSize: "1.3rem",
+    },
+
+    topperRow: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "12px 0",
+      borderBottom: "1px solid var(--card-border)",
+      fontSize: "0.9rem",
+      transition: "all 0.2s ease",
+    },
+
+    topperRowName: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    },
+
+    topperIndex: {
+      color: "var(--primary-purple)",
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+    },
+
+    topperScore: {
+      color: "var(--accent-orange)",
+      fontWeight: 800,
+      fontFamily: '"Bricolage Grotesque", sans-serif',
+    },
+
+    leaderboardNote: {
+      fontSize: "0.75rem",
+      color: "var(--text-dim)",
+      marginTop: "15px",
+      fontStyle: "italic",
+    },
+  };
+
   return (
     <>
       <Head>
@@ -216,24 +496,30 @@ export default function ResponseAnalyzer() {
         />
       </Head>
 
-      <div className="animated-bg"></div>
-      <div className="deco-circle deco-circle-1"></div>
-      <div className="deco-circle deco-circle-2"></div>
+      <div className="animated-bg" style={styles.animatedBg}></div>
+      <div
+        className="deco-circle deco-circle-1"
+        style={{ ...styles.decoCircleBase, ...styles.decoCircle1 }}
+      ></div>
+      <div
+        className="deco-circle deco-circle-2"
+        style={{ ...styles.decoCircleBase, ...styles.decoCircle2 }}
+      ></div>
 
-      <header>
-        <div className="logo">
-          IPM<span>CAREERS</span>
+      <header style={styles.header}>
+        <div className="logo" style={styles.logo}>
+          IPM<span style={styles.logoAccent}>CAREERS</span>
         </div>
       </header>
 
-      <div className="container">
+      <div className="container" style={styles.container}>
         <main>
           {view === "setup" && (
-            <div id="setupView" className="glass-card">
-              <h2>IIM-B UG Response Analyzer</h2>
+            <div id="setupView" className="glass-card" style={styles.glassCard}>
+              <h2 style={styles.h2}>IIM-B UG Response Analyzer</h2>
               <div className="input-grid">
                 <div>
-                  <label>Name</label>
+                  <label style={styles.fieldLabel}>Name</label>
                   <input
                     type="text"
                     name="name"
@@ -256,7 +542,7 @@ export default function ResponseAnalyzer() {
                   />
                 </div>
                 <div>
-                  <label>Mobile No.</label>
+                  <label style={styles.fieldLabel}>Mobile No.</label>
                   <input
                     type="tel"
                     name="mobile"
@@ -279,7 +565,7 @@ export default function ResponseAnalyzer() {
                   />
                 </div>
                 <div>
-                  <label>Email</label>
+                  <label style={styles.fieldLabel}>Email</label>
                   <input
                     type="email"
                     name="email"
@@ -304,7 +590,7 @@ export default function ResponseAnalyzer() {
               </div>
               <div className="input-grid">
                 <div>
-                  <label>Category</label>
+                  <label style={styles.fieldLabel}>Category</label>
                   <select
                     name="category"
                     value={formData.category}
@@ -321,6 +607,13 @@ export default function ResponseAnalyzer() {
                       transition: "all 0.3s ease",
                       width: "100%",
                       backgroundColor: "rgba(10, 6, 20, 0.8)",
+                      cursor: "pointer",
+                      appearance: "none",
+                      backgroundImage:
+                        "url(\"data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23E79801' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E\")",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 16px center",
+                      paddingRight: "45px",
                     }}
                   >
                     <option>General</option>
@@ -330,7 +623,7 @@ export default function ResponseAnalyzer() {
                   </select>
                 </div>
                 <div>
-                  <label>City</label>
+                  <label style={styles.fieldLabel}>City</label>
                   <input
                     type="text"
                     name="city"
@@ -353,8 +646,8 @@ export default function ResponseAnalyzer() {
                   />
                 </div>
               </div>
-              <div className="upload-area">
-                <label>Response Source</label>
+              <div className="upload-area" style={styles.uploadArea}>
+                <label style={styles.fieldLabel}>Response Source</label>
                 <input
                   type="url"
                   name="link"
@@ -400,14 +693,20 @@ export default function ResponseAnalyzer() {
                       display: "block",
                     }}
                   ></i>
-                  <p>
+                  <p style={styles.uploadBoxP}>
                     <strong>
                       {selectedFile
                         ? selectedFile.name
                         : "Upload HTML Response File"}
                     </strong>
                   </p>
-                  <p style={{ fontSize: "0.8rem", marginTop: "5px" }}>
+                  <p
+                    style={{
+                      ...styles.uploadBoxP,
+                      fontSize: "0.8rem",
+                      marginTop: "5px",
+                    }}
+                  >
                     {selectedFile
                       ? `${(selectedFile.size / 1024).toFixed(1)} KB`
                       : "Click to browse or drag and drop"}
@@ -415,7 +714,7 @@ export default function ResponseAnalyzer() {
                   <input
                     type="file"
                     ref={fileInputRef}
-                    className="hidden"
+                    style={{ display: "none" }}
                     accept=".html,.htm"
                     onChange={handleFileChange}
                   />
@@ -423,7 +722,7 @@ export default function ResponseAnalyzer() {
               </div>
               <button
                 className="btn-neon"
-                style={{ marginTop: "25px" }}
+                style={{ ...styles.btnNeon, marginTop: "25px" }}
                 onClick={startProcess}
               >
                 <i
@@ -437,38 +736,70 @@ export default function ResponseAnalyzer() {
           )}
 
           {view === "results" && currentStudent && (
-            <div id="resultsView" className="glass-card">
-              <h2 id="resName">{currentStudent.name}</h2>
-              <p id="resMeta">
+            <div
+              id="resultsView"
+              className="glass-card"
+              style={styles.glassCard}
+            >
+              <h2 id="resName" style={styles.resName}>
+                {currentStudent.name}
+              </h2>
+              <p id="resMeta" style={styles.resMeta}>
                 {currentStudent.category} | {currentStudent.city} |{" "}
                 {currentStudent.mobile}
               </p>
 
               <div className="stats-grid">
-                <div className="stat-box highlight">
-                  <div className="stat-icon">🏆</div>
-                  <label>Total Score</label>
-                  <span className="val">{currentStudent.total}</span>
+                <div
+                  className="stat-box highlight"
+                  style={{ ...styles.statBox, ...styles.statBoxHighlight }}
+                >
+                  <div
+                    className="stat-icon"
+                    style={{ ...styles.statIcon, ...styles.statIconHighlight }}
+                  >
+                    🏆
+                  </div>
+                  <label style={styles.statLabel}>Total Score</label>
+                  <span
+                    className="val"
+                    style={{ ...styles.statVal, ...styles.statValHighlight }}
+                  >
+                    {currentStudent.total}
+                  </span>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-icon">📝</div>
-                  <label>Verbal Ability</label>
-                  <span className="val">{currentStudent.s1}</span>
+                <div className="stat-box" style={styles.statBox}>
+                  <div className="stat-icon" style={styles.statIcon}>
+                    📝
+                  </div>
+                  <label style={styles.statLabel}>Verbal Ability</label>
+                  <span className="val" style={styles.statVal}>
+                    {currentStudent.s1}
+                  </span>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-icon">🧩</div>
-                  <label>Logical Reasoning</label>
-                  <span className="val">{currentStudent.s2}</span>
+                <div className="stat-box" style={styles.statBox}>
+                  <div className="stat-icon" style={styles.statIcon}>
+                    🧩
+                  </div>
+                  <label style={styles.statLabel}>Logical Reasoning</label>
+                  <span className="val" style={styles.statVal}>
+                    {currentStudent.s2}
+                  </span>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-icon">🔢</div>
-                  <label>Quantitative Ability</label>
-                  <span className="val">{currentStudent.s3}</span>
+                <div className="stat-box" style={styles.statBox}>
+                  <div className="stat-icon" style={styles.statIcon}>
+                    🔢
+                  </div>
+                  <label style={styles.statLabel}>Quantitative Ability</label>
+                  <span className="val" style={styles.statVal}>
+                    {currentStudent.s3}
+                  </span>
                 </div>
               </div>
 
               <button
                 className="btn-neon secondary no-print"
+                style={{ ...styles.btnNeon, ...styles.btnNeonSecondary }}
                 onClick={resetAnalysis}
               >
                 <i className="fas fa-redo"></i> New Analysis
@@ -478,28 +809,42 @@ export default function ResponseAnalyzer() {
         </main>
 
         <aside className="no-print">
-          <div className="glass-card leaderboard-card">
-            <h3>
-              <i className="fas fa-trophy"></i>
+          <div
+            className="glass-card leaderboard-card"
+            style={{ ...styles.glassCard, padding: "24px" }}
+          >
+            <h3 style={styles.leaderboardH3}>
+              <i className="fas fa-trophy" style={styles.leaderboardH3Icon}></i>
               Local Leaderboard
             </h3>
             <div id="leaderboard">
               {leaderboard.map((student, index) => (
-                <div key={index} className="topper-row">
-                  <span>
-                    <b>{index + 1}.</b> {student.name}
+                <div
+                  key={index}
+                  className="topper-row"
+                  style={{
+                    ...styles.topperRow,
+                    ...(index === leaderboard.length - 1
+                      ? { borderBottom: "none" }
+                      : null),
+                  }}
+                >
+                  <span style={styles.topperRowName}>
+                    <b style={styles.topperIndex}>{index + 1}.</b>{" "}
+                    {student.name}
                   </span>
-                  <span>{student.total}</span>
+                  <span style={styles.topperScore}>{student.total}</span>
                 </div>
               ))}
             </div>
-            <p className="leaderboard-note">*Stored on this device only</p>
+            <p className="leaderboard-note" style={styles.leaderboardNote}>
+              *Stored on this device only
+            </p>
           </div>
         </aside>
       </div>
 
-      {/* Global styles for variables and background */}
-      <style jsx global>{`
+      <style>{`
         :root {
           --primary-purple: #833589;
           --accent-orange: #e79801;
@@ -512,97 +857,23 @@ export default function ResponseAnalyzer() {
           --danger: #ef4444;
         }
 
-        /* Animated background needs to be on body/main container */
         body {
           background-color: var(--bg-dark);
           color: var(--text-light);
           margin: 0;
           overflow-x: hidden;
+          font-family: "DM Sans", sans-serif;
         }
-      `}</style>
 
-      {/* Scoped styles for the component content */}
-      <style jsx>{`
         * {
           box-sizing: border-box;
         }
 
-        .container,
-        .glass-card,
-        .btn-neon,
-        .stat-box,
-        input,
-        select {
-          font-family: "DM Sans", sans-serif;
-        }
-
-        /* Re-implement body::before as a fixed div in the component since styled-jsx global body::before can be tricky with Next.js layouts */
-        .animated-bg {
-          position: fixed;
-          top: -50%;
-          left: -50%;
-          width: 200%;
-          height: 200%;
-          background: radial-gradient(
-              circle at 20% 30%,
-              rgba(131, 53, 137, 0.15) 0%,
-              transparent 50%
-            ),
-            radial-gradient(
-              circle at 80% 70%,
-              rgba(231, 152, 1, 0.1) 0%,
-              transparent 50%
-            );
-          animation: gradientShift 20s ease infinite;
-          z-index: -1;
-          pointer-events: none;
-        }
-
-        @keyframes gradientShift {
-          0%,
-          100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(5%, 5%);
-          }
-        }
-
-        header {
-          background: rgba(26, 17, 36, 0.95);
-          backdrop-filter: blur(20px);
-          padding: 15px 5%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom-width: 2px !important;
-          border-bottom-style: solid !important;
-          border-bottom-color: rgba(131, 53, 137, 0.3) !important;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo {
-          font-family: "Bricolage Grotesque", sans-serif;
-          font-weight: 800;
-          font-size: 1.4rem;
-        }
-
-        .logo span {
-          color: var(--accent-orange);
-        }
-
+        /* Responsive grid needs CSS (inline styles can't be overridden by media queries) */
         .container {
-          max-width: 1100px;
-          margin: 40px auto;
-          padding: 0 20px;
           display: grid;
           grid-template-columns: 1fr 320px;
           gap: 30px;
-          position: relative;
-          z-index: 1;
         }
 
         @media (max-width: 992px) {
@@ -611,54 +882,6 @@ export default function ResponseAnalyzer() {
           }
         }
 
-        .glass-card {
-          background: rgba(26, 17, 36, 0.6);
-          backdrop-filter: blur(20px);
-          border-width: 1px !important;
-          border-style: solid !important;
-          border-color: #2a1d35 !important;
-          border-radius: 20px;
-          padding: 30px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .glass-card::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: linear-gradient(
-            90deg,
-            var(--primary-purple),
-            var(--accent-orange),
-            var(--primary-purple)
-          );
-          background-size: 200% 100%;
-          animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
-        }
-
-        h2 {
-          font-family: "Bricolage Grotesque", sans-serif;
-          font-size: 1.6rem;
-          font-weight: 700;
-          margin-bottom: 24px;
-          color: var(--text-light);
-        }
-
-        /* Inputs */
         .input-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -666,67 +889,49 @@ export default function ResponseAnalyzer() {
           margin-bottom: 15px;
         }
 
-        label {
-          display: block;
-          font-size: 0.75rem;
-          color: var(--text-dim);
-          margin-bottom: 6px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          margin: 30px 0;
         }
 
+        @media (max-width: 768px) {
+          .input-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .stat-box.highlight {
+            grid-column: span 1;
+          }
+        }
+
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+        }
+
+        /* Focus/placeholder */
         input:focus,
         select:focus {
           border-color: #833589 !important;
           outline: none;
-          box-shadow: 0 0 0 3px rgba(131, 53, 137, 0.1);
+          box-shadow: 0 0 0 3px rgba(131, 53, 137, 0.1) !important;
         }
 
         input::placeholder {
           color: rgba(184, 169, 195, 0.5);
         }
 
-        select {
-          cursor: pointer;
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23E79801' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 16px center;
-          padding-right: 45px;
-        }
-
-        .upload-area {
-          margin-top: 20px;
-        }
-
+        /* Hover/pseudo-elements + keyframes */
         .upload-box:hover {
           border-color: #833589 !important;
-          background: rgba(131, 53, 137, 0.05);
-        }
-
-        .upload-box p {
-          color: var(--text-dim);
-          font-size: 0.9rem;
-        }
-
-        .btn-neon {
-          background: linear-gradient(135deg, var(--accent-orange), #f5a623);
-          color: #1a0a20;
-          border: none;
-          padding: 15px 30px;
-          border-radius: 10px;
-          font-weight: 700;
-          font-family: "Bricolage Grotesque", sans-serif;
-          width: 100%;
-          cursor: pointer;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          transition: all 0.3s ease;
-          font-size: 0.95rem;
-          position: relative;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(231, 152, 1, 0.3);
+          background: rgba(131, 53, 137, 0.05) !important;
         }
 
         .btn-neon::before {
@@ -747,7 +952,7 @@ export default function ResponseAnalyzer() {
 
         .btn-neon:hover {
           transform: translateY(-2px);
-          box-shadow: 0 15px 40px rgba(231, 152, 1, 0.4);
+          box-shadow: 0 15px 40px rgba(231, 152, 1, 0.4) !important;
         }
 
         .btn-neon:hover::before {
@@ -758,40 +963,25 @@ export default function ResponseAnalyzer() {
           transform: translateY(0);
         }
 
-        .btn-neon.secondary {
-          background: rgba(131, 53, 137, 0.2);
-          color: var(--text-light);
-          border: 1px solid var(--primary-purple);
-          box-shadow: none;
-        }
-
         .btn-neon.secondary:hover {
-          background: rgba(131, 53, 137, 0.3);
+          background: rgba(131, 53, 137, 0.3) !important;
         }
 
-        .btn-export {
-          padding: 8px 20px;
-          font-size: 0.8rem;
-          width: auto;
-        }
-
-        /* Stats */
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-          margin: 30px 0;
-        }
-
-        .stat-box {
-          background: rgba(10, 6, 20, 0.6);
-          padding: 24px;
-          border-radius: 16px;
-          text-align: center;
-          border: 1px solid var(--card-border);
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          overflow: hidden;
+        .glass-card::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(
+            90deg,
+            var(--primary-purple),
+            var(--accent-orange),
+            var(--primary-purple)
+          );
+          background-size: 200% 100%;
+          animation: shimmer 3s linear infinite;
         }
 
         .stat-box::before {
@@ -815,20 +1005,13 @@ export default function ResponseAnalyzer() {
         }
 
         .stat-box:hover {
-          border-color: var(--primary-purple);
+          border-color: var(--primary-purple) !important;
           transform: translateY(-5px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(131, 53, 137, 0.3);
+          box-shadow: 0 20px 40px rgba(131, 53, 137, 0.3) !important;
         }
 
         .stat-box.highlight {
-          border-color: var(--accent-orange);
-          background: linear-gradient(
-            135deg,
-            rgba(231, 152, 1, 0.15),
-            rgba(131, 53, 137, 0.1)
-          );
           grid-column: span 3;
-          padding: 32px;
         }
 
         .stat-box.highlight::after {
@@ -848,6 +1031,34 @@ export default function ResponseAnalyzer() {
           animation: pulse-glow 3s ease infinite;
         }
 
+        .topper-row:hover {
+          padding-left: 8px !important;
+          color: var(--accent-orange) !important;
+        }
+
+        .topper-row:last-child {
+          border-bottom: none;
+        }
+
+        @keyframes gradientShift {
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          50% {
+            transform: translate(5%, 5%);
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+
         @keyframes pulse-glow {
           0%,
           100% {
@@ -860,38 +1071,6 @@ export default function ResponseAnalyzer() {
           }
         }
 
-        .stat-icon {
-          width: 50px;
-          height: 50px;
-          margin: 0 auto 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 12px;
-          font-size: 1.5rem;
-          background: linear-gradient(
-            135deg,
-            rgba(131, 53, 137, 0.2),
-            rgba(131, 53, 137, 0.05)
-          );
-          border: 1px solid rgba(131, 53, 137, 0.3);
-          position: relative;
-          z-index: 1;
-        }
-
-        .stat-box.highlight .stat-icon {
-          width: 70px;
-          height: 70px;
-          font-size: 2rem;
-          background: linear-gradient(
-            135deg,
-            rgba(231, 152, 1, 0.3),
-            rgba(131, 53, 137, 0.2)
-          );
-          border-color: var(--accent-orange);
-          animation: icon-float 3s ease infinite;
-        }
-
         @keyframes icon-float {
           0%,
           100% {
@@ -902,138 +1081,6 @@ export default function ResponseAnalyzer() {
           }
         }
 
-        .stat-box label {
-          font-size: 0.8rem;
-          margin-bottom: 12px;
-          display: block;
-          font-weight: 600;
-          letter-spacing: 0.5px;
-          position: relative;
-          z-index: 1;
-        }
-
-        .stat-box .val {
-          font-size: 2.5rem;
-          font-weight: 800;
-          color: var(--accent-orange);
-          display: block;
-          font-family: "Bricolage Grotesque", sans-serif;
-          position: relative;
-          z-index: 1;
-          text-shadow: 0 2px 10px rgba(231, 152, 1, 0.3);
-        }
-
-        .stat-box.highlight .val {
-          font-size: 4rem;
-          background: linear-gradient(135deg, var(--accent-orange), #f5a623);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .hidden {
-          display: none;
-        }
-
-        /* Results Header */
-        #resName {
-          color: var(--accent-orange);
-          margin: 0 0 8px 0;
-          font-size: 1.8rem;
-        }
-
-        #resMeta {
-          color: var(--text-dim);
-          font-size: 0.9rem;
-          margin-bottom: 20px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid var(--card-border);
-        }
-
-        /* Leaderboard */
-        .leaderboard-card {
-          padding: 24px;
-        }
-
-        .leaderboard-card h3 {
-          margin-top: 0;
-          font-size: 1.1rem;
-          font-family: "Bricolage Grotesque", sans-serif;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 20px;
-        }
-
-        .leaderboard-card h3 i {
-          color: var(--accent-orange);
-          font-size: 1.3rem;
-        }
-
-        .topper-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 0;
-          border-bottom: 1px solid var(--card-border);
-          font-size: 0.9rem;
-          transition: all 0.2s ease;
-        }
-
-        .topper-row:hover {
-          padding-left: 8px;
-          color: var(--accent-orange);
-        }
-
-        .topper-row:last-child {
-          border-bottom: none;
-        }
-
-        .topper-row span:first-child {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .topper-row b {
-          color: var(--primary-purple);
-          font-family: "Bricolage Grotesque", sans-serif;
-        }
-
-        .topper-row span:last-child {
-          color: var(--accent-orange);
-          font-weight: 800;
-          font-family: "Bricolage Grotesque", sans-serif;
-        }
-
-        .leaderboard-note {
-          font-size: 0.75rem;
-          color: var(--text-dim);
-          margin-top: 15px;
-          font-style: italic;
-        }
-
-        @media print {
-          .no-print {
-            display: none;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .input-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .stats-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .stat-box.highlight {
-            grid-column: span 1;
-          }
-        }
-
-        /* Loading animation */
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -1043,45 +1090,6 @@ export default function ResponseAnalyzer() {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-
-        .glass-card {
-          animation: fadeIn 0.5s ease;
-        }
-
-        /* Decorative circles */
-        .deco-circle {
-          position: fixed;
-          border-radius: 50%;
-          pointer-events: none;
-          opacity: 0.4;
-          z-index: 0;
-        }
-
-        .deco-circle-1 {
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(
-            circle,
-            rgba(131, 53, 137, 0.2),
-            transparent
-          );
-          top: -200px;
-          right: -200px;
-          animation: rotate 20s linear infinite;
-        }
-
-        .deco-circle-2 {
-          width: 300px;
-          height: 300px;
-          background: radial-gradient(
-            circle,
-            rgba(231, 152, 1, 0.15),
-            transparent
-          );
-          bottom: -150px;
-          left: -150px;
-          animation: rotate 25s linear infinite reverse;
         }
 
         @keyframes rotate {
