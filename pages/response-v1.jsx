@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
+import { NextSeo } from "next-seo";
 import axios from "axios";
 
 export default function ResponseAnalyzer() {
@@ -691,9 +692,9 @@ export default function ResponseAnalyzer() {
   return (
     <>
       <Head>
-        <title>IIM Bangalore UG Response Key Analyzer</title>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
           rel="stylesheet"
@@ -709,6 +710,37 @@ export default function ResponseAnalyzer() {
           rel="stylesheet"
         />
       </Head>
+
+      <NextSeo
+        title="IIM Bangalore UG Response Sheet & Answer Key | IIM B UG Response Key Tool + Score Calculator"
+        description="Analyze your IIM Bangalore UG response sheet instantly. Upload your response HTML to calculate section-wise and total score using the IIM B UG Response Key Tool, Answer Key, and Score Calculator."
+        canonical="https://register.ipmcareer.com/response-v1"
+        additionalMetaTags={[
+          {
+            name: "keywords",
+            content:
+              "iim bangalore ug response sheet, IIM B UG Response Key Tool, IIM Bangalore, IIM Bangalore UG, IIM Bangalore UG Answer Key, IIM Bangalore UG Score Calculator, IIM Bangalore UG Response Key Tool, IIM B UG Score Calculator",
+          },
+          { name: "robots", content: "index, follow" },
+          { name: "googlebot", content: "index, follow" },
+        ]}
+        openGraph={{
+          url: "https://register.ipmcareer.com/response-v1",
+          title:
+            "IIM Bangalore UG Response Sheet & Answer Key | IIM B UG Response Key Tool + Score Calculator",
+          description:
+            "Upload your IIM Bangalore UG response sheet HTML and get your calculated score instantly with the IIM Bangalore UG Response Key Tool and Score Calculator.",
+          images: [
+            {
+              url: "/iimbug.png",
+              width: 1200,
+              height: 630,
+              alt: "IIM Bangalore UG Response Key Tool",
+            },
+          ],
+        }}
+        twitter={{ cardType: "summary" }}
+      ></NextSeo>
 
       <div className="animated-bg" style={styles.animatedBg}></div>
       <div
