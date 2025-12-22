@@ -65,8 +65,8 @@ export default async function handler(req, res) {
       name: "IIMB Response Analyzer",
       address: config.from,
     },
-    // to: "ipmcareeronline@gmail.com",
-    to: "devankit1994@gmail.com",
+    to: "ipmcareeronline@gmail.com",
+    // to: "devankit1994@gmail.com",
     subject: "New IIMB Scorecard Uploaded",
     text: `
 New IIMB scorecard upload received:
