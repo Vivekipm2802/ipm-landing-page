@@ -2,12 +2,21 @@
 
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import axios from "axios";
 
 export default function IPMATScorePage() {
   const [showResult, setShowResult] = useState(false);
   const [userName, setUserName] = useState("Result Summary");
   const [fileMeta, setFileMeta] = useState({ name: "", size: 0 });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    category: "GEN",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [scores, setScores] = useState({
     total: 0,
@@ -29,30 +38,53 @@ export default function IPMATScorePage() {
     setUserName("Result Summary");
     setScores({ total: 0, sa: 0, mcq: 0, va: 0, stats: [] });
     setFileMeta({ name: "", size: 0 });
+    setSelectedFile(null);
     setDragActive(false);
+    setFormData({ name: "", mobile: "", email: "", category: "GEN" });
     const input = document.getElementById("fileInput");
     if (input) input.value = "";
+  };
+
+  const clearFile = () => {
+    setFileMeta({ name: "", size: 0 });
+    setSelectedFile(null);
+    const input = document.getElementById("fileInput");
+    if (input) input.value = "";
+  };
+
+  const uploadToCloudinary = async (file) => {
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size exceeds the limit of 10MB");
+      return null;
+    }
+
+    const imageData = new FormData();
+    imageData.append("file", file);
+    imageData.append("upload_preset", "leg7fkr7"); // Using same preset as ImageUploader.js
+
+    try {
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/duyo9pzxy/auto/upload/",
+        imageData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload failed", error);
+      alert("Failed to upload file. Please try again.");
+      return null;
+    }
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setFileMeta({ name: file.name, size: file.size });
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(event.target.result, "text/html");
-
-      const name =
-        doc.querySelector("table td:nth-child(2)")?.innerText || "Candidate";
-      setUserName(`Scorecard: ${name}`);
-
-      processData(doc);
-    };
-
-    reader.readAsText(file);
+    setSelectedFile(file);
   };
 
   const handleDrop = (e) => {
@@ -62,27 +94,13 @@ export default function IPMATScorePage() {
 
     const file = e.dataTransfer?.files?.[0];
     if (!file) return;
-
     if (!/\.html?$/i.test(file.name)) return;
 
     setFileMeta({ name: file.name, size: file.size });
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(event.target.result, "text/html");
-
-      const name =
-        doc.querySelector("table td:nth-child(2)")?.innerText || "Candidate";
-      setUserName(`Scorecard: ${name}`);
-
-      processData(doc);
-    };
-
-    reader.readAsText(file);
+    setSelectedFile(file);
   };
 
-  const processData = (doc) => {
+  const calculateScoresFromDoc = (doc) => {
     const stats = {
       SA: { n: "Quant SA", c: 0, w: 0, s: 0, m: 0, neg: 0 },
       MCQ: { n: "Quant MCQ", c: 0, w: 0, s: 0, m: 0, neg: 1 },
@@ -135,9 +153,9 @@ export default function IPMATScorePage() {
         const menu = panel.querySelector(".menu-tbl");
         if (!menu) return;
 
-        const chosen = Array.from(menu.querySelectorAll("td")).find((td) =>
-          td.innerText.includes("Chosen Option")
-        )?.nextElementSibling?.innerText.trim();
+        const chosen = Array.from(menu.querySelectorAll("td"))
+          .find((td) => td.innerText.includes("Chosen Option"))
+          ?.nextElementSibling?.innerText.trim();
 
         const tick = panel.querySelector('img[src*="tick.png"]');
         const correctNum = tick
@@ -156,16 +174,87 @@ export default function IPMATScorePage() {
     });
 
     const total = stats.SA.m + stats.MCQ.m + stats.VA.m;
-
-    setScores({
+    return {
       total,
       sa: stats.SA.m,
       mcq: stats.MCQ.m,
       va: stats.VA.m,
       stats: Object.values(stats),
-    });
+    };
+  };
 
-    setShowResult(true);
+  const handleSubmit = async () => {
+    // Validations
+    if (!formData.name.trim()) {
+      alert("Please enter your name.");
+      return;
+    }
+    if (!/^\d{10}$/.test(formData.mobile)) {
+      alert("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    if (!selectedFile) {
+      alert("Please upload your response sheet.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 1. Process locally first to get scores
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(event.target.result, "text/html");
+
+          const calculatedScores = calculateScoresFromDoc(doc);
+          const name =
+            doc.querySelector("table td:nth-child(2)")?.innerText ||
+            formData.name ||
+            "Candidate";
+
+          // 2. Upload to Cloudinary
+          const fileUrl = await uploadToCloudinary(selectedFile);
+          if (!fileUrl) {
+            setIsSubmitting(false);
+            return;
+          }
+
+          // 3. Send email to Admin with scores
+          await axios.post("/api/sendScorecardAdmin", {
+            ...formData,
+            fileUrl,
+            scores: {
+              sa: calculatedScores.sa,
+              mcq: calculatedScores.mcq,
+              va: calculatedScores.va,
+              total: calculatedScores.total,
+            },
+          });
+
+          // 4. Update UI
+          setUserName(`Scorecard: ${name}`);
+          setScores(calculatedScores);
+          setShowResult(true);
+          setIsSubmitting(false);
+        } catch (innerError) {
+          console.error(innerError);
+          setIsSubmitting(false);
+          alert("Error processing file. Please check if it's valid.");
+        }
+      };
+
+      reader.readAsText(selectedFile);
+    } catch (error) {
+      console.error(error);
+      setIsSubmitting(false);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   const ActionButton = ({ icon, children, onClick, variant = "primary" }) => (
@@ -211,6 +300,48 @@ export default function IPMATScorePage() {
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         />
+        <style>{`
+          .rcFormGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            width: 100%;
+          }
+
+          .rcInputGroup {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .rcLabel {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+          }
+
+          .rcInput {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.2s;
+          }
+
+          .rcInput:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+          }
+
+          .rcDropzoneDisabled {
+            opacity: 0.6;
+            pointer-events: none;
+            background-color: #f9f9f9;
+            cursor: not-allowed;
+          }
+        `}</style>
       </Head>
 
       <div className="rcPage">
@@ -218,11 +349,7 @@ export default function IPMATScorePage() {
         <header className="rcTopbar">
           <div className="rcTopbarInner">
             <a className="rcBrand" href="/">
-              <img
-                className="rcLogo"
-                src="ipm_logo.svg"
-                alt="IPM Careers"
-              />
+              <img className="rcLogo" src="ipm_logo.svg" alt="IPM Careers" />
             </a>
 
             {/* <div className="rcTopbarActions">
@@ -267,7 +394,6 @@ export default function IPMATScorePage() {
                 </span>
               </div>
             </div>
-
           </div>
         </section>
 
@@ -282,22 +408,87 @@ export default function IPMATScorePage() {
                     <div className="rcCardHeader">
                       <h2 className="rcCardTitle">Generate Your Score Sheet</h2>
                       <p className="rcCardSubtitle">
-                        Upload your <b>official response HTML file</b>. Your
-                        file never leaves your device.
+                        Fill your details and upload your{" "}
+                        <b>official response HTML file</b>.
                       </p>
+                    </div>
+
+                    <div
+                      className="rcFormGrid"
+                      style={{ marginBottom: "20px" }}
+                    >
+                      <div className="rcInputGroup">
+                        <label className="rcLabel">Name</label>
+                        <input
+                          className="rcInput"
+                          type="text"
+                          placeholder="Your Name"
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="rcInputGroup">
+                        <label className="rcLabel">Mobile</label>
+                        <input
+                          className="rcInput"
+                          type="tel"
+                          placeholder="Your Mobile"
+                          value={formData.mobile}
+                          onChange={(e) =>
+                            setFormData({ ...formData, mobile: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="rcInputGroup">
+                        <label className="rcLabel">Email</label>
+                        <input
+                          className="rcInput"
+                          type="email"
+                          placeholder="Your Email"
+                          value={formData.email}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="rcInputGroup">
+                        <label className="rcLabel">Category</label>
+                        <select
+                          className="rcInput"
+                          value={formData.category}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              category: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="GEN">GEN</option>
+                          <option value="OBC">OBC</option>
+                          <option value="SC/ST">SC/ST</option>
+                          <option value="EWS">EWS</option>
+                          <option value="PWD">PWD</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div
                       className={`rcDropzone ${
                         dragActive ? "rcDropzoneActive" : ""
-                      }`}
+                      } ${isSubmitting ? "rcDropzoneDisabled" : ""}`}
                       role="button"
                       tabIndex={0}
-                      onClick={() =>
-                        document.getElementById("fileInput")?.click()
-                      }
+                      onClick={() => {
+                        if (!isSubmitting)
+                          document.getElementById("fileInput")?.click();
+                      }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                        if (
+                          !isSubmitting &&
+                          (e.key === "Enter" || e.key === " ")
+                        ) {
                           e.preventDefault();
                           document.getElementById("fileInput")?.click();
                         }
@@ -324,13 +515,21 @@ export default function IPMATScorePage() {
                         <i className="fas fa-file-arrow-up" />
                       </div>
                       <div className="rcDropText">
-                        <p className="rcDropTitle">
-                          Drag & drop your HTML file here
-                        </p>
-                        <p className="rcDropSub">
-                          or <span className="rcLinkLike">browse</span> to select
-                          it
-                        </p>
+                        {isSubmitting ? (
+                          <p className="rcDropTitle">
+                            Processing... Please wait...
+                          </p>
+                        ) : (
+                          <>
+                            <p className="rcDropTitle">
+                              Drag & drop your HTML file here
+                            </p>
+                            <p className="rcDropSub">
+                              or <span className="rcLinkLike">browse</span> to
+                              select it
+                            </p>
+                          </>
+                        )}
                       </div>
 
                       <input
@@ -354,7 +553,7 @@ export default function IPMATScorePage() {
                         <button
                           className="rcIconBtn"
                           type="button"
-                          onClick={reset}
+                          onClick={clearFile}
                           aria-label="Clear selected file"
                         >
                           <i className="fa-solid fa-xmark" />
@@ -362,16 +561,35 @@ export default function IPMATScorePage() {
                       </div>
                     ) : null}
 
+                    <div style={{ marginTop: "20px" }}>
+                      <button
+                        className="rcBtn"
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        style={{
+                          width: "100%",
+                          justifyContent: "center",
+                          opacity: isSubmitting ? 0.7 : 1,
+                        }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <i className="fa-solid fa-circle-notch fa-spin" />
+                            <span className="rcBtnText">Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-bolt" />
+                            <span className="rcBtnText">
+                              Generate Scorecard
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
                     <div className="rcInfoRow">
-                      <div className="rcInfo">
-                        <p className="rcInfoTitle">
-                          <i className="fa-solid fa-lock" /> Privacy-first
-                        </p>
-                        <p className="rcInfoText">
-                          Your response sheet is parsed locally in your browser.
-                          Nothing is uploaded or stored.
-                        </p>
-                      </div>
                       <div className="rcInfo">
                         <p className="rcInfoTitle">
                           <i className="fa-solid fa-circle-info" /> Tip
@@ -422,7 +640,11 @@ export default function IPMATScorePage() {
                         value={scores.sa}
                         sub="+4 / 0"
                       />
-                      <ScoreCard label="QA MCQ" value={scores.mcq} sub="+4 / -1" />
+                      <ScoreCard
+                        label="QA MCQ"
+                        value={scores.mcq}
+                        sub="+4 / -1"
+                      />
                       <ScoreCard
                         label="Verbal Ability"
                         value={scores.va}
@@ -438,7 +660,11 @@ export default function IPMATScorePage() {
                         </p>
                       </div>
 
-                      <div className="rcTableWrap" role="region" aria-label="Marks table">
+                      <div
+                        className="rcTableWrap"
+                        role="region"
+                        aria-label="Marks table"
+                      >
                         <table className="rcTable">
                           <thead>
                             <tr>
@@ -568,10 +794,12 @@ export default function IPMATScorePage() {
                   <p className="rcSideCTAHeadline">Want more tools?</p>
                   <div className="rcSideLinks">
                     <a className="rcSideLink" href="/call">
-                      IPMAT Call Predictor <i className="fa-solid fa-arrow-right" />
+                      IPMAT Call Predictor{" "}
+                      <i className="fa-solid fa-arrow-right" />
                     </a>
                     <a className="rcSideLink" href="/topperlist">
-                      IPMAT Topper List <i className="fa-solid fa-arrow-right" />
+                      IPMAT Topper List{" "}
+                      <i className="fa-solid fa-arrow-right" />
                     </a>
                   </div>
                 </div>
@@ -592,8 +820,8 @@ export default function IPMATScorePage() {
             --rc-muted: #5b616e;
 
             --rc-card: rgba(255, 255, 255, 0.92);
-            --rc-border: rgba(20, 21, 26, 0.10);
-            --rc-shadow: 0 18px 60px rgba(17, 24, 39, 0.10);
+            --rc-border: rgba(20, 21, 26, 0.1);
+            --rc-shadow: 0 18px 60px rgba(17, 24, 39, 0.1);
 
             --rc-radius: 18px;
           }
@@ -696,7 +924,7 @@ export default function IPMATScorePage() {
           }
 
           .rcBtnSecondary:hover {
-            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.10);
+            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.1);
           }
 
           .rcBtnIcon {
@@ -832,7 +1060,7 @@ export default function IPMATScorePage() {
           }
 
           .rcMiniItem {
-            background: rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 14px;
             padding: 12px;
@@ -955,7 +1183,7 @@ export default function IPMATScorePage() {
             border-radius: 16px;
             display: grid;
             place-items: center;
-            background: rgba(131, 53, 137, 0.10);
+            background: rgba(131, 53, 137, 0.1);
             color: var(--rc-brand1);
             font-size: 22px;
             flex: 0 0 auto;
@@ -1201,7 +1429,7 @@ export default function IPMATScorePage() {
           }
 
           .rcTableTotalRow td {
-            background: rgba(242, 173, 0, 0.10) !important;
+            background: rgba(242, 173, 0, 0.1) !important;
             border-bottom: 0;
           }
 
@@ -1283,7 +1511,7 @@ export default function IPMATScorePage() {
             height: 28px;
             border-radius: 10px;
             background: rgba(131, 53, 137, 0.12);
-            border: 1px solid rgba(131, 53, 137, 0.20);
+            border: 1px solid rgba(131, 53, 137, 0.2);
             color: rgba(131, 53, 137, 1);
             font-weight: 900;
             display: grid;
@@ -1344,7 +1572,7 @@ export default function IPMATScorePage() {
 
           .rcSideLink:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.10);
+            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.1);
           }
 
           /* Responsive */
