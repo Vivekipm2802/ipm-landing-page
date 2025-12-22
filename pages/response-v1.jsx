@@ -249,10 +249,13 @@ export default function ResponseAnalyzer() {
     },
 
     logo: {
-      fontFamily: '"Bricolage Grotesque", sans-serif',
-      fontWeight: 800,
-      fontSize: "1.4rem",
-      color: "var(--text-light)",
+      display: "flex",
+      alignItems: "center",
+    },
+    logoImg: {
+      height: "34px",
+      width: "auto",
+      display: "block",
     },
     logoAccent: {
       color: "var(--accent-orange)",
@@ -508,7 +511,11 @@ export default function ResponseAnalyzer() {
 
       <header style={styles.header}>
         <div className="logo" style={styles.logo}>
-          IPM<span style={styles.logoAccent}>CAREERS</span>
+          <img
+            src="/whitelogoipm.svg"
+            alt="IPM Careers"
+            style={styles.logoImg}
+          />
         </div>
       </header>
 
