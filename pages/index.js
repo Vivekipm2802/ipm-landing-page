@@ -669,7 +669,7 @@ export default function Home() {
           <div className={styles.grad1}></div>
           <div className={styles.grad2}></div>
           <div className={styles.c1}>
-            <h2>India's Premium IPMAT Coaching here</h2>
+            <h2>India's Premium IPMAT Coaching</h2>
             <p>Join now to grab the opportunity to learn from our experts</p>
             <div className={styles.trust}>TRUSTED BY THOUSANDS OF STUDENTS</div>
             <Switcher features={features} />

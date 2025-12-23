@@ -144,6 +144,58 @@ function cronberryTrigger(username, u_email, u_mobile, u_year, u_city, linke) {
 
   xhr.send(data);
 }
+async function salesforceTrigger(username, u_email, u_mobile, u_city) {
+  try {
+    // Step 1: Get Access Token
+    const tokenResponse = await axios.post(
+      'https://login.salesforce.com/services/oauth2/token',
+      qs.stringify({
+        grant_type: 'password',
+        client_id: '3MVG9FINO1nsxRuDEnk6xn3s.omMitXxOVinGtQZD45w_v2Ok_X8KmAbKpyo5VHpY18KqJveslF1TU1epB6q1',
+        client_secret: '073E3DAFA1AD79DE697905B1197458513D424030A433C019019703B346FDC908',
+        username: 'nmimsintegrationuser@nmims.com',
+        password: 'Salesforce#1'
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }
+    );
+
+    const { access_token, instance_url } = tokenResponse.data;
+
+    // Step 2: Create Lead
+    const nameParts = username.split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || firstName;
+
+    await axios.post(
+      `${instance_url}/services/apexrest/LeadCreation`,
+      {
+        FirstName: firstName,
+        LastName: lastName,
+        Email: u_email,
+        MobilePhone: u_mobile,
+        City: u_city,
+        Program__c: "Management",
+        Program_Level__c: "Postgraduate Programs",
+        Course__c: "MBA",
+        LeadSource: "API",
+        utm_source__C: "IPM",
+        UTM_Campaign_Name__c: "NPAT Landing Page"
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access_token}`
+        }
+      }
+    );
+
+    console.log('Salesforce lead created successfully');
+  } catch (error) {
+    console.error('Salesforce error:', error);
+  }
+}
 
 const mentors=[
   {
@@ -464,6 +516,7 @@ async function SubmitContact(){
     TestApi();
     triggerInterakt();
       /* await axios.post('/') */
+      salesforceTrigger(formData.fullname, formData.email, formData.phone, formData.city);
       cronberryTrigger(formData.fullname,formData.email,formData.phone,formData.year,formData.city,'https://register.ipmcareer.com');
       const {data,error} = await supabase.from('ipm_leads').insert({
         name:formData.fullname,
