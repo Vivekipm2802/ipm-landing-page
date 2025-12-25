@@ -547,10 +547,10 @@ export default function Home() {
   async function callSalesforceOAuth() {
     const data = qs.stringify({
       grant_type: 'password',
-      client_id: '3MVG9FINO1nsxRuDEnk6xn3s.omMitXxOVinGtQZD45w_v2Ok_X8KmAbKpyo5VHpY18KqJveslF1TU1epB6q1',
-      client_secret: '073E3DAFA1AD79DE697905B1197458513D424030A433C019019703B346FDC908',
-      username: 'nmimsintegrationuser@nmims.com',
-      password: 'Salesforce#1'
+      client_id: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_ID,
+      client_secret: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_SECRET,
+      username: process.env.NEXT_PUBLIC_SALESFORCE_USERNAME,
+      password: process.env.NEXT_PUBLIC_SALESFORCE_PASSWORD
     });
 
     try {
