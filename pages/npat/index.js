@@ -48,8 +48,6 @@ export default function Home() {
   const [timeoutId, setTimeoutId] = useState(null);
   const [datahtml, setHtml] = useState();
   const [formData, setFormData] = useState();
-  const [accessToken, setAccessToken] = useState();
-  const [instanceUrl, setInstanceUrl] = useState();
 
   const testimonials = [
     {
@@ -515,8 +513,7 @@ export default function Home() {
       console.log(error);
     }
     await axios.post("/api/contactEmail", formData);
-    await callSalesforceOAuth();
-    await createSalesforceLead();
+    await axios.post("/api/salesforce-lead", formData);
     setNotification("Submitted successfully!");
     setLoader(false);
     setSubmitted(true);
@@ -542,67 +539,6 @@ export default function Home() {
       .catch((res) => {
         handleAPI(formData.fullname, formData.email, res.data);
       });
-  }
-
-  async function callSalesforceOAuth() {
-    const data = qs.stringify({
-      grant_type: 'password',
-      client_id: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_ID,
-      client_secret: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_SECRET,
-      username: process.env.NEXT_PUBLIC_SALESFORCE_USERNAME,
-      password: process.env.NEXT_PUBLIC_SALESFORCE_PASSWORD
-    });
-
-    try {
-      const response = await axios.post('https://login.salesforce.com/services/oauth2/token', data, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-      console.log(response.data);
-      setAccessToken(response.data.access_token);
-      setInstanceUrl(response.data.instance_url);
-    } catch (error) {
-      console.error('Error calling Salesforce OAuth:', error);
-    }
-  }
-
-  async function createSalesforceLead() {
-    if (!accessToken || !instanceUrl) {
-      console.error('Access token or instance URL not available');
-      return;
-    }
-
-    const nameParts = formData.fullname.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || firstName; // If only one name, use it as lastName
-
-    const leadData = {
-      FirstName: firstName,
-      LastName: lastName,
-      Email: formData.email,
-      MobilePhone: formData.phone,
-      State: '', // Not provided in formData
-      City: formData.city,
-      Program__c: 'Management',
-      Program_Level__c: 'Postgraduate Programs',
-      Course__c: 'MBA',
-      LeadSource: 'API',
-      utm_source__c: 'IPM',
-      UTM_Campaign_Name__c: ''
-    };
-
-    try {
-      const response = await axios.post(`${instanceUrl}/services/apexrest/LeadCreation`, leadData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      console.log('Lead creation response:', response.data);
-    } catch (error) {
-      console.error('Error creating Salesforce lead:', error.response ? error.response.data : error.message);
-    }
   }
 
   async function studentlogin(d) {
