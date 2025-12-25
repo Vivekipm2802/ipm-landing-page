@@ -48,6 +48,8 @@ export default function Home() {
   const [timeoutId, setTimeoutId] = useState(null);
   const [datahtml, setHtml] = useState();
   const [formData, setFormData] = useState();
+  const [accessToken, setAccessToken] = useState();
+  const [instanceUrl, setInstanceUrl] = useState();
 
   const testimonials = [
     {
@@ -82,7 +84,7 @@ export default function Home() {
     "Limited Seats",
     "Best Coaching",
   ];
-  function cronberryTrigger(
+  async function cronberryTrigger(
     username,
     u_email,
     u_mobile,
@@ -92,73 +94,74 @@ export default function Home() {
   ) {
     console.log(arguments);
 
-    var id = Date.now();
-    var data = JSON.stringify({
-      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
-      audienceId: id,
-      name: username,
-      email: u_email,
-      mobile: u_mobile,
-      ios_fcm_token: "",
-      web_fcm_token: "",
-      android_fcm_token: "",
-      profile_path: "",
-      active: "",
-      audience_id: "",
-      paramList: [
-        {
-          paramKey: "source",
-          paramValue: "",
-        },
-        {
-          paramKey: "city",
-          paramValue: u_city,
-        },
-        {
-          paramKey: "postcode",
-          paramValue: "",
-        },
-        {
-          paramKey: "total_amount",
-          paramValue: "",
-        },
-        {
-          paramKey: "abondon_cart",
-          paramValue: true,
-        },
-        {
-          paramKey: "preparing_for_which_year",
-          paramValue: u_year,
-        },
-        {
-          paramKey: "subject",
-          paramValue: "",
-        },
-        {
-          paramKey: "formurl",
-          paramValue: linke,
-        },
-        {
-          paramKey: "formname",
-          paramValue: "NPAT Mumbai Landing Page",
-        },
-      ],
-    });
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("readystatechange", function () {
-      if (this.readyState === 4) {
-        setLoader(false);
-        setNotification("Submitted Successfully");
-        setSubmitted(true);
-      }
-    });
-    xhr.open(
-      "POST",
-      "https://register.cronberry.com/api/campaign/register-audience-data"
-    );
-    xhr.setRequestHeader("Content-Type", "application/json");
+    return new Promise((resolve, reject) => {
+      var id = Date.now();
+      var data = JSON.stringify({
+        projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
+        audienceId: id,
+        name: username,
+        email: u_email,
+        mobile: u_mobile,
+        ios_fcm_token: "",
+        web_fcm_token: "",
+        android_fcm_token: "",
+        profile_path: "",
+        active: "",
+        audience_id: "",
+        paramList: [
+          {
+            paramKey: "source",
+            paramValue: "",
+          },
+          {
+            paramKey: "city",
+            paramValue: u_city,
+          },
+          {
+            paramKey: "postcode",
+            paramValue: "",
+          },
+          {
+            paramKey: "total_amount",
+            paramValue: "",
+          },
+          {
+            paramKey: "abondon_cart",
+            paramValue: true,
+          },
+          {
+            paramKey: "preparing_for_which_year",
+            paramValue: u_year,
+          },
+          {
+            paramKey: "subject",
+            paramValue: "",
+          },
+          {
+            paramKey: "formurl",
+            paramValue: linke,
+          },
+          {
+            paramKey: "formname",
+            paramValue: "NPAT Mumbai Landing Page",
+          },
+        ],
+      });
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === 4) {
+          resolve();
+        }
+      });
+      xhr.onerror = reject;
+      xhr.open(
+        "POST",
+        "https://register.cronberry.com/api/campaign/register-audience-data"
+      );
+      xhr.setRequestHeader("Content-Type", "application/json");
 
-    xhr.send(data);
+      xhr.send(data);
+    });
   }
 
   const mentors = [
@@ -487,7 +490,7 @@ export default function Home() {
     TestApi();
     triggerInterakt();
     /* await axios.post('/') */
-    cronberryTrigger(
+    await cronberryTrigger(
       formData.fullname,
       formData.email,
       formData.phone,
@@ -511,6 +514,12 @@ export default function Home() {
     } else if (error) {
       console.log(error);
     }
+    await axios.post("/api/contactEmail", formData);
+    await callSalesforceOAuth();
+    await createSalesforceLead();
+    setNotification("Submitted successfully!");
+    setLoader(false);
+    setSubmitted(true);
   }
 
   async function TestApi() {
@@ -533,6 +542,67 @@ export default function Home() {
       .catch((res) => {
         handleAPI(formData.fullname, formData.email, res.data);
       });
+  }
+
+  async function callSalesforceOAuth() {
+    const data = qs.stringify({
+      grant_type: 'password',
+      client_id: '3MVG9FINO1nsxRuDEnk6xn3s.omMitXxOVinGtQZD45w_v2Ok_X8KmAbKpyo5VHpY18KqJveslF1TU1epB6q1',
+      client_secret: '073E3DAFA1AD79DE697905B1197458513D424030A433C019019703B346FDC908',
+      username: 'nmimsintegrationuser@nmims.com',
+      password: 'Salesforce#1'
+    });
+
+    try {
+      const response = await axios.post('https://login.salesforce.com/services/oauth2/token', data, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      console.log(response.data);
+      setAccessToken(response.data.access_token);
+      setInstanceUrl(response.data.instance_url);
+    } catch (error) {
+      console.error('Error calling Salesforce OAuth:', error);
+    }
+  }
+
+  async function createSalesforceLead() {
+    if (!accessToken || !instanceUrl) {
+      console.error('Access token or instance URL not available');
+      return;
+    }
+
+    const nameParts = formData.fullname.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || firstName; // If only one name, use it as lastName
+
+    const leadData = {
+      FirstName: firstName,
+      LastName: lastName,
+      Email: formData.email,
+      MobilePhone: formData.phone,
+      State: '', // Not provided in formData
+      City: formData.city,
+      Program__c: 'Management',
+      Program_Level__c: 'Postgraduate Programs',
+      Course__c: 'MBA',
+      LeadSource: 'API',
+      utm_source__c: 'IPM',
+      UTM_Campaign_Name__c: ''
+    };
+
+    try {
+      const response = await axios.post(`${instanceUrl}/services/apexrest/LeadCreation`, leadData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      console.log('Lead creation response:', response.data);
+    } catch (error) {
+      console.error('Error creating Salesforce lead:', error.response ? error.response.data : error.message);
+    }
   }
 
   async function studentlogin(d) {
