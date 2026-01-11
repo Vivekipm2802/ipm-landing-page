@@ -16,5 +16,10 @@
       ]
     }
   ],
-  "rewrites": [{ "source": "/dist/(.*)", "destination": "/dist/$1" }]
+  "rewrites": [
+    {
+      "source": "/air1commadcenter/(.*)",
+      "destination": "/air1commadcenter/$1"
+    }
+  ]
 }
