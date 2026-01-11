@@ -15,11 +15,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/air1commandcenter/(.*)",
-      "destination": "/air1commandcenter/$1"
-    }
   ]
 }
