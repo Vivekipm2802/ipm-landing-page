@@ -18,8 +18,8 @@
   ],
   "rewrites": [
     {
-      "source": "/air1commadcenter/(.*)",
-      "destination": "/air1commadcenter/$1"
+      "source": "/air1commandcenter/(.*)",
+      "destination": "/air1commandcenter/$1"
     }
   ]
 }
