@@ -679,7 +679,7 @@ export default function Home() {
           <div className={styles.grad1}></div>
           <div className={styles.grad2}></div>
           <div className={styles.c1}>
-            <h2>Premium NPATs Crash Course by IPM Careers</h2>
+            <h2>Premium NPATss Crash Course by IPM Careers</h2>
             <p>Join now to grab the opportunity to learn from our experts</p>
             <div className={styles.trust}>Starting from 15th March</div>
             <Switcher features={features} />
