@@ -1,17 +1,17 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
-import remarkGfm from 'remark-gfm';
+import Link from "next/link";
+import Image from "next/image";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
+import remarkGfm from "remark-gfm";
 
 export default function BlogsPage({ blogs, error, debugInfo }) {
   return (
-    <main 
+    <main
       className="min-h-screen w-full"
-      style={{ backgroundColor: '#050818' }}
+      style={{ backgroundColor: "#050818" }}
     >
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
         <header className="mb-8 sm:mb-12">
@@ -40,7 +40,9 @@ export default function BlogsPage({ blogs, error, debugInfo }) {
 
         {blogs.length === 0 ? (
           <div className="text-center py-20 rounded-2xl bg-[#0F172B] border border-[rgba(245,158,11,0.15)]">
-            <p className="text-xl text-slate-400">No blogs found. Add .md files to content/blogs/</p>
+            <p className="text-xl text-slate-400">
+              No blogs found. Add .md files to content/blogs/
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -49,7 +51,12 @@ export default function BlogsPage({ blogs, error, debugInfo }) {
                 <div className="rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-full cursor-pointer hover:-translate-y-1 bg-[#0F172B] border border-[rgba(245,158,11,0.15)]">
                   {blog.coverImage && (
                     <div className="relative h-48 w-full overflow-hidden">
-                      <Image src={blog.coverImage} alt={blog.title} fill className="object-cover" />
+                      <Image
+                        src={blog.coverImage}
+                        alt={blog.title}
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                      />
                     </div>
                   )}
                   <div className="p-6">
@@ -57,17 +64,24 @@ export default function BlogsPage({ blogs, error, debugInfo }) {
                       {blog.title}
                     </h2>
                     <p className="text-slate-400 text-sm mb-3">
-                      {new Date(blog.date).toLocaleDateString('en-US', {
-                        year: 'numeric', month: 'long', day: 'numeric',
+                      {new Date(blog.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
                       })}
                     </p>
                     {blog.excerpt && (
-                      <p className="text-slate-300 mb-4 line-clamp-3">{blog.excerpt}</p>
+                      <p className="text-slate-300 mb-4 line-clamp-3">
+                        {blog.excerpt}
+                      </p>
                     )}
                     {blog.tags && blog.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {blog.tags.map((tag) => (
-                          <span key={tag} className="text-xs px-3 py-1 rounded-full font-medium bg-[rgba(99,102,241,0.15)] text-[#a5b4fc] border border-[rgba(245,158,11,0.15)]">
+                          <span
+                            key={tag}
+                            className="text-xs px-3 py-1 rounded-full font-medium bg-[rgba(99,102,241,0.15)] text-[#a5b4fc] border border-[rgba(245,158,11,0.15)]"
+                          >
                             {tag}
                           </span>
                         ))}
@@ -87,10 +101,10 @@ export default function BlogsPage({ blogs, error, debugInfo }) {
 export async function getStaticProps() {
   let blogs = [];
   let error = null;
-  let debugInfo = { contentPath: '', filesFound: [] };
+  let debugInfo = { contentPath: "", filesFound: [] };
 
   try {
-    const blogsDirectory = path.join(process.cwd(), 'content', 'blogs');
+    const blogsDirectory = path.join(process.cwd(), "content", "blogs");
     debugInfo.contentPath = blogsDirectory;
 
     // Check if directory exists
@@ -102,13 +116,13 @@ export async function getStaticProps() {
     const fileNames = fs.readdirSync(blogsDirectory);
     debugInfo.filesFound = fileNames;
 
-    const mdFiles = fileNames.filter((fileName) => fileName.endsWith('.md'));
+    const mdFiles = fileNames.filter((fileName) => fileName.endsWith(".md"));
 
     // Process each markdown file
     const blogPromises = mdFiles.map(async (fileName) => {
-      const slug = fileName.replace(/\.md$/, '');
+      const slug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(blogsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data, content } = matter(fileContents);
 
       const processedContent = await remark()
@@ -119,7 +133,7 @@ export async function getStaticProps() {
       return {
         slug,
         content: processedContent.toString(),
-        title: data.title || 'Untitled',
+        title: data.title || "Untitled",
         date: data.date || new Date().toISOString(),
         lastModified: data.lastModified,
         author: data.author,
@@ -137,15 +151,14 @@ export async function getStaticProps() {
       const timeB = new Date(b.date || 0).getTime();
       return timeB - timeA;
     });
-
   } catch (e) {
     error = e.message || String(e);
-    console.error('Error loading blogs:', e);
+    console.error("Error loading blogs:", e);
   }
 
   return {
     props: {
-      blogs: blogs.map(b => ({
+      blogs: blogs.map((b) => ({
         slug: b.slug,
         title: b.title,
         date: b.date,
