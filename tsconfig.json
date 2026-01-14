@@ -20,7 +20,7 @@
     "pages/okk/index.jsx",
     "pages/blogs/index.js",
     "pages/lib/blogs.js",
-    "pages/blogs/blogcard.jsx",
+    "components/BlogCard.jsx",
     "pages/blogs/index.jsx"
   ],
   "exclude": ["node_modules"]
