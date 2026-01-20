@@ -74,7 +74,15 @@ const AdsLandingPage: React.FC = () => {
                 className="text-6xl md:text-8xl xl:text-9xl font-serif font-black mb-8 leading-[0.9] tracking-tighter"
               >
                 IPMAT is a <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-yellow-200 to-white italic">
+                <span
+                  className="bg-clip-text text-transparent italic"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to right, #F59E0B, #FDE68A, #FFFFFF)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
                   Battle of Logic.
                 </span>
               </motion.h1>
