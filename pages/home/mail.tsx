@@ -213,7 +213,7 @@ const UnifiedRegistrationForm: React.FC<UnifiedRegistrationFormProps> = ({
           Join Directors Special Batch
         </h3>
         <p className="text-slate-400 text-sm mb-8">
-          Schedule a 1-on-1 Strategy Session with Poorva Didi's Team.
+          Schedule a 1-on-1 Strategy Session with Ashutosh Sir's Team.
         </p>
 
         {formStatus === 'success' ? (

@@ -21,6 +21,7 @@ import {
   Layers,
   Menu,
   X,
+  Phone,
 } from "lucide-react";
 import UnifiedRegistrationForm from "./mail";
 
@@ -564,22 +565,23 @@ const AdsLandingPage: React.FC = () => {
               >
                 <Quote className="w-16 h-16 text-brand-900/10" />
 
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tighter uppercase italic leading-[0.85]">
-                  Winning <br />
-                  is a{" "}
+                <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tighter uppercase italic leading-[0.85] max-w-[650px]">
+                  Winning is a{" "}
                   <span className="underline decoration-brand-900 decoration-8">
                     Choice.
                   </span>
                 </h2>
-
                 <p className="text-xl md:text-2xl font-black uppercase tracking-[0.2em] opacity-80">
                   ONLY 50 SEATS IN THE DIRECTOR'S BATCH.
                 </p>
 
                 <button
-                  onClick={() =>
-                    window.scrollTo({ top: 0, behavior: "smooth" })
-                  }
+                  onClick={() => {
+                    // Try multiple methods for maximum compatibility
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                  }}
                   className="group relative px-12 py-6 bg-brand-900 text-white rounded-[40px] font-black text-2xl hover:scale-105 transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex items-center gap-4 overflow-hidden"
                 >
                   <span className="relative z-10">APPLY NOW</span>
@@ -613,7 +615,7 @@ const AdsLandingPage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                className="relative flex justify-center lg:justify-end"
+                className="relative flex flex-col items-center lg:items-end gap-6"
               >
                 {/* Pin */}
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
@@ -638,6 +640,30 @@ const AdsLandingPage: React.FC = () => {
                   {/* Paper texture overlay */}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 rounded-2xl pointer-events-none" />
                 </div>
+
+                {/* Phone Number Card */}
+                <motion.a
+                  href="tel:8299470392"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="group relative bg-brand-900 text-white px-8 py-4 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] hover:scale-105 transition-all duration-300 flex items-center gap-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-brand-gold rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
+                      <Phone className="w-6 h-6 text-brand-900" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-70">
+                        Call Now
+                      </p>
+                      <p className="text-2xl font-black tracking-wider">
+                        8299470392
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 opacity-50 group-hover:translate-x-2 group-hover:opacity-100 transition-all" />
+                </motion.a>
               </motion.div>
             </div>
           </div>
