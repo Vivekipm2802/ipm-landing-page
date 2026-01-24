@@ -285,12 +285,12 @@ const AdsLandingPage: React.FC = () => {
                     <motion.div
                       initial={{ y: 20, opacity: 0 }}
                       whileInView={{ y: 0, opacity: 1 }}
-                      className="p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl"
+                      className="p-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl"
                     >
-                      <h4 className="text-4xl font-serif font-black text-white mb-1">
+                      <h4 className="text-2xl font-serif font-black text-white mb-1">
                         Nikhilesh Sanka
                       </h4>
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
                         <Trophy className="w-5 h-5 text-brand-gold fill-brand-gold" />
                         <span className="text-brand-gold font-black uppercase tracking-widest text-xs">
                           All India Rank 1
@@ -466,25 +466,25 @@ const AdsLandingPage: React.FC = () => {
                   <motion.div
                     initial={{ x: -20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
-                    className="absolute -top-10 -right-10 p-6 bg-white rounded-3xl shadow-2xl z-20 border border-slate-100 hidden lg:block"
+                    className="absolute -top-6 -right-6 lg:-top-10 lg:-right-10 p-4 lg:p-6 bg-white rounded-2xl lg:rounded-3xl shadow-2xl z-20 border border-slate-100"
                   >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Activity className="w-5 h-5 text-green-500" />
+                    <div className="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-4">
+                      <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Activity className="w-4 h-4 lg:w-5 lg:h-5 text-green-500" />
                       </div>
                       <div>
-                        <p className="text-[10px] text-slate-600 font-bold uppercase">
+                        <p className="text-[8px] lg:text-[10px] text-slate-600 font-bold uppercase">
                           Akshat Attri
                         </p>
-                        <p className="text-sm font-black text-brand-gold">
+                        <p className="text-xs lg:text-sm font-black text-brand-gold">
                           AIR 7 IPMAT 2025
                         </p>
-                        <p className="text-sm font-black text-slate-900">
+                        <p className="text-xs lg:text-sm font-black text-slate-900">
                           2 year Classroom student
                         </p>
                       </div>
                     </div>
-                    <div className="flex gap-1 h-6 items-end">
+                    <div className="flex gap-1 h-4 lg:h-6 items-end">
                       {[40, 60, 45, 80, 70, 95].map((h, i) => (
                         <motion.div
                           key={i}
@@ -496,7 +496,7 @@ const AdsLandingPage: React.FC = () => {
                     </div>
                   </motion.div>
 
-                  <div className="rounded-[40px] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] border-8 border-white">
+                  <div className="rounded-[25px] lg:rounded-[40px] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] border-4 lg:border-8 border-white">
                     <img
                       src="/akshat-atri.jpeg"
                       alt="Success Mentoring"
@@ -528,10 +528,6 @@ const AdsLandingPage: React.FC = () => {
                     <h4 className="text-lg font-bold mb-2 text-slate-900">
                       Direct Founder Access
                     </h4>
-                    {/* <p className="text-slate-500 text-sm italic">
-                    Direct access to our founders for strategic career mapping
-                    and IIM Interview prep from Day 1.
-                  </p> */}
                   </div>
                   <div className="p-6 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all border border-slate-100 group">
                     <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-4 group-hover:bg-amber-600 transition-colors">
@@ -540,11 +536,6 @@ const AdsLandingPage: React.FC = () => {
                     <h4 className="text-lg font-bold mb-2 text-slate-900">
                       Legacy of AIR 1
                     </h4>
-                    {/* <p className="text-slate-500 text-sm italic">
-                    Inherited the proven training methodology of IPM Careers.
-                    Our curriculum isn't just 'prep'; it's the exact path taken
-                    by 1000+ successful IIM students.
-                  </p> */}
                   </div>
                 </div>
               </div>
