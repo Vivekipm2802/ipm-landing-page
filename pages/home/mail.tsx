@@ -15,7 +15,7 @@ const sendViaFormSubmit = async (fullname: string, email: string, phone: string,
     formData.append('Target Year', year);
     formData.append('Submitted At', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
     
-    const response = await fetch('https://formsubmit.co/rishabhsingh0363@gmail.com', {
+    const response = await fetch('https://formsubmit.co/ipmcareeronline@gmail.com', {
       method: 'POST',
       body: formData,
       headers: {
