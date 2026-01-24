@@ -5,25 +5,28 @@ import { ArrowRight, Lock, CheckCircle2, Zap } from 'lucide-react';
 // FormSubmit - Production email service
 const sendViaFormSubmit = async (fullname: string, email: string, phone: string, city: string, year: string) => {
   try {
-    const formData = new FormData();
-    formData.append('_subject', '🎓 New IPM Registration Alert!');
-    formData.append('_template', 'table'); // Use clean table format
-    formData.append('Name', fullname);
-    formData.append('Email', email);
-    formData.append('Phone', phone);
-    formData.append('City', city || 'Not provided');
-    formData.append('Target Year', year);
-    formData.append('Submitted At', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
-    
-    const response = await fetch('https://formsubmit.co/ipmcareeronline@gmail.com', {
+    const response = await fetch('https://formsubmit.co/ajax/ipmcareeronline@gmail.com', {
       method: 'POST',
-      body: formData,
       headers: {
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        _subject: '🎓 New IPM Registration Alert!',
+        _template: 'table',
+        _captcha: 'false',
+        Name: fullname,
+        Email: email,
+        Phone: phone,
+        City: city || 'Not provided',
+        'Target Year': year,
+        'Submitted At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+      })
     });
     
-    if (!response.ok) {
+    const data = await response.json();
+    
+    if (data.success !== 'true') {
       throw new Error('FormSubmit failed');
     }
     
@@ -202,7 +205,7 @@ const UnifiedRegistrationForm: React.FC<UnifiedRegistrationFormProps> = ({
       className={`lg:col-span-5 ${className}`}
     >
       <div className="bg-slate-800/40 backdrop-blur-2xl border border-white/10 p-10 rounded-[50px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] relative">
-        <div className="absolute -top-6 -right-6 bg-yellow-400 text-slate-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl animate-bounce">
+        <div className="absolute -top-6 -right-6 bg-brand-gold text-slate-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl animate-bounce">
           Limited Batch Seats
         </div>
 
@@ -292,7 +295,7 @@ const UnifiedRegistrationForm: React.FC<UnifiedRegistrationFormProps> = ({
             <button
               type="submit"
               disabled={formStatus === 'submitting'}
-              className="w-full py-6 bg-yellow-400 text-slate-900 font-black rounded-[20px] text-xl hover:bg-white transition-all transform hover:scale-[1.02] active:scale-95 shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50"
+              className="w-full py-6 bg-brand-gold text-slate-900 font-black rounded-[20px] text-xl hover:bg-white transition-all transform hover:scale-[1.02] active:scale-95 shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {formStatus === 'submitting' ? (
                 <motion.div

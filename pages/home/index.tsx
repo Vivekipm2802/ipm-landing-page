@@ -565,7 +565,8 @@ const AdsLandingPage: React.FC = () => {
                 <Quote className="w-16 h-16 text-brand-900/10" />
 
                 <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tighter uppercase italic leading-[0.85]">
-                  Winning is a <br />
+                  Winning <br />
+                  is a{" "}
                   <span className="underline decoration-brand-900 decoration-8">
                     Choice.
                   </span>
