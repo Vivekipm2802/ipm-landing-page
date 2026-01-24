@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@next/font": "13.1.1",
     "@nextui-org/react": "^2.3.6",
     "@react-pdf/renderer": "^3.4.4",
