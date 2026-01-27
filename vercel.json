@@ -23,7 +23,7 @@
     },
     {
       "source": "/dsbchallenge/(.*)",
-      "destination": "/dsbchallenge/index.html"
+      "destination": "/dsbchallenge/$1"
     }
   ]
 }
