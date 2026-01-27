@@ -20,6 +20,10 @@
     {
       "source": "/air1commadcenter/(.*)",
       "destination": "/air1commadcenter/$1"
+    },
+    {
+      "source": "/dsbchallenge/(.*)",
+      "destination": "/dsbchallenge/$1"
     }
   ]
 }
