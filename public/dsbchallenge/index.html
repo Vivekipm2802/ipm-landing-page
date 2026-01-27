@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>IPM Careers - Elite Mock Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@800&display=swap");
+
+      :root {
+        --primary: #060818;
+        --brand-purple: #833589;
+        --brand-gold: #f2ad00;
+        --surface: rgba(255, 255, 255, 0.02);
+        --surface-bright: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --accent-glow: rgba(131, 53, 137, 0.2);
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background-color: var(--primary);
+        color: #ffffff;
+        overflow-x: hidden;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Cinematic Mesh Background with Brand Purple and Gold accents */
+
+      .bg-mesh {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: var(--primary);
+        background-image:
+          radial-gradient(
+            at 0% 0%,
+            rgba(131, 53, 137, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 0%,
+            rgba(242, 173, 0, 0.05) 0px,
+            transparent 40%
+          ),
+          radial-gradient(at 50% 50%, rgba(6, 8, 24, 1) 0px, transparent 100%),
+          radial-gradient(
+            at 100% 100%,
+            rgba(131, 53, 137, 0.08) 0px,
+            transparent 40%
+          );
+      }
+
+      .noise::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.03;
+        background: url("https://grainy-gradients.vercel.app/noise.svg");
+        mix-blend-mode: overlay;
+      }
+
+      .font-display {
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .font-heavy {
+        font-family: "Bricolage Grotesque", sans-serif;
+      }
+
+      .glass {
+        background: var(--surface);
+        backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      /* Dark Purple/Gold Gradient Variants */
+
+      .grad-primary {
+        background: linear-gradient(180deg, #833589 0%, #4a1d4e 100%);
+      }
+
+      .grad-gold {
+        background: linear-gradient(180deg, #f2ad00 0%, #a67600 100%);
+      }
+
+      .grad-dark {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      }
+
+      .grad-brand-text {
+        background: linear-gradient(180deg, #833589 0%, #f2ad00 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .text-purple {
+        color: #833589;
+      }
+
+      .text-gold {
+        color: #f2ad00;
+      }
+
+      /* Motion Graphics */
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .shimmer-mask {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .shimmer-mask::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.05),
+          transparent
+        );
+        animation: shimmer 3s infinite;
+        pointer-events: none;
+      }
+
+      .glow-btn {
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, #833589 0%, #4a1d4e 100%);
+        color: #ffffff;
+      }
+
+      .glow-btn:hover {
+        box-shadow: 0 0 40px rgba(131, 53, 137, 0.4);
+        transform: scale(1.02) translateY(-2px);
+      }
+
+      @keyframes slideUpFade {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-entrance {
+        animation: slideUpFade 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      /* Fixed Ghost Text Overlap for Mobile */
+
+      .ghost-text {
+        position: absolute;
+        top: 0;
+        right: 0;
+        pointer-events: none;
+        user-select: none;
+        line-height: 1;
+        font-weight: 800;
+        opacity: 0.05;
+        color: white;
+        z-index: 0;
+      }
+
+      @media (max-width: 768px) {
+        .ghost-text {
+          font-size: 5rem;
+          padding: 0.5rem;
+          right: 0.5rem;
+          top: 0.5rem;
+        }
+      }
+
+      @media (min-width: 769px) {
+        .ghost-text {
+          font-size: 16rem;
+          padding: 3rem;
+        }
+      }
+
+      /* Print Optimization */
+
+      @media print {
+        body {
+          background: white !important;
+          color: #1a1a1a !important;
+          font-family: "Outfit", Helvetica, Arial, sans-serif !important;
+        }
+        .noise,
+        .bg-mesh,
+        .glow-btn,
+        button,
+        .QuestionPalette,
+        .no-print,
+        nav,
+        .timer-container {
+          display: none !important;
+        }
+        .glass {
+          background: white !important;
+          border: 1px solid #ddd !important;
+          box-shadow: none !important;
+          backdrop-filter: none !important;
+          color: #1a1a1a !important;
+          margin-bottom: 1.5rem !important;
+          padding: 1.5rem !important;
+          border-radius: 0.5rem !important;
+        }
+        .text-white,
+        .text-slate-400,
+        .text-slate-500,
+        .text-slate-600 {
+          color: #333 !important;
+        }
+        .text-purple {
+          color: #833589 !important;
+        }
+        .text-gold {
+          color: #a67600 !important;
+        }
+        .print-container {
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 1cm !important;
+        }
+        .print-page-break {
+          page-break-before: always;
+        }
+        h1,
+        h2,
+        h3,
+        h4 {
+          color: #000 !important;
+          page-break-after: avoid;
+        }
+        .flex {
+          display: flex !important;
+        }
+        .grid {
+          display: grid !important;
+        }
+        img {
+          max-width: 250px !important;
+          margin: 0 auto !important;
+          display: block !important;
+        }
+      }
+    </style>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+          "react/": "https://esm.sh/react@^19.2.3/",
+          "react": "https://esm.sh/react@^19.2.3"
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="/dsbchallenge/assets/index-CYZdGbPO.js"></script>
+  </head>
+  <body class="noise">
+    <div class="bg-mesh"></div>
+    <div id="root"></div>
+  </body>
+</html>
