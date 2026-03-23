@@ -9,9 +9,8 @@ export default async function handler(req, res) {
   const { name, mobile, email, category, fileUrl, scores } = req.body;
 
   // Supabase Configuration
-  const supabaseUrl = "https://msxeahieemrylklgruhl.supabase.co";
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zeGVhaGllZW1yeWxrbGdydWhsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDg1Mzk5OCwiZXhwIjoyMDY2NDI5OTk4fQ.JqmpLWp5-_UKM71vZKLEu4ehztjxUeY9TCHE9SoLmUU";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // 1. Insert into Supabase
@@ -40,12 +39,11 @@ export default async function handler(req, res) {
   }
 
   const config = {
-    server: "smtp.zeptomail.in",
+    server: process.env.ZEPTOMAIL_SERVER || "smtp.zeptomail.in",
     port: 465,
     username: "emailapikey",
-    password:
-      "PHtE6r1fS7y93mYmoRFVt6S9F5GtMd98r74yeFNG4oxKA/BRG00A+YsskGO1okwrVqERHKKTzt884rjNt7rQdD25Yz0eWGqyqK3sx/VYSPOZsbq6x00ct14ZdULaV4fndd5u3Sffvt/cNA==",
-    from: "noreply@ipmcareer.com",
+    password: process.env.ZEPTOMAIL_API_KEY,
+    from: process.env.MAIL_FROM_NOREPLY || "noreply@ipmcareer.com",
   };
 
   const transporter = nodemailer.createTransport({

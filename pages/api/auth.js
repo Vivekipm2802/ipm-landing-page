@@ -6,7 +6,7 @@ export default async function(req, res) {
     
     if (req.method == "POST") {
         console.log(req.body)
-        const r = [{ email: 'ipmcareeronline@gmail.com', password: 'ipmcareer@79054$' }];
+        const r = [{ email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD }];
 
 
 

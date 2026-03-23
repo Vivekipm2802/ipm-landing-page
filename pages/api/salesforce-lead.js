@@ -12,10 +12,10 @@ export default async function handler(req, res) {
     // Step 1: Get OAuth token
     const oauthData = qs.stringify({
       grant_type: "password",
-      client_id: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_ID,
-      client_secret: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_SECRET,
-      username: process.env.NEXT_PUBLIC_SALESFORCE_USERNAME,
-      password: process.env.NEXT_PUBLIC_SALESFORCE_PASSWORD,
+      client_id: process.env.SALESFORCE_CLIENT_ID,
+      client_secret: process.env.SALESFORCE_CLIENT_SECRET,
+      username: process.env.SALESFORCE_USERNAME,
+      password: process.env.SALESFORCE_PASSWORD,
     });
 
     const oauthResponse = await axios.post(

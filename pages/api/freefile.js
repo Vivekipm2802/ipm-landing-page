@@ -9,7 +9,7 @@ export default function handler(req, res) {
     function cronberryTrigger(username, u_email, u_mobile) {
         const id = Date.now();
         const data = JSON.stringify({
-            "projectKey": "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
+            "projectKey": process.env.CRONBERRY_PROJECT_KEY,
             "audienceId": id,
             "name": username,
             "email": u_email,
@@ -106,11 +106,11 @@ export default function handler(req, res) {
 
 
     const config = {
-        server: 'smtppro.zoho.in',
+        server: process.env.MAIL_SERVER_ZOHO,
         port: 465,
-        username: 'info@ipmcareer.in',
-        password: 'IPMCareers$#@1',
-        from: 'info@ipmcareer.in'
+        username: process.env.MAIL_USER_ZOHO,
+        password: process.env.MAIL_PASS_ZOHO,
+        from: process.env.MAIL_USER_ZOHO
     }
 
 

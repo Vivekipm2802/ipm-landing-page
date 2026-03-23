@@ -3,12 +3,12 @@ const nodemailer = require('nodemailer');
 
 // Define your email configuration
 const transporter = nodemailer.createTransport({
-    host: 'mail.ipmcareer.com',
+    host: process.env.MAIL_SERVER_PRIMARY,
     port: 465,
     secure: true,
     auth: {
-      user: 'register@ipmcareer.com',
-      pass: 'Androidapp1@',
+      user: process.env.MAIL_USER_PRIMARY,
+      pass: process.env.MAIL_PASS_PRIMARY,
     },
   });
   
