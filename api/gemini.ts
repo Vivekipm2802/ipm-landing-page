@@ -36,14 +36,14 @@ export default async function handler(req: Request) {
       );
     }
 
-    // Try v1beta first, then v1 — with multiple models
+    // Try newer model names first (Google updated model availability March 2026)
     const attempts = [
-      { ver: 'v1beta', model: 'gemini-2.0-flash' },
-      { ver: 'v1beta', model: 'gemini-1.5-flash' },
-      { ver: 'v1',     model: 'gemini-2.0-flash' },
-      { ver: 'v1',     model: 'gemini-1.5-flash' },
-      { ver: 'v1beta', model: 'gemini-pro' },
-      { ver: 'v1',     model: 'gemini-pro' },
+      { ver: 'v1beta', model: 'gemini-2.5-flash' },
+      { ver: 'v1beta', model: 'gemini-2.0-flash-001' },
+      { ver: 'v1beta', model: 'gemini-2.5-flash-preview-05-20' },
+      { ver: 'v1',     model: 'gemini-2.5-flash' },
+      { ver: 'v1',     model: 'gemini-2.0-flash-001' },
+      { ver: 'v1beta', model: 'gemini-1.5-flash-002' },
     ];
 
     const allErrors: string[] = [];
