@@ -3,7 +3,6 @@ export const config = {
 };
 
 export default async function handler(req: Request) {
-  // CORS headers for the DSB Challenge subdirectory
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -22,8 +21,8 @@ export default async function handler(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: 'GEMINI_API_KEY not configured on server' }),
-      { status: 500, headers: corsHeaders }
+      JSON.stringify({ error: 'GEMINI_API_KEY not configured on server. Go to Vercel → Settings → Environment Variables and add GEMINI_API_KEY.' }),
+      { status: 200, headers: corsHeaders }
     );
   }
 
@@ -37,13 +36,21 @@ export default async function handler(req: Request) {
       );
     }
 
-    // Try multiple models as fallback
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest'];
-    let lastError = '';
+    // Try v1beta first, then v1 — with multiple models
+    const attempts = [
+      { ver: 'v1beta', model: 'gemini-2.0-flash' },
+      { ver: 'v1beta', model: 'gemini-1.5-flash' },
+      { ver: 'v1',     model: 'gemini-2.0-flash' },
+      { ver: 'v1',     model: 'gemini-1.5-flash' },
+      { ver: 'v1beta', model: 'gemini-pro' },
+      { ver: 'v1',     model: 'gemini-pro' },
+    ];
 
-    for (const model of models) {
+    const allErrors: string[] = [];
+
+    for (const { ver, model } of attempts) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${apiKey}`;
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -59,8 +66,9 @@ export default async function handler(req: Request) {
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
           const errMsg = errData?.error?.message || `HTTP ${res.status}`;
-          lastError = `${model}: ${errMsg}`;
-          // Auth errors won't be fixed by trying another model
+          allErrors.push(`${ver}/${model}: ${errMsg}`);
+
+          // Auth/key errors won't be fixed by trying another model
           if (res.status === 401 || res.status === 403) {
             return new Response(
               JSON.stringify({ error: `API Key error: ${errMsg}` }),
@@ -73,18 +81,19 @@ export default async function handler(req: Request) {
         const data = await res.json();
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         if (!text) {
-          lastError = `${model}: empty response`;
+          allErrors.push(`${ver}/${model}: empty response`);
           continue;
         }
 
+        // Success!
         return new Response(JSON.stringify({ text }), { status: 200, headers: corsHeaders });
       } catch (e: any) {
-        lastError = `${model}: ${e.message}`;
+        allErrors.push(`${ver}/${model}: ${e.message}`);
       }
     }
 
     return new Response(
-      JSON.stringify({ error: `All models failed. ${lastError}` }),
+      JSON.stringify({ error: `All models failed: ${allErrors.join(' | ')}` }),
       { status: 200, headers: corsHeaders }
     );
   } catch (error: any) {
