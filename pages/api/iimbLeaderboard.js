@@ -8,9 +8,8 @@ export default async function handler(req, res) {
   // Prevent caching so leaderboard stays fresh
   res.setHeader("Cache-Control", "no-store, max-age=0");
 
-  const supabaseUrl = "https://msxeahieemrylklgruhl.supabase.co";
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zeGVhaGllZW1yeWxrbGdydWhsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDg1Mzk5OCwiZXhwIjoyMDY2NDI5OTk4fQ.JqmpLWp5-_UKM71vZKLEu4ehztjxUeY9TCHE9SoLmUU";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {

@@ -8,12 +8,12 @@ const nodemailer = require('nodemailer');
 
 // Define your email configuration
 const transporter = nodemailer.createTransport({
-    host: 'smtppro.zoho.in',
+    host: process.env.MAIL_SERVER_ZOHO,
     port: 465,
     secure: true,
     auth: {
-      user: 'info@ipmcareer.in',
-      pass: 'IPMCareers$#@1',
+      user: process.env.MAIL_USER_ZOHO,
+      pass: process.env.MAIL_PASS_ZOHO,
     },
   });
 

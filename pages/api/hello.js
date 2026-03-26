@@ -17,11 +17,11 @@ export default function handler(req, res) {
 
 
     const config = {
-        server: 'smtp.zeptomail.in',
+        server: process.env.ZEPTOMAIL_SERVER || 'smtp.zeptomail.in',
         port: 465,
         username: 'emailapikey',
-        password: 'PHtE6r1fS7y93mYmoRFVt6S9F5GtMd98r74yeFNG4oxKA/BRG00A+YsskGO1okwrVqERHKKTzt884rjNt7rQdD25Yz0eWGqyqK3sx/VYSPOZsbq6x00ct14ZdULaV4fndd5u3Sffvt/cNA==',
-        from: 'noreply@ipmcareer.com'
+        password: process.env.ZEPTOMAIL_API_KEY,
+        from: process.env.MAIL_FROM_NOREPLY || 'noreply@ipmcareer.com'
     }
 
 

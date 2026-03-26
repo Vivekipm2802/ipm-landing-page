@@ -21,10 +21,10 @@ export default async function LoginHandler(req, res) {
 
 
         const data = {
-            client_id: 3158,
-            security_code: 'd1R9fF5mfiE=',
-            course_id: 35736,
-            category_id: 835941,
+            client_id: parseInt(process.env.TCY_CLIENT_ID),
+            security_code: process.env.TCY_SECURITY_CODE,
+            course_id: parseInt(process.env.TCY_COURSE_ID || "35736"),
+            category_id: parseInt(process.env.TCY_CATEGORY_ID || "835941"),
             action: 'register',
             state: 'Uttar Pradesh',
             full_name: formData.full_name,

@@ -22,7 +22,7 @@ export default async function LoginHandler(req, res) {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                "Authorization": "Basic Y3lVZkhzUG9hbkowX2tPS3JqWkVvZllxYWZpNnJxX3FySWQ2b1VUODczUTo=",
+                "Authorization": `Basic ${process.env.INTERAKT_API_KEY}`,
                 "Access-Control-Allow-Origin": "*"
             }
         }).then((reso) => {
@@ -57,7 +57,7 @@ export default async function LoginHandler(req, res) {
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    "Authorization": "Basic Y3lVZkhzUG9hbkowX2tPS3JqWkVvZllxYWZpNnJxX3FySWQ2b1VUODczUTo="
+                    "Authorization": `Basic ${process.env.INTERAKT_API_KEY}`
                 }
             }).then(reso => {
 

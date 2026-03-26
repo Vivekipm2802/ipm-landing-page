@@ -10,19 +10,19 @@ export default async function handler(req, res) {
     }
 
     const config1 = {
-        server: "mail.ipmcareer.com",
+        server: process.env.MAIL_SERVER_PRIMARY,
         port: 465,
-        username: "register@ipmcareer.com",
-        password: "Androidapp1@",
-        from: "register@ipmcareer.com",
+        username: process.env.MAIL_USER_PRIMARY,
+        password: process.env.MAIL_PASS_PRIMARY,
+        from: process.env.MAIL_USER_PRIMARY,
     };
 
     const config2 = {
-        server: "smtppro.zoho.in",
+        server: process.env.MAIL_SERVER_ZOHO,
         port: 465,
-        username: "info@ipmcareer.in",
-        password: "IPMCareers$#@1",
-        from: "info@ipmcareer.in",
+        username: process.env.MAIL_USER_ZOHO,
+        password: process.env.MAIL_PASS_ZOHO,
+        from: process.env.MAIL_USER_ZOHO,
     };
 
     const mainbody = req.body.record;

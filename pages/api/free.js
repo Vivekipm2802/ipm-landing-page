@@ -17,11 +17,11 @@ export default function handler(req, res) {
 
 
     const config = {
-        server: 'mail.ipmcareer.com',
+        server: process.env.MAIL_SERVER_PRIMARY,
         port: 465,
-        username: 'register@ipmcareer.com',
-        password: 'Androidapp1@',
-        from: 'register@ipmcareer.com'
+        username: process.env.MAIL_USER_PRIMARY,
+        password: process.env.MAIL_PASS_PRIMARY,
+        from: process.env.MAIL_USER_PRIMARY
     }
 
 
