@@ -183,7 +183,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       const navButtons = aside.querySelectorAll('button');
       let isAdmin = false;
       navButtons.forEach(b => {
-        if (b.textContent.includes('Results') || b.textContent.includes('Tests') || b.textContent.includes('Leaderboard')) {
+        const txt = b.textContent.trim();
+        if (txt.includes('Simulation Bank') || txt.includes('Lock Terminal') || txt.includes('Sync Cloud') || txt.includes('Student Insights') || txt.includes('Forge New')) {
           isAdmin = true;
         }
       });
