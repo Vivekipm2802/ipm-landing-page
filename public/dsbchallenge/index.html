@@ -236,7 +236,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
               <h2 style="font-size:22px;font-weight:900;color:#f2ad00;text-transform:uppercase;letter-spacing:2px;">Premium Users</h2>
               <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Toggle premium access for any user</p>
             </div>
-            <button onclick="document.getElementById('premium-mgmt-panel').remove()" style="width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#94a3b8;cursor:pointer;font-size:18px;">â</button>
+            <button onclick="document.getElementById('premium-mgmt-panel').remove()" style="width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#94a3b8;cursor:pointer;font-size:18px;">Ã¢ÂÂ</button>
           </div>
 
           <div style="margin-bottom:20px;">
@@ -314,7 +314,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div onclick="window.__premSelectUser('${u.email}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s;" onmouseover="this.style.background='rgba(242,173,0,0.08)'" onmouseout="this.style.background='transparent'">
           <span style="font-size:12px;color:white;font-weight:600;">${u.name || 'No Name'}</span>
           <span style="font-size:10px;color:#64748b;margin-left:8px;">${u.email}</span>
-          ${u.isPremium ? '<span style="font-size:9px;color:#22c55e;margin-left:6px;font-weight:800;">â PREMIUM</span>' : ''}
+          ${u.isPremium ? '<span style="font-size:9px;color:#22c55e;margin-left:6px;font-weight:800;">Ã¢ÂÂ PREMIUM</span>' : ''}
         </div>
       `).join('');
       dropdown.style.display = 'block';
@@ -354,7 +354,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
                 <p style="font-size:14px;font-weight:700;color:white;">${data.name || 'Unknown'}</p>
                 <p style="font-size:11px;color:#94a3b8;margin-top:2px;">${email}</p>
                 <p style="font-size:10px;margin-top:6px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${isPremium ? '#22c55e' : '#ef4444'};">
-                  ${isPremium ? 'â PREMIUM ACTIVE' : 'â FREE USER'}
+                  ${isPremium ? 'Ã¢ÂÂ PREMIUM ACTIVE' : 'Ã¢ÂÂ FREE USER'}
                 </p>
               </div>
               <button id="prem-toggle-btn" onclick="window.__premToggle('${email}', ${!isPremium})" style="padding:10px 18px;border:none;border-radius:12px;font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;background:${isPremium ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)'};color:${isPremium ? '#ef4444' : '#22c55e'};">
@@ -437,24 +437,25 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     observer.observe(document.body, { childList: true, subtree: true });
     </script>
   
-    <!-- Hide difficulty labels from student-facing Duels and Skip n Solve screens -->
+
+    <!-- Hide subject+difficulty from student Duels and Skip n Solve -->
     <script>
     (function(){
       var obs = new MutationObserver(function(){
-        // DUELS: Remove difficulty from "SUBJECT | DIFFICULTY" label
-        document.querySelectorAll('p.uppercase.tracking-wider').forEach(function(el){
-          var t = el.textContent||'';
-          if(/\|\s*(easy|medium|hard)/i.test(t)){
-            el.textContent = t.replace(/\s*\|\s*(easy|medium|hard)/i,'');
+        // DUELS: Hide entire subject|difficulty line
+        document.querySelectorAll("p.uppercase.tracking-wider").forEach(function(el){
+          var t = el.textContent||"";
+          if(/\|/.test(t) || /number system|algebra|probability|geometry|time|work|arithmetic|permut|combin|percent|ratio|profit|trigono|mensur|average|speed|function|logarithm|progression/i.test(t)){
+            el.style.display = "none";
           }
         });
-        // SKIP N SOLVE: Hide difficulty badge pill (EASY/MEDIUM/HARD)
-        document.querySelectorAll('span.rounded-full').forEach(function(el){
-          var t = (el.textContent||'').trim();
+        // SKIP N SOLVE: Hide difficulty badge
+        document.querySelectorAll("span.rounded-full").forEach(function(el){
+          var t = (el.textContent||"").trim();
           if(/^(EASY|MEDIUM|HARD)$/i.test(t)){
-            var parent = el.parentElement;
-            if(parent && parent.tagName === 'P') parent.style.display = 'none';
-            else el.style.display = 'none';
+            var p = el.parentElement;
+            if(p && p.tagName === "P") p.style.display = "none";
+            else el.style.display = "none";
           }
         });
       });
