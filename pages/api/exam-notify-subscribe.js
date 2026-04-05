@@ -56,6 +56,10 @@ export default async function handler(req, res) {
 
   const lastDateParsed = parseIndianDate(lastDate);
 
+  // Debug: check env vars are loaded
+  const urlPresent = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const keyPresent = !!process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+
   // Upsert — don't create duplicate subscriptions for same email+exam
   const { error } = await supabase
     .from('exam_notifications')
@@ -76,7 +80,11 @@ export default async function handler(req, res) {
 
   if (error) {
     console.error('Supabase upsert error:', error);
-    return res.status(500).json({ error: 'Failed to save subscription' });
+    // Temporarily return real error for debugging
+    return res.status(500).json({
+      error: 'Failed to save subscription',
+      debug: { urlPresent, keyPresent, supabaseError: error.message, supabaseCode: error.code }
+    });
   }
 
   return res.status(200).json({ success: true, message: 'Subscribed successfully' });
