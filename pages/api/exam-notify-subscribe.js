@@ -8,59 +8,35 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY   // service key to bypass RLS
+  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY
 );
 
-// Parses date strings like "14th March '2026", "26th May'2026", "06 April '26", "April 15, 2026"
 function parseIndianDate(str) {
   if (!str || str === 'To be announced' || str === 'Coming Soon') return null;
-
-  // Normalize: remove ordinal suffixes, smart apostrophes, extra spaces
   let s = str
     .replace(/(\d+)(st|nd|rd|th)/gi, '$1')
     .replace(/['\u2019]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-
-  // Handle "26th May2026" → "26 May 2026" (missing space before year)
   s = s.replace(/([A-Za-z])(\d{4})/, '$1 $2');
-
-  // Handle 2-digit years like "26" → "2026"
   s = s.replace(/\b(\d{2})\s*$/, (m, y) => (parseInt(y) < 50 ? '20' + y : '19' + y));
-
   const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0]; // YYYY-MM-DD
+  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
 }
 
 export default async function handler(req, res) {
-  // Allow CORS from register.ipmcareer.com
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { email, examName, lastDate } = req.body || {};
-
-  if (!email || !examName) {
-    return res.status(400).json({ error: 'email and examName are required' });
-  }
-
-  // Basic email validation
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: 'Invalid email address' });
-  }
+  if (!email || !examName) return res.status(400).json({ error: 'email and examName are required' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Invalid email address' });
 
   const lastDateParsed = parseIndianDate(lastDate);
 
-  // Debug: check env vars are loaded
-  const urlPresent = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const keyPresent = !!process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
-
-  // Upsert — don't create duplicate subscriptions for same email+exam
   const { error } = await supabase
     .from('exam_notifications')
     .upsert(
@@ -79,13 +55,9 @@ export default async function handler(req, res) {
     );
 
   if (error) {
-    console.error('Supabase upsert error:', error);
-    // Temporarily return real error for debugging
-    return res.status(500).json({
-      error: 'Failed to save subscription',
-      debug: { urlPresent, keyPresent, supabaseError: error.message, supabaseCode: error.code }
-    });
+    console.error('Supabase upsert error:', JSON.stringify(error));
+    return res.status(500).json({ error: error.message || 'Failed to save subscription', code: error.code });
   }
 
-  return res.status(200).json({ success: true, message: 'Subscribed successfully' });
+  return res.status(200).json({ success: true });
 }
