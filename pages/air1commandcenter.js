@@ -6,8 +6,7 @@ export async function getServerSideProps({ res }) {
   let html = fs.readFileSync(htmlPath, 'utf8');
 
   // Inject base href so relative asset paths resolve correctly from /air1commandcenter
-  html = html.replace('<head>', '<head>
-  <base href="/air1commandcenter/">');
+  html = html.replace('<head>', '<head>\n  <base href="/air1commandcenter/">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
