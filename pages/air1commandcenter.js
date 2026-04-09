@@ -1,14 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
-/**
- * Serves public/air1commandcenter/index.html through Next.js SSR.
- * This bypasses Vercel's static-file edge cache which was serving a stale
- * version of the file even after new deployments with the bell injection code.
- */
 export async function getServerSideProps({ res }) {
   const htmlPath = path.join(process.cwd(), 'public', 'air1commandcenter', 'index.html');
-  const html = fs.readFileSync(htmlPath, 'utf8');
+  let html = fs.readFileSync(htmlPath, 'utf8');
+
+  // Fix relative asset paths — the HTML was built to be served from /air1commandcenter/
+  // but Next.js serves this page at /air1commandcenter (no trailing slash), so
+  // relative paths like "assets/..." resolve to /assets/... (wrong).
+  // Injecting <base href> corrects all relative URLs in one shot.
+  html = html.replace('<head>', '<head>\n  <base href="/air1commandcenter/">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -17,7 +18,6 @@ export async function getServerSideProps({ res }) {
   return { props: {} };
 }
 
-// Component never renders because res.end() fires first in getServerSideProps
 export default function AirCommandCenter() {
   return null;
 }
