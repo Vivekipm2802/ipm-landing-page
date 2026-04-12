@@ -760,10 +760,6 @@
     box-shadow: none;
   }
 
-  :global(body) {
-    background: white;
-  }
-
   .enrollBtn,
   .downloadBtn {
     display: none !important;
