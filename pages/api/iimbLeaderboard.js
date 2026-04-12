@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store, max-age=0");
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
