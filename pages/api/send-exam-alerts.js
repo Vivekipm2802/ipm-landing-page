@@ -13,7 +13,7 @@ import nodemailer from 'nodemailer';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 const CRON_SECRET = process.env.CRON_SECRET || 'ipm-cron-2026';
