@@ -202,13 +202,12 @@ function Response() {
       setFormData();
       setLoading(false);
       setUrl();
-      toast.success("Successfully Generated Scorecard");
-      setDownloadLink(`/scorecard/${uid}`);
-      handleGenerate(
-        `https://register.ipmcareer.com/scorecard/${uid}`,
-        b.email,
-        "Unknown Student"
-      );
+      toast.success("Successfully Generated Scorecard! Redirecting to detailed report...");
+      setDownloadLink(`/report/${uid}`);
+      // Redirect to detailed report page after short delay
+      setTimeout(() => {
+        router.push(`/report/${uid}`);
+      }, 1500);
     }
   }
 
