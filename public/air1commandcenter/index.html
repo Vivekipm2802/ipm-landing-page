@@ -74,10 +74,12 @@
          card in the Forms tab, and handles the subscribe flow.
     ====================================================== -->
     <style>
+      /* Prevent horizontal overflow on mobile */
+      body { overflow-x: hidden; }
       /* Bell button on each card */
       .ipm-bell-btn {
         position: absolute;
-        top: 18px;
+        top: 14px;
         right: 52px;
         width: 36px;
         height: 36px;
@@ -90,6 +92,14 @@
         cursor: pointer;
         transition: all 0.2s ease;
         z-index: 10;
+      }
+      @media (max-width: 640px) {
+        .ipm-bell-btn {
+          top: 12px;
+          right: 12px;
+          width: 34px;
+          height: 34px;
+        }
       }
       .ipm-bell-btn:hover {
         background: rgba(249,160,27,0.25);
@@ -120,11 +130,22 @@
         background: #0f1117;
         border: 1px solid #1e2533;
         border-radius: 20px;
-        padding: 32px;
-        width: 90%;
+        padding: 28px 24px;
+        width: 92%;
         max-width: 420px;
         position: relative;
         animation: ipm-slide-up 0.25s ease;
+        margin: 0 auto;
+      }
+      @media (max-width: 640px) {
+        #ipm-notify-modal {
+          width: 96%;
+          padding: 24px 18px;
+          border-radius: 16px;
+        }
+        .ipm-modal-btns { flex-direction: column; }
+        #ipm-notify-cancel { flex: none; }
+        #ipm-notify-submit { flex: none; }
       }
       @keyframes ipm-slide-up {
         from { opacity: 0; transform: translateY(20px); }
@@ -314,6 +335,7 @@
         btn.title = subscribed ? 'You\'re subscribed!' : 'Get deadline reminders';
         btn.innerHTML = bellSVG(subscribed);
         btn.addEventListener('click', () => openModal(examName, lastDate, btn));
+        card.style.position = 'relative';
         card.appendChild(btn);
       }
 
