@@ -3,8 +3,12 @@
    Design System: Apple-inspired, clean, minimal
    ============================================================================ */
 
-/* Design Tokens */
-:root {
+/* Design Tokens — scoped to .shell to avoid CSS Module global selector errors */
+
+/* ============================================================================
+   Shell Container
+   ============================================================================ */
+.shell {
   --color-primary: #6c63ff;
   --color-primary-dark: #4a44cc;
   --color-primary-light: #8b84ff;
@@ -48,12 +52,7 @@
   --transition-fast: 150ms ease;
   --transition-base: 300ms ease;
   --transition-slow: 500ms ease;
-}
 
-/* ============================================================================
-   Shell Container
-   ============================================================================ */
-.shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
