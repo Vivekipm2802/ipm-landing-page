@@ -74,25 +74,27 @@
          card in the Forms tab, and handles the subscribe flow.
     ====================================================== -->
     <style>
-      /* === MOBILE HORIZONTAL OVERFLOW FIX === */
-      /* overflow:clip clips content WITHOUT creating a scroll container,
-         so position:sticky on the tab bar still works correctly on iOS */
-      html {
-        overflow-x: hidden; /* fallback */
-        overflow-x: clip;   /* iOS 16+ — doesn't break sticky */
+      /* === MOBILE HORIZONTAL SCROLL FIX ===
+         touch-action:pan-y  → iOS only allows vertical finger panning on body
+         overscroll-behavior-x:none → prevents horizontal scroll chaining to parent
+         These two together stop the tab bar swipe from shifting the page sideways */
+      html, body {
+        overflow-x: hidden;
         max-width: 100vw;
-      }
-      body {
-        overflow-x: hidden !important;
-        max-width: 100vw;
+        overscroll-behavior-x: none;
+        touch-action: pan-y;
       }
       #root {
-        overflow-x: clip;
+        overflow-x: hidden;
         max-width: 100vw;
       }
-      /* Fix tab bar: the -mx-2 class (negative margin) pushes it outside
-         the parent container, causing page-level horizontal overflow on iOS.
-         We neutralise the negative margin and keep slight inset padding. */
+      /* Allow the tab bar to scroll internally but contain it */
+      .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x pan-y;
+      }
+      /* Neutralise the -mx-2 negative margin that bleeds outside parent */
       .overflow-x-auto[class*="-mx-"] {
         margin-left: 0 !important;
         margin-right: 0 !important;
