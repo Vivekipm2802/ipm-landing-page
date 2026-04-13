@@ -728,6 +728,541 @@
   }
 }
 
+/* ═══════ SMART RECOMMENDATION SECTION ═══════ */
+.smartSection {
+  margin: 2rem 0;
+}
+
+/* Cutoff Bar */
+.cutoffContainer {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin-bottom: 1.5rem;
+}
+
+.cutoffBar {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+.cutoffTrack {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+}
+
+.cutoffFill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #ef4444 0%, #f59e0b 40%, #22c55e 70%, #6c63ff 100%);
+  transition: width 1s ease;
+}
+
+.cutoffMarker {
+  position: absolute;
+  top: -8px;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 28px;
+  background: #ef4444;
+  z-index: 2;
+}
+
+.cutoffMarkerSafe {
+  background: #22c55e;
+}
+
+.cutoffMarkerLabel {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: #6b7280;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.cutoffScoreIndicator {
+  position: absolute;
+  bottom: -30px;
+  transform: translateX(-50%);
+}
+
+.cutoffYourScore {
+  background: #1a1a2e;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Probability Meter */
+.probabilityBox {
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.probabilityLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.probabilityMeter {
+  height: 20px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.probabilityFill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1.2s ease;
+}
+
+.probHigh { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.probMedium { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.probLow { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+.probabilityValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+
+.probabilityNote {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+/* Recommendation Cards */
+.recommendationCard {
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid;
+}
+
+.recHigh {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-color: #bbf7d0;
+}
+
+.recBorderline {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-color: #fde68a;
+}
+
+.recLow {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+  border-color: #e9d5ff;
+}
+
+.recHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.recEmoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.recTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.recSubtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.recDescription {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Action Cards */
+.recActions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.recActionCard {
+  background: rgba(255,255,255,0.9);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.recActionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-color: #6c63ff;
+}
+
+.recActionIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.recActionContent h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.recActionContent p {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.recActionCta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6c63ff;
+}
+
+/* Social Proof Banner */
+.socialProof {
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Path Layout (for LOW bucket) */
+.recPathsContainer {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 1rem;
+}
+
+.recPath {
+  flex: 1;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.recPathHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.recPathHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.recPathIcon {
+  font-size: 1.5rem;
+}
+
+.recPathDescription {
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.recPathActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recPathDividerOr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recPathDividerOr span {
+  background: #e9d5ff;
+  color: #7c3aed;
+  font-weight: 800;
+  font-size: 0.8rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Compare Grid */
+.compareGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.compareCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.compareLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.compareValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+
+.comparePositive { color: #16a34a; }
+.compareNegative { color: #ef4444; }
+
+/* ═══════ SHARE SECTION ═══════ */
+.shareSection {
+  margin: 2rem 0;
+}
+
+.shareCardContainer {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.shareCard {
+  background: linear-gradient(135deg, #1a1a2e, #2d2b55);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 340px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.shareCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shareCardLogo {
+  height: 28px;
+  filter: brightness(0) invert(1);
+}
+
+.shareCardBadge {
+  background: rgba(108, 99, 255, 0.3);
+  color: #a5b4fc;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.shareCardBody {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.shareCardName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c4b5fd;
+  margin-bottom: 0.5rem;
+}
+
+.shareCardScore {
+  margin-bottom: 1rem;
+}
+
+.shareCardScoreValue {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+}
+
+.shareCardScoreMax {
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.shareCardBreakdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.shareCardStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.shareCardStatLabel {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.shareCardStatValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.shareCardDivider {
+  width: 1px;
+  height: 30px;
+  background: rgba(255,255,255,0.2);
+}
+
+.shareCardAccuracy {
+  font-size: 0.8rem;
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+.shareCardFooter {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+  color: #6b7280;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.shareButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shareWhatsApp {
+  background: #25d366 !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+.shareWhatsApp:hover {
+  background: #1da851 !important;
+}
+
+.shareCopy {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  border: 1px solid #e5e7eb !important;
+  cursor: pointer;
+}
+
+.shareCopy:hover {
+  background: #e5e7eb !important;
+}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 768px) {
+  .recActions {
+    grid-template-columns: 1fr;
+  }
+  .recPathsContainer {
+    flex-direction: column;
+  }
+  .recPathDividerOr {
+    padding: 0.5rem 0;
+  }
+  .compareGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .shareCardContainer {
+    flex-direction: column;
+  }
+  .shareCard {
+    width: 100%;
+  }
+  .shareButtons {
+    flex-direction: row;
+    width: 100%;
+  }
+  .shareWhatsApp,
+  .shareCopy {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .cutoffMarkerLabel {
+    font-size: 0.55rem;
+  }
+  .recTitle {
+    font-size: 1.1rem;
+  }
+  .recEmoji {
+    font-size: 2rem;
+  }
+  .shareButtons {
+    flex-direction: column;
+  }
+}
+
 /* Print Styles */
 @media print {
   .reportPage {
@@ -761,7 +1296,11 @@
   }
 
   .enrollBtn,
-  .downloadBtn {
+  .downloadBtn,
+  .shareSection,
+  .recActions,
+  .recPathActions,
+  .shareButtons {
     display: none !important;
   }
 }
