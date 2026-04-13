@@ -20,6 +20,7 @@ import {
   Spacer,
 } from "@nextui-org/react";
 import ShareButton from "../components/ShareButton";
+import AppShell from "../components/AppShell";
 import { toast } from "react-hot-toast";
 
 function Response() {
@@ -276,6 +277,7 @@ function Response() {
   }
 
   return (
+    <AppShell activePage="/response">
     <div className={styles.maincont}>
       {/* {loading ? 
 <div className={styles.loading_overlay}>
@@ -739,6 +741,7 @@ function Response() {
         )}
       </div>
     </div>
+    </AppShell>
   );
 }
 

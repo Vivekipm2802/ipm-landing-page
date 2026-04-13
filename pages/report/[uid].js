@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo';
 import 'tailwindcss/tailwind.css';
 import { Button, Divider, Spacer, Card, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
 import { useRouter } from 'next/router';
+import AppShell from '../../components/AppShell';
 
 function Report({ data, error, isFound }) {
   const [jsonData, setJsonData] = useState(null);
@@ -138,6 +139,7 @@ function Report({ data, error, isFound }) {
   }
 
   return (
+    <AppShell activePage="/report">
     <div className={styles.reportPage}>
       <NextSeo
         title={'IPMAT Detailed Report | IPM Careers Premium IPMAT Coaching'}
@@ -546,6 +548,7 @@ function Report({ data, error, isFound }) {
         </Button>
       </div>
     </div>
+    </AppShell>
   );
 }
 

@@ -4,6 +4,7 @@ import 'tailwindcss/tailwind.css';
 import { Button, Input, Spacer, Chip } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 import { supabase } from '../utils/supabaseClient';
+import AppShell from '../components/AppShell';
 import styles from './InterviewPrep.module.css';
 
 // IPMAT PI question categories
@@ -130,6 +131,7 @@ export default function InterviewPrep() {
   // Landing state — category selector
   if (!sessionStarted) {
     return (
+      <AppShell activePage="/interview-prep">
       <div className={styles.prepPage}>
         <NextSeo
           title="AI Mock Interview | IPM Careers"
@@ -172,11 +174,13 @@ export default function InterviewPrep() {
           <span>✨</span> Free trial includes {MAX_FREE_MESSAGES} messages (~2 mock sessions). For unlimited access, enroll in our PI Batch.
         </div>
       </div>
+      </AppShell>
     );
   }
 
   // Chat state
   return (
+    <AppShell activePage="/interview-prep">
     <div className={styles.chatPage}>
       <NextSeo title={`Mock PI: ${selectedCategory.label} | IPM Careers`} />
 
@@ -270,5 +274,6 @@ export default function InterviewPrep() {
         </Button>
       </div>
     </div>
+    </AppShell>
   );
 }

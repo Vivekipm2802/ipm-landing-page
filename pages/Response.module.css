@@ -1,15 +1,15 @@
 .maincont {
     width: 100%;
     min-height: 100vh;
-    background-color: #f2f2f2;
-    font-family: Modernist;
-    padding: 0 4rem;
-    padding-top: 4rem;
+    background-color: transparent;
+    font-family: 'Poppins', sans-serif;
+    padding: 0 1.5rem;
+    padding-top: 0;
     overflow: hidden;
 }
 
 .maincont * {
-    font-family: Modernist;
+    font-family: 'Poppins', sans-serif;
 }
 
 .section {

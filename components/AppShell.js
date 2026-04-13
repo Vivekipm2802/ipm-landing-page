@@ -1,0 +1,222 @@
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import styles from './AppShell.module.css';
+
+const AppShell = ({ activePage, children }) => {
+  const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle scroll effect on top bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const isActive = (path) => {
+    if (path === '/response') {
+      return router.pathname === '/response';
+    }
+    return router.pathname.startsWith(path);
+  };
+
+  const navItems = [
+    { icon: '📊', label: 'Score Analyzer', path: '/response' },
+    { icon: '📋', label: 'My Report', path: '/report', disabled: false },
+    { icon: '🤖', label: 'AI Mock Interview', path: '/interview-prep' },
+    { icon: '🏆', label: 'Topper List', path: '/topperlist' },
+    { icon: '🎯', label: 'College Predictor', path: '/call' },
+    { icon: '📚', label: 'PI Batch', path: '/pi-batch' },
+  ];
+
+  const topNavItems = [
+    { label: 'Score Analyzer', path: '/response' },
+    { label: 'AI Interview', path: '/interview-prep' },
+    { label: 'Topper List', path: '/topperlist' },
+    { label: 'College Predictor', path: '/call' },
+  ];
+
+  return (
+    <div className={styles.shell}>
+      {/* Top Navigation Bar */}
+      <header className={`${styles.topbar} ${isScrolled ? styles.topbarScrolled : ''}`}>
+        <div className={styles.topbarContent}>
+          {/* Left: Logo + Mobile Menu Toggle */}
+          <div className={styles.topbarLeft}>
+            {isMobile && (
+              <button
+                className={styles.hamburger}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <span className={styles.hamburgerLine}></span>
+                <span className={styles.hamburgerLine}></span>
+                <span className={styles.hamburgerLine}></span>
+              </button>
+            )}
+            <Link href="/" className={styles.logo}>
+              <img
+                src="/hd-logo.svg"
+                alt="IPM Careers"
+                className={styles.logoImg}
+              />
+              <span className={styles.logoText}>IPM Careers</span>
+            </Link>
+          </div>
+
+          {/* Center: Navigation (Desktop Only) */}
+          {!isMobile && (
+            <nav className={styles.topbarNav}>
+              {topNavItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`${styles.topbarLink} ${
+                    isActive(item.path) ? styles.topbarLinkActive : ''
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+
+          {/* Right: CTA Button */}
+          <Link href="/pi-batch" className={styles.ctaButton}>
+            Enroll in PI Batch
+          </Link>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobile && mobileMenuOpen && (
+        <div className={styles.mobileMenuOverlay} onClick={() => setMobileMenuOpen(false)}>
+          <div className={styles.mobileMenuContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.mobileMenuHeader}>
+              <h3>Menu</h3>
+              <button
+                className={styles.mobileMenuClose}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <nav className={styles.mobileNavList}>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`${styles.mobileNavItem} ${
+                    isActive(item.path) ? styles.mobileNavItemActive : ''
+                  } ${item.disabled ? styles.mobileNavItemDisabled : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className={styles.mobileNavIcon}>{item.icon}</span>
+                  <span className={styles.mobileNavLabel}>{item.label}</span>
+                </Link>
+              ))}
+              <div className={styles.mobileNavDivider}></div>
+              <a
+                href="tel:8299470392"
+                className={styles.mobileNavItem}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className={styles.mobileNavIcon}>📞</span>
+                <span className={styles.mobileNavLabel}>Contact Us</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.container}>
+        {/* Left Sidebar (Desktop Only) */}
+        {!isMobile && (
+          <aside
+            className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarCollapsed}`}
+          >
+            <div className={styles.sidebarContent}>
+              <nav className={styles.sidebarNav}>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`${styles.sidebarItem} ${
+                      isActive(item.path) ? styles.sidebarItemActive : ''
+                    } ${item.disabled ? styles.sidebarItemDisabled : ''}`}
+                  >
+                    <span className={styles.sidebarIcon}>{item.icon}</span>
+                    {sidebarOpen && (
+                      <span className={styles.sidebarLabel}>{item.label}</span>
+                    )}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className={styles.sidebarDivider}></div>
+
+              <a
+                href="tel:8299470392"
+                className={`${styles.sidebarItem} ${styles.sidebarContact}`}
+                title="Call us"
+              >
+                <span className={styles.sidebarIcon}>📞</span>
+                {sidebarOpen && (
+                  <span className={styles.sidebarLabel}>Contact Us</span>
+                )}
+              </a>
+            </div>
+
+            {/* Sidebar Footer */}
+            <div className={styles.sidebarFooter}>
+              <button
+                className={styles.collapseToggle}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              >
+                {sidebarOpen ? '◀' : '▶'}
+              </button>
+              {sidebarOpen && (
+                <div className={styles.sidebarInfo}>
+                  <p className={styles.poweredBy}>Powered by IPM Careers</p>
+                  <p className={styles.version}>v1.0.0</p>
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
+
+        {/* Main Content */}
+        <main className={`${styles.main} ${!sidebarOpen && !isMobile ? styles.mainExpanded : ''}`}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default AppShell;
+export { AppShell };
