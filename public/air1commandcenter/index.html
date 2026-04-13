@@ -452,6 +452,40 @@
       // ── Enter key submits ──────────────────────────────────────
       emailEl.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
 
+      // ── Block horizontal page scroll on iOS ────────────────────
+      // CSS overflow/touch-action is not reliable on iOS Safari.
+      // Instead: track touch direction and cancel horizontal page swipes,
+      // and also hard-reset any stray window.scrollX back to 0.
+      (function() {
+        let _sx = 0, _sy = 0;
+        document.addEventListener('touchstart', function(e) {
+          _sx = e.touches[0].clientX;
+          _sy = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function(e) {
+          var dx = Math.abs(e.touches[0].clientX - _sx);
+          var dy = Math.abs(e.touches[0].clientY - _sy);
+          if (dx > dy + 5) {
+            // Horizontal swipe — walk up to check for a real scroll container
+            var el = e.target, found = false;
+            while (el && el !== document.documentElement) {
+              var ox = window.getComputedStyle(el).overflowX;
+              if ((ox === 'auto' || ox === 'scroll') && el.scrollWidth > el.clientWidth) {
+                found = true; break;
+              }
+              el = el.parentElement;
+            }
+            if (!found) e.preventDefault(); // no scroll container → block page drift
+          }
+        }, { passive: false });
+
+        // Safety net: if window.scrollX ever drifts, snap back instantly
+        window.addEventListener('scroll', function() {
+          if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
+        }, { passive: true });
+      })();
+
       // ── MutationObserver — watches for React rendering cards ───
       const observer = new MutationObserver(() => scanCards());
       observer.observe(document.getElementById('root'), {
