@@ -74,9 +74,29 @@
          card in the Forms tab, and handles the subscribe flow.
     ====================================================== -->
     <style>
-      /* Hard lock horizontal overflow — prevents page scrolling right when swiping tabs */
-      html, body { overflow-x: hidden !important; max-width: 100vw !important; }
-      #root { overflow-x: hidden !important; max-width: 100vw !important; }
+      /* === MOBILE HORIZONTAL OVERFLOW FIX === */
+      /* overflow:clip clips content WITHOUT creating a scroll container,
+         so position:sticky on the tab bar still works correctly on iOS */
+      html {
+        overflow-x: hidden; /* fallback */
+        overflow-x: clip;   /* iOS 16+ — doesn't break sticky */
+        max-width: 100vw;
+      }
+      body {
+        overflow-x: hidden !important;
+        max-width: 100vw;
+      }
+      #root {
+        overflow-x: clip;
+        max-width: 100vw;
+      }
+      /* Fix tab bar: the -mx-2 class (negative margin) pushes it outside
+         the parent container, causing page-level horizontal overflow on iOS.
+         We neutralise the negative margin and keep slight inset padding. */
+      .overflow-x-auto[class*="-mx-"] {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
       * { box-sizing: border-box; }
       /* Bell button on each card */
       .ipm-bell-btn {
