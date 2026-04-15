@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './Report.module.css';
 import { supabase } from '../../utils/supabaseClient';
 import { NextSeo } from 'next-seo';
@@ -6,6 +6,228 @@ import 'tailwindcss/tailwind.css';
 import { Button, Divider, Spacer, Card, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
+
+// ═══════ ANIMATED COUNTER HOOK ═══════
+function useCountUp(target, duration = 1600) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target == null) return;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return count;
+}
+
+// ═══════ GRADE & VIBE HELPERS ═══════
+function getGrade(score, max) {
+  const pct = (score / max) * 100;
+  if (pct >= 80) return { letter: 'S+', vibe: 'Absolute legend status 🔥', emoji: '👑', color: '#ffd700' };
+  if (pct >= 70) return { letter: 'S',  vibe: 'You cooked. IIM bound.', emoji: '🚀', color: '#00d4ff' };
+  if (pct >= 60) return { letter: 'A+', vibe: 'Strong game. Lock in PI prep.', emoji: '💪', color: '#00ff88' };
+  if (pct >= 50) return { letter: 'A',  vibe: 'Solid. One more push.', emoji: '⚡', color: '#a855f7' };
+  if (pct >= 40) return { letter: 'B',  vibe: 'In the fight. Refine strategy.', emoji: '🎯', color: '#ff8c42' };
+  if (pct >= 25) return { letter: 'C',  vibe: 'Foundation laid. Time to level up.', emoji: '📈', color: '#ff5e7e' };
+  return { letter: 'D', vibe: 'Every topper started here. Let\'s build.', emoji: '🌱', color: '#6c63ff' };
+}
+
+// ═══════ HERO REVEAL COMPONENT ═══════
+const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
+  const scoreNow = useCountUp(scores.total.score, 1800);
+  const pct = (scores.total.score / scores.total.max) * 100;
+  const grade = getGrade(scores.total.score, scores.total.max);
+  const firstName = (studentName || 'Student').split(' ')[0];
+
+  return (
+    <div className={styles.hero} style={{ '--grade-color': grade.color }}>
+      <div className={styles.heroBlobs}>
+        <div className={styles.blob1}></div>
+        <div className={styles.blob2}></div>
+        <div className={styles.blob3}></div>
+      </div>
+      <div className={styles.heroContent}>
+        <div className={styles.heroTop}>
+          <span className={styles.heroBadge}>⚡ IPMAT 2024 • {category || 'GEN'}</span>
+          <span className={styles.heroDate}>{new Date(testDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+        <h1 className={styles.heroGreeting}>hey {firstName.toLowerCase()},</h1>
+        <p className={styles.heroSub}>here's your wrapped 👇</p>
+
+        <div className={styles.heroScoreBlock}>
+          <div className={styles.heroGradeRing}>
+            <svg viewBox="0 0 120 120" className={styles.ringSvg}>
+              <circle cx="60" cy="60" r="52" className={styles.ringBg} />
+              <circle
+                cx="60" cy="60" r="52"
+                className={styles.ringFg}
+                style={{ strokeDasharray: `${(pct / 100) * 326.7} 326.7` }}
+              />
+            </svg>
+            <div className={styles.heroGradeLetter}>{grade.letter}</div>
+          </div>
+          <div className={styles.heroScoreRight}>
+            <div className={styles.heroScoreValue}>
+              {scoreNow}<span className={styles.heroScoreMax}>/{scores.total.max}</span>
+            </div>
+            <div className={styles.heroVibe}>
+              <span className={styles.heroVibeEmoji}>{grade.emoji}</span> {grade.vibe}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.heroChips}>
+          <div className={styles.heroChip}><span>🎯</span> {stats.accuracy}% accuracy</div>
+          <div className={styles.heroChip}><span>✅</span> {stats.totalCorrect} correct</div>
+          <div className={styles.heroChip}><span>📝</span> {stats.attempted}/{stats.total} attempted</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════ BENTO DONUT CHART ═══════
+const BentoDonut = ({ correct, incorrect, unattempted, total }) => {
+  const cPct = total > 0 ? (correct / total) * 100 : 0;
+  const iPct = total > 0 ? (incorrect / total) * 100 : 0;
+  const uPct = total > 0 ? (unattempted / total) * 100 : 0;
+  const circ = 2 * Math.PI * 46;
+  const cDash = (cPct / 100) * circ;
+  const iDash = (iPct / 100) * circ;
+  const uDash = (uPct / 100) * circ;
+  return (
+    <div className={styles.bentoCard + ' ' + styles.bentoDonut}>
+      <div className={styles.bentoLabel}>Question Breakdown</div>
+      <div className={styles.donutWrap}>
+        <svg viewBox="0 0 120 120" className={styles.donutSvg}>
+          <circle cx="60" cy="60" r="46" className={styles.donutTrack} />
+          <circle cx="60" cy="60" r="46" className={styles.donutCorrect}
+            style={{ strokeDasharray: `${cDash} ${circ}`, strokeDashoffset: 0 }} />
+          <circle cx="60" cy="60" r="46" className={styles.donutIncorrect}
+            style={{ strokeDasharray: `${iDash} ${circ}`, strokeDashoffset: -cDash }} />
+          <circle cx="60" cy="60" r="46" className={styles.donutUnatt}
+            style={{ strokeDasharray: `${uDash} ${circ}`, strokeDashoffset: -(cDash + iDash) }} />
+          <text x="60" y="57" textAnchor="middle" className={styles.donutCenterNum}>{correct}</text>
+          <text x="60" y="73" textAnchor="middle" className={styles.donutCenterLbl}>correct</text>
+        </svg>
+      </div>
+      <div className={styles.donutLegend}>
+        <div><span className={styles.dotCorrect}></span>Correct {correct}</div>
+        <div><span className={styles.dotIncorrect}></span>Wrong {incorrect}</div>
+        <div><span className={styles.dotUnatt}></span>Skipped {unattempted}</div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════ BENTO STAT CARD ═══════
+const BentoStat = ({ label, value, sub, emoji, tone = 'default' }) => (
+  <div className={`${styles.bentoCard} ${styles['bentoTone_' + tone]}`}>
+    <div className={styles.bentoEmoji}>{emoji}</div>
+    <div className={styles.bentoValue}>{value}</div>
+    <div className={styles.bentoLabel}>{label}</div>
+    {sub && <div className={styles.bentoSub}>{sub}</div>}
+  </div>
+);
+
+// ═══════ SUBJECT BAR CARD ═══════
+const SubjectBar = ({ title, subtitle, score, max, correct, total, color }) => {
+  const pct = Math.max(0, (score / max) * 100);
+  const acc = total > 0 ? Math.round((correct / total) * 100) : 0;
+  return (
+    <div className={styles.subjectCard} style={{ '--subj-color': color }}>
+      <div className={styles.subjectHead}>
+        <div>
+          <div className={styles.subjectTitle}>{title}</div>
+          <div className={styles.subjectSubtitle}>{subtitle}</div>
+        </div>
+        <div className={styles.subjectScore}>
+          <span>{score}</span>
+          <small>/{max}</small>
+        </div>
+      </div>
+      <div className={styles.subjectBarTrack}>
+        <div className={styles.subjectBarFill} style={{ width: `${pct}%` }}></div>
+      </div>
+      <div className={styles.subjectFoot}>
+        <span>🎯 {acc}% accuracy</span>
+        <span>{correct}/{total} correct</span>
+      </div>
+    </div>
+  );
+};
+
+// ═══════ FLASHCARDS (weak question review) ═══════
+const Flashcards = ({ jsonData }) => {
+  const wrong = [];
+  if (jsonData?.sa) jsonData.sa.forEach((q, i) => {
+    if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
+      wrong.push({ ...q, type: 'SA', subject: 'Quant (SA)', num: i + 1, color: '#6c63ff' });
+  });
+  if (jsonData?.mcq) jsonData.mcq.forEach((q, i) => {
+    if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
+      wrong.push({ ...q, type: 'MCQ', subject: 'Quant (MCQ)', num: i + 1, color: '#00d4ff' });
+  });
+  if (jsonData?.va) jsonData.va.forEach((q, i) => {
+    if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
+      wrong.push({ ...q, type: 'VA', subject: 'Verbal Ability', num: i + 1, color: '#ff5e7e' });
+  });
+  const top = wrong.slice(0, 8);
+  const [flipped, setFlipped] = useState({});
+
+  if (top.length === 0) {
+    return (
+      <div className={styles.flashEmpty}>
+        <div className={styles.flashEmptyEmoji}>🏆</div>
+        <div className={styles.flashEmptyTitle}>Zero wrong attempts. Unreal.</div>
+        <div className={styles.flashEmptySub}>You either skipped smart or hit every target. Respect.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.flashSection}>
+      <div className={styles.flashHeader}>
+        <div>
+          <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Review Cards 🃏</h2>
+          <p className={styles.flashSubtitle}>Tap any card to flip. Focus on these in your next mock.</p>
+        </div>
+        <span className={styles.flashCount}>{top.length} to review</span>
+      </div>
+      <div className={styles.flashGrid}>
+        {top.map((q, i) => (
+          <div
+            key={i}
+            className={`${styles.flashCard} ${flipped[i] ? styles.flashFlipped : ''}`}
+            onClick={() => setFlipped(f => ({ ...f, [i]: !f[i] }))}
+            style={{ '--card-color': q.color }}
+          >
+            <div className={styles.flashInner}>
+              <div className={styles.flashFront}>
+                <div className={styles.flashTag}>{q.subject}</div>
+                <div className={styles.flashQNum}>Q{q.num}</div>
+                <div className={styles.flashPrompt}>You answered:</div>
+                <div className={styles.flashYourAns}>{q.givenAnswer || '—'}</div>
+                <div className={styles.flashFlipHint}>tap to reveal ↻</div>
+              </div>
+              <div className={styles.flashBack}>
+                <div className={styles.flashBackLabel}>Correct answer</div>
+                <div className={styles.flashRightAns}>{q.rightAnswer}</div>
+                <div className={styles.flashNote}>+4 marks up for grabs next time 💰</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 function Report({ data, error, isFound }) {
   const [jsonData, setJsonData] = useState(null);
@@ -158,165 +380,69 @@ function Report({ data, error, isFound }) {
         }}
       />
 
-      {/* Header Section */}
-      <div className={styles.headerSection}>
-        <div className={styles.logoArea}>
-          <img src="/hd-logo.svg" alt="IPM Careers" className={styles.logo} />
-        </div>
-        <div className={styles.profileInfo}>
-          <h1 className={styles.welcomeText}>Welcome, {data?.name || 'Student'}</h1>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <span className={styles.label}>Test Date</span>
-              <span className={styles.value}>{new Date(data?.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.label}>Category</span>
-              <span className={styles.value}>{data?.category || 'N/A'}</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.label}>Exam</span>
-              <span className={styles.value}>IPMAT 2024</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.label}>Tool</span>
-              <span className={styles.value}>Response Sheet Analyzer</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ═══ HERO REVEAL (Spotify-Wrapped style) ═══ */}
+      {scores && stats && (
+        <HeroReveal
+          scores={scores}
+          stats={stats}
+          studentName={data?.name}
+          testDate={data?.created_at}
+          category={data?.category}
+        />
+      )}
 
-      {/* Score Banner */}
-      {scores && (
-        <div className={styles.scoreBanner}>
-          <div className={styles.scoreCircle}>
-            <div className={styles.scoreValue}>{scores.total.score}</div>
-            <div className={styles.scoreMax}>/ {scores.total.max}</div>
-          </div>
-          <div className={styles.scoreDescription}>
-            <p className={styles.descriptionTitle}>Your Overall Score</p>
-            <p className={styles.descriptionText}>Your score is calculated based on your uploaded response sheet and official answer key</p>
+      {/* ═══ BENTO GRID — performance snapshot ═══ */}
+      {scores && stats && (
+        <div className={styles.bentoSection}>
+          <h2 className={styles.sectionTitle}>The Breakdown 📊</h2>
+          <div className={styles.bentoGrid}>
+            <BentoDonut
+              correct={stats.totalCorrect}
+              incorrect={stats.totalIncorrect}
+              unattempted={stats.totalUnattempted}
+              total={stats.total}
+            />
+            <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
+            <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
+            <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
+            <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
+            <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
           </div>
         </div>
       )}
 
-      {/* Overview Stats */}
-      {stats && (
-        <div className={styles.overviewSection}>
-          <h2 className={styles.sectionTitle}>Performance Overview</h2>
-          <div className={styles.statsGrid}>
-            <div className={`${styles.statCard} ${styles.statCard1}`}>
-              <div className={styles.statIcon}>📝</div>
-              <div className={styles.statContent}>
-                <div className={styles.statValue}>{stats.attempted}</div>
-                <div className={styles.statLabel}>Questions Attempted</div>
-                <div className={styles.statSubtext}>out of {stats.total}</div>
-              </div>
-            </div>
-
-            <div className={`${styles.statCard} ${styles.statCard2}`}>
-              <div className={styles.statIcon}>🎯</div>
-              <div className={styles.statContent}>
-                <div className={styles.statValue}>{stats.accuracy}%</div>
-                <div className={styles.statLabel}>Accuracy Rate</div>
-                <div className={styles.statSubtext}>{stats.totalCorrect} correct answers</div>
-              </div>
-            </div>
-
-            <div className={`${styles.statCard} ${styles.statCard3}`}>
-              <div className={styles.statIcon}>✓</div>
-              <div className={styles.statContent}>
-                <div className={styles.statValue}>+{stats.positiveScore}</div>
-                <div className={styles.statLabel}>Positive Score</div>
-                <div className={styles.statSubtext}>from correct answers</div>
-              </div>
-            </div>
-
-            <div className={`${styles.statCard} ${styles.statCard4}`}>
-              <div className={styles.statIcon}>✗</div>
-              <div className={styles.statContent}>
-                <div className={styles.statValue}>-{stats.marksLost}</div>
-                <div className={styles.statLabel}>Marks Lost</div>
-                <div className={styles.statSubtext}>from incorrect answers</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Subject-wise Performance */}
+      {/* ═══ SUBJECT BARS — sexy animated bars ═══ */}
       {scores && stats && (
         <div className={styles.performanceSection}>
-          <h2 className={styles.sectionTitle}>Subject-Wise Performance</h2>
-          <div className={styles.scoreCardsGrid}>
-            <div className={`${styles.scoreCard} ${styles.scoreCardOverall}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Overall Score</span>
-              </div>
-              <div className={styles.cardScore}>
-                <span className={styles.score}>{scores.total.score}</span>
-                <span className={styles.maxScore}>/ {scores.total.max}</span>
-              </div>
-              <div className={styles.cardStats}>
-                <div className={styles.cardStat}>
-                  <span className={styles.correct}>{stats.totalCorrect} Correct</span>
-                </div>
-                <div className={styles.cardStat}>
-                  <span className={styles.incorrect}>{stats.totalIncorrect} Incorrect</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={`${styles.scoreCard} ${styles.scoreCardSA}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Short Answer (SA)</span>
-                <span className={styles.cardSubtitle}>Quantitative</span>
-              </div>
-              <div className={styles.cardScore}>
-                <span className={styles.score}>{scores.sa.score}</span>
-                <span className={styles.maxScore}>/ {scores.sa.max}</span>
-              </div>
-              <div className={styles.cardStats}>
-                <div className={styles.cardStat}>
-                  <span className={styles.correct}>{stats.sa.correct}/{stats.sa.total}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={`${styles.scoreCard} ${styles.scoreCardMCQ}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Multiple Choice (MCQ)</span>
-                <span className={styles.cardSubtitle}>Quantitative</span>
-              </div>
-              <div className={styles.cardScore}>
-                <span className={styles.score}>{scores.mcq.score}</span>
-                <span className={styles.maxScore}>/ {scores.mcq.max}</span>
-              </div>
-              <div className={styles.cardStats}>
-                <div className={styles.cardStat}>
-                  <span className={styles.correct}>{stats.mcq.correct}/{stats.mcq.total}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={`${styles.scoreCard} ${styles.scoreCardVA}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Verbal Ability</span>
-                <span className={styles.cardSubtitle}>Reading Comprehension</span>
-              </div>
-              <div className={styles.cardScore}>
-                <span className={styles.score}>{scores.va.score}</span>
-                <span className={styles.maxScore}>/ {scores.va.max}</span>
-              </div>
-              <div className={styles.cardStats}>
-                <div className={styles.cardStat}>
-                  <span className={styles.correct}>{stats.va.correct}/{stats.va.total}</span>
-                </div>
-              </div>
-            </div>
+          <h2 className={styles.sectionTitle}>Subject Deep-Dive 🔬</h2>
+          <div className={styles.subjectGrid}>
+            <SubjectBar
+              title="Short Answer"
+              subtitle="Quantitative Ability (no negative)"
+              score={scores.sa.score} max={scores.sa.max}
+              correct={stats.sa.correct} total={stats.sa.total}
+              color="#6c63ff"
+            />
+            <SubjectBar
+              title="Multiple Choice"
+              subtitle="Quantitative Ability"
+              score={scores.mcq.score} max={scores.mcq.max}
+              correct={stats.mcq.correct} total={stats.mcq.total}
+              color="#00d4ff"
+            />
+            <SubjectBar
+              title="Verbal Ability"
+              subtitle="Reading Comprehension"
+              score={scores.va.score} max={scores.va.max}
+              correct={stats.va.correct} total={stats.va.total}
+              color="#ff5e7e"
+            />
           </div>
         </div>
       )}
+
+      {/* ═══ FLASHCARDS — weak question review ═══ */}
+      {jsonData && <Flashcards jsonData={jsonData} />}
 
       {/* Test Breakdown Table */}
       {stats && (
