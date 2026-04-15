@@ -3,12 +3,42 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import styles from './AppShell.module.css';
 
-const AppShell = ({ activePage, children }) => {
+const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+
+  // Detect if user has browser history to go back to
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCanGoBack(window.history.length > 1 && document.referrer !== '');
+    }
+  }, [router.asPath]);
+
+  const handleBack = () => {
+    if (canGoBack) {
+      router.back();
+    } else {
+      router.push('/response');
+    }
+  };
+
+  // Auto-derive page title from route if not provided
+  const routeTitleMap = {
+    '/response': 'Score Analyzer',
+    '/report': 'My Report',
+    '/interview-prep': 'AI Mock Interview',
+    '/topperlist': 'Topper List',
+    '/call': 'College Predictor',
+    '/pi-batch': 'PI Preparation Batch',
+    '/': 'Home',
+  };
+  const derivedTitle = pageTitle || Object.entries(routeTitleMap).find(([path]) =>
+    router.pathname === path || router.pathname.startsWith(path + '/')
+  )?.[1] || '';
 
   // Detect mobile screen size
   useEffect(() => {
@@ -64,7 +94,7 @@ const AppShell = ({ activePage, children }) => {
       {/* Top Navigation Bar */}
       <header className={`${styles.topbar} ${isScrolled ? styles.topbarScrolled : ''}`}>
         <div className={styles.topbarContent}>
-          {/* Left: Logo + Mobile Menu Toggle */}
+          {/* Left: Back + Logo + Mobile Menu Toggle */}
           <div className={styles.topbarLeft}>
             {isMobile && (
               <button
@@ -77,6 +107,19 @@ const AppShell = ({ activePage, children }) => {
                 <span className={styles.hamburgerLine}></span>
               </button>
             )}
+            {(showBack !== false && router.pathname !== '/response' && router.pathname !== '/') && (
+              <button
+                className={styles.backBtn}
+                onClick={handleBack}
+                aria-label="Go back"
+                title="Back"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                <span className={styles.backBtnLabel}>Back</span>
+              </button>
+            )}
             <Link href="/" className={styles.logo}>
               <img
                 src="/hd-logo.svg"
@@ -85,6 +128,12 @@ const AppShell = ({ activePage, children }) => {
               />
               <span className={styles.logoText}>IPM Careers</span>
             </Link>
+            {derivedTitle && !isMobile && (
+              <div className={styles.breadcrumb}>
+                <span className={styles.breadcrumbSep}>/</span>
+                <span className={styles.breadcrumbCurrent}>{breadcrumb || derivedTitle}</span>
+              </div>
+            )}
           </div>
 
           {/* Center: Navigation (Desktop Only) */}
