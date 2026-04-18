@@ -255,7 +255,7 @@ const ReportModern = ({ data, scores, stats, jsonData, router }) => {
         <div className={s.heroMesh}></div>
         <div className={s.heroInner}>
           <div className={s.heroMeta}>
-            <span className={s.heroPill}>⚡ IPMAT 2024 &bull; {category}</span>
+            <span className={s.heroPill}>⚡ IPMAT 2026 &bull; {category}</span>
             <span className={s.heroDate}>
               {data?.created_at && new Date(data.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
@@ -657,14 +657,14 @@ const ReportModern = ({ data, scores, stats, jsonData, router }) => {
         <div className={s.shareButtons}>
           <button className={`${s.shareBtn} ${s.shareBtnWhatsApp}`}
             onClick={() => {
-              const text = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! 🎯\n\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\n\nCheck your score too 👉 https://register.ipmcareer.com/response\n\nMy report: https://register.ipmcareer.com/report/${uid}`;
+              const text = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! 🎯\n\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\n\nCheck your score too 👉 https://register.ipmcareer.com/response\n\nMy report: https://register.ipmcareer.com/report/${uid}`;
               window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
             }}>
             Share on WhatsApp
           </button>
           <button className={`${s.shareBtn} ${s.shareBtnCopy}`}
             onClick={() => {
-              const text = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\n\nCheck yours: https://register.ipmcareer.com/response`;
+              const text = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\n\nCheck yours: https://register.ipmcareer.com/response`;
               navigator.clipboard.writeText(text);
               alert('Score copied to clipboard!');
             }}>

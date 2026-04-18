@@ -109,7 +109,7 @@ return <div className='flex flex-col bg-gray-100 h-screen w-full justify-center 
 
 </div>*/}
 <div className='w-full h-12'></div>
-<h2 className='my-1 text-2xl font-bold text-center w-full text-primary'>{data.name}'s IPMAT 2024 Scorecard</h2>
+<h2 className='my-1 text-2xl font-bold text-center w-full text-primary'>{data.name}'s IPMAT 2026 Scorecard</h2>
 <Divider></Divider>
 <div className={styles.scoresection}>
 

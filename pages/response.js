@@ -609,10 +609,10 @@ function Response() {
               ) : (
                 <>
                   <div className={styles.instructions}>
-                    <h2>HOW TO CHECK IPMAT 2024 SCORE??</h2>
+                    <h2>HOW TO CHECK IPMAT 2026 SCORE??</h2>
                     <ul>
                       <li>
-                        Login to IPMAT 2024 official website &nbsp;{" "}
+                        Login to IPMAT 2026 official website &nbsp;{" "}
                         <a
                           style={{ color: "var(--brand-col1)" }}
                           href="https://www.iimidr.ac.in/academic-programmes/five-year-integrated-programme-in-management-ipm/ipm-admissions-details"

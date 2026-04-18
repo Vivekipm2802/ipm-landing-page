@@ -78,7 +78,7 @@ const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
       </div>
       <div className={styles.heroContent}>
         <div className={styles.heroTop}>
-          <span className={styles.heroBadge}>⚡ IPMAT 2024 • {category || 'GEN'}</span>
+          <span className={styles.heroBadge}>⚡ IPMAT 2026 • {category || 'GEN'}</span>
           <span className={styles.heroDate}>{new Date(testDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
         </div>
         <h1 className={styles.heroGreeting}>hey {firstName.toLowerCase()},</h1>
@@ -113,8 +113,8 @@ const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
         </div>
 
         <div className={styles.heroShareRow}>
-          <button className={styles.heroShareBtn} onClick={() => { const t = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024!\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`, '_blank'); }}>Share on WhatsApp</button>
-          <button className={styles.heroShareBtnAlt} onClick={() => { const t = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; navigator.clipboard.writeText(t); alert('Score copied!'); }}>Copy Score</button>
+          <button className={styles.heroShareBtn} onClick={() => { const t = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026!\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`, '_blank'); }}>Share on WhatsApp</button>
+          <button className={styles.heroShareBtnAlt} onClick={() => { const t = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; navigator.clipboard.writeText(t); alert('Score copied!'); }}>Copy Score</button>
         </div>
       </div>
     </div>
@@ -754,7 +754,7 @@ function Report({ data, error, isFound }) {
                 <div className={styles.shareCard} id="share-card">
                   <div className={styles.shareCardHeader}>
                     <img src="/hd-logo.svg" alt="IPM Careers" className={styles.shareCardLogo} />
-                    <span className={styles.shareCardBadge}>IPMAT 2024</span>
+                    <span className={styles.shareCardBadge}>IPMAT 2026</span>
                   </div>
                   <div className={styles.shareCardBody}>
                     <div className={styles.shareCardName}>{data?.name || 'Student'}</div>
@@ -787,11 +787,11 @@ function Report({ data, error, isFound }) {
                 </div>
                 <div className={styles.shareButtons}>
                   <Button className={styles.shareWhatsApp} onPress={() => {
-                    const text = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! 🎯\n\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\n\nCheck your score too 👉 https://register.ipmcareer.com/response\n\nMy detailed report: https://register.ipmcareer.com/report/${router.query.uid}`;
+                    const text = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! 🎯\n\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\n\nCheck your score too 👉 https://register.ipmcareer.com/response\n\nMy detailed report: https://register.ipmcareer.com/report/${router.query.uid}`;
                     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                   }}>Share on WhatsApp</Button>
                   <Button className={styles.shareCopy} onPress={() => {
-                    const text = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\n\nCheck yours: https://register.ipmcareer.com/response`;
+                    const text = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\n\nCheck yours: https://register.ipmcareer.com/response`;
                     navigator.clipboard.writeText(text);
                     alert('Score copied to clipboard!');
                   }}>Copy Score</Button>
