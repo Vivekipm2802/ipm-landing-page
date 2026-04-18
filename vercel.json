@@ -9,8 +9,14 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
         {
           "key": "Access-Control-Allow-Methods",
           "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
@@ -31,5 +37,11 @@
       "source": "/dsbchallenge/(.*)",
       "destination": "/dsbchallenge/$1"
     }
-  ]
+  ],
+  "functions": {
+    "pages/api/generateReportPDF.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  }
 }

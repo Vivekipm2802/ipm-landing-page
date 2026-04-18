@@ -37,6 +37,7 @@ function Response() {
   const [topperslist, setToppersList] = useState(0);
   const [vis, setVis] = useState();
   const [error, setError] = useState();
+  useEffect(() => { if (error) { const t = setTimeout(() => setError(undefined), 4000); return () => clearTimeout(t); } }, [error]);
 
   useEffect(() => {
     getCount();
@@ -532,9 +533,8 @@ function Response() {
                 </Button>
 
                 {downloadLink != undefined ? (
-                  <p className="text-red-500 text-xs border-red-500 border-1 rounded-xl p-1 bg-red-100 mt-2 px-4">
-                    Due to High Traffic PDF Generation might not happen properly
-                    , meanwhile you can access our virtual scorecard and print.
+                  <p className="text-amber-600 text-xs border-amber-400 border-1 rounded-xl p-2 bg-amber-50 mt-2 px-4">
+                    Your scorecard is ready below! You can also view the detailed report for a full breakdown.
                   </p>
                 ) : (
                   ""
@@ -548,7 +548,7 @@ function Response() {
                     className="text-black my-4"
                     href={downloadLink}
                   >
-                    Download Virtual Scorecard
+                    View Detailed Report
                   </Button>
                 ) : (
                   ""
