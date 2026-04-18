@@ -682,11 +682,8 @@ const ReportModern = ({ data, scores, stats, jsonData, router }) => {
 
       {/* Download */}
       <div className={s.downloadBar}>
-        <button className={s.downloadBtn} onClick={() => {
-          const uid = window.location.pathname.split('/').pop();
-          window.open(`/api/generateReportPDF?uid=${encodeURIComponent(uid)}`, '_blank');
-        }}>
-          📥 Download as PDF
+        <button className={s.downloadBtn} onClick={() => { window.print(); }}>
+          📥 Save as PDF
         </button>
       </div>
     </div>

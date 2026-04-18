@@ -846,10 +846,7 @@ function Report({ data, error, isFound }) {
 
           {/* Download */}
           <div className={styles.downloadBar}>
-            <Button className={styles.downloadBtn} onPress={() => {
-              const uid = window.location.pathname.split('/').pop();
-              window.open(`/api/generateReportPDF?uid=${encodeURIComponent(uid)}`, '_blank');
-            }}>📥 Download as PDF</Button>
+            <Button className={styles.downloadBtn} onPress={() => { window.print(); }}>📥 Save as PDF</Button>
           </div>
         </div>
       )}
