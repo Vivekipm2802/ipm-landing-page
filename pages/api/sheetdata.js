@@ -140,7 +140,15 @@ export default async function handler(req, res) {
         let rightAnswer = "";
         let givenAnswer = "";
 
-        if (bucket === "sa") {
+        // Detect SA-type questions by checking for "Given Answer" field in the HTML
+        // (VA section can also contain SA-type questions)
+        const hasGivenAnswer = rowTbl.find("td").filter(function () {
+          return $(this).text().trim().toLowerCase().startsWith("given answer");
+        }).length > 0;
+
+        const isSAType = (bucket === "sa" || hasGivenAnswer);
+
+        if (isSAType) {
           // SA (Short Answer) questions:
           //   - Correct answer: .rightAns text like "Possible Answer: 3000" → extract "3000"
           //   - Given answer: TD after "Given Answer :" label
