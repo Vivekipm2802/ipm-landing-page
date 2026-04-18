@@ -1769,12 +1769,14 @@
   .shareCardBreakdown { gap: 0.8rem; }
 }
 
-/* ── Cutoff: readable labels on mobile ── */
+/* ── Cutoff: readable labels on mobile, stagger to prevent overlap ── */
 @media (max-width: 600px) {
   .cutoffContainer { padding: 1.25rem; }
-  .cutoffMarkerLabel { font-size: 0.6rem; top: -36px; }
+  .cutoffMarkerLabel { font-size: 0.55rem; top: -34px; }
   .cutoffYourScore { font-size: 0.65rem; padding: 3px 8px; }
-  .cutoffBar { padding-top: 2.5rem; margin-bottom: 2.5rem; }
+  .cutoffBar { padding-top: 4rem; margin-bottom: 2.5rem; }
+  .cutoffMarker:not(.cutoffMarkerSafe) .cutoffMarkerLabel { top: -56px; }
+  .cutoffMarkerSafe .cutoffMarkerLabel { top: -34px; }
 }
 
 /* ── Download bar: safe area for notched phones ── */
