@@ -107,9 +107,9 @@ const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
         </div>
 
         <div className={styles.heroChips}>
-          <div className={styles.heroChip}><span>🎯</span> {stats.accuracy}% accuracy</div>
-          <div className={styles.heroChip}><span>✅</span> {stats.totalCorrect} correct</div>
-          <div className={styles.heroChip}><span>📝</span> {stats.attempted}/{stats.total} attempted</div>
+          <div className={styles.heroChip}><span>📐</span> SA: {scores.sa.score}/{scores.sa.max}</div>
+          <div className={styles.heroChip}><span>✏️</span> MCQ: {scores.mcq.score}/{scores.mcq.max}</div>
+          <div className={styles.heroChip}><span>📖</span> VA: {scores.va.score}/{scores.va.max}</div>
         </div>
 
         <div className={styles.heroShareRow}>
