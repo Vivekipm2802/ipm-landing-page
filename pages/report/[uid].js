@@ -111,6 +111,11 @@ const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
           <div className={styles.heroChip}><span>✅</span> {stats.totalCorrect} correct</div>
           <div className={styles.heroChip}><span>📝</span> {stats.attempted}/{stats.total} attempted</div>
         </div>
+
+        <div className={styles.heroShareRow}>
+          <button className={styles.heroShareBtn} onClick={() => { const t = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024!\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`, '_blank'); }}>Share on WhatsApp</button>
+          <button className={styles.heroShareBtnAlt} onClick={() => { const t = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2024! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\nCheck yours: https://register.ipmcareer.com/response`; navigator.clipboard.writeText(t); alert('Score copied!'); }}>Copy Score</button>
+        </div>
       </div>
     </div>
   );
@@ -539,7 +544,7 @@ function Report({ data, error, isFound }) {
   const [jsonData, setJsonData] = useState(null);
   const [scores, setScores] = useState(null);
   const [stats, setStats] = useState(null);
-  const [view, setView] = useState('modern'); // 'modern' or 'classic'
+  const [view, setView] = useState('classic'); // 'modern' or 'classic'
   const router = useRouter();
 
   // Score calculation
@@ -736,46 +741,6 @@ function Report({ data, error, isFound }) {
             </div>
           )}
 
-          {/* Detailed Question-wise */}
-          {jsonData && (
-            <div className={styles.detailedSection}>
-              <h2 className={styles.sectionTitle}>Detailed Question-Wise Analysis</h2>
-              {jsonData.sa && jsonData.sa.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h3 className={styles.subsectionTitle}>Short Answer (Quantitative Ability)</h3>
-                  <div className={styles.tableWrapper}>
-                    <table className={styles.detailTable}>
-                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
-                      <tbody>{jsonData.sa.map((q, idx) => <QuestionRow key={`sa-${idx}`} question={q} index={idx + 1} type="SA" />)}</tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {jsonData.mcq && jsonData.mcq.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h3 className={styles.subsectionTitle}>Multiple Choice (Quantitative Ability)</h3>
-                  <div className={styles.tableWrapper}>
-                    <table className={styles.detailTable}>
-                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
-                      <tbody>{jsonData.mcq.map((q, idx) => <QuestionRow key={`mcq-${idx}`} question={q} index={jsonData.sa.length + idx + 1} type="MCQ" />)}</tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              {jsonData.va && jsonData.va.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h3 className={styles.subsectionTitle}>Verbal Ability (Reading Comprehension)</h3>
-                  <div className={styles.tableWrapper}>
-                    <table className={styles.detailTable}>
-                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
-                      <tbody>{jsonData.va.map((q, idx) => <QuestionRow key={`va-${idx}`} question={q} index={jsonData.sa.length + jsonData.mcq.length + idx + 1} type="VA" />)}</tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Smart Recommendation */}
           {scores && stats && (
             <SmartRecommendation scores={scores} stats={stats} category={data?.category || 'GEN'} studentName={data?.name || 'Student'} router={router} uid={router.query.uid} />
@@ -832,6 +797,46 @@ function Report({ data, error, isFound }) {
                   }}>Copy Score</Button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Detailed Question-wise */}
+          {jsonData && (
+            <div className={styles.detailedSection}>
+              <h2 className={styles.sectionTitle}>Detailed Question-Wise Analysis</h2>
+              {jsonData.sa && jsonData.sa.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h3 className={styles.subsectionTitle}>Short Answer (Quantitative Ability)</h3>
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.detailTable}>
+                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
+                      <tbody>{jsonData.sa.map((q, idx) => <QuestionRow key={`sa-${idx}`} question={q} index={idx + 1} type="SA" />)}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {jsonData.mcq && jsonData.mcq.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h3 className={styles.subsectionTitle}>Multiple Choice (Quantitative Ability)</h3>
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.detailTable}>
+                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
+                      <tbody>{jsonData.mcq.map((q, idx) => <QuestionRow key={`mcq-${idx}`} question={q} index={jsonData.sa.length + idx + 1} type="MCQ" />)}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {jsonData.va && jsonData.va.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h3 className={styles.subsectionTitle}>Verbal Ability (Reading Comprehension)</h3>
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.detailTable}>
+                      <thead><tr><th>Q No</th><th>Your Answer</th><th>Correct Answer</th><th>Status</th><th>Evaluation</th></tr></thead>
+                      <tbody>{jsonData.va.map((q, idx) => <QuestionRow key={`va-${idx}`} question={q} index={jsonData.sa.length + jsonData.mcq.length + idx + 1} type="VA" />)}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

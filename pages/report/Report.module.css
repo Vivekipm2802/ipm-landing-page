@@ -1656,3 +1656,54 @@
   .hero, .bentoCard, .subjectCard, .flashCard { break-inside: avoid; }
   .flashSection, .blob1, .blob2, .blob3 { display: none; }
 }
+
+/* ── Hero Share Row ── */
+.heroShareRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.heroShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: none;
+  background: #25d366;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.heroShareBtn:hover {
+  background: #20bd5a;
+  transform: translateY(-1px);
+}
+
+.heroShareBtnAlt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  backdrop-filter: blur(8px);
+}
+
+.heroShareBtnAlt:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
