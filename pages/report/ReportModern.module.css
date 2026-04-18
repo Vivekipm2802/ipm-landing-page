@@ -1494,3 +1494,45 @@
     color: #222;
   }
 }
+
+
+/* ═══════ MOBILE UX AUDIT FIXES (Apr 2026) ═══════ */
+
+/* ── Hero: fix negative margin bleed ── */
+@media (max-width: 480px) {
+  .hero {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+    overflow: hidden;
+  }
+  .heroChip { min-height: 36px; }
+}
+
+/* ── Toggle: prevent overlap on mobile Safari ── */
+@media (max-width: 480px) {
+  .viewToggle {
+    top: 56px;
+    padding: 8px 0 6px;
+    background: rgba(10, 10, 20, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+}
+
+/* ── Touch targets ── */
+@media (max-width: 768px) {
+  .heroChip { min-height: 40px; display: inline-flex; align-items: center; }
+  .toggleBtn { min-height: 40px; display: inline-flex; align-items: center; }
+  .shareWhatsApp, .shareCopy { min-height: 44px; }
+}
+
+/* ── Detail table scroll ── */
+@media (max-width: 768px) {
+  .questionTable { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* ── Safe area for notched phones ── */
+.footer {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}

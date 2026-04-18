@@ -354,6 +354,8 @@
   background: white;
   border-radius: 12px;
   overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -1529,7 +1531,8 @@
 
 .subjectBarTrack {
   width: 100%; height: 14px; background: #f1f5f9; border-radius: 999px;
-  overflow: hidden; margin-bottom: 16px;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch; margin-bottom: 16px;
 }
 .subjectBarFill {
   height: 100%; border-radius: 999px;
@@ -1706,4 +1709,108 @@
 .heroShareBtnAlt:hover {
   background: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
+}
+
+
+/* ═══════ MOBILE UX AUDIT FIXES (Apr 2026) ═══════ */
+
+/* ── Hero: proper mobile sizing ── */
+@media (max-width: 768px) {
+  .hero { padding: 32px 20px 28px; border-radius: 18px; }
+  .heroGreeting { font-size: clamp(32px, 8vw, 48px); }
+  .heroSub { font-size: 16px; margin-bottom: 28px; }
+  .heroScoreBlock { gap: 20px; margin-bottom: 24px; }
+  .heroGradeRing { width: 130px; height: 130px; }
+  .heroGradeLetter { font-size: 44px; }
+  .heroScoreValue { font-size: clamp(40px, 10vw, 64px); }
+  .heroScoreRight { min-width: unset; }
+  .heroVibe { font-size: 14px; padding: 8px 14px; }
+  .heroChips { gap: 8px; }
+  .heroChip { padding: 10px 14px; font-size: 13px; min-height: 44px; display: inline-flex; align-items: center; }
+  .heroShareRow { flex-direction: column; gap: 8px; }
+  .heroShareBtn, .heroShareBtnAlt { width: 100%; justify-content: center; min-height: 44px; font-size: 14px; }
+  .heroTop { margin-bottom: 20px; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 24px 16px 22px; border-radius: 16px; }
+  .heroGreeting { font-size: 28px; }
+  .heroSub { font-size: 14px; margin-bottom: 20px; }
+  .heroScoreBlock { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+  .heroGradeRing { width: 110px; height: 110px; }
+  .heroGradeLetter { font-size: 36px; }
+  .heroScoreValue { font-size: 44px; }
+  .heroScoreRight { min-width: unset; text-align: center; }
+  .heroChips { justify-content: center; }
+  .heroChip { padding: 8px 12px; font-size: 12px; }
+  .heroBadge { font-size: 11px; padding: 6px 10px; }
+  .heroDate { font-size: 11px; }
+}
+
+/* ── Detail table: scrollable on mobile ── */
+.detailTableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .detailTable { min-width: 520px; }
+  .detailTable th { padding: 0.6rem 0.4rem; font-size: 0.75rem; }
+  .detailTable td { padding: 0.6rem 0.4rem; font-size: 0.8rem; max-width: 80px; }
+  .statusBadge { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+}
+
+/* ── Share card: no fixed width overflow ── */
+@media (max-width: 480px) {
+  .shareCard { width: 100%; max-width: 100%; padding: 1.25rem; }
+  .shareCardScoreValue { font-size: 2.2rem; }
+  .shareCardBreakdown { gap: 0.8rem; }
+}
+
+/* ── Cutoff: readable labels on mobile ── */
+@media (max-width: 600px) {
+  .cutoffContainer { padding: 1.25rem; }
+  .cutoffMarkerLabel { font-size: 0.6rem; top: -36px; }
+  .cutoffYourScore { font-size: 0.65rem; padding: 3px 8px; }
+  .cutoffBar { padding-top: 2.5rem; margin-bottom: 2.5rem; }
+}
+
+/* ── Download bar: safe area for notched phones ── */
+.downloadBar {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Touch targets: minimum 44px ── */
+@media (max-width: 768px) {
+  .enrollBtn { min-height: 44px; }
+  .downloadBtn { min-height: 44px; }
+}
+
+/* ── Subject cards: full width on small screens ── */
+@media (max-width: 480px) {
+  .subjectGrid { grid-template-columns: 1fr; gap: 14px; }
+  .subjectCard { padding: 20px; }
+  .subjectTitle { font-size: 17px; }
+  .subjectScore { font-size: 26px; }
+}
+
+/* ── Flashcards: better sizing on small phones ── */
+@media (max-width: 480px) {
+  .flashGrid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flashCard { height: 180px; }
+}
+
+/* ── Bento: reduce padding on small phones ── */
+@media (max-width: 480px) {
+  .bentoCard { padding: 16px; border-radius: 16px; }
+  .bentoGrid { gap: 10px; }
+}
+
+/* ── Recommendation section: tighter on mobile ── */
+@media (max-width: 480px) {
+  .recCard { padding: 1.25rem; }
+  .recTitle { font-size: 1rem; }
+  .compareGrid { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
