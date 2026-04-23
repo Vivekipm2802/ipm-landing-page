@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 const MODES = [
   { key: 'sop', icon: '📝', name: 'SOP Deep-Dive', desc: 'Questions from your SOP', duration: '10 min' },
@@ -167,6 +168,7 @@ export default function MockInterview() {
   if (!started) {
     return (
       <AppShell>
+      <PIAuthGuard>
         <NextSeo title="AI Mock Interview — PI Prep | IPM Careers" />
         <div className={styles.pageContainer}>
           <div className={styles.pageHeader}>
@@ -223,13 +225,15 @@ export default function MockInterview() {
             </button>
           </div>
         </div>
-      </AppShell>
+      </PIAuthGuard>
+    </AppShell>
     );
   }
 
   // Interview in progress
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="AI Mock Interview — In Progress | IPM Careers" />
       <div className={styles.pageContainer} style={{ maxWidth: 700 }}>
         <div className={styles.chatContainer}>
@@ -361,6 +365,7 @@ export default function MockInterview() {
           </div>
         )}
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }

@@ -4,6 +4,7 @@ import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { supabase } from '../../utils/supabaseClient';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 const BOARDS = ['CBSE', 'ICSE/ISC', 'State Board', 'IB', 'IGCSE', 'Other'];
 const STREAMS = ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Humanities', 'Other'];
@@ -106,6 +107,7 @@ export default function PIProfile() {
 
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="My Profile — PI Prep | IPM Careers" />
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
@@ -293,6 +295,7 @@ export default function PIProfile() {
           </button>
         </div>
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }

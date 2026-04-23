@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 const SOP_SECTIONS = [
   {
@@ -124,6 +125,7 @@ export default function SOPBuilder() {
 
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="SOP Builder — PI Prep | IPM Careers" />
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
@@ -267,6 +269,7 @@ export default function SOPBuilder() {
           </div>
         )}
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }

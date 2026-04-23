@@ -4,6 +4,7 @@ import { Scrollbar } from 'smooth-scrollbar-react'
 import Head from 'next/head'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
+import { AuthProvider } from '../hooks/useAuth'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -25,7 +26,9 @@ export default function App({ Component, pageProps }) {
       <Toaster position="bottom-right" toastOptions={{ className: 'font-sans' }} />
       <Scrollbar damping thumbMinSize>
         <NextUIProvider>
-          <Component {...pageProps} />
+          <AuthProvider>
+            <Component {...pageProps} />
+          </AuthProvider>
         </NextUIProvider>
       </Scrollbar>
     </>

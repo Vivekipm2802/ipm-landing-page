@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 // ── Question Bank Data ──
 // REPLACE with parsed PDF content. Each question needs: category, text, answer, difficulty
@@ -126,6 +127,7 @@ export default function QuestionBank() {
 
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="Question Bank — PI Prep | IPM Careers" />
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
@@ -257,6 +259,7 @@ export default function QuestionBank() {
           </div>
         </div>
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }

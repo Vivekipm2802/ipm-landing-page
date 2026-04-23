@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 // ── Expert Profiles (editable — add/remove experts here) ──
 const EXPERTS = [
@@ -179,6 +180,7 @@ export default function ExpertBooking() {
 
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="Expert Booking — PI Prep | IPM Careers" />
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
@@ -418,6 +420,7 @@ export default function ExpertBooking() {
           </div>
         )}
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }

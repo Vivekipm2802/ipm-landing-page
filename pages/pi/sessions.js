@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
+import PIAuthGuard from '../../components/PIAuthGuard';
 
 // ── Session Data (editable — add/remove sessions here) ──
 const PAST_SESSIONS = [
@@ -146,6 +147,7 @@ export default function Sessions() {
 
   return (
     <AppShell>
+      <PIAuthGuard>
       <NextSeo title="Sessions — PI Prep | IPM Careers" />
       <div className={styles.pageContainer}>
         <div className={styles.pageHeader}>
@@ -304,6 +306,7 @@ export default function Sessions() {
           </div>
         </div>
       </div>
+    </PIAuthGuard>
     </AppShell>
   );
 }
