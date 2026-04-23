@@ -1,7 +1,8 @@
-// /components/PIAuthGuard.js — Wraps PI pages with login + paywall checks
+// /components/PIAuthGuard.js — Wraps PI pages with login + paywall check
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
-import styles from '../pages/pi/PIPrep.module.css';
+
+const RAZORPAY_LINK = 'https://rzp.io/rzp/pi-batch';
 
 export default function PIAuthGuard({ children }) {
   const router = useRouter();
@@ -33,7 +34,6 @@ export default function PIAuthGuard({ children }) {
         <p style={{ color: '#22c55e', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 24px' }}>
           First 24 hours free — then just ₹99 one-time
         </p>
-
         <button
           onClick={signInWithGoogle}
           style={{
@@ -54,7 +54,6 @@ export default function PIAuthGuard({ children }) {
           </svg>
           Continue with Google
         </button>
-
         <div style={{ marginTop: 32, padding: '16px 20px', background: '#f8fafc', borderRadius: 14, textAlign: 'left' }}>
           <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1a1a2e', marginBottom: 10 }}>What you get:</div>
           {['AI Mock Interview with IIM-style panel', 'SOP Builder with AI review & trap detection', '40+ curated PI questions with model answers', 'Expert booking for 1-on-1 coaching', 'Recorded strategy sessions'].map((item, i) => (
@@ -78,9 +77,10 @@ export default function PIAuthGuard({ children }) {
         <p style={{ color: '#64748b', fontSize: '0.92rem', margin: '0 0 20px', lineHeight: 1.6 }}>
           Unlock unlimited access to all PI Prep tools for a one-time payment of just ₹99.
         </p>
-
-        <button
-          onClick={() => initiatePayment(piUser?.email, router)}
+        <a
+          href={RAZORPAY_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '14px 36px', border: 'none', borderRadius: 14,
@@ -88,23 +88,30 @@ export default function PIAuthGuard({ children }) {
             color: '#fff', fontSize: '1rem', fontWeight: 700,
             cursor: 'pointer', fontFamily: 'inherit',
             boxShadow: '0 4px 16px rgba(108,99,255,0.3)',
-            transition: 'all 0.2s',
+            transition: 'all 0.2s', textDecoration: 'none',
           }}
         >
-          🔓 Unlock for ₹99
-        </button>
-
+          🔓 Pay ₹99 to Unlock
+        </a>
         <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: 10 }}>
           One-time payment • Lifetime access • Secure Razorpay checkout
         </p>
-
         <div style={{
-          marginTop: 24, padding: '14px 18px', background: '#fef3c7',
+          marginTop: 20, padding: '14px 18px', background: '#f0fdf4',
+          borderRadius: 12, fontSize: '0.82rem', color: '#166534', textAlign: 'left'
+        }}>
+          <strong>✅ After payment:</strong> Share your payment screenshot and registered email on{' '}
+          <a href={`https://wa.me/918299470392?text=Hi%2C%20I%20paid%20%E2%82%B999%20for%20PI%20Prep%20access.%20My%20email%3A%20${encodeURIComponent(piUser?.email || '')}`} target="_blank" rel="noopener" style={{ color: '#6c63ff', fontWeight: 700 }}>
+            WhatsApp
+          </a>
+          . We'll activate your premium access within 1 hour.
+        </div>
+        <div style={{
+          marginTop: 12, padding: '14px 18px', background: '#fef3c7',
           borderRadius: 12, fontSize: '0.82rem', color: '#92400e', textAlign: 'left'
         }}>
           <strong>💡 Can't pay online?</strong> Send ₹99 via UPI to <strong>8299470392@paytm</strong> and
-          share the screenshot on <a href="https://wa.me/918299470392?text=Hi%2C%20I%20paid%20%E2%82%B999%20for%20PI%20Prep%20access.%20My%20email%3A%20${encodeURIComponent(piUser?.email || '')}" target="_blank" rel="noopener" style={{ color: '#6c63ff', fontWeight: 700 }}>WhatsApp</a>.
-          We'll activate your account within 1 hour.
+          share the screenshot on <a href={`https://wa.me/918299470392?text=Hi%2C%20I%20paid%20%E2%82%B999%20via%20UPI%20for%20PI%20Prep.%20My%20email%3A%20${encodeURIComponent(piUser?.email || '')}`} target="_blank" rel="noopener" style={{ color: '#6c63ff', fontWeight: 700 }}>WhatsApp</a>.
         </div>
       </div>
     );
@@ -124,73 +131,17 @@ export default function PIAuthGuard({ children }) {
           color: '#92400e',
         }}>
           ⏳ Free trial: <strong>{trialTimeLeft}</strong> remaining •{' '}
-          <span
-            onClick={() => initiatePayment(piUser?.email, router)}
-            style={{ color: '#6c63ff', cursor: 'pointer', textDecoration: 'underline' }}
+          <a
+            href={RAZORPAY_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#6c63ff', textDecoration: 'underline' }}
           >
             Upgrade for ₹99
-          </span>
+          </a>
         </div>
       )}
       {children}
     </>
   );
-}
-
-// Razorpay payment initiation
-async function initiatePayment(email, router) {
-  try {
-    // 1. Create order on server
-    const res = await fetch('/api/pi/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const order = await res.json();
-    if (order.error) throw new Error(order.error);
-
-    // 2. Open Razorpay checkout
-    const options = {
-      key: order.razorpayKeyId,
-      amount: order.amount,
-      currency: 'INR',
-      name: 'IPM Careers',
-      description: 'PI Prep — Lifetime Access',
-      order_id: order.orderId,
-      prefill: { email },
-      theme: { color: '#6c63ff' },
-      handler: async function (response) {
-        // 3. Verify payment on server
-        const verifyRes = await fetch('/api/pi/verify-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            email,
-          }),
-        });
-        const result = await verifyRes.json();
-        if (result.success) {
-          alert('Payment successful! You now have lifetime access.');
-          router.reload();
-        } else {
-          alert('Payment verification failed. Please contact support.');
-        }
-      },
-    };
-
-    // Load Razorpay script if not already loaded
-    if (!window.Razorpay) {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => new window.Razorpay(options).open();
-      document.body.appendChild(script);
-    } else {
-      new window.Razorpay(options).open();
-    }
-  } catch (err) {
-    alert('Payment initiation failed: ' + err.message);
-  }
 }
