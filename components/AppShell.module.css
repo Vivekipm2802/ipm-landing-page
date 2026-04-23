@@ -96,7 +96,8 @@
   align-items: center;
   gap: var(--size-spacing-lg);
   min-width: 0;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  overflow: hidden;
 }
 
 .logo {
@@ -134,8 +135,10 @@
 .topbarNav {
   display: none;
   align-items: center;
-  gap: var(--size-spacing-xl);
+  justify-content: center;
+  gap: var(--size-spacing-lg);
   flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
@@ -625,6 +628,22 @@
   }
 }
 
+
+/* ── Topbar overlap fix for tablets ── */
+@media (min-width: 768px) and (max-width: 1100px) {
+  .topbarNav {
+    gap: var(--size-spacing-md);
+  }
+  .topbarLink {
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+  }
+  .ctaButton {
+    font-size: var(--font-size-xs);
+    padding: 0.375rem var(--size-spacing-md);
+    white-space: nowrap;
+  }
+}
 /* ============================================================================
    Print Styles
    ============================================================================ */

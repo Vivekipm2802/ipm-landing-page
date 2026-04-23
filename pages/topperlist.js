@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import styles from './Topper.module.css'
 import TopperWrap from '../components/TopperWrap';
+import AppShell from '../components/AppShell';
 
 
 function Topper({data}){
@@ -63,7 +64,7 @@ const config = {
     
   ]
 }
-    return <div className={styles.main}>
+    return <AppShell><div className={styles.main}>
         <div className={styles.left}>
         <div className={styles.logo}>
 
@@ -121,6 +122,7 @@ const config = {
 
        </div>
     </div>
+    </AppShell>
 }
 
 const ConditionalWrap = ({children,wrapper,condition})=>{
