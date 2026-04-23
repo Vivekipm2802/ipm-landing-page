@@ -796,3 +796,63 @@
 @media (max-width: 900px) {
   .breadcrumb { display: none; }
 }
+
+
+/* ═══ PI Prep Sidebar Section ═══ */
+.sidebarSeparator {
+  padding: 16px 16px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-primary, #6c63ff);
+  opacity: 0.8;
+}
+.sidebarSepLine {
+  height: 1px;
+  background: var(--color-border, #e2e8f0);
+  margin: 12px 8px 6px;
+}
+.sidebarItemDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: default;
+}
+.comingSoon {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
+/* Mobile nav separator */
+.mobileNavSeparator {
+  padding: 14px 20px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-primary, #6c63ff);
+  border-top: 1px solid var(--color-border, #e2e8f0);
+  margin-top: 8px;
+}
+.mobileNavItemDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.comingSoonMobile {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+}

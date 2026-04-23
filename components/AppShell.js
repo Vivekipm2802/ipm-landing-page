@@ -29,6 +29,12 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   // Auto-derive page title from route if not provided
   const routeTitleMap = {
     '/response': 'Score Analyzer',
+    '/pi/profile': 'My Profile',
+    '/pi/sop': 'SOP Builder',
+    '/pi/mock': 'AI Mock Interview',
+    '/pi/questions': 'Question Bank',
+    '/pi/booking': 'Expert Booking',
+    '/pi/sessions': 'Sessions',
     '/report': 'My Report',
     '/interview-prep': 'AI Mock Interview',
     '/topperlist': 'Topper List',
@@ -76,17 +82,22 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   const navItems = [
     { icon: '📊', label: 'Score Analyzer', path: '/response' },
     { icon: '📋', label: 'My Report', path: '/report', disabled: false },
-    { icon: '🤖', label: 'AI Mock Interview', path: '/interview-prep' },
     { icon: '🏆', label: 'Topper List', path: '/topperlist' },
     { icon: '🎯', label: 'College Predictor', path: '/call' },
-    { icon: '📚', label: 'PI Batch', path: '/pi-batch' },
+    { separator: true, label: 'PI Prep' },
+    { icon: '🧑‍🎓', label: 'My Profile', path: '/pi/profile' },
+    { icon: '✍️', label: 'SOP Builder', path: '/pi/sop' },
+    { icon: '🤖', label: 'AI Mock Interview', path: '/pi/mock' },
+    { icon: '📚', label: 'Question Bank', path: '/pi/questions', disabled: true },
+    { icon: '📅', label: 'Expert Booking', path: '/pi/booking', disabled: true },
+    { icon: '📹', label: 'Sessions', path: '/pi/sessions', disabled: true },
   ];
 
   const topNavItems = [
     { label: 'Score Analyzer', path: '/response' },
-    { label: 'AI Interview', path: '/interview-prep' },
+    { label: 'PI Prep', path: '/pi/profile' },
+    { label: 'AI Mock', path: '/pi/mock' },
     { label: 'Topper List', path: '/topperlist' },
-    { label: 'College Predictor', path: '/call' },
   ];
 
   return (
@@ -174,18 +185,27 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
               </button>
             </div>
             <nav className={styles.mobileNavList}>
-              {navItems.map((item) => (
+              {navItems.map((item, idx) => (
+                item.separator ? (
+                  <div key={item.label} className={styles.mobileNavSeparator}>
+                    <span>{item.label}</span>
+                  </div>
+                ) : (
                 <Link
                   key={item.path}
-                  href={item.path}
+                  href={item.disabled ? '#' : item.path}
                   className={`${styles.mobileNavItem} ${
                     isActive(item.path) ? styles.mobileNavItemActive : ''
                   } ${item.disabled ? styles.mobileNavItemDisabled : ''}`}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => { if (item.disabled) { e.preventDefault(); } else { setMobileMenuOpen(false); } }}
                 >
                   <span className={styles.mobileNavIcon}>{item.icon}</span>
-                  <span className={styles.mobileNavLabel}>{item.label}</span>
+                  <span className={styles.mobileNavLabel}>
+                    {item.label}
+                    {item.disabled && <span className={styles.comingSoonMobile}>Soon</span>}
+                  </span>
                 </Link>
+                )
               ))}
               <div className={styles.mobileNavDivider}></div>
               <a
@@ -209,19 +229,30 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
           >
             <div className={styles.sidebarContent}>
               <nav className={styles.sidebarNav}>
-                {navItems.map((item) => (
+                {navItems.map((item, idx) => (
+                  item.separator ? (
+                    <div key={item.label} className={styles.sidebarSeparator}>
+                      {sidebarOpen && <span>{item.label}</span>}
+                      {!sidebarOpen && <div className={styles.sidebarSepLine}></div>}
+                    </div>
+                  ) : (
                   <Link
                     key={item.path}
-                    href={item.path}
+                    href={item.disabled ? '#' : item.path}
                     className={`${styles.sidebarItem} ${
                       isActive(item.path) ? styles.sidebarItemActive : ''
                     } ${item.disabled ? styles.sidebarItemDisabled : ''}`}
+                    onClick={item.disabled ? (e) => e.preventDefault() : undefined}
                   >
                     <span className={styles.sidebarIcon}>{item.icon}</span>
                     {sidebarOpen && (
-                      <span className={styles.sidebarLabel}>{item.label}</span>
+                      <span className={styles.sidebarLabel}>
+                        {item.label}
+                        {item.disabled && <span className={styles.comingSoon}>Soon</span>}
+                      </span>
                     )}
                   </Link>
+                  )
                 ))}
               </nav>
 
