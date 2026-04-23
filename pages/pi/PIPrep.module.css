@@ -806,3 +806,601 @@
   .btnPrimary { width: 100%; }
   .btnRow { flex-direction: column; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   Phase 2 — Sessions, Expert Booking, Question Bank
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Tab Bar ── */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+.tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.tab:hover {
+  color: #1a1a2e;
+  background: rgba(255,255,255,0.5);
+}
+.tabActive {
+  background: #fff;
+  color: #6c63ff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.tabCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #e5e7eb;
+  color: #475569;
+}
+.tabActive .tabCount {
+  background: #6c63ff20;
+  color: #6c63ff;
+}
+
+/* ── Sessions ── */
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.sessionCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s;
+}
+.sessionCard:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.sessionCardHeader {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.sessionDate {
+  min-width: 56px;
+  text-align: center;
+  background: #6c63ff10;
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+.sessionDateDay {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #6c63ff;
+  line-height: 1;
+}
+.sessionDateMonth {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c63ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.sessionInfo {
+  flex: 1;
+  min-width: 0;
+}
+.sessionTitle {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.sessionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.sessionTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sessionTag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.sessionDesc {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+.sessionActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.countdown {
+  text-align: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ef444415, #f5a62315);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.countdownValue {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ef4444;
+  line-height: 1;
+}
+.countdownLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #f97316;
+  text-transform: uppercase;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Video Embed ── */
+.videoEmbed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f172a;
+}
+.videoEmbed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.videoPlaceholder {
+  width: 100%;
+  padding: 3rem 1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.videoPlaceholderIcon {
+  font-size: 2rem;
+}
+
+/* ── Expert Booking ── */
+.expertGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+.expertCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.expertCard:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+.expertHeader {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.expertAvatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+.expertHeaderInfo {
+  flex: 1;
+  min-width: 0;
+}
+.expertName {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.expertTitle {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+.expertStats {
+  display: flex;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: #475569;
+  margin-top: 4px;
+  font-weight: 600;
+}
+.expertBio {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.expertSpecialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.expertSpecTag {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #6c63ff12;
+  color: #6c63ff;
+  border: 1px solid #6c63ff20;
+}
+.expertFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+.expertPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.priceAmount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.priceUnit {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ── Date & Time Slots ── */
+.dateGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dateSlot {
+  padding: 10px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+.dateSlot:hover {
+  border-color: #6c63ff;
+  background: #6c63ff08;
+}
+.dateSlotActive {
+  border-color: #6c63ff;
+  background: #6c63ff10;
+}
+.dateSlotDay {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+.dateSlotDate {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-top: 2px;
+}
+.dateSlotActive .dateSlotDay,
+.dateSlotActive .dateSlotDate {
+  color: #6c63ff;
+}
+
+.timeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.timeSlot {
+  padding: 10px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  transition: all 0.2s;
+}
+.timeSlot:hover {
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+.timeSlotActive {
+  border-color: #6c63ff;
+  background: #6c63ff;
+  color: #fff;
+}
+.timeSlotActive:hover {
+  color: #fff;
+}
+
+/* ── Booking Summary ── */
+.bookingSummary {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-top: 12px;
+}
+.bookingSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.bookingSummaryRow:last-child {
+  border-bottom: none;
+}
+.bookingSummaryLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+.bookingSummaryValue {
+  font-size: 0.9rem;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+/* ── Question Bank ── */
+.searchBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.searchInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  color: #1a1a2e;
+  background: #fff;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.searchInput:focus {
+  border-color: #6c63ff;
+}
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+.questionList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.questionItem {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.questionItem:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-color: #6c63ff30;
+}
+.questionItemExpanded {
+  border-color: #6c63ff40;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.08);
+}
+.questionHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.questionNum {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #6c63ff12;
+  color: #6c63ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+.questionText {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.5;
+}
+.questionDifficulty {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.diffEasy { background: #dcfce7; color: #166534; }
+.diffMedium { background: #fef3c7; color: #92400e; }
+.diffHard { background: #fce7f3; color: #9d174d; }
+.questionBookmark {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.questionBookmark:hover {
+  background: #f5a62320;
+}
+.questionAnswer {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+.answerLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c63ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.answerText {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.7;
+}
+.questionCategoryTag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  margin-top: 8px;
+}
+
+/* ── Phase 2 Responsive ── */
+@media (max-width: 768px) {
+  .sessionCardHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sessionDate {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .countdown {
+    align-self: flex-start;
+  }
+  .expertGrid {
+    grid-template-columns: 1fr;
+  }
+  .dateGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .timeGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .tabBar {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .sessionActions {
+    flex-direction: column;
+  }
+  .sessionActions .btnPrimary,
+  .sessionActions .btnSecondary {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  .expertFooter {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .expertFooter .btnPrimary {
+    text-align: center;
+    justify-content: center;
+  }
+  .dateGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .timeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bookingSummary {
+    padding: 0.75rem 1rem;
+  }
+  .searchBar {
+    flex-direction: column;
+  }
+}

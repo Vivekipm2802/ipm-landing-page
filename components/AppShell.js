@@ -88,9 +88,9 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     { icon: '🧑‍🎓', label: 'My Profile', path: '/pi/profile' },
     { icon: '✍️', label: 'SOP Builder', path: '/pi/sop' },
     { icon: '🤖', label: 'AI Mock Interview', path: '/pi/mock' },
-    { icon: '📚', label: 'Question Bank', path: '/pi/questions', disabled: true },
-    { icon: '📅', label: 'Expert Booking', path: '/pi/booking', disabled: true },
-    { icon: '📹', label: 'Sessions', path: '/pi/sessions', disabled: true },
+    { icon: '📚', label: 'Question Bank', path: '/pi/questions' },
+    { icon: '📅', label: 'Expert Booking', path: '/pi/booking' },
+    { icon: '📹', label: 'Sessions', path: '/pi/sessions' },
   ];
 
   const topNavItems = [
