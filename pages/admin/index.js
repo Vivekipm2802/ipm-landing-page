@@ -16,12 +16,16 @@ const TABS = [
 const CATEGORIES = ['SOP', 'Academics', 'GK', 'Situational', 'Why IIM'];
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
+const ADMIN_PASSWORD = 'PIPrep@dmin!';
 export default function AdminPortal() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [passwordVerified, setPasswordVerified] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Data states
   const [users, setUsers] = useState([]);
@@ -207,6 +211,29 @@ export default function AdminPortal() {
 
   if (loading) return <div style={S.loadingPage}>Loading...</div>;
   if (!isAdmin) return <div style={S.loadingPage}>Not authorized</div>;
+
+  // Password gate
+  if (!passwordVerified) {
+    return (
+      <>
+        <Head><title>Admin Login — IPM Careers</title></Head>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f23', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ background: '#1a1a3e', borderRadius: 16, padding: '48px 40px', maxWidth: 400, width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', textAlign: 'center' }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>&#x1F510;</div>
+            <h1 style={{ color: '#fff', fontSize: 22, margin: '0 0 8px' }}>Admin Access</h1>
+            <p style={{ color: '#9999bb', fontSize: 14, margin: '0 0 28px' }}>Enter the admin password to continue</p>
+            <form onSubmit={(e) => { e.preventDefault(); if (passwordInput === ADMIN_PASSWORD) { setPasswordVerified(true); setPasswordError(''); } else { setPasswordError('Incorrect password'); setPasswordInput(''); } }}>
+              <input type='password' placeholder='Enter admin password' value={passwordInput} onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(''); }} autoFocus style={{ width: '100%', padding: '14px 16px', fontSize: 16, borderRadius: 10, border: passwordError ? '2px solid #ff4d6a' : '2px solid #2d2d5e', background: '#12122a', color: '#fff', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
+              {passwordError && <p style={{ color: '#ff4d6a', fontSize: 13, margin: '4px 0 8px', textAlign: 'left' }}>{passwordError}</p>}
+              <button type='submit' style={{ width: '100%', padding: '14px', fontSize: 16, fontWeight: 600, borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #6c5ce7, #a855f7)', color: '#fff', cursor: 'pointer', marginTop: 8 }}>Unlock Admin Panel</button>
+            </form>
+            <p style={{ color: '#555577', fontSize: 12, marginTop: 20 }}>Logged in as {user?.email}</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
 
   return (
     <>
