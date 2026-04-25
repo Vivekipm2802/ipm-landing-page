@@ -153,8 +153,10 @@ function Response() {
           setLoading(false);
         }
       })
-      .catch((error) => {
-        setHelpModal(true);
+      .catch((err) => {
+        console.error("Sheetdata error:", err);
+        const msg = err?.response?.data?.error || "Failed to fetch response sheet. Check the URL and try again.";
+        setError(msg);
         setLoading(false);
       });
   }
@@ -163,31 +165,58 @@ function Response() {
     setLoading(true);
     const mainTotal = c;
     const uid = uuid();
-    const { error } = await supabase.from("responses").insert({
-      email: b.email,
-      phone: b.phone,
-      data: JSON.stringify(a),
-      name: a.StudentData.participantName,
-      total: mainTotal,
-      link: url.trim(),
-      category: b.category,
-      uuid: uid,
-    });
+    const saVal = calculateScores(a.sa, 0, 4);
+    const mcqVal = calculateScores(a.mcq, 1, 4);
+    const vaVal = calculateScores(a.va, 1, 4, true);
 
-    if (error) {
-      setLoading(false);
-      toast.error("Unable to Generate your Scorecard");
+    // Try full insert with sectional scores first, fall back to basic insert
+    let insertError = null;
+    try {
+      const { error } = await supabase.from("responses").insert({
+        email: b.email,
+        phone: b.phone,
+        data: JSON.stringify(a),
+        name: a.StudentData.participantName,
+        total: mainTotal,
+        link: url.trim(),
+        category: b.category,
+        uuid: uid,
+        sa_score: saVal,
+        mcq_score: mcqVal,
+        va_score: vaVal,
+        city: b.city || '',
+      });
+      if (error) {
+        console.warn("Full insert failed, trying basic insert:", error.message);
+        const { error: err2 } = await supabase.from("responses").insert({
+          email: b.email,
+          phone: b.phone,
+          data: JSON.stringify(a),
+          name: a.StudentData.participantName,
+          total: mainTotal,
+          link: url.trim(),
+          category: b.category,
+          uuid: uid,
+        });
+        if (err2) insertError = err2;
+      }
+    } catch (e) {
+      console.error("Supabase insert exception:", e);
     }
-    if (!error) {
-      setFormData();
-      setLoading(false);
-      setUrl();
-      toast.success("Scorecard generated! Redirecting to your detailed report...");
-      setDownloadLink(`/report/${uid}`);
-      setTimeout(() => {
-        router.push(`/report/${uid}`);
-      }, 1500);
+
+    if (insertError) {
+      console.error("Both inserts failed:", insertError);
     }
+
+    // Always show scorecard regardless of DB save status
+    setFormData();
+    setLoading(false);
+    setUrl();
+    toast.success("Scorecard generated! Redirecting to your detailed report...");
+    setDownloadLink(`/report/${uid}`);
+    setTimeout(() => {
+      router.push(`/report/${uid}`);
+    }, 1500);
   }
 
   function validatePhone(phone) {
@@ -261,9 +290,7 @@ function Response() {
             <span className={styles.heroTitleAccent}>Get your score in 10 seconds.</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Instant sectional breakdown with SA, MCQ & VA scores. See exactly where you stand
-            and get a detailed performance report.
-          </p>
+            </p>
 
           {/* Social Proof */}
           <div className={styles.socialProof}>
@@ -275,9 +302,7 @@ function Response() {
               Since <span className={styles.proofStatNum}>2022</span>
             </div>
             <div className={styles.proofDot}></div>
-            <a href="/topperlist" style={{ color: '#6c63ff', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
-              View Topper List →
-            </a>
+            
           </div>
         </div>
 
@@ -411,6 +436,19 @@ function Response() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>City</label>
+                <input
+                  className={styles.formInput}
+                  type="text"
+                  placeholder="e.g. Mumbai"
+                  value={formData?.city || ''}
+                  onChange={e => { setError(); setFormData(prev => ({ ...prev, city: e.target.value })); }}
+                />
+              </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Response Sheet URL</label>
                 <input
@@ -504,7 +542,7 @@ function Response() {
 
           {/* ── Feature Cards ── */}
           <div className={styles.featureGrid}>
-            <a href="/topperlist" className={styles.featureCard}>
+            <a href="/call" className={styles.featureCard}>
               <span className={styles.featureIcon}>🏆</span>
               <span className={styles.featureName}>Topper List</span>
               <span className={styles.featureDesc}>See the highest IPMAT scores</span>

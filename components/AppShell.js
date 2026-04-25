@@ -131,14 +131,14 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
                 <span className={styles.backBtnLabel}>Back</span>
               </button>
             )}
-            <Link href="/" className={styles.logo}>
+            <a href="https://www.ipmcareer.com" className={styles.logo}>
               <img
                 src="/hd-logo.svg"
                 alt="IPM Careers"
                 className={styles.logoImg}
               />
               <span className={styles.logoText}>IPM Careers</span>
-            </Link>
+            </a>
             {derivedTitle && !isMobile && (
               <div className={styles.breadcrumb}>
                 <span className={styles.breadcrumbSep}>/</span>
@@ -165,9 +165,9 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
           )}
 
           {/* Right: CTA Button */}
-          <Link href="/pi-batch" className={styles.ctaButton}>
+          <a href="https://rzp.io/rzp/pi-batch" target="_blank" rel="noopener noreferrer" className={styles.ctaButton}>
             Enroll in PI Batch
-          </Link>
+          </a>
         </div>
       </header>
 
