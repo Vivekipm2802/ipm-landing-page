@@ -271,6 +271,11 @@ function Response() {
       <div className={styles.page}>
         {/* ── Hero ── */}
         <div className={styles.hero}>
+          {/* Floating glow orbs */}
+          <div className={`${styles.heroGlow} ${styles.heroGlow1}`}></div>
+          <div className={`${styles.heroGlow} ${styles.heroGlow2}`}></div>
+          <div className={`${styles.heroGlow} ${styles.heroGlow3}`}></div>
+
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowDot}></span>
             IPMAT 2026 Score Analyzer
@@ -285,7 +290,7 @@ function Response() {
           {/* Social Proof */}
           <div className={styles.socialProof}>
             <div className={styles.proofStat}>
-              <span className={styles.proofStatNum}>{index.toLocaleString()}+</span> scorecards generated
+              <span className={styles.proofStatNum}>{index.toLocaleString()}+</span> scorecards
             </div>
             <div className={styles.proofDot}></div>
             <div className={styles.proofStat}>
