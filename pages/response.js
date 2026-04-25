@@ -165,9 +165,11 @@ function Response() {
     setLoading(true);
     const mainTotal = c;
     const uid = uuid();
+    const saVal = calculateScores(a.sa, 0, 4);
+    const mcqVal = calculateScores(a.mcq, 1, 4);
+    const vaVal = calculateScores(a.va, 1, 4, true);
 
-    // Core insert — only columns that exist in the table
-    const row = {
+    const { error } = await supabase.from("responses").insert({
       email: b.email,
       phone: b.phone,
       data: JSON.stringify(a),
@@ -176,26 +178,13 @@ function Response() {
       link: url.trim(),
       category: b.category,
       uuid: uid,
-    };
-
-    const { error } = await supabase.from("responses").insert(row);
+      sa_score: saVal,
+      mcq_score: mcqVal,
+      va_score: vaVal,
+      city: b.city || '',
+    });
     if (error) {
       console.error("Supabase insert error:", error);
-    }
-
-    // Try to update with sectional scores (won't fail if columns don't exist yet)
-    try {
-      const saVal = calculateScores(a.sa, 0, 4);
-      const mcqVal = calculateScores(a.mcq, 1, 4);
-      const vaVal = calculateScores(a.va, 1, 4, true);
-      await supabase.from("responses").update({
-        sa_score: saVal,
-        mcq_score: mcqVal,
-        va_score: vaVal,
-        city: b.city || '',
-      }).eq("uuid", uid);
-    } catch (e) {
-      // Columns may not exist yet — that is fine
     }
 
     // Always show scorecard
