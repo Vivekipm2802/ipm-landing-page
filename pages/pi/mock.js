@@ -22,8 +22,6 @@ export default function MockInterview() {
   const [loading, setLoading] = useState(false);
   const [finished, setFinished] = useState(false);
   const [report, setReport] = useState(null);
-  const [geminiKey, setGeminiKey] = useState('');
-  const [showKeyInput, setShowKeyInput] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -32,8 +30,6 @@ export default function MockInterview() {
 
   useEffect(() => {
     try {
-      const key = localStorage.getItem('gemini_api_key');
-      if (key) setGeminiKey(key);
     } catch {}
   }, []);
 
@@ -41,17 +37,7 @@ export default function MockInterview() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const saveGeminiKey = (key) => {
-    setGeminiKey(key);
-    localStorage.setItem('gemini_api_key', key);
-    setShowKeyInput(false);
-  };
-
   const startInterview = async () => {
-    if (!geminiKey) {
-      setShowKeyInput(true);
-      return;
-    }
     if (!mode) return;
 
     setStarted(true);
@@ -75,7 +61,6 @@ export default function MockInterview() {
           mode,
           profile,
           sop,
-          apiKey: geminiKey,
         }),
       });
 
@@ -116,7 +101,6 @@ export default function MockInterview() {
           history: [...messages, { role: 'user', text: userMsg }],
           questionCount: questionCount,
           maxQuestions,
-          apiKey: geminiKey,
         }),
       });
 
@@ -150,7 +134,6 @@ export default function MockInterview() {
           mode,
           history: fullHistory,
           profile,
-          apiKey: geminiKey,
         }),
       });
 
@@ -197,23 +180,7 @@ export default function MockInterview() {
             </div>
           </div>
 
-          {showKeyInput && (
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>🔑 Enter Your Gemini API Key</div>
-              <div className={styles.cardSubtitle}>
-                Get a free key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style={{ color: '#6c63ff' }}>Google AI Studio</a>. Your key stays in your browser only.
-              </div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                <input
-                  className={styles.input}
-                  type="password"
-                  placeholder="AIza..."
-                  onChange={e => setGeminiKey(e.target.value)}
-                />
-                <button className={styles.btnPrimary} onClick={() => saveGeminiKey(geminiKey)}>Save</button>
-              </div>
-            </div>
-          )}
+
 
           <div className={styles.btnRow}>
             <button

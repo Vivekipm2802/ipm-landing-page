@@ -52,16 +52,12 @@ export default function SOPBuilder() {
   const [review, setReview] = useState(null);
   const [traps, setTraps] = useState([]);
   const [sopStatus, setSopStatus] = useState('draft'); // draft, review, final
-  const [geminiKey, setGeminiKey] = useState('');
-  const [showKeyInput, setShowKeyInput] = useState(false);
 
   // Load saved SOP
   useEffect(() => {
     try {
       const stored = localStorage.getItem('pi_sop');
       if (stored) setSop(JSON.parse(stored));
-      const key = localStorage.getItem('gemini_api_key');
-      if (key) setGeminiKey(key);
     } catch {}
   }, []);
 
@@ -80,17 +76,7 @@ export default function SOPBuilder() {
   const completedSections = SOP_SECTIONS.filter(s => wordCount(sop[s.key]) >= 20).length;
   const fullSopText = SOP_SECTIONS.map(s => `## ${s.title}\n${sop[s.key] || ''}`).join('\n\n');
 
-  const saveGeminiKey = (key) => {
-    setGeminiKey(key);
-    localStorage.setItem('gemini_api_key', key);
-    setShowKeyInput(false);
-  };
-
   const reviewSOP = async () => {
-    if (!geminiKey) {
-      setShowKeyInput(true);
-      return;
-    }
     setReviewing(true);
     setReview(null);
     setTraps([]);
@@ -106,7 +92,6 @@ export default function SOPBuilder() {
         body: JSON.stringify({
           sop: fullSopText,
           profile,
-          apiKey: geminiKey,
         }),
       });
 
@@ -209,24 +194,7 @@ export default function SOPBuilder() {
           )}
         </div>
 
-        {/* Gemini API Key Input */}
-        {showKeyInput && (
-          <div className={styles.card} style={{ marginTop: '1rem' }}>
-            <div className={styles.cardTitle}>🔑 Enter Your Gemini API Key</div>
-            <div className={styles.cardSubtitle}>Get a free key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style={{ color: '#6c63ff' }}>Google AI Studio</a>. Your key stays in your browser only.</div>
-            <div className={styles.formGrid} style={{ gridTemplateColumns: '1fr auto', marginTop: 12 }}>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="AIza..."
-                onChange={e => setGeminiKey(e.target.value)}
-              />
-              <button className={styles.btnPrimary} onClick={() => { saveGeminiKey(geminiKey); reviewSOP(); }}>
-                Save & Review
-              </button>
-            </div>
-          </div>
-        )}
+
 
         {/* AI Review Results */}
         {review && (

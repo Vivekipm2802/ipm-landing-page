@@ -4,8 +4,10 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { action, mode, profile, sop, history, questionCount, maxQuestions, apiKey } = req.body;
-  if (!apiKey) return res.status(400).json({ error: 'Gemini API key required' });
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'Gemini API key not configured on server' });
+
+  const { action, mode, profile, sop, history, questionCount, maxQuestions } = req.body;
 
   const profileContext = profile
     ? `Student Profile:
