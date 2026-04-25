@@ -35,9 +35,9 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     '/pi/questions': 'Question Bank',
     '/pi/booking': 'Expert Booking',
     '/pi/sessions': 'Sessions',
-    '/report': 'My Report',
+
     '/interview-prep': 'AI Mock Interview',
-    '/topperlist': 'Topper List',
+
     '/call': 'College Predictor',
     '/pi-batch': 'PI Preparation Batch',
     '/': 'Home',
@@ -81,8 +81,8 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
   const navItems = [
     { icon: '📊', label: 'Score Analyzer', path: '/response' },
-    { icon: '📋', label: 'My Report', path: '/report', disabled: false },
-    { icon: '🏆', label: 'Topper List', path: '/topperlist' },
+
+
     { icon: '🎯', label: 'College Predictor', path: '/call' },
     { separator: true, label: 'PI Prep' },
     { icon: '🧑‍🎓', label: 'My Profile', path: '/pi/profile' },
@@ -97,7 +97,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     { label: 'Score Analyzer', path: '/response' },
     { label: 'PI Prep', path: '/pi/profile' },
     { label: 'AI Mock', path: '/pi/mock' },
-    { label: 'Topper List', path: '/topperlist' },
+
   ];
 
   return (
