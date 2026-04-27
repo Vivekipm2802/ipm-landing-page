@@ -165,11 +165,21 @@ function Response() {
     setLoading(true);
     const mainTotal = c;
     const uid = uuid();
-    const saVal = calculateScores(a.sa, 0, 4);
-    const mcqVal = calculateScores(a.mcq, 1, 4);
-    const vaVal = calculateScores(a.va, 1, 4, true);
 
-    const { error } = await supabase.from("responses").insert({
+    // Safely calculate sectional scores
+    let saVal = null;
+    let mcqVal = null;
+    let vaVal = null;
+    try {
+      saVal = calculateScores(a.sa, 0, 4);
+      mcqVal = calculateScores(a.mcq, 1, 4);
+      vaVal = calculateScores(a.va, 1, 4, true);
+    } catch (e) {
+      console.error("Score calculation error:", e);
+    }
+
+    // Core row data that always works
+    const coreRow = {
       email: b.email,
       phone: b.phone,
       data: JSON.stringify(a),
@@ -178,16 +188,33 @@ function Response() {
       link: url.trim(),
       category: b.category,
       uuid: uid,
+    };
+
+    // Try insert with sectional scores first
+    let insertError = null;
+    const fullRow = {
+      ...coreRow,
       sa_score: saVal,
       mcq_score: mcqVal,
       va_score: vaVal,
       city: b.city || '',
-    });
-    if (error) {
-      console.error("Supabase insert error:", error);
+    };
+    const { error } = await supabase.from("responses").insert(fullRow);
+    insertError = error;
+
+    // If full insert failed, fallback to core-only insert
+    if (insertError) {
+      console.error("Full insert failed, trying core-only:", insertError);
+      const { error: fallbackError } = await supabase.from("responses").insert(coreRow);
+      if (fallbackError) {
+        console.error("Core insert also failed:", fallbackError);
+        setLoading(false);
+        toast.error("Unable to save your scorecard. Please try again.");
+        return;
+      }
     }
 
-    // Always show scorecard
+    // Only redirect if insert succeeded
     setFormData();
     setLoading(false);
     setUrl();
