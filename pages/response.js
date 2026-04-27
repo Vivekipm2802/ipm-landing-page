@@ -178,8 +178,7 @@ function Response() {
       console.error("Score calculation error:", e);
     }
 
-    // Core row data that always works
-    const coreRow = {
+    const row = {
       email: b.email,
       phone: b.phone,
       data: JSON.stringify(a),
@@ -188,33 +187,43 @@ function Response() {
       link: url.trim(),
       category: b.category,
       uuid: uid,
-    };
-
-    // Try insert with sectional scores first
-    let insertError = null;
-    const fullRow = {
-      ...coreRow,
-      sa_score: saVal,
-      mcq_score: mcqVal,
-      va_score: vaVal,
+      sa_score: typeof saVal === 'number' ? saVal : null,
+      mcq_score: typeof mcqVal === 'number' ? mcqVal : null,
+      va_score: typeof vaVal === 'number' ? vaVal : null,
       city: b.city || '',
     };
-    const { error } = await supabase.from("responses").insert(fullRow);
-    insertError = error;
 
-    // If full insert failed, fallback to core-only insert
-    if (insertError) {
-      console.error("Full insert failed, trying core-only:", insertError);
-      const { error: fallbackError } = await supabase.from("responses").insert(coreRow);
-      if (fallbackError) {
-        console.error("Core insert also failed:", fallbackError);
-        setLoading(false);
-        toast.error("Unable to save your scorecard. Please try again.");
-        return;
+    console.log("INSERT ROW:", JSON.stringify(row));
+
+    try {
+      const { error } = await supabase.from("responses").insert(row);
+      if (error) {
+        console.error("INSERT ERROR:", JSON.stringify(error));
+        // Retry without score columns
+        const { error: e2 } = await supabase.from("responses").insert({
+          email: b.email,
+          phone: b.phone,
+          data: JSON.stringify(a),
+          name: a.StudentData.participantName,
+          total: mainTotal,
+          link: url.trim(),
+          category: b.category,
+          uuid: uid,
+        });
+        if (e2) {
+          console.error("FALLBACK ERROR:", JSON.stringify(e2));
+          setLoading(false);
+          toast.error("Save failed: " + (e2.message || e2.code || "unknown error"));
+          return;
+        }
       }
+    } catch (ex) {
+      console.error("EXCEPTION:", ex);
+      setLoading(false);
+      toast.error("Exception: " + ex.message);
+      return;
     }
 
-    // Only redirect if insert succeeded
     setFormData();
     setLoading(false);
     setUrl();
