@@ -57,7 +57,7 @@ CRITICAL RULES:
 
 IMPORTANT: You are speaking out loud. Be conversational. No markdown, no bullet points, no formatting. Just natural spoken Indian English.`;
 
-const MODEL = 'models/gemini-3.1-flash-live-preview';
+const MODEL = 'models/gemini-2.5-flash';
 
 // Audio Helpers
 function floatTo16BitPCM(float32Array) {
