@@ -760,21 +760,6 @@ function Report({ data, error, isFound }) {
             <HeroReveal scores={scores} stats={stats} studentName={data?.name} testDate={data?.created_at} category={data?.category} />
           )}
 
-          {/* Bento Grid */}
-          {scores && stats && (
-            <div className={styles.bentoSection}>
-              <h2 className={styles.sectionTitle}>The Breakdown 📊</h2>
-              <div className={styles.bentoGrid}>
-                <BentoDonut correct={stats.totalCorrect} incorrect={stats.totalIncorrect} unattempted={stats.totalUnattempted} total={stats.total} />
-                <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
-                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
-                <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
-                <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
-                <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
-              </div>
-            </div>
-          )}
-
           {/* Subject Bars */}
           {scores && stats && (
             <div className={styles.performanceSection}>
@@ -834,14 +819,26 @@ function Report({ data, error, isFound }) {
             </div>
           )}
 
-          {/* Smart Recommendation */}
-          {scores && stats && (
-            <SmartRecommendation scores={scores} stats={stats} category={data?.category || 'GEN'} studentName={data?.name || 'Student'} router={router} uid={router.query.uid} />
-          )}
+
 
           {/* Data Insights */}
           {scores && stats && (
             <DataInsights score={scores.total.score} maxScore={scores.total.max} />
+          )}
+
+          {/* Bento Grid */}
+          {scores && stats && (
+            <div className={styles.bentoSection}>
+              <h2 className={styles.sectionTitle}>The Breakdown 📊</h2>
+              <div className={styles.bentoGrid}>
+                <BentoDonut correct={stats.totalCorrect} incorrect={stats.totalIncorrect} unattempted={stats.totalUnattempted} total={stats.total} />
+                <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
+                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
+                <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
+                <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
+                <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
+              </div>
+            </div>
           )}
 
           {/* Detailed Question-wise */}
