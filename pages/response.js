@@ -193,34 +193,16 @@ function Response() {
       city: b.city || '',
     };
 
-    console.log("INSERT ROW:", JSON.stringify(row));
-
     try {
-      const { error } = await supabase.from("responses").insert(row);
-      if (error) {
-        console.error("INSERT ERROR:", JSON.stringify(error));
-        // Retry without score columns
-        const { error: e2 } = await supabase.from("responses").insert({
-          email: b.email,
-          phone: b.phone,
-          data: JSON.stringify(a),
-          name: a.StudentData.participantName,
-          total: mainTotal,
-          link: url.trim(),
-          category: b.category,
-          uuid: uid,
-        });
-        if (e2) {
-          console.error("FALLBACK ERROR:", JSON.stringify(e2));
-          setLoading(false);
-          toast.error("Save failed: " + (e2.message || e2.code || "unknown error"));
-          return;
-        }
+      // Use server-side API to bypass RLS
+      const response = await axios.post('/api/save-response', row);
+      if (response.data.error) {
+        throw new Error(response.data.error);
       }
     } catch (ex) {
-      console.error("EXCEPTION:", ex);
+      console.error("Save error:", ex);
       setLoading(false);
-      toast.error("Exception: " + ex.message);
+      toast.error("Unable to save scorecard. Please try again.");
       return;
     }
 
