@@ -1,279 +1,459 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { NextSeo } from 'next-seo';
 import 'tailwindcss/tailwind.css';
-import { Button, Input, Spacer, Chip } from '@nextui-org/react';
 import { useRouter } from 'next/router';
-import { supabase } from '../utils/supabaseClient';
 import AppShell from '../components/AppShell';
 import styles from './InterviewPrep.module.css';
 
-// IPMAT PI question categories
-const QUESTION_CATEGORIES = [
-  { id: 'why_ipm', label: 'Why IPM/IIM?', icon: '🎯' },
-  { id: 'about_you', label: 'About You', icon: '🧑' },
-  { id: 'academics', label: 'Academics', icon: '📚' },
-  { id: 'current_affairs', label: 'Current Affairs', icon: '🌍' },
-  { id: 'leadership', label: 'Leadership & Teamwork', icon: '👥' },
-  { id: 'ethics', label: 'Ethics & Dilemma', icon: '⚖️' },
-  { id: 'career', label: 'Career Goals', icon: '🚀' },
-  { id: 'general', label: 'General PI', icon: '💬' },
+// Interviewer Panel Config
+const INTERVIEWERS = [
+  {
+    id: 'sharma',
+    name: 'Prof. R.K. Sharma',
+    role: 'Chairperson',
+    gender: 'male',
+    avatar: '👨‍🏫',
+    color: '#6c63ff',
+    focus: 'Academics, Current Affairs, Career Goals',
+  },
+  {
+    id: 'gupta',
+    name: 'Prof. Anil Gupta',
+    role: 'Panelist',
+    gender: 'male',
+    avatar: '👨‍💼',
+    color: '#00d4ff',
+    focus: 'Personality, Leadership, Situational Questions',
+  },
+  {
+    id: 'mehra',
+    name: 'Dr. Priya Mehra',
+    role: 'Panelist',
+    gender: 'female',
+    avatar: '👩‍🏫',
+    color: '#ff5e7e',
+    focus: 'Ethics, Opinion-based, Why MBA/IPM',
+  },
 ];
 
-const MAX_FREE_MESSAGES = 20; // Free trial: 20 messages (roughly 2 mock sessions)
+const SYSTEM_PROMPT = `You are simulating a 3-person IIM Indore Personal Interview (PI) panel for IPMAT admission. You play ALL THREE interviewers who take turns naturally.
 
+THE PANEL:
+1. Prof. R.K. Sharma (Chairperson, Male) - Senior economics professor. Asks about academics, current affairs, career goals. Probing, serious tone. Speaks with authority.
+2. Prof. Anil Gupta (Panelist, Male) - Management faculty. Asks about personality, hobbies, leadership, situational/HR questions. Friendly but sharp. Occasionally cracks dry jokes.
+3. Dr. Priya Mehra (Panelist, Female) - Law and Ethics faculty. Asks ethical dilemmas, opinion-based questions, why MBA/IPM. Analytical, warm, encouraging but challenging.
+
+CRITICAL RULES:
+- Start by having Prof. Sharma welcome the student and ask them to introduce themselves.
+- Each interviewer asks 3-5 questions before passing to the next. They may interject or follow up on each others questions naturally.
+- ALWAYS prefix your speech with the interviewer name in square brackets exactly like: [Prof. Sharma] or [Prof. Gupta] or [Dr. Mehra]
+- Ask follow-up questions based on student answers - do not use pre-scripted questions.
+- Use Indian English naturally - say "kindly", "could you elaborate", "what is your take on", "tell me about yourself", etc.
+- The interview should last about 15-20 exchanges total (across all 3 panelists).
+- At the end, Prof. Sharma should thank the student and say the interview is over.
+- Be realistic - challenge weak answers, appreciate good ones, probe deeper on vague responses.
+- Cover: Introduction, Academics, Why IPM/IIM, Current Affairs, Ethical dilemma, Career goals, Hobbies/Extracurriculars.
+- Keep responses concise - this is a conversation, not a lecture. Each interviewer utterance should be 1-3 sentences max.
+
+IMPORTANT: You are speaking out loud. Be conversational. No markdown, no bullet points, no formatting. Just natural spoken Indian English.`;
+
+const MODEL = 'models/gemini-2.0-flash-live-001';
+
+// Audio Helpers
+function floatTo16BitPCM(float32Array) {
+  const buffer = new ArrayBuffer(float32Array.length * 2);
+  const view = new DataView(buffer);
+  for (let i = 0; i < float32Array.length; i++) {
+    let s = Math.max(-1, Math.min(1, float32Array[i]));
+    view.setInt16(i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return buffer;
+}
+
+function downsampleBuffer(buffer, inputRate, outputRate) {
+  if (inputRate === outputRate) return buffer;
+  const ratio = inputRate / outputRate;
+  const newLength = Math.round(buffer.length / ratio);
+  const result = new Float32Array(newLength);
+  for (let i = 0; i < newLength; i++) {
+    const idx = Math.round(i * ratio);
+    result[i] = buffer[idx] || 0;
+  }
+  return result;
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+// Main Component
 export default function InterviewPrep() {
   const router = useRouter();
-  const { uid } = router.query;
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [studentData, setStudentData] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [sessionStarted, setSessionStarted] = useState(false);
-  const [messageCount, setMessageCount] = useState(0);
-  const [trialEnded, setTrialEnded] = useState(false);
-  const chatEndRef = useRef(null);
+  const [phase, setPhase] = useState('lobby');
+  const [activeInterviewer, setActiveInterviewer] = useState(0);
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [transcript, setTranscript] = useState([]);
+  const [error, setError] = useState(null);
+  const [volume, setVolume] = useState(0);
 
-  // Fetch student data if uid provided
+  const wsRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const streamRef = useRef(null);
+  const processorRef = useRef(null);
+  const playbackCtxRef = useRef(null);
+  const audioQueueRef = useRef([]);
+  const isPlayingRef = useRef(false);
+  const timerRef = useRef(null);
+  const currentTextRef = useRef('');
+  const sourceRef = useRef(null);
+  const phaseRef = useRef('lobby');
+  const isMicOnRef = useRef(true);
+  const volumeRafRef = useRef(null);
+  const analyserRef = useRef(null);
+
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+  useEffect(() => { isMicOnRef.current = isMicOn; }, [isMicOn]);
+
+  // Timer
   useEffect(() => {
-    if (uid) {
-      fetchStudentData(uid);
+    if (phase === 'live') {
+      timerRef.current = setInterval(() => setTimer(t => t + 1), 1000);
     }
-  }, [uid]);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [phase]);
 
-  // Auto-scroll chat
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const formatTime = (s) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  };
 
-  async function fetchStudentData(uuid) {
-    try {
-      const { data, error } = await supabase.rpc('get_response_data', { uuid_arg: uuid });
-      if (data && data.length > 0) {
-        const record = data[0];
-        const parsed = JSON.parse(record.data);
-        setStudentData({
-          name: record.name,
-          total: record.total,
-          category: record.category,
-          sa: parsed.sa?.length || 0,
-          mcq: parsed.mcq?.length || 0,
-          va: parsed.va?.length || 0,
-        });
-      }
-    } catch (e) {
-      console.error('Failed to fetch student data:', e);
-    }
-  }
+  // Detect active interviewer from text
+  const detectInterviewer = useCallback((text) => {
+    if (text.includes('[Prof. Sharma]') || text.includes('Prof. Sharma')) setActiveInterviewer(0);
+    else if (text.includes('[Prof. Gupta]') || text.includes('Prof. Gupta')) setActiveInterviewer(1);
+    else if (text.includes('[Dr. Mehra]') || text.includes('Dr. Mehra')) setActiveInterviewer(2);
+  }, []);
 
-  function startSession(category) {
-    setSelectedCategory(category);
-    setSessionStarted(true);
-
-    const studentContext = studentData
-      ? `\n\nThe student's name is ${studentData.name}, they scored ${studentData.total}/360 in IPMAT, category: ${studentData.category}.`
-      : '';
-
-    const welcomeMessage = {
-      role: 'assistant',
-      content: `Welcome to your AI Mock PI Session! 🎓\n\nI'll be your interviewer today, focusing on **${category.label}** questions.\n\nI'll ask you questions one at a time, just like a real IIM PI panel. After each answer, I'll give you feedback and tips.\n\nLet's begin! Are you ready?${studentContext ? '\n\n*I can see your IPMAT score — I\'ll factor that into our discussion.*' : ''}`,
-    };
-    setMessages([welcomeMessage]);
-  }
-
-  async function sendMessage() {
-    if (!input.trim() || loading) return;
-
-    if (messageCount >= MAX_FREE_MESSAGES) {
-      setTrialEnded(true);
+  // Play audio queue
+  const playNextChunk = useCallback(() => {
+    if (audioQueueRef.current.length === 0) {
+      isPlayingRef.current = false;
+      setIsAISpeaking(false);
       return;
     }
+    isPlayingRef.current = true;
+    setIsAISpeaking(true);
+    const chunk = audioQueueRef.current.shift();
+    const pcmData = base64ToArrayBuffer(chunk);
+    const int16 = new Int16Array(pcmData);
+    const float32 = new Float32Array(int16.length);
+    for (let i = 0; i < int16.length; i++) {
+      float32[i] = int16[i] / 32768;
+    }
+    if (!playbackCtxRef.current || playbackCtxRef.current.state === 'closed') {
+      playbackCtxRef.current = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+    }
+    const ctx = playbackCtxRef.current;
+    const buf = ctx.createBuffer(1, float32.length, 24000);
+    buf.getChannelData(0).set(float32);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.onended = () => playNextChunk();
+    sourceRef.current = src;
+    src.start();
+  }, []);
 
-    const userMessage = { role: 'user', content: input.trim() };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setInput('');
-    setLoading(true);
-    setMessageCount(prev => prev + 1);
+  // Start Interview
+  const startInterview = async () => {
+    setPhase('connecting');
+    setError(null);
+    setTranscript([]);
+    setTimer(0);
 
     try {
-      const res = await fetch('/api/interviewChat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
-          category: selectedCategory.id,
-          studentData,
-        }),
+      const res = await fetch('/api/gemini-session');
+      const { key } = await res.json();
+      if (!key) throw new Error('No API key configured');
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       });
+      streamRef.current = stream;
 
-      const data = await res.json();
+      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
 
-      if (data.reply) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-      } else {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: "I'm having trouble connecting right now. Please try again in a moment.",
-        }]);
-      }
+      ws.onopen = () => {
+        ws.send(JSON.stringify({
+          setup: {
+            model: MODEL,
+            generationConfig: {
+              responseModalities: ['AUDIO', 'TEXT'],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: 'Kore'
+                  }
+                }
+              }
+            },
+            systemInstruction: {
+              parts: [{ text: SYSTEM_PROMPT }]
+            }
+          }
+        }));
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.setupComplete) {
+          setPhase('live');
+          startAudioCapture(stream, ws);
+          return;
+        }
+        if (msg.serverContent) {
+          const sc = msg.serverContent;
+          if (sc.modelTurn && sc.modelTurn.parts) {
+            for (const part of sc.modelTurn.parts) {
+              if (part.inlineData && part.inlineData.mimeType && part.inlineData.mimeType.includes('audio')) {
+                audioQueueRef.current.push(part.inlineData.data);
+                if (!isPlayingRef.current) playNextChunk();
+              }
+              if (part.text) {
+                currentTextRef.current += part.text;
+                detectInterviewer(currentTextRef.current);
+              }
+            }
+          }
+          if (sc.turnComplete) {
+            const fullText = currentTextRef.current.trim();
+            if (fullText) {
+              let speaker = INTERVIEWERS[0].name;
+              const match = fullText.match(/\[(Prof\. Sharma|Prof\. Gupta|Dr\. Mehra)\]/);
+              if (match) speaker = match[1];
+              const cleanText = fullText.replace(/\[(Prof\. Sharma|Prof\. Gupta|Dr\. Mehra)\]\s*/g, '');
+              setTranscript(prev => [...prev, { role: 'interviewer', speaker, text: cleanText }]);
+            }
+            currentTextRef.current = '';
+          }
+        }
+      };
+
+      ws.onerror = () => {
+        setError('Connection failed. Check your internet and try again.');
+        setPhase('lobby');
+      };
+
+      ws.onclose = () => {
+        if (phaseRef.current === 'live') stopInterview();
+      };
+
     } catch (err) {
-      console.error('Chat error:', err);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: "Something went wrong. Please try again.",
-      }]);
+      console.error('Start error:', err);
+      setError(err.message || 'Failed to start. Allow microphone access and try again.');
+      setPhase('lobby');
     }
+  };
 
-    setLoading(false);
-  }
+  // Audio Capture
+  const startAudioCapture = (stream, ws) => {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = audioCtx;
+    const source = audioCtx.createMediaStreamSource(stream);
+    const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+    processorRef.current = processor;
 
-  // Landing state — category selector
-  if (!sessionStarted) {
-    return (
-      <AppShell activePage="/interview-prep">
-      <div className={styles.prepPage}>
-        <NextSeo
-          title="AI Mock Interview | IPM Careers"
-          description="Practice for your IIM PI round with our AI-powered mock interview tool. Get instant feedback and improve your answers."
-        />
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    analyserRef.current = analyser;
 
-        <div className={styles.heroSection}>
-          <img src="/hd-logo.svg" alt="IPM Careers" className={styles.heroLogo} />
-          <h1 className={styles.heroTitle}>AI Mock PI Interview</h1>
-          <p className={styles.heroSubtitle}>
-            Practice for your IIM Personal Interview with our AI interviewer.
-            Get real-time feedback on your answers.
-          </p>
-          {studentData && (
-            <div className={styles.studentBadge}>
-              <span>Welcome, {studentData.name}</span>
-              <Chip size="sm" color="secondary">Score: {studentData.total}/360</Chip>
-            </div>
-          )}
-        </div>
+    const updateVolume = () => {
+      if (phaseRef.current !== 'live') return;
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a, b) => a + b, 0) / data.length;
+      setVolume(avg / 255);
+      volumeRafRef.current = requestAnimationFrame(updateVolume);
+    };
+    volumeRafRef.current = requestAnimationFrame(updateVolume);
 
-        <div className={styles.categorySection}>
-          <h2 className={styles.categoryTitle}>Choose Your Interview Topic</h2>
-          <p className={styles.categorySubtitle}>Select a category to start your mock PI session</p>
-          <div className={styles.categoryGrid}>
-            {QUESTION_CATEGORIES.map(cat => (
-              <div
-                key={cat.id}
-                className={styles.categoryCard}
-                onClick={() => startSession(cat)}
-              >
-                <span className={styles.categoryIcon}>{cat.icon}</span>
-                <span className={styles.categoryLabel}>{cat.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+    processor.onaudioprocess = (e) => {
+      if (!isMicOnRef.current || ws.readyState !== WebSocket.OPEN) return;
+      const inputData = e.inputBuffer.getChannelData(0);
+      const downsampled = downsampleBuffer(inputData, audioCtx.sampleRate, 16000);
+      const pcm = floatTo16BitPCM(downsampled);
+      const base64 = arrayBufferToBase64(pcm);
+      ws.send(JSON.stringify({
+        realtimeInput: {
+          mediaChunks: [{
+            mimeType: 'audio/pcm;rate=16000',
+            data: base64
+          }]
+        }
+      }));
+    };
 
-        <div className={styles.trialNote}>
-          <span>✨</span> Free trial includes {MAX_FREE_MESSAGES} messages (~2 mock sessions). For unlimited access, enroll in our PI Batch.
-        </div>
-      </div>
-      </AppShell>
-    );
-  }
+    source.connect(processor);
+    processor.connect(audioCtx.destination);
+  };
 
-  // Chat state
+  // Stop Interview
+  const stopInterview = useCallback(() => {
+    setPhase('ended');
+    if (volumeRafRef.current) cancelAnimationFrame(volumeRafRef.current);
+    if (wsRef.current) { try { wsRef.current.close(); } catch(e) {} wsRef.current = null; }
+    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+    if (processorRef.current) { processorRef.current.disconnect(); processorRef.current = null; }
+    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') { audioCtxRef.current.close(); audioCtxRef.current = null; }
+    if (playbackCtxRef.current && playbackCtxRef.current.state !== 'closed') { playbackCtxRef.current.close(); playbackCtxRef.current = null; }
+    if (sourceRef.current) { try { sourceRef.current.stop(); } catch(e) {} sourceRef.current = null; }
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setIsAISpeaking(false);
+  }, []);
+
+  const toggleMic = () => setIsMicOn(prev => !prev);
+
+  useEffect(() => { return () => stopInterview(); }, [stopInterview]);
+
   return (
-    <AppShell activePage="/interview-prep">
-    <div className={styles.chatPage}>
-      <NextSeo title={`Mock PI: ${selectedCategory.label} | IPM Careers`} />
+    <AppShell>
+      <NextSeo title="AI Mock Interview | IPM Careers" description="Practice your IIM Personal Interview with AI-powered voice interview panel" />
+      <div className={styles.container}>
 
-      {/* Chat Header */}
-      <div className={styles.chatHeader}>
-        <div className={styles.chatHeaderLeft}>
-          <Button
-            size="sm"
-            variant="light"
-            onPress={() => { setSessionStarted(false); setMessages([]); setSelectedCategory(null); }}
-          >
-            ← Back
-          </Button>
-          <div>
-            <div className={styles.chatHeaderTitle}>Mock PI Interview</div>
-            <div className={styles.chatHeaderCategory}>{selectedCategory.icon} {selectedCategory.label}</div>
-          </div>
-        </div>
-        <div className={styles.chatHeaderRight}>
-          <Chip size="sm" variant="flat" color={messageCount >= MAX_FREE_MESSAGES - 5 ? 'danger' : 'default'}>
-            {MAX_FREE_MESSAGES - messageCount} messages left
-          </Chip>
-        </div>
-      </div>
-
-      {/* Chat Messages */}
-      <div className={styles.chatMessages}>
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`${styles.chatBubble} ${msg.role === 'user' ? styles.chatUser : styles.chatAssistant}`}>
-            {msg.role === 'assistant' && <div className={styles.chatAvatar}>🎓</div>}
-            <div className={styles.chatContent}>
-              <div className={styles.chatText} dangerouslySetInnerHTML={{
-                __html: msg.content
-                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                  .replace(/\n/g, '<br />')
-              }} />
+        {/* LOBBY */}
+        {phase === 'lobby' && (
+          <div className={styles.lobby}>
+            <div className={styles.lobbyIcon}>{'🎙️'}</div>
+            <h1 className={styles.lobbyTitle}>AI Mock Interview</h1>
+            <p className={styles.lobbySubtitle}>Practice with a realistic 3-person IIM PI panel. Voice-to-voice, just like the real thing.</p>
+            <div className={styles.panelPreview}>
+              {INTERVIEWERS.map((iv) => (
+                <div key={iv.id} className={styles.panelCard}>
+                  <div className={styles.panelAvatar} style={{ background: iv.color }}>{iv.avatar}</div>
+                  <div className={styles.panelName}>{iv.name}</div>
+                  <div className={styles.panelRole}>{iv.role}</div>
+                  <div className={styles.panelFocus}>{iv.focus}</div>
+                </div>
+              ))}
             </div>
+            <div className={styles.lobbyTips}>
+              <h3>{'💡'} Tips for your mock PI</h3>
+              <ul>
+                <li>Use a quiet room with good internet</li>
+                <li>Speak clearly in English, like a real interview</li>
+                <li>Answer in 30-60 seconds per question</li>
+                <li>The panel will ask follow-ups based on your answers</li>
+              </ul>
+            </div>
+            {error && <div className={styles.errorMsg}>{error}</div>}
+            <button className={styles.startBtn} onClick={startInterview}>{'🎤'} Start Mock Interview</button>
           </div>
-        ))}
-        {loading && (
-          <div className={`${styles.chatBubble} ${styles.chatAssistant}`}>
-            <div className={styles.chatAvatar}>🎓</div>
-            <div className={styles.chatContent}>
-              <div className={styles.typingIndicator}>
-                <span></span><span></span><span></span>
+        )}
+
+        {/* CONNECTING */}
+        {phase === 'connecting' && (
+          <div className={styles.lobby}>
+            <div className={styles.connectingSpinner}></div>
+            <h2 className={styles.lobbyTitle}>Setting up your interview room...</h2>
+            <p className={styles.lobbySubtitle}>Connecting to AI panel and requesting mic access</p>
+          </div>
+        )}
+
+        {/* LIVE */}
+        {phase === 'live' && (
+          <div className={styles.liveRoom}>
+            <div className={styles.timerBar}>
+              <span className={styles.liveIndicator}>{'🔴'} LIVE</span>
+              <span className={styles.timerText}>{formatTime(timer)}</span>
+              <button className={styles.endBtn} onClick={stopInterview}>End Interview</button>
+            </div>
+            <div className={styles.interviewerPanel}>
+              {INTERVIEWERS.map((iv, i) => (
+                <div key={iv.id} className={`${styles.interviewer} ${i === activeInterviewer && isAISpeaking ? styles.interviewerActive : ''}`}>
+                  <div className={styles.avatarRing} style={{ borderColor: i === activeInterviewer && isAISpeaking ? iv.color : 'transparent' }}>
+                    <div className={styles.avatar} style={{ background: iv.color }}>{iv.avatar}</div>
+                    {i === activeInterviewer && isAISpeaking && (
+                      <div className={styles.speakingWave}><span></span><span></span><span></span></div>
+                    )}
+                  </div>
+                  <div className={styles.ivName}>{iv.name}</div>
+                  <div className={styles.ivRole}>{iv.role}</div>
+                </div>
+              ))}
+            </div>
+            <div className={styles.studentArea}>
+              <div className={`${styles.micCircle} ${isMicOn && !isAISpeaking ? styles.micActive : ''}`} style={{ transform: `scale(${1 + (isMicOn ? volume * 0.3 : 0)})` }}>
+                <span>{isMicOn ? '🎤' : '🔇'}</span>
+              </div>
+              <div className={styles.studentLabel}>
+                {isAISpeaking ? 'Panel is speaking...' : isMicOn ? 'Listening to you...' : 'Mic is muted'}
+              </div>
+              <div className={styles.micControls}>
+                <button className={`${styles.micBtn} ${!isMicOn ? styles.micBtnMuted : ''}`} onClick={toggleMic}>
+                  {isMicOn ? '🎤 Mute' : '🔇 Unmute'}
+                </button>
+              </div>
+            </div>
+            <div className={styles.transcriptArea}>
+              <h3 className={styles.transcriptTitle}>Interview Transcript</h3>
+              <div className={styles.transcriptScroll}>
+                {transcript.map((entry, i) => (
+                  <div key={i} className={styles.transcriptEntry}>
+                    <span className={styles.transcriptSpeaker}>{entry.speaker}:</span>
+                    <span className={styles.transcriptText}> {entry.text}</span>
+                  </div>
+                ))}
+                {transcript.length === 0 && (
+                  <div className={styles.transcriptEmpty}>Interview will begin shortly... The panel will greet you first.</div>
+                )}
               </div>
             </div>
           </div>
         )}
-        <div ref={chatEndRef} />
-      </div>
 
-      {/* Trial Ended Overlay */}
-      {trialEnded && (
-        <div className={styles.trialOverlay}>
-          <div className={styles.trialOverlayCard}>
-            <h3>Free Trial Completed!</h3>
-            <p>You've used all {MAX_FREE_MESSAGES} free messages. To continue unlimited mock PI sessions:</p>
-            <Button
-              className={styles.enrollCta}
-              onPress={() => router.push('/pi-batch')}
-            >
-              Enroll in PI Batch — Unlimited Access
-            </Button>
-            <Button
-              variant="light"
-              onPress={() => window.open('https://wa.me/918299470392?text=Hi%2C%20I%20tried%20the%20AI%20Mock%20Interview%20and%20want%20to%20know%20about%20PI%20Batch', '_blank')}
-            >
-              Talk to a Mentor
-            </Button>
+        {/* ENDED */}
+        {phase === 'ended' && (
+          <div className={styles.lobby}>
+            <div className={styles.lobbyIcon}>{'✅'}</div>
+            <h1 className={styles.lobbyTitle}>Interview Complete!</h1>
+            <p className={styles.lobbySubtitle}>Duration: {formatTime(timer)} | {transcript.length} exchanges</p>
+            <div className={styles.reviewTranscript}>
+              <h3>Full Transcript</h3>
+              {transcript.map((entry, i) => (
+                <div key={i} className={styles.reviewEntry}>
+                  <strong>{entry.speaker}:</strong> {entry.text}
+                </div>
+              ))}
+            </div>
+            <div className={styles.endActions}>
+              <button className={styles.startBtn} onClick={() => { setPhase('lobby'); setTranscript([]); }}>{'🔄'} Practice Again</button>
+              <button className={styles.secondaryBtn} onClick={() => router.push('/pi-prep')}>{'⬅️'} Back to PI Prep</button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Chat Input */}
-      <div className={styles.chatInputBar}>
-        <input
-          className={styles.chatInput}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && sendMessage()}
-          placeholder={trialEnded ? 'Trial ended — enroll for unlimited access' : 'Type your answer...'}
-          disabled={loading || trialEnded}
-        />
-        <Button
-          className={styles.sendBtn}
-          onPress={sendMessage}
-          disabled={loading || trialEnded || !input.trim()}
-        >
-          Send
-        </Button>
+        )}
       </div>
-    </div>
     </AppShell>
   );
 }
