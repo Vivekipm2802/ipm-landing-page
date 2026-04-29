@@ -279,6 +279,13 @@ export default function InterviewPrep() {
           if (msg.setupComplete) {
             setConnected(true);
             setPhase('live');
+            // Send initial text to trigger the AI panel to start speaking
+            ws.send(JSON.stringify({
+              clientContent: {
+                turns: [{ role: 'user', parts: [{ text: 'Hello, I am here for my interview. Please begin.' }] }],
+                turnComplete: true
+              }
+            }));
             startMic(ws);
             return;
           }
