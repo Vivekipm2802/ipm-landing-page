@@ -1,6 +1,6 @@
 // /pages/api/gemini-chat.js
 // Server-side Gemini chat API for AI Mock Interview
-// Keeps API key secure on server, streams responses
+// Uses gemini-3.1-flash-lite-preview with retry logic
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -18,7 +18,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Build Gemini API request
     const contents = messages.map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
@@ -36,26 +35,37 @@ export default async function handler(req, res) {
       }
     };
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+    const MODEL = 'gemini-3.1-flash-lite-preview';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${key}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    // Retry up to 3 times on 503
+    let lastError = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-    if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        return res.status(200).json({ text });
+      }
+
+      if (response.status === 503 && attempt < 2) {
+        // Wait before retry: 1s, 2s
+        await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
+        lastError = `503 (attempt ${attempt + 1})`;
+        continue;
+      }
+
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
-      return res.status(response.status).json({ error: `Gemini API error: ${response.status}` });
+      return res.status(response.status).json({ error: `API error: ${response.status}` });
     }
 
-    const data = await response.json();
-
-    // Extract text from response
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
-    return res.status(200).json({ text });
+    return res.status(503).json({ error: 'Model temporarily unavailable. Please try again.' });
   } catch (err) {
     console.error('Gemini chat error:', err);
     return res.status(500).json({ error: 'Failed to get response from Gemini' });
