@@ -153,8 +153,10 @@ function Response() {
           setLoading(false);
         }
       })
-      .catch((error) => {
-        setHelpModal(true);
+      .catch((err) => {
+        console.error("Sheetdata error:", err);
+        const msg = err?.response?.data?.error || "Failed to fetch response sheet. Check the URL and try again.";
+        setError(msg);
         setLoading(false);
       });
   }
@@ -163,6 +165,10 @@ function Response() {
     setLoading(true);
     const mainTotal = c;
     const uid = uuid();
+    const saVal = calculateScores(a.sa, 0, 4);
+    const mcqVal = calculateScores(a.mcq, 1, 4);
+    const vaVal = calculateScores(a.va, 1, 4, true);
+
     const { error } = await supabase.from("responses").insert({
       email: b.email,
       phone: b.phone,
@@ -172,22 +178,24 @@ function Response() {
       link: url.trim(),
       category: b.category,
       uuid: uid,
+      sa_score: saVal,
+      mcq_score: mcqVal,
+      va_score: vaVal,
+      city: b.city || '',
     });
-
     if (error) {
-      setLoading(false);
-      toast.error("Unable to Generate your Scorecard");
+      console.error("Supabase insert error:", error);
     }
-    if (!error) {
-      setFormData();
-      setLoading(false);
-      setUrl();
-      toast.success("Scorecard generated! Redirecting to your detailed report...");
-      setDownloadLink(`/report/${uid}`);
-      setTimeout(() => {
-        router.push(`/report/${uid}`);
-      }, 1500);
-    }
+
+    // Always show scorecard
+    setFormData();
+    setLoading(false);
+    setUrl();
+    toast.success("Scorecard generated! Redirecting to your detailed report...");
+    setDownloadLink(`/report/${uid}`);
+    setTimeout(() => {
+      router.push(`/report/${uid}`);
+    }, 1500);
   }
 
   function validatePhone(phone) {
@@ -252,6 +260,11 @@ function Response() {
       <div className={styles.page}>
         {/* ── Hero ── */}
         <div className={styles.hero}>
+          {/* Floating glow orbs */}
+          <div className={`${styles.heroGlow} ${styles.heroGlow1}`}></div>
+          <div className={`${styles.heroGlow} ${styles.heroGlow2}`}></div>
+          <div className={`${styles.heroGlow} ${styles.heroGlow3}`}></div>
+
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowDot}></span>
             IPMAT 2026 Score Analyzer
@@ -261,23 +274,19 @@ function Response() {
             <span className={styles.heroTitleAccent}>Get your score in 10 seconds.</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Instant sectional breakdown with SA, MCQ & VA scores. See exactly where you stand
-            and get a detailed performance report.
-          </p>
+            </p>
 
           {/* Social Proof */}
           <div className={styles.socialProof}>
             <div className={styles.proofStat}>
-              <span className={styles.proofStatNum}>{index.toLocaleString()}+</span> scorecards generated
+              <span className={styles.proofStatNum}>{index.toLocaleString()}+</span> scorecards
             </div>
             <div className={styles.proofDot}></div>
             <div className={styles.proofStat}>
               Since <span className={styles.proofStatNum}>2022</span>
             </div>
             <div className={styles.proofDot}></div>
-            <a href="/topperlist" style={{ color: '#6c63ff', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
-              View Topper List →
-            </a>
+            
           </div>
         </div>
 
@@ -411,6 +420,19 @@ function Response() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>City</label>
+                <input
+                  className={styles.formInput}
+                  type="text"
+                  placeholder="e.g. Mumbai"
+                  value={formData?.city || ''}
+                  onChange={e => { setError(); setFormData(prev => ({ ...prev, city: e.target.value })); }}
+                />
+              </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Response Sheet URL</label>
                 <input
@@ -504,7 +526,7 @@ function Response() {
 
           {/* ── Feature Cards ── */}
           <div className={styles.featureGrid}>
-            <a href="/topperlist" className={styles.featureCard}>
+            <a href="/call" className={styles.featureCard}>
               <span className={styles.featureIcon}>🏆</span>
               <span className={styles.featureName}>Topper List</span>
               <span className={styles.featureDesc}>See the highest IPMAT scores</span>

@@ -4,8 +4,10 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { sop, profile, apiKey } = req.body;
-  if (!apiKey) return res.status(400).json({ error: 'Gemini API key required' });
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'Gemini API key not configured on server' });
+
+  const { sop, profile } = req.body;
   if (!sop) return res.status(400).json({ error: 'SOP content required' });
 
   const profileContext = profile
