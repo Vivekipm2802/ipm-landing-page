@@ -2033,3 +2033,162 @@
   .recTitle { font-size: 1rem; }
   .compareGrid { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
+/* ═══════ COMPREHENSIVE PRINT / PDF FIX ═══════ */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .reportPage {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%) !important;
+    padding: 1rem !important;
+  }
+
+  /* Hero keeps its dark gradient */
+  .hero {
+    background: linear-gradient(135deg, #0f0e2e 0%, #1a0f3d 40%, #2d1b5e 100%) !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 32px 28px !important;
+  }
+  .heroGreeting, .heroScoreValue, .heroGradeLetter {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+  }
+  .heroBadge {
+    background: rgba(255,255,255,0.12) !important;
+    color: white !important;
+  }
+  .heroDate { color: rgba(255,255,255,0.7) !important; }
+  .heroVibe {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+  }
+  .heroChip {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: white !important;
+  }
+  .heroGradeRing svg circle {
+    stroke-opacity: 1 !important;
+  }
+
+  /* Bento cards */
+  .bentoCard {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+  }
+  .bentoValue { color: #1a1a2e !important; }
+
+  /* Donut chart */
+  .donutCorrect { stroke: #00c896 !important; }
+  .donutIncorrect { stroke: #ff5e7e !important; }
+  .donutUnatt { stroke: #cbd5e1 !important; }
+  .donutTrack { stroke: #f1f1f5 !important; }
+  .dotCorrect { background: #00c896 !important; }
+  .dotIncorrect { background: #ff5e7e !important; }
+  .dotUnatt { background: #cbd5e1 !important; }
+
+  /* Stat cards with colored left borders */
+  .statCard {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+  }
+  .statCard1 { border-left: 4px solid #22c55e !important; }
+  .statCard2 { border-left: 4px solid #ef4444 !important; }
+  .statCard3 { border-left: 4px solid #6c63ff !important; }
+  .statCard4 { border-left: 4px solid #f59e0b !important; }
+  .statValue { color: #1a1a2e !important; }
+
+  /* Subject cards */
+  .subjectCard {
+    background: white !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+  }
+  .subjectBarTrack { background: #f1f5f9 !important; }
+  .subjectBarFill {
+    background: var(--subj-color, #6c63ff) !important;
+  }
+
+  /* Score distribution bars */
+  .barTrack { background: #f0f0f0 !important; }
+  .barFill {
+    background: linear-gradient(90deg, #d4a5d0, #c07db8) !important;
+  }
+  .barFillActive {
+    background: linear-gradient(90deg, rgb(158,65,152), rgb(120,40,110)) !important;
+  }
+  .barRowActive { background: rgba(158,65,152,0.06) !important; }
+
+  /* AIR card */
+  .airCard {
+    background: linear-gradient(135deg, rgb(158,65,152), rgb(110,42,99)) !important;
+    color: white !important;
+    break-inside: avoid !important;
+  }
+  .airCardTitle, .airCardRank, .airCardNote { color: white !important; }
+
+  /* Status badges in tables */
+  .status-correct { background-color: #dcfce7 !important; color: #166534 !important; }
+  .status-incorrect { background-color: #fee2e2 !important; color: #991b1b !important; }
+  .status-unattempted { background-color: #f3f4f6 !important; color: #6b7280 !important; }
+
+  /* Detail table row highlights */
+  .detailTable tbody tr:nth-child(even) { background: #f9fafb !important; }
+
+  /* Card stats pills */
+  .cardStat { background: #f3f4f6 !important; }
+
+  /* Section headers gradient line */
+  .sectionTitle::after,
+  .sectionHeader::after {
+    background: linear-gradient(90deg, rgb(158,65,152), rgb(110,42,99)) !important;
+  }
+
+  /* Flashcards: hide in print (they flip, not useful in PDF) */
+  .flashSection { display: none !important; }
+
+  /* Blobs: hide animated elements */
+  .blob1, .blob2, .blob3, .heroBlobs { display: none !important; }
+
+  /* Hide interactive elements */
+  .downloadBar, .enrollBtn, .downloadBtn,
+  .shareButtons, .recActions, .recPathActions,
+  .heroShareRow { display: none !important; }
+
+  /* No hover transforms */
+  .statCard:hover, .bentoCard:hover, .subjectCard:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Insight section */
+  .insightSection, .dataInsightsSection {
+    break-inside: avoid !important;
+  }
+
+  /* Score banner gradient */
+  .scoreBanner {
+    background: linear-gradient(135deg, rgb(158,65,152), rgb(110,42,99)) !important;
+    color: white !important;
+  }
+
+  /* Header section */
+  .headerSection {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+  }
+  .infoItem {
+    background: #f8f9fa !important;
+    border-left: 3px solid rgb(158,65,152) !important;
+  }
+}
