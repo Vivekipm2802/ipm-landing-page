@@ -356,12 +356,10 @@ export default function InterviewPrep() {
         }
       });
 
+      // Start mic — model will auto-start based on system prompt
       sessionRef.current = session;
-
-      // Start mic and send initial trigger AFTER session is assigned
       startMic(session);
-      // Use SDK's send() method to trigger the AI panel to start
-      session.send('Hello, I am ready for my interview. Please begin.');
+      console.log('Session methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(session)));
 
     } catch (err) {
       console.error('Start error:', err);
