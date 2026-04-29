@@ -1517,9 +1517,7 @@
   .viewToggle {
     top: 56px;
     padding: 8px 0 6px;
-    background: rgba(10, 10, 20, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: transparent;
   }
 }
 

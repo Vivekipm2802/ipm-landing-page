@@ -717,7 +717,7 @@
   }
 
   .downloadBar {
-    display: none;
+    display: flex;
   }
 
   .footerInfo {
