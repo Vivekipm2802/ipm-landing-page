@@ -570,7 +570,7 @@
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
-  z-index: 50;
+  z-index: 999;
   border-top: 2px solid rgb(158, 65, 152);
 }
 
@@ -1776,16 +1776,17 @@
 
 .youAreHere {
   position: absolute;
-  right: -32px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  color: rgb(158,65,152);
-  background: rgba(158,65,152,0.12);
+  color: white;
+  background: rgb(158,65,152);
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+  z-index: 2;
 }
 
 .barValue {
