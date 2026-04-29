@@ -90,7 +90,7 @@ class AudioPlayer {
   }
 }
 
-// ─── AudioRecorder: captures PCM 16kHz via AudioWorklet ───
+// ─── AudioRecorder: captures PCM 16kHz with AudioWorklet + ScriptProcessor fallback ───
 class AudioRecorder {
   constructor(onAudioData) {
     this.onAudioData = onAudioData;
@@ -99,42 +99,55 @@ class AudioRecorder {
     this.processor = null;
   }
   async start() {
-    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
     const source = this.context.createMediaStreamSource(this.stream);
-    const workletCode = `
-      class PCMProcessor extends AudioWorkletProcessor {
-        process(inputs) {
-          const input = inputs[0];
-          if (input && input.length > 0) this.port.postMessage(input[0]);
-          return true;
+
+    try {
+      // Try AudioWorklet first (modern browsers)
+      const workletCode = `
+        class PCMProcessor extends AudioWorkletProcessor {
+          process(inputs) {
+            const input = inputs[0];
+            if (input && input.length > 0) this.port.postMessage(input[0]);
+            return true;
+          }
         }
-      }
-      registerProcessor('pcm-processor', PCMProcessor);
-    `;
-    const blob = new Blob([workletCode], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
-    await this.context.audioWorklet.addModule(url);
-    URL.revokeObjectURL(url);
-    this.processor = new AudioWorkletNode(this.context, 'pcm-processor');
-    this.processor.port.onmessage = (e) => {
-      const float32 = e.data;
-      const int16 = new Int16Array(float32.length);
-      for (let i = 0; i < float32.length; i++) {
-        let s = Math.max(-1, Math.min(1, float32[i]));
-        int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-      }
-      const bytes = new Uint8Array(int16.buffer);
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, i + chunkSize);
-        binary += String.fromCharCode.apply(null, chunk);
-      }
-      this.onAudioData(btoa(binary));
-    };
-    source.connect(this.processor);
-    this.processor.connect(this.context.destination);
+        registerProcessor('pcm-processor', PCMProcessor);
+      `;
+      const blob = new Blob([workletCode], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      await this.context.audioWorklet.addModule(url);
+      URL.revokeObjectURL(url);
+      this.processor = new AudioWorkletNode(this.context, 'pcm-processor');
+      this.processor.port.onmessage = (e) => this._processFloat32(e.data);
+      source.connect(this.processor);
+      this.processor.connect(this.context.destination);
+    } catch (workletErr) {
+      // Fallback to ScriptProcessorNode
+      console.warn('AudioWorklet failed, using ScriptProcessor fallback:', workletErr);
+      this.processor = this.context.createScriptProcessor(4096, 1, 1);
+      this.processor.onaudioprocess = (e) => {
+        this._processFloat32(e.inputBuffer.getChannelData(0));
+      };
+      source.connect(this.processor);
+      this.processor.connect(this.context.destination);
+    }
+  }
+  _processFloat32(float32) {
+    const int16 = new Int16Array(float32.length);
+    for (let i = 0; i < float32.length; i++) {
+      let s = Math.max(-1, Math.min(1, float32[i]));
+      int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    const bytes = new Uint8Array(int16.buffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode.apply(null, chunk);
+    }
+    this.onAudioData(btoa(binary));
   }
   stop() {
     if (this.processor) { this.processor.disconnect(); this.processor = null; }
@@ -153,7 +166,7 @@ function detectInterviewer(text) {
 
 export default function InterviewPrep() {
   const router = useRouter();
-  const [phase, setPhase] = useState('lobby'); // lobby | connecting | live | ended | feedback
+  const [phase, setPhase] = useState('lobby');
   const [studentData, setStudentData] = useState(null);
   const [connected, setConnected] = useState(false);
   const [micActive, setMicActive] = useState(false);
@@ -168,12 +181,11 @@ export default function InterviewPrep() {
   const sessionRef = useRef(null);
   const recorderRef = useRef(null);
   const playerRef = useRef(null);
-  const activeSpeakerRef = useRef(null);
-  const currentTextRef = useRef('');
+  const currentModelTextRef = useRef('');
+  const currentUserTextRef = useRef('');
   const transcriptRef = useRef([]);
   const timerRef = useRef(null);
 
-  // Sync transcript ref
   useEffect(() => { transcriptRef.current = transcript; }, [transcript]);
 
   // Load student data from Supabase
@@ -207,16 +219,14 @@ export default function InterviewPrep() {
 
   const addTranscript = useCallback((role, text) => {
     if (!text.trim()) return;
-    const speaker = role === 'user' ? 'You' : 'Panel';
-    setTranscript(prev => [...prev, { role, speaker, text }]);
-    // Detect active interviewer from model text
+    setTranscript(prev => [...prev, { role, speaker: role === 'user' ? 'You' : 'Panel', text }]);
     if (role === 'model') {
       const idx = detectInterviewer(text);
       if (idx !== null) setActiveInterviewer(idx);
     }
   }, []);
 
-  // ─── Start Interview: get ephemeral token, open WebSocket ───
+  // ─── Start Interview using @google/genai SDK ───
   const startInterview = async () => {
     setPhase('connecting');
     setError(null);
@@ -224,145 +234,127 @@ export default function InterviewPrep() {
     setTimer(0);
 
     try {
-      // 1. Get ephemeral token from our server
+      // 1. Get API key from server
       const tokenRes = await fetch('/api/gemini-live-token', { method: 'POST' });
-      if (!tokenRes.ok) throw new Error('Failed to get session token');
-      const tokenData = await tokenRes.json();
-      const ephemeralToken = tokenData.token || tokenData.ephemeralToken || tokenData;
+      if (!tokenRes.ok) throw new Error('Failed to get API key');
+      const { token } = await tokenRes.json();
+      if (!token) throw new Error('No API key returned');
 
-      // 2. Create audio player & recorder
+      // 2. Dynamically import @google/genai (client-side only, avoids SSR issues)
+      const { GoogleGenAI, Modality } = await import('@google/genai');
+
+      // 3. Create client
+      const client = new GoogleGenAI({ apiKey: token });
+
+      // 4. Create audio player
       playerRef.current = new AudioPlayer();
       playerRef.current.resume();
 
-      // 3. Build system prompt
-      const systemInstruction = buildSystemPrompt(studentData);
+      // 5. Build system prompt
+      const systemPrompt = buildSystemPrompt(studentData);
 
-      // 4. Connect to Gemini Live API via WebSocket
-      const model = 'gemini-3.1-flash-live-preview';
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${typeof ephemeralToken === 'string' ? ephemeralToken : ephemeralToken.token || ''}`;
-
-      const ws = new WebSocket(wsUrl);
-      sessionRef.current = ws;
-
-      ws.onopen = () => {
-        // Send setup message
-        ws.send(JSON.stringify({
-          setup: {
-            model: `models/${model}`,
-            generationConfig: {
-              responseModalities: ['AUDIO'],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName: 'Puck' }
-                }
-              }
-            },
-            systemInstruction: {
-              parts: [{ text: systemInstruction }]
-            },
-            outputAudioTranscription: {},
-            inputAudioTranscription: {},
+      // 6. Connect to Gemini Live API via SDK
+      const session = await client.live.connect({
+        model: 'models/gemini-3.1-flash-live-preview',
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: 'Puck' }
+            }
           }
-        }));
-      };
-
-      ws.onmessage = async (event) => {
-        try {
-          // Handle Blob data from WebSocket
-          let rawData = event.data;
-          if (rawData instanceof Blob) {
-            rawData = await rawData.text();
-          }
-          const msg = JSON.parse(rawData);
-
-          // Setup complete
-          if (msg.setupComplete) {
+        },
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        callbacks: {
+          onopen: () => {
+            console.log('Live API connected');
             setConnected(true);
             setPhase('live');
-            // Send initial text to trigger the AI panel to start speaking
-            ws.send(JSON.stringify({
-              clientContent: {
-                turns: [{ role: 'user', parts: [{ text: 'Hello, I am here for my interview. Please begin.' }] }],
-                turnComplete: true
-              }
-            }));
-            startMic(ws);
-            return;
-          }
+            // Mic start and initial trigger happen AFTER connect() returns (below)
+          },
 
-          // Server content
-          const serverContent = msg.serverContent;
-          if (!serverContent) return;
+          onmessage: (message) => {
+            // Setup complete signal
+            if (message.setupComplete) {
+              console.log('Setup complete');
+              return;
+            }
 
-          // Audio data — play immediately
-          if (serverContent.modelTurn && serverContent.modelTurn.parts) {
-            for (const part of serverContent.modelTurn.parts) {
-              if (part.inlineData && part.inlineData.data) {
-                setIsAISpeaking(true);
-                playerRef.current?.playBase64PCM(part.inlineData.data);
-              }
-              // Model text transcription
-              if (part.text) {
-                if (activeSpeakerRef.current === 'user') {
-                  addTranscript('user', currentTextRef.current);
-                  currentTextRef.current = '';
+            const sc = message.serverContent;
+            if (!sc) return;
+
+            // Audio data from model — play it
+            if (sc.modelTurn && sc.modelTurn.parts) {
+              for (const part of sc.modelTurn.parts) {
+                if (part.inlineData && part.inlineData.data) {
+                  setIsAISpeaking(true);
+                  playerRef.current?.playBase64PCM(part.inlineData.data);
                 }
-                activeSpeakerRef.current = 'model';
-                currentTextRef.current += part.text;
               }
             }
-          }
 
-          // Input (user) transcription
-          if (serverContent.inputTranscription && serverContent.inputTranscription.text) {
-            if (activeSpeakerRef.current === 'model') {
-              addTranscript('model', currentTextRef.current);
-              currentTextRef.current = '';
+            // Output transcription (what the model is saying as text)
+            if (sc.outputTranscription && sc.outputTranscription.text) {
+              currentModelTextRef.current += sc.outputTranscription.text;
             }
-            activeSpeakerRef.current = 'user';
-            currentTextRef.current += serverContent.inputTranscription.text;
-          }
 
-          // Output (model) transcription
-          if (serverContent.outputTranscription && serverContent.outputTranscription.text) {
-            if (activeSpeakerRef.current === 'user') {
-              addTranscript('user', currentTextRef.current);
-              currentTextRef.current = '';
+            // Input transcription (what the user said as text)
+            if (sc.inputTranscription && sc.inputTranscription.text) {
+              currentUserTextRef.current += sc.inputTranscription.text;
             }
-            activeSpeakerRef.current = 'model';
-            currentTextRef.current += serverContent.outputTranscription.text;
-          }
 
-          // Turn complete
-          if (serverContent.turnComplete) {
-            if (activeSpeakerRef.current && currentTextRef.current.trim()) {
-              addTranscript(activeSpeakerRef.current, currentTextRef.current);
-              currentTextRef.current = '';
+            // Turn complete — flush transcripts
+            if (sc.turnComplete) {
+              if (currentModelTextRef.current.trim()) {
+                addTranscript('model', currentModelTextRef.current);
+                currentModelTextRef.current = '';
+              }
+              if (currentUserTextRef.current.trim()) {
+                addTranscript('user', currentUserTextRef.current);
+                currentUserTextRef.current = '';
+              }
+              setIsAISpeaking(false);
             }
-            activeSpeakerRef.current = null;
-            setIsAISpeaking(false);
-          }
 
-          // Interrupted
-          if (serverContent.interrupted) {
-            setIsAISpeaking(false);
-          }
+            // Interrupted
+            if (sc.interrupted) {
+              if (currentModelTextRef.current.trim()) {
+                addTranscript('model', currentModelTextRef.current);
+                currentModelTextRef.current = '';
+              }
+              setIsAISpeaking(false);
+            }
+          },
 
-        } catch (e) {
-          console.error('WebSocket message parse error:', e);
+          onerror: (err) => {
+            console.error('Live API error:', err);
+            setError('Connection error. Please try again.');
+            setPhase('lobby');
+          },
+
+          onclose: () => {
+            console.log('Live API closed');
+            setConnected(false);
+            setMicActive(false);
+            // Flush any remaining user text
+            if (currentUserTextRef.current.trim()) {
+              addTranscript('user', currentUserTextRef.current);
+              currentUserTextRef.current = '';
+            }
+          }
         }
-      };
+      });
 
-      ws.onclose = () => {
-        setConnected(false);
-        setMicActive(false);
-      };
+      sessionRef.current = session;
 
-      ws.onerror = (err) => {
-        console.error('WebSocket error:', err);
-        setError('Connection error. Please try again.');
-        setPhase('lobby');
-      };
+      // Start mic and send initial trigger AFTER session is assigned
+      startMic(session);
+      session.sendClientContent({
+        turns: [{ role: 'user', parts: [{ text: 'Hello, I am ready for my interview. Please begin.' }] }],
+        turnComplete: true
+      });
 
     } catch (err) {
       console.error('Start error:', err);
@@ -372,22 +364,21 @@ export default function InterviewPrep() {
   };
 
   // ─── Start Mic ───
-  const startMic = async (ws) => {
+  const startMic = async (session) => {
     try {
       recorderRef.current = new AudioRecorder((base64) => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({
-            realtimeInput: {
-              mediaChunks: [{
-                data: base64,
-                mimeType: 'audio/pcm;rate=16000'
-              }]
-            }
-          }));
+        try {
+          session.sendRealtimeInput({
+            data: base64,
+            mimeType: 'audio/pcm;rate=16000'
+          });
+        } catch (e) {
+          // Session might be closed
         }
       });
       await recorderRef.current.start();
       setMicActive(true);
+      console.log('Mic started');
     } catch (err) {
       console.error('Mic error:', err);
       setError('Microphone access denied. Please allow mic and try again.');
@@ -396,11 +387,13 @@ export default function InterviewPrep() {
 
   // ─── Stop Interview ───
   const stopInterview = useCallback(() => {
-    // Flush any remaining text
-    if (activeSpeakerRef.current && currentTextRef.current.trim()) {
-      addTranscript(activeSpeakerRef.current, currentTextRef.current);
-      currentTextRef.current = '';
-      activeSpeakerRef.current = null;
+    if (currentModelTextRef.current.trim()) {
+      addTranscript('model', currentModelTextRef.current);
+      currentModelTextRef.current = '';
+    }
+    if (currentUserTextRef.current.trim()) {
+      addTranscript('user', currentUserTextRef.current);
+      currentUserTextRef.current = '';
     }
     recorderRef.current?.stop();
     playerRef.current?.stop();
@@ -414,7 +407,6 @@ export default function InterviewPrep() {
     setPhase('ended');
   }, [addTranscript]);
 
-  // Cleanup on unmount
   useEffect(() => { return () => { stopInterview(); }; }, [stopInterview]);
 
   // ─── Generate Feedback ───
@@ -460,7 +452,6 @@ Keep it concise and encouraging.`;
       <NextSeo title="AI Mock Interview | IPM Careers" description="Practice for your IIM Indore PI with our AI-powered mock interview panel." />
       <div className={styles.interviewPage}>
 
-        {/* ─── LOBBY ─── */}
         {phase === 'lobby' && (
           <div className={styles.lobbyContainer}>
             <div className={styles.lobbyHeader}>
@@ -478,7 +469,7 @@ Keep it concise and encouraging.`;
             )}
 
             <div className={styles.panelGrid}>
-              {INTERVIEWERS.map((prof, i) => (
+              {INTERVIEWERS.map((prof) => (
                 <div key={prof.id} className={styles.panelCard}>
                   <div className={styles.panelAvatar}>{prof.avatar}</div>
                   <div className={styles.panelName}>{prof.name}</div>
@@ -496,7 +487,6 @@ Keep it concise and encouraging.`;
           </div>
         )}
 
-        {/* ─── CONNECTING ─── */}
         {phase === 'connecting' && (
           <div className={styles.connectingContainer}>
             <div className={styles.connectingSpinner}></div>
@@ -505,10 +495,8 @@ Keep it concise and encouraging.`;
           </div>
         )}
 
-        {/* ─── LIVE INTERVIEW ─── */}
         {phase === 'live' && (
           <div className={styles.liveContainer}>
-            {/* Top bar */}
             <div className={styles.liveTopBar}>
               <div className={styles.liveStatus}>
                 <span className={styles.liveDot}></span>
@@ -518,7 +506,6 @@ Keep it concise and encouraging.`;
               <button className={styles.endBtn} onClick={stopInterview}>End Interview</button>
             </div>
 
-            {/* Interviewer panel */}
             <div className={styles.interviewerRow}>
               {INTERVIEWERS.map((prof, i) => (
                 <div key={prof.id} className={`${styles.interviewerCard} ${activeInterviewer === i ? styles.activeInterviewer : ''}`}>
@@ -531,7 +518,6 @@ Keep it concise and encouraging.`;
               ))}
             </div>
 
-            {/* AI Speaking indicator */}
             {isAISpeaking && (
               <div className={styles.speakingIndicator}>
                 <div className={styles.soundWave}><span></span><span></span><span></span><span></span><span></span></div>
@@ -539,7 +525,6 @@ Keep it concise and encouraging.`;
               </div>
             )}
 
-            {/* Mic button */}
             <div className={styles.micSection}>
               <button
                 className={`${styles.micBtn} ${micActive ? styles.micActive : ''} ${isAISpeaking ? styles.micThinking : ''}`}
@@ -555,14 +540,8 @@ Keep it concise and encouraging.`;
                 {micActive ? '🎙️' : '🎤'}
               </button>
               <p className={styles.micLabel}>{micActive ? (isAISpeaking ? 'Panel is speaking...' : 'Listening...') : 'Tap mic to speak'}</p>
-              {!micActive && !isAISpeaking && (
-                <button className={styles.unmuteBtn} onClick={() => { if (sessionRef.current) startMic(sessionRef.current); }}>
-                  🔇 Unmute
-                </button>
-              )}
             </div>
 
-            {/* Transcript */}
             {transcript.length > 0 && (
               <div className={styles.transcriptSection}>
                 <h3 className={styles.transcriptTitle}>INTERVIEW TRANSCRIPT</h3>
@@ -581,23 +560,15 @@ Keep it concise and encouraging.`;
           </div>
         )}
 
-        {/* ─── ENDED ─── */}
         {phase === 'ended' && (
           <div className={styles.endedContainer}>
             <div className={styles.endedIcon}>✅</div>
             <h2 className={styles.endedTitle}>Interview Complete!</h2>
             <p className={styles.endedSubtitle}>Duration: {formatTime(timer)} &bull; {transcript.filter(t => t.role === 'user').length} responses</p>
-
             <div className={styles.endedActions}>
-              <button className={styles.feedbackBtn} onClick={generateFeedback}>
-                Get AI Feedback & Score
-              </button>
-              <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>
-                Try Again
-              </button>
+              <button className={styles.feedbackBtn} onClick={generateFeedback}>Get AI Feedback & Score</button>
+              <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>Try Again</button>
             </div>
-
-            {/* Transcript review */}
             {transcript.length > 0 && (
               <div className={styles.reviewSection}>
                 <h3 className={styles.reviewTitle}>Interview Transcript</h3>
@@ -611,7 +582,6 @@ Keep it concise and encouraging.`;
           </div>
         )}
 
-        {/* ─── FEEDBACK ─── */}
         {phase === 'feedback' && (
           <div className={styles.endedContainer}>
             <h2 className={styles.endedTitle}>Performance Feedback</h2>
@@ -628,9 +598,7 @@ Keep it concise and encouraging.`;
                   ))}
                 </div>
                 <div className={styles.endedActions}>
-                  <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>
-                    Start New Interview
-                  </button>
+                  <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>Start New Interview</button>
                 </div>
               </>
             )}
