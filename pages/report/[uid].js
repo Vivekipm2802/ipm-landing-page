@@ -46,14 +46,6 @@ const DataInsights = ({ score, maxScore }) => {
           <div className={styles.insightsStatValue}>{insights.predictedAIR.label}</div>
           <div className={styles.insightsStatLabel}>Predicted AIR</div>
         </div>
-        <div className={styles.insightsStat}>
-          <div className={styles.insightsStatValue}>{insights.percentile}%</div>
-          <div className={styles.insightsStatLabel}>Percentile</div>
-        </div>
-        <div className={styles.insightsStat}>
-          <div className={styles.insightsStatValue}>{score}/{maxScore}</div>
-          <div className={styles.insightsStatLabel}>Your Score</div>
-        </div>
       </div>
 
       {/* Score Distribution Chart */}
@@ -775,49 +767,7 @@ function Report({ data, error, isFound }) {
           {/* Flashcards */}
           {jsonData && <Flashcards jsonData={jsonData} />}
 
-          {/* Test Breakdown Table */}
-          {stats && (
-            <div className={styles.breakdownSection}>
-              <h2 className={styles.sectionTitle}>Test Breakdown</h2>
-              <div className={styles.tableWrapper}>
-                <table className={styles.breakdownTable}>
-                  <thead>
-                    <tr><th>Subject</th><th>Correct</th><th>Incorrect</th><th>Unattempted</th><th>Total</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className={styles.tdLabel}>Overall</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.totalCorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.totalIncorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.totalUnattempted}</span></td>
-                      <td>{stats.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Short Answer (SA)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.sa.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.sa.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.sa.unattempted}</span></td>
-                      <td>{stats.sa.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Multiple Choice (MCQ)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.mcq.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.mcq.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.mcq.unattempted}</span></td>
-                      <td>{stats.mcq.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Verbal Ability (VA)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.va.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.va.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.va.unattempted}</span></td>
-                      <td>{stats.va.total}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+
 
 
 

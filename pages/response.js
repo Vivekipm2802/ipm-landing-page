@@ -544,7 +544,7 @@ function Response() {
 
           {/* ── Feature Cards ── */}
           <div className={styles.featureGrid}>
-            <a href="/call" className={styles.featureCard}>
+            <a href="/topperlist" className={styles.featureCard}>
               <span className={styles.featureIcon}>🏆</span>
               <span className={styles.featureName}>Topper List</span>
               <span className={styles.featureDesc}>See the highest IPMAT scores</span>

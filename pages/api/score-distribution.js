@@ -2,21 +2,16 @@ import { getSupabaseServer } from '../../utils/supabaseClient';
 
 // Hardcoded IPMAT score distribution estimates
 const ESTIMATED_DISTRIBUTION = {
-  '300+': 2, '280-300': 5, '260-280': 8, '240-260': 12,
-  '220-240': 18, '200-220': 22, '180-200': 15, '160-180': 10,
-  '140-160': 5, 'Below 140': 3,
+  '250+': 10, '220-250': 20, '200-220': 25, '170-200': 22,
+  '140-170': 15, 'Below 140': 8,
 };
 
 const BRACKETS = [
-  { label: '300+', min: 300, max: 360 },
-  { label: '280-300', min: 280, max: 299 },
-  { label: '260-280', min: 260, max: 279 },
-  { label: '240-260', min: 240, max: 259 },
-  { label: '220-240', min: 220, max: 239 },
+  { label: '250+', min: 250, max: 360 },
+  { label: '220-250', min: 220, max: 249 },
   { label: '200-220', min: 200, max: 219 },
-  { label: '180-200', min: 180, max: 199 },
-  { label: '160-180', min: 160, max: 179 },
-  { label: '140-160', min: 140, max: 159 },
+  { label: '170-200', min: 170, max: 199 },
+  { label: '140-170', min: 140, max: 169 },
   { label: 'Below 140', min: 0, max: 139 },
 ];
 
