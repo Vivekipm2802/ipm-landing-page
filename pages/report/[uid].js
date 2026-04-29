@@ -6,8 +6,93 @@ import { NextSeo } from 'next-seo';
 import 'tailwindcss/tailwind.css';
 import { Button, Divider, Spacer, Card, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import AppShell from '../../components/AppShell';
 import ReportModern from '../../components/ReportModern';
+
+
+// ═══════ DATA INSIGHTS COMPONENT ═══════
+const DataInsights = ({ score, maxScore }) => {
+  const [insights, setInsights] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`/api/score-distribution?score=${score}`)
+      .then(res => { setInsights(res.data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [score]);
+
+  if (loading) return (
+    <div className={styles.insightsSection}>
+      <h2 className={styles.sectionTitle}>Data Insights</h2>
+      <div className={styles.insightsLoading}>Loading insights...</div>
+    </div>
+  );
+
+  if (!insights) return null;
+
+  const dist = insights.distribution;
+  const brackets = Object.keys(dist);
+  const values = Object.values(dist);
+  const maxVal = Math.max(...values);
+
+  return (
+    <div className={styles.insightsSection}>
+      <h2 className={styles.sectionTitle}>Data Insights</h2>
+
+      {/* Top Stats Row */}
+      <div className={styles.insightsStatsRow}>
+        <div className={styles.insightsStat}>
+          <div className={styles.insightsStatValue}>{insights.predictedAIR.label}</div>
+          <div className={styles.insightsStatLabel}>Predicted AIR</div>
+        </div>
+      </div>
+
+      {/* Score Distribution Chart */}
+      <div className={styles.chartContainer}>
+        <h3 className={styles.chartTitle}>Score Distribution</h3>
+        <p className={styles.chartSubtitle}>
+          {insights.isRealData 
+            ? `Based on ${insights.sampleSize} students on IPM Careers` 
+            : 'Based on estimated IPMAT score patterns'}
+        </p>
+        <div className={styles.barChart}>
+          {brackets.map((label, i) => {
+            const isUser = label === insights.userBracket;
+            const pct = maxVal > 0 ? (values[i] / maxVal) * 100 : 0;
+            return (
+              <div key={label} className={`${styles.barRow} ${isUser ? styles.barRowActive : ''}`}>
+                <div className={styles.barLabel}>{label}</div>
+                <div className={styles.barTrack}>
+                  <div
+                    className={`${styles.barFill} ${isUser ? styles.barFillActive : ''}`}
+                    style={{ width: `${Math.max(pct, 3)}%` }}
+                  />
+                  {isUser && <span className={styles.youAreHere}>YOU</span>}
+                </div>
+                <div className={styles.barValue}>
+                  {insights.isRealData ? values[i] : `${values[i]}%`}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* AIR Prediction Card */}
+      <div className={styles.airCard}>
+        <div className={styles.airCardIcon}>🎯</div>
+        <div className={styles.airCardContent}>
+          <div className={styles.airCardTitle}>Predicted All India Rank</div>
+          <div className={styles.airCardRank}>{insights.predictedAIR.label}</div>
+          <div className={styles.airCardNote}>
+            out of ~50,000 applicants • Based on historical IPMAT trends
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ═══════ VIEW TOGGLE COMPONENT ═══════
 const ViewToggle = ({ view, setView }) => (
@@ -645,11 +730,11 @@ function Report({ data, error, isFound }) {
         }}
       />
 
-      {/* ═══ VIEW TOGGLE ═══ */}
-      <ViewToggle view={view} setView={setView} />
 
       {/* ═══ MODERN VIEW ═══ */}
       {view === 'modern' && (
+        <>
+        <ViewToggle view={view} setView={setView} />
         <ReportModern
           data={data}
           scores={scores}
@@ -657,29 +742,16 @@ function Report({ data, error, isFound }) {
           jsonData={jsonData}
           router={router}
         />
+        </>
       )}
 
       {/* ═══ CLASSIC VIEW ═══ */}
       {view === 'classic' && (
         <div className={styles.reportPage}>
+          <ViewToggle view={view} setView={setView} />
           {/* Hero */}
           {scores && stats && (
             <HeroReveal scores={scores} stats={stats} studentName={data?.name} testDate={data?.created_at} category={data?.category} />
-          )}
-
-          {/* Bento Grid */}
-          {scores && stats && (
-            <div className={styles.bentoSection}>
-              <h2 className={styles.sectionTitle}>The Breakdown 📊</h2>
-              <div className={styles.bentoGrid}>
-                <BentoDonut correct={stats.totalCorrect} incorrect={stats.totalIncorrect} unattempted={stats.totalUnattempted} total={stats.total} />
-                <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
-                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
-                <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
-                <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
-                <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
-              </div>
-            </div>
           )}
 
           {/* Subject Bars */}
@@ -697,105 +769,26 @@ function Report({ data, error, isFound }) {
           {/* Flashcards */}
           {jsonData && <Flashcards jsonData={jsonData} />}
 
-          {/* Test Breakdown Table */}
-          {stats && (
-            <div className={styles.breakdownSection}>
-              <h2 className={styles.sectionTitle}>Test Breakdown</h2>
-              <div className={styles.tableWrapper}>
-                <table className={styles.breakdownTable}>
-                  <thead>
-                    <tr><th>Subject</th><th>Correct</th><th>Incorrect</th><th>Unattempted</th><th>Total</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className={styles.tdLabel}>Overall</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.totalCorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.totalIncorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.totalUnattempted}</span></td>
-                      <td>{stats.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Short Answer (SA)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.sa.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.sa.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.sa.unattempted}</span></td>
-                      <td>{stats.sa.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Multiple Choice (MCQ)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.mcq.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.mcq.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.mcq.unattempted}</span></td>
-                      <td>{stats.mcq.total}</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.tdLabel}>Verbal Ability (VA)</td>
-                      <td><span className={`${styles.badge} ${styles.badgeCorrect}`}>{stats.va.correct}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeIncorrect}`}>{stats.va.incorrect}</span></td>
-                      <td><span className={`${styles.badge} ${styles.badgeUnattempted}`}>{stats.va.unattempted}</span></td>
-                      <td>{stats.va.total}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+
+
+
+
+          {/* Data Insights */}
+          {scores && stats && (
+            <DataInsights score={scores.total.score} maxScore={scores.total.max} />
           )}
 
-          {/* Smart Recommendation */}
+          {/* Bento Grid */}
           {scores && stats && (
-            <SmartRecommendation scores={scores} stats={stats} category={data?.category || 'GEN'} studentName={data?.name || 'Student'} router={router} uid={router.query.uid} />
-          )}
-
-          {/* Share */}
-          {scores && stats && (
-            <div className={styles.shareSection}>
-              <h2 className={styles.sectionTitle}>Share Your Score</h2>
-              <div className={styles.shareCardContainer}>
-                <div className={styles.shareCard} id="share-card">
-                  <div className={styles.shareCardHeader}>
-                    <img src="/hd-logo.svg" alt="IPM Careers" className={styles.shareCardLogo} />
-                    <span className={styles.shareCardBadge}>IPMAT 2026</span>
-                  </div>
-                  <div className={styles.shareCardBody}>
-                    <div className={styles.shareCardName}>{data?.name || 'Student'}</div>
-                    <div className={styles.shareCardScore}>
-                      <span className={styles.shareCardScoreValue}>{scores.total.score}</span>
-                      <span className={styles.shareCardScoreMax}>/{scores.total.max}</span>
-                    </div>
-                    <div className={styles.shareCardBreakdown}>
-                      <div className={styles.shareCardStat}>
-                        <span className={styles.shareCardStatLabel}>SA</span>
-                        <span className={styles.shareCardStatValue}>{scores.sa.score}</span>
-                      </div>
-                      <div className={styles.shareCardDivider}></div>
-                      <div className={styles.shareCardStat}>
-                        <span className={styles.shareCardStatLabel}>MCQ</span>
-                        <span className={styles.shareCardStatValue}>{scores.mcq.score}</span>
-                      </div>
-                      <div className={styles.shareCardDivider}></div>
-                      <div className={styles.shareCardStat}>
-                        <span className={styles.shareCardStatLabel}>VA</span>
-                        <span className={styles.shareCardStatValue}>{scores.va.score}</span>
-                      </div>
-                    </div>
-                    <div className={styles.shareCardAccuracy}>Accuracy: {stats.accuracy}%</div>
-                  </div>
-                  <div className={styles.shareCardFooter}>
-                    <span>Generated by IPM Careers</span>
-                    <span>ipmcareer.com/response</span>
-                  </div>
-                </div>
-                <div className={styles.shareButtons}>
-                  <Button className={styles.shareWhatsApp} onPress={() => {
-                    const text = `Hey! I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! 🎯\n\nSA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score}\nAccuracy: ${stats.accuracy}%\n\nCheck your score too 👉 https://register.ipmcareer.com/response\n\nMy detailed report: https://register.ipmcareer.com/report/${router.query.uid}`;
-                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-                  }}>Share on WhatsApp</Button>
-                  <Button className={styles.shareCopy} onPress={() => {
-                    const text = `I scored ${scores.total.score}/${scores.total.max} in IPMAT 2026! SA: ${scores.sa.score} | MCQ: ${scores.mcq.score} | VA: ${scores.va.score} | Accuracy: ${stats.accuracy}%\n\nCheck yours: https://register.ipmcareer.com/response`;
-                    navigator.clipboard.writeText(text);
-                    alert('Score copied to clipboard!');
-                  }}>Copy Score</Button>
-                </div>
+            <div className={styles.bentoSection}>
+              <h2 className={styles.sectionTitle}>The Breakdown 📊</h2>
+              <div className={styles.bentoGrid}>
+                <BentoDonut correct={stats.totalCorrect} incorrect={stats.totalIncorrect} unattempted={stats.totalUnattempted} total={stats.total} />
+                <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
+                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
+                <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
+                <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
+                <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
               </div>
             </div>
           )}
@@ -851,7 +844,7 @@ function Report({ data, error, isFound }) {
 
           {/* Download */}
           <div className={styles.downloadBar}>
-            <Button className={styles.downloadBtn} onPress={() => { window.print(); }}>📥 Save as PDF</Button>
+            <button className={styles.downloadBtn} onClick={() => { window.print(); }}>📥 Save as PDF</button>
           </div>
         </div>
       )}

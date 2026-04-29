@@ -165,11 +165,20 @@ function Response() {
     setLoading(true);
     const mainTotal = c;
     const uid = uuid();
-    const saVal = calculateScores(a.sa, 0, 4);
-    const mcqVal = calculateScores(a.mcq, 1, 4);
-    const vaVal = calculateScores(a.va, 1, 4, true);
 
-    const { error } = await supabase.from("responses").insert({
+    // Safely calculate sectional scores
+    let saVal = null;
+    let mcqVal = null;
+    let vaVal = null;
+    try {
+      saVal = calculateScores(a.sa, 0, 4);
+      mcqVal = calculateScores(a.mcq, 1, 4);
+      vaVal = calculateScores(a.va, 1, 4, true);
+    } catch (e) {
+      console.error("Score calculation error:", e);
+    }
+
+    const row = {
       email: b.email,
       phone: b.phone,
       data: JSON.stringify(a),
@@ -178,16 +187,25 @@ function Response() {
       link: url.trim(),
       category: b.category,
       uuid: uid,
-      sa_score: saVal,
-      mcq_score: mcqVal,
-      va_score: vaVal,
+      sa_score: typeof saVal === 'number' ? saVal : null,
+      mcq_score: typeof mcqVal === 'number' ? mcqVal : null,
+      va_score: typeof vaVal === 'number' ? vaVal : null,
       city: b.city || '',
-    });
-    if (error) {
-      console.error("Supabase insert error:", error);
+    };
+
+    try {
+      // Use server-side API to bypass RLS
+      const response = await axios.post('/api/save-response', row);
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
+    } catch (ex) {
+      console.error("Save error:", ex);
+      setLoading(false);
+      toast.error("Unable to save scorecard. Please try again.");
+      return;
     }
 
-    // Always show scorecard
     setFormData();
     setLoading(false);
     setUrl();
@@ -526,7 +544,7 @@ function Response() {
 
           {/* ── Feature Cards ── */}
           <div className={styles.featureGrid}>
-            <a href="/call" className={styles.featureCard}>
+            <a href="/topperlist" className={styles.featureCard}>
               <span className={styles.featureIcon}>🏆</span>
               <span className={styles.featureName}>Topper List</span>
               <span className={styles.featureDesc}>See the highest IPMAT scores</span>
