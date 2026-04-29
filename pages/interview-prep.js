@@ -6,35 +6,11 @@ import AppShell from '../components/AppShell';
 import styles from './InterviewPrep.module.css';
 import { supabase } from '../utils/supabaseClient';
 
-// Interviewer Panel Config
+// ─── Panel Config ───
 const INTERVIEWERS = [
-  {
-    id: 'sharma',
-    name: 'Prof. R.K. Sharma',
-    role: 'Chairperson',
-    gender: 'male',
-    avatar: '👨‍🏫',
-    color: '#6c63ff',
-    focus: 'Academics, Current Affairs, Career Goals',
-  },
-  {
-    id: 'gupta',
-    name: 'Prof. Anil Gupta',
-    role: 'Panelist',
-    gender: 'male',
-    avatar: '👨‍💼',
-    color: '#00d4ff',
-    focus: 'Personality, Leadership, Situational Questions',
-  },
-  {
-    id: 'mehra',
-    name: 'Dr. Priya Mehra',
-    role: 'Panelist',
-    gender: 'female',
-    avatar: '👩‍🏫',
-    color: '#ff5e7e',
-    focus: 'Ethics, Opinion-based, Why MBA/IPM',
-  },
+  { id: 'sharma', name: 'Prof. R.K. Sharma', role: 'Chairperson', avatar: '👨‍🏫', color: '#6c63ff', focus: 'Academics, Current Affairs, Career Goals' },
+  { id: 'gupta', name: 'Prof. Anil Gupta', role: 'Panelist', avatar: '👨‍💼', color: '#00d4ff', focus: 'Personality, Leadership, Situational Questions' },
+  { id: 'mehra', name: 'Dr. Priya Mehra', role: 'Panelist', avatar: '👩‍🏫', color: '#ff5e7e', focus: 'Ethics, Opinion-based, Why MBA/IPM' },
 ];
 
 function buildSystemPrompt(studentData) {
@@ -54,92 +30,160 @@ function buildSystemPrompt(studentData) {
     }
   }
 
-  return `You are simulating a 3-person IIM Indore Personal Interview (PI) panel for IPMAT admission. You play ALL Ttic - challenge weak answers, appreciate good ones, probe deeper on vague responses.
+  return `You are simulating a 3-person IIM Indore Personal Interview (PI) panel for IPMAT admission. You play ALL THREE interviewers who take turns naturally.
+
+THE PANEL:
+1. Prof. R.K. Sharma (Chairperson, Male) - Senior economics professor. Asks about academics, current affairs, career goals. Probing, serious tone. Speaks with authority.
+2. Prof. Anil Gupta (Panelist, Male) - Management faculty. Asks about personality, hobbies, leadership, situational/HR questions. Friendly but sharp. Occasionally cracks dry jokes.
+3. Dr. Priya Mehra (Panelist, Female) - Law and Ethics faculty. Asks ethical dilemmas, opinion-based questions, why MBA/IPM. Analytical, warm, encouraging but challenging.
+
+CRITICAL RULES:
+- Start by having Prof. Sharma welcome the student by name (if available) and ask them to introduce themselves.
+- Each interviewer asks 1-2 questions before passing to the next. They may interject or follow up on each other's questions naturally.
+- ALWAYS prefix your speech with the interviewer name in square brackets exactly like: [Prof. Sharma] or [Prof. Gupta] or [Dr. Mehra]. This is critical for the transcript.
+- Ask follow-up questions based on student answers — do not use pre-scripted questions.
+- If you have the student's SOP, reference specific points from it.
+- If you have their IPMAT scores, you may reference their performance.
+- Use natural Indian English — say "kindly", "could you elaborate", "what is your take on", etc.
+- Keep responses concise — each interviewer utterance should be 1-3 sentences max.
+- The interview should last about 15-20 exchanges total (across all 3 panelists).
+- At the end, Prof. Sharma should thank the student and say the interview is over.
+- Be realistic — challenge weak answers, appreciate good ones, probe deeper on vague responses.
 - Cover: Introduction, Academics, Why IPM/IIM, Current Affairs, Ethical dilemma, Career goals, Hobbies/Extracurriculars.
-- Keep responses concise - each interviewer utterance should be 1-3 sentences max.
 
 IMPORTANT: You are speaking out loud. Be conversational. No markdown, no bullet points, no formatting. Just natural spoken Indian English.${contextBlock}`;
 }
 
-// Gemini TTS — converts text to speech via Gemini TTS model
-async function speakWithGeminiTTS(text, voiceName) {
-  try {
-    const res = await fetch('/api/gemini-tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voice: voiceName || 'Kore' }),
-    });
-    if (!res.ok) throw new Error('TTS failed');
-    const data = await res.json();
-    if (!data.audio) throw new Error('No audio data');
-
-    // Decode base64 audio and play
-    const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
-    const audioBlob = new Blob([audioBytes], { type: data.mimeType || 'audio/mp3' });
-    const audioUrl = URL.createObjectURL(audioBlob);
-
-    return new Promise((resolve) => {
-      const audio = new Audio(audioUrl);
-      audio.onended = () => { URL.revokeObjectURL(audioUrl); resolve(); };
-      audio.onerror = () => { URL.revokeObjectURL(audioUrl); resolve(); };
-      audio.play().catch(() => resolve());
-    });
-  } catch (err) {
-    console.error('Gemini TTS error, falling back to browser TTS:', err);
-    // Fallback to browser SpeechSynthesis
-    return new Promise((resolve) => {
-      if (!window.speechSynthesis) { resolve(); return; }
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.lang = 'en-IN';
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
-      window.speechSynthesis.speak(utterance);
-    });
+// ─── AudioPlayer: plays PCM base64 chunks via Web Audio API ───
+class AudioPlayer {
+  constructor() {
+    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+    this.nextTime = 0;
+  }
+  resume() {
+    if (this.context.state === 'suspended') this.context.resume();
+  }
+  playBase64PCM(base64) {
+    try {
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+      const samples = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(samples.length);
+      for (let i = 0; i < samples.length; i++) float32[i] = samples[i] / 32768.0;
+      const buffer = this.context.createBuffer(1, float32.length, 24000);
+      buffer.getChannelData(0).set(float32);
+      const source = this.context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.context.destination);
+      const currentTime = this.context.currentTime;
+      if (this.nextTime < currentTime) this.nextTime = currentTime + 0.05;
+      source.start(this.nextTime);
+      this.nextTime += buffer.duration;
+    } catch (e) {
+      console.error('Playback error:', e);
+    }
+  }
+  stop() {
+    try { this.context.close(); } catch (e) {}
   }
 }
 
-// Voice mapping for each interviewer (Gemini TTS voice names)
-const INTERVIEWER_VOICES = {
-  'Prof. Sharma': 'Kore',    // Male, authoritative
-  'Prof. Gupta': 'Puck',     // Male, friendly
-  'Dr. Mehra': 'Kore',       // Will use different voice if available
-};
+// ─── AudioRecorder: captures PCM 16kHz via AudioWorklet ───
+class AudioRecorder {
+  constructor(onAudioData) {
+    this.onAudioData = onAudioData;
+    this.context = null;
+    this.stream = null;
+    this.processor = null;
+  }
+  async start() {
+    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const source = this.context.createMediaStreamSource(this.stream);
+    const workletCode = `
+      class PCMProcessor extends AudioWorkletProcessor {
+        process(inputs) {
+          const input = inputs[0];
+          if (input && input.length > 0) this.port.postMessage(input[0]);
+          return true;
+        }
+      }
+      registerProcessor('pcm-processor', PCMProcessor);
+    `;
+    const blob = new Blob([workletCode], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    await this.context.audioWorklet.addModule(url);
+    URL.revokeObjectURL(url);
+    this.processor = new AudioWorkletNode(this.context, 'pcm-processor');
+    this.processor.port.onmessage = (e) => {
+      const float32 = e.data;
+      const int16 = new Int16Array(float32.length);
+      for (let i = 0; i < float32.length; i++) {
+        let s = Math.max(-1, Math.min(1, float32[i]));
+        int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      }
+      const bytes = new Uint8Array(int16.buffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, chunk);
+      }
+      this.onAudioData(btoa(binary));
+    };
+    source.connect(this.processor);
+    this.processor.connect(this.context.destination);
+  }
+  stop() {
+    if (this.processor) { this.processor.disconnect(); this.processor = null; }
+    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
+    if (this.context && this.context.state !== 'closed') { this.context.close(); this.context = null; }
+  }
+}
 
-// Main Component
+// ─── Detect interviewer from text ───
+function detectInterviewer(text) {
+  if (text.includes('[Prof. Sharma]') || text.includes('Prof. Sharma')) return 0;
+  if (text.includes('[Prof. Gupta]') || text.includes('Prof. Gupta')) return 1;
+  if (text.includes('[Dr. Mehra]') || text.includes('Dr. Mehra')) return 2;
+  return null;
+}
+
 export default function InterviewPrep() {
   const router = useRouter();
-  const [phase, setPhase] = useState('lobby');
-  const [activeInterviewer, setActiveInterviewer] = useState(0);
-  const [isListening, setIsListening] = useState(false);
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
-  const [isThinking, setIsThinking] = useState(false);
-  const [timer, setTimer] = useState(0);
-  const [transcript, setTranscript] = useState([]);
-  const [error, setError] = useState(null);
-  const [liveText, setLiveText] = useState('');
+  const [phase, setPhase] = useState('lobby'); // lobby | connecting | live | ended | feedback
   const [studentData, setStudentData] = useState(null);
+  const [connected, setConnected] = useState(false);
+  const [micActive, setMicActive] = useState(false);
+  const [transcript, setTranscript] = useState([]);
+  const [activeInterviewer, setActiveInterviewer] = useState(0);
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [error, setError] = useState(null);
+  const [timer, setTimer] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
-  const messagesRef = useRef([]);
-  const recognitionRef = useRef(null);
+  const sessionRef = useRef(null);
+  const recorderRef = useRef(null);
+  const playerRef = useRef(null);
+  const activeSpeakerRef = useRef(null);
+  const currentTextRef = useRef('');
+  const transcriptRef = useRef([]);
   const timerRef = useRef(null);
-  const phaseRef = useRef('lobby');
-  const systemPromptRef = useRef('');
-  const shouldListenRef = useRef(false);
-  const stopRequestedRef = useRef(false);
 
-  useEffect(() => { phaseRef.current = phase; }, [phase]);
+  // Sync transcript ref
+  useEffect(() => { transcriptRef.current = transcript; }, [transcript]);
 
-  // Load student data from URL param
+  // Load student data from Supabase
   useEffect(() => {
     const loadStudentData = async () => {
       const uid = router.query.uid;
       if (!uid) return;
       try {
         const { data } = await supabase.rpc('get_response_data', { uuid_arg: uid });
-        if (data && data.length > 0) {
-          setStudentData(data[0]);
-        }
+        if (data && data.length > 0) setStudentData(data[0]);
       } catch (e) {
         console.log('Could not load student data:', e);
       }
@@ -161,404 +205,423 @@ export default function InterviewPrep() {
     return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
   };
 
-  // Detect active interviewer from text
-  const detectInterviewer = useCallback((text) => {
-    if (text.includes('[Prof. Sharma]') || text.includes('Prof. Sharma:')) return 0;
-    if (text.includes('[Prof. Gupta]') || text.includes('Prof. Gupta:')) return 1;
-    if (text.includes('[Dr. Mehra]') || text.includes('Dr. Mehra:')) return 2;
-    return null;
+  const addTranscript = useCallback((role, text) => {
+    if (!text.trim()) return;
+    const speaker = role === 'user' ? 'You' : 'Panel';
+    setTranscript(prev => [...prev, { role, speaker, text }]);
+    // Detect active interviewer from model text
+    if (role === 'model') {
+      const idx = detectInterviewer(text);
+      if (idx !== null) setActiveInterviewer(idx);
+    }
   }, []);
 
-  // Get Gemini TTS voice name for interviewer
-  const getVoiceForText = useCallback((text) => {
-    if (text.includes('[Prof. Sharma]')) return INTERVIEWER_VOICES['Prof. Sharma'];
-    if (text.includes('[Prof. Gupta]')) return INTERVIEWER_VOICES['Prof. Gupta'];
-    if (text.includes('[Dr. Mehra]')) return INTERVIEWER_VOICES['Dr. Mehra'];
-    return 'Kore';
-  }, []);
-
-  // Send message to Gemini and get response
-  const sendToGemini = useCallback(async (userText) => {
-    messagesRef.current.push({ role: 'user', content: userText });
-    setTranscript(prev => [...prev, { role: 'student', speaker: 'You', text: userText }]);
-    setIsThinking(true);
-    setIsListening(false);
-
-    try {
-      const res = await fetch('/api/gemini-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: messagesRef.current,
-          systemPrompt: systemPromptRef.current,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`API error: ${res.status}`);
-      const data = await res.json();
-      const aiText = data.text;
-
-      if (!aiText) throw new Error('Empty response from AI');
-
-      messagesRef.current.push({ role: 'assistant', content: aiText });
-      setIsThinking(false);
-
-      // Parse and speak each interviewer's part
-      // Split by interviewer tags
-      const segments = aiText.split(/(?=\[(?:Prof\. Sharma|Prof\. Gupta|Dr\. Mehra)\])/);
-      
-      for (const segment of segments) {
-        if (stopRequestedRef.current) break;
-        const trimmed = segment.trim();
-        if (!trimmed) continue;
-
-        // Detect interviewer
-        const idx = detectInterviewer(trimmed);
-        if (idx !== null) setActiveInterviewer(idx);
-
-        // Clean text for display
-        let speaker = INTERVIEWERS[idx || 0].name;
-        const match = trimmed.match(/\[(Prof\. Sharma|Prof\. Gupta|Dr\. Mehra)\]/);
-        if (match) speaker = match[1];
-        const cleanText = trimmed.replace(/\[(Prof\. Sharma|Prof\. Gupta|Dr\. Mehra)\]\s*/g, '');
-
-        if (cleanText) {
-          setTranscript(prev => [...prev, { role: 'interviewer', speaker, text: cleanText }]);
-          setIsAISpeaking(true);
-          const voice = getVoiceForText(trimmed);
-          await speakWithGeminiTTS(cleanText, voice);
-        }
-      }
-
-      setIsAISpeaking(false);
-
-      // Check if interview is over
-      const lowerText = aiText.toLowerCase();
-      if (lowerText.includes('interview is over') || lowerText.includes('interview is complete') || 
-          lowerText.includes('all the best') || lowerText.includes('that concludes')) {
-        setTimeout(() => setPhase('ended'), 1500);
-        return;
-      }
-
-      // Start listening again
-      if (phaseRef.current === 'live') {
-        shouldListenRef.current = true;
-        startListening();
-      }
-    } catch (err) {
-      console.error('Gemini error:', err);
-      setIsThinking(false);
-      setError('AI response failed. Tap the mic to try again.');
-      if (phaseRef.current === 'live') {
-        shouldListenRef.current = true;
-        startListening();
-      }
-    }
-  }, [detectInterviewer, getVoiceForText]);
-
-  // Speech Recognition
-  const startListening = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setError('Speech recognition not supported in this browser. Use Chrome for best experience.');
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-IN';
-    recognitionRef.current = recognition;
-
-    let finalText = '';
-    let silenceTimer = null;
-
-    recognition.onresult = (event) => {
-      let interim = '';
-      finalText = '';
-      for (let i = 0; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript + ' ';
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-      setLiveText(finalText + interim);
-
-      // Reset silence timer on new speech
-      if (silenceTimer) clearTimeout(silenceTimer);
-      silenceTimer = setTimeout(() => {
-        const fullText = (finalText + interim).trim();
-        if (fullText.length > 5) { // Only send if meaningful input
-          recognition.stop();
-          setLiveText('');
-          sendToGemini(fullText);
-        }
-      }, 2000); // 2 second silence = done speaking
-    };
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setError(null);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      // Auto-restart if we should still be listening
-      if (shouldListenRef.current && phaseRef.current === 'live') {
-        try { recognition.start(); } catch(e) {}
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.log('Speech recognition error:', event.error);
-      if (event.error === 'no-speech') {
-        // Restart silently
-        if (shouldListenRef.current && phaseRef.current === 'live') {
-          try { recognition.start(); } catch(e) {}
-        }
-      } else if (event.error !== 'aborted') {
-        setError(`Mic error: ${event.error}. Tap mic to retry.`);
-      }
-    };
-
-    try {
-      recognition.start();
-    } catch(e) {
-      console.error('Failed to start recognition:', e);
-    }
-  }, [sendToGemini]);
-
-  // Start Interview
+  // ─── Start Interview: get ephemeral token, open WebSocket ───
   const startInterview = async () => {
     setPhase('connecting');
     setError(null);
     setTranscript([]);
     setTimer(0);
-    messagesRef.current = [];
-    stopRequestedRef.current = false;
-
-    // Build system prompt with student context
-    systemPromptRef.current = buildSystemPrompt(studentData);
 
     try {
-      // Request mic permission
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(t => t.stop()); // Release immediately, Web Speech API handles mic
+      // 1. Get ephemeral token from our server
+      const tokenRes = await fetch('/api/gemini-live-token', { method: 'POST' });
+      if (!tokenRes.ok) throw new Error('Failed to get session token');
+      const tokenData = await tokenRes.json();
+      const ephemeralToken = tokenData.token || tokenData.ephemeralToken || tokenData;
 
-      setPhase('live');
+      // 2. Create audio player & recorder
+      playerRef.current = new AudioPlayer();
+      playerRef.current.resume();
 
-      // Send initial empty message to get the panel's welcome
-      // We simulate this by sending a "start" message
-      await sendToGemini('(The student has just entered the interview room and sat down. Begin the interview.)');
+      // 3. Build system prompt
+      const systemInstruction = buildSystemPrompt(studentData);
+
+      // 4. Connect to Gemini Live API via WebSocket
+      const model = 'gemini-3.1-flash-live-preview';
+      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${typeof ephemeralToken === 'string' ? ephemeralToken : ephemeralToken.token || ''}`;
+
+      const ws = new WebSocket(wsUrl);
+      sessionRef.current = ws;
+
+      ws.onopen = () => {
+        // Send setup message
+        ws.send(JSON.stringify({
+          setup: {
+            model: `models/${model}`,
+            generationConfig: {
+              responseModalities: ['AUDIO'],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: { voiceName: 'Puck' }
+                }
+              }
+            },
+            systemInstruction: {
+              parts: [{ text: systemInstruction }]
+            },
+            outputAudioTranscription: {},
+            inputAudioTranscription: {},
+          }
+        }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+
+          // Setup complete
+          if (msg.setupComplete) {
+            setConnected(true);
+            setPhase('live');
+            startMic(ws);
+            return;
+          }
+
+          // Server content
+          const serverContent = msg.serverContent;
+          if (!serverContent) return;
+
+          // Audio data — play immediately
+          if (serverContent.modelTurn && serverContent.modelTurn.parts) {
+            for (const part of serverContent.modelTurn.parts) {
+              if (part.inlineData && part.inlineData.data) {
+                setIsAISpeaking(true);
+                playerRef.current?.playBase64PCM(part.inlineData.data);
+              }
+              // Model text transcription
+              if (part.text) {
+                if (activeSpeakerRef.current === 'user') {
+                  addTranscript('user', currentTextRef.current);
+                  currentTextRef.current = '';
+                }
+                activeSpeakerRef.current = 'model';
+                currentTextRef.current += part.text;
+              }
+            }
+          }
+
+          // Input (user) transcription
+          if (serverContent.inputTranscription && serverContent.inputTranscription.text) {
+            if (activeSpeakerRef.current === 'model') {
+              addTranscript('model', currentTextRef.current);
+              currentTextRef.current = '';
+            }
+            activeSpeakerRef.current = 'user';
+            currentTextRef.current += serverContent.inputTranscription.text;
+          }
+
+          // Output (model) transcription
+          if (serverContent.outputTranscription && serverContent.outputTranscription.text) {
+            if (activeSpeakerRef.current === 'user') {
+              addTranscript('user', currentTextRef.current);
+              currentTextRef.current = '';
+            }
+            activeSpeakerRef.current = 'model';
+            currentTextRef.current += serverContent.outputTranscription.text;
+          }
+
+          // Turn complete
+          if (serverContent.turnComplete) {
+            if (activeSpeakerRef.current && currentTextRef.current.trim()) {
+              addTranscript(activeSpeakerRef.current, currentTextRef.current);
+              currentTextRef.current = '';
+            }
+            activeSpeakerRef.current = null;
+            setIsAISpeaking(false);
+          }
+
+          // Interrupted
+          if (serverContent.interrupted) {
+            setIsAISpeaking(false);
+          }
+
+        } catch (e) {
+          console.error('WebSocket message parse error:', e);
+        }
+      };
+
+      ws.onclose = () => {
+        setConnected(false);
+        setMicActive(false);
+      };
+
+      ws.onerror = (err) => {
+        console.error('WebSocket error:', err);
+        setError('Connection error. Please try again.');
+        setPhase('lobby');
+      };
+
     } catch (err) {
       console.error('Start error:', err);
-      setError(err.message || 'Failed to start. Allow microphone access and try again.');
+      setError(err.message || 'Failed to start. Try again.');
       setPhase('lobby');
     }
   };
 
-  // Stop Interview
-  const stopInterview = useCallback(() => {
-    setPhase('ended');
-    shouldListenRef.current = false;
-    stopRequestedRef.current = true;
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch(e) {}
-      recognitionRef.current = null;
-    }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    // Stop any playing audio elements
-    document.querySelectorAll('audio').forEach(a => { a.pause(); a.src = ''; });
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    setIsAISpeaking(false);
-    setIsListening(false);
-    setIsThinking(false);
-    setLiveText('');
-  }, []);
-
-  // Manual mic toggle
-  const toggleMic = () => {
-    if (isListening) {
-      shouldListenRef.current = false;
-      if (recognitionRef.current) recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      shouldListenRef.current = true;
-      startListening();
+  // ─── Start Mic ───
+  const startMic = async (ws) => {
+    try {
+      recorderRef.current = new AudioRecorder((base64) => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            realtimeInput: {
+              mediaChunks: [{
+                data: base64,
+                mimeType: 'audio/pcm;rate=16000'
+              }]
+            }
+          }));
+        }
+      });
+      await recorderRef.current.start();
+      setMicActive(true);
+    } catch (err) {
+      console.error('Mic error:', err);
+      setError('Microphone access denied. Please allow mic and try again.');
     }
   };
 
-  useEffect(() => { return () => stopInterview(); }, [stopInterview]);
-
-  // Scroll transcript to bottom
-  const transcriptEndRef = useRef(null);
-  useEffect(() => {
-    if (transcriptEndRef.current) {
-      transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  // ─── Stop Interview ───
+  const stopInterview = useCallback(() => {
+    // Flush any remaining text
+    if (activeSpeakerRef.current && currentTextRef.current.trim()) {
+      addTranscript(activeSpeakerRef.current, currentTextRef.current);
+      currentTextRef.current = '';
+      activeSpeakerRef.current = null;
     }
-  }, [transcript]);
+    recorderRef.current?.stop();
+    playerRef.current?.stop();
+    if (sessionRef.current) {
+      try { sessionRef.current.close(); } catch (e) {}
+      sessionRef.current = null;
+    }
+    setConnected(false);
+    setMicActive(false);
+    setIsAISpeaking(false);
+    setPhase('ended');
+  }, [addTranscript]);
 
+  // Cleanup on unmount
+  useEffect(() => { return () => { stopInterview(); }; }, [stopInterview]);
+
+  // ─── Generate Feedback ───
+  const generateFeedback = async () => {
+    setFeedbackLoading(true);
+    setPhase('feedback');
+    try {
+      const transcriptText = transcriptRef.current.map(t => `[${t.role === 'user' ? 'STUDENT' : 'PANEL'}] ${t.text}`).join('\n');
+      const prompt = `You are an expert IIM Interview coach. Review this mock PI transcript for IPMAT admission.
+
+STUDENT PROFILE:
+Name: ${studentData?.name || 'Unknown'}
+City: ${studentData?.city || 'Unknown'}
+IPMAT Scores: ${studentData?.total_score || '?'}/360 (SA: ${studentData?.sa_score || '?'}, MCQ: ${studentData?.mcq_score || '?'}, VA: ${studentData?.va_score || '?'})
+
+TRANSCRIPT:
+${transcriptText}
+
+Provide structured feedback:
+1. Overall Impression (2-3 sentences)
+2. Strengths (3-4 bullet points)
+3. Areas to Improve (3-4 actionable bullet points)
+4. Score out of 10
+Keep it concise and encouraging.`;
+
+      const res = await fetch('/api/gemini-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], systemPrompt: 'You are an expert IIM interview coach. Be constructive and specific.' }),
+      });
+      const data = await res.json();
+      setFeedback(data.text || 'Could not generate feedback.');
+    } catch (e) {
+      setFeedback('Sorry, feedback generation failed. Please try again.');
+    } finally {
+      setFeedbackLoading(false);
+    }
+  };
+
+  // ─── RENDER ───
   return (
     <AppShell>
-      <NextSeo 
-        title="AI Mock Interview | IPM Careers" 
-        description="Practice your IIM Personal Interview with AI-powered voice interview panel" 
-      />
+      <NextSeo title="AI Mock Interview | IPM Careers" description="Practice for your IIM Indore PI with our AI-powered mock interview panel." />
+      <div className={styles.interviewPage}>
 
-      <div className={styles.container}>
-        {/* LOBBY */}
+        {/* ─── LOBBY ─── */}
         {phase === 'lobby' && (
-          <div className={styles.lobby}>
-            <div className={styles.lobbyIcon}>{'🎙️'}</div>
-            <h1 className={styles.lobbyTitle}>AI Mock Interview</h1>
-            <p className={styles.lobbySubtitle}>
-              Practice with a realistic 3-person IIM PI panel. Speak naturally — the AI listens, thinks, and responds by voice.
-            </p>
+          <div className={styles.lobbyContainer}>
+            <div className={styles.lobbyHeader}>
+              <h1 className={styles.lobbyTitle}>IIM Indore Mock PI Panel</h1>
+              <p className={styles.lobbySubtitle}>AI-powered Personal Interview simulation with real-time voice</p>
+            </div>
 
             {studentData && (
               <div className={styles.studentContext}>
-                <div className={styles.contextBadge}>{'✅'} Student profile loaded</div>
-                <p className={styles.contextInfo}>
-                  {studentData.name} | Score: {studentData.total_score || '—'} | {studentData.category || 'GEN'}
-                </p>
-                <p className={styles.contextNote}>The panel will personalize questions based on your profile and SOP</p>
+                <div className={styles.contextBadge}>Profile Loaded</div>
+                <p className={styles.contextInfo}>{studentData.name} &bull; {studentData.city || 'India'}</p>
+                <p className={styles.contextInfo}>IPMAT Score: {studentData.total_score}/{studentData.total_max || 360}</p>
+                <p className={styles.contextNote}>Your scores and SOP will be used to personalize the interview</p>
               </div>
             )}
 
-            <div className={styles.panelPreview}>
-              {INTERVIEWERS.map((iv) => (
-                <div key={iv.id} className={styles.panelCard}>
-                  <div className={styles.panelAvatar} style={{ background: iv.color }}>{iv.avatar}</div>
-                  <div className={styles.panelName}>{iv.name}</div>
-                  <div className={styles.panelRole}>{iv.role}</div>
-                  <div className={styles.panelFocus}>{iv.focus}</div>
+            <div className={styles.panelGrid}>
+              {INTERVIEWERS.map((prof, i) => (
+                <div key={prof.id} className={styles.panelCard}>
+                  <div className={styles.panelAvatar}>{prof.avatar}</div>
+                  <div className={styles.panelName}>{prof.name}</div>
+                  <div className={styles.panelRole}>{prof.role}</div>
                 </div>
               ))}
             </div>
 
-            <div className={styles.lobbyTips}>
-              <h3>{'💡'} Tips for your mock PI</h3>
-              <ul>
-                <li>Use Chrome browser for best speech recognition</li>
-                <li>Use a quiet room — speak clearly in English</li>
-                <li>Answer in 30-60 seconds per question</li>
-                <li>Wait for the panel to finish speaking before you respond</li>
-                <li>The panel will ask follow-ups based on YOUR answers</li>
-              </ul>
-            </div>
+            {error && <p className={styles.errorText}>{error}</p>}
 
-            {error && <div className={styles.errorMsg}>{error}</div>}
             <button className={styles.startBtn} onClick={startInterview}>
-              {'🎤'} Start Mock Interview
+              Start Mock Interview
             </button>
+            <p className={styles.lobbyNote}>Uses your microphone for real-time voice conversation. Works best in Chrome.</p>
           </div>
         )}
 
-        {/* CONNECTING */}
+        {/* ─── CONNECTING ─── */}
         {phase === 'connecting' && (
-          <div className={styles.lobby}>
+          <div className={styles.connectingContainer}>
             <div className={styles.connectingSpinner}></div>
-            <h2 className={styles.lobbyTitle}>Setting up your interview room...</h2>
-            <p className={styles.lobbySubtitle}>Requesting mic access and preparing the panel</p>
+            <h2 className={styles.connectingTitle}>Setting up your interview room...</h2>
+            <p className={styles.connectingSubtitle}>Requesting mic access and connecting to the panel</p>
           </div>
         )}
 
-        {/* LIVE */}
+        {/* ─── LIVE INTERVIEW ─── */}
         {phase === 'live' && (
-          <div className={styles.liveRoom}>
-            <div className={styles.timerBar}>
-              <span className={styles.liveIndicator}>{'🔴'} LIVE</span>
-              <span className={styles.timerText}>{formatTime(timer)}</span>
+          <div className={styles.liveContainer}>
+            {/* Top bar */}
+            <div className={styles.liveTopBar}>
+              <div className={styles.liveStatus}>
+                <span className={styles.liveDot}></span>
+                <span>LIVE</span>
+              </div>
+              <div className={styles.liveTimer}>{formatTime(timer)}</div>
               <button className={styles.endBtn} onClick={stopInterview}>End Interview</button>
             </div>
 
-            <div className={styles.interviewerPanel}>
-              {INTERVIEWERS.map((iv, i) => (
-                <div key={iv.id} className={`${styles.interviewer} ${i === activeInterviewer && isAISpeaking ? styles.interviewerActive : ''}`}>
-                  <div className={styles.avatarRing} style={{ borderColor: i === activeInterviewer && isAISpeaking ? iv.color : 'transparent' }}>
-                    <div className={styles.avatar} style={{ background: iv.color }}>{iv.avatar}</div>
-                    {i === activeInterviewer && isAISpeaking && (
-                      <div className={styles.speakingWave}><span></span><span></span><span></span></div>
-                    )}
+            {/* Interviewer panel */}
+            <div className={styles.interviewerRow}>
+              {INTERVIEWERS.map((prof, i) => (
+                <div key={prof.id} className={`${styles.interviewerCard} ${activeInterviewer === i ? styles.activeInterviewer : ''}`}>
+                  <div className={styles.interviewerAvatar} style={{ borderColor: activeInterviewer === i ? prof.color : 'transparent' }}>
+                    {prof.avatar}
                   </div>
-                  <div className={styles.ivName}>{iv.name}</div>
-                  <div className={styles.ivRole}>{iv.role}</div>
+                  <div className={styles.interviewerName}>{prof.name}</div>
+                  <div className={styles.interviewerRole}>{prof.role}</div>
                 </div>
               ))}
             </div>
 
-            <div className={styles.studentArea}>
-              <div 
-                className={`${styles.micCircle} ${isListening && !isAISpeaking ? styles.micActive : ''} ${isThinking ? styles.micThinking : ''}`}
-                onClick={!isAISpeaking ? toggleMic : undefined}
+            {/* AI Speaking indicator */}
+            {isAISpeaking && (
+              <div className={styles.speakingIndicator}>
+                <div className={styles.soundWave}><span></span><span></span><span></span><span></span><span></span></div>
+                <span>{INTERVIEWERS[activeInterviewer].name} is speaking...</span>
+              </div>
+            )}
+
+            {/* Mic button */}
+            <div className={styles.micSection}>
+              <button
+                className={`${styles.micBtn} ${micActive ? styles.micActive : ''} ${isAISpeaking ? styles.micThinking : ''}`}
+                onClick={() => {
+                  if (micActive) {
+                    recorderRef.current?.stop();
+                    setMicActive(false);
+                  } else if (sessionRef.current) {
+                    startMic(sessionRef.current);
+                  }
+                }}
               >
-                <span>{isThinking ? '🤔' : isListening ? '🎤' : '🔇'}</span>
-              </div>
-              <div className={styles.studentLabel}>
-                {isAISpeaking ? 'Panel is speaking...' : 
-                 isThinking ? 'Panel is thinking...' :
-                 isListening ? 'Listening to you... (speak now)' : 
-                 'Tap mic to speak'}
-              </div>
-              {liveText && (
-                <div className={styles.liveTranscript}>
-                  <span className={styles.liveTranscriptLabel}>You: </span>{liveText}
-                </div>
-              )}
-              {!isAISpeaking && !isThinking && (
-                <div className={styles.micControls}>
-                  <button className={`${styles.micBtn} ${!isListening ? styles.micBtnMuted : ''}`} onClick={toggleMic}>
-                    {isListening ? '🎤 Mute' : '🔇 Unmute'}
-                  </button>
-                </div>
+                {micActive ? '🎙️' : '🎤'}
+              </button>
+              <p className={styles.micLabel}>{micActive ? (isAISpeaking ? 'Panel is speaking...' : 'Listening...') : 'Tap mic to speak'}</p>
+              {!micActive && !isAISpeaking && (
+                <button className={styles.unmuteBtn} onClick={() => { if (sessionRef.current) startMic(sessionRef.current); }}>
+                  🔇 Unmute
+                </button>
               )}
             </div>
 
-            {error && <div className={styles.errorMsg} style={{margin: '0.5rem 1rem'}}>{error}</div>}
-
-            <div className={styles.transcriptArea}>
-              <h3 className={styles.transcriptTitle}>Interview Transcript</h3>
-              <div className={styles.transcriptScroll}>
-                {transcript.map((entry, i) => (
-                  <div key={i} className={`${styles.transcriptEntry} ${entry.role === 'student' ? styles.transcriptStudent : ''}`}>
-                    <span className={styles.transcriptSpeaker}>{entry.speaker}:</span>
-                    <span className={styles.transcriptText}> {entry.text}</span>
-                  </div>
-                ))}
-                {transcript.length === 0 && (
-                  <div className={styles.transcriptEmpty}>Interview will begin shortly... The panel will greet you first.</div>
-                )}
-                <div ref={transcriptEndRef} />
+            {/* Transcript */}
+            {transcript.length > 0 && (
+              <div className={styles.transcriptSection}>
+                <h3 className={styles.transcriptTitle}>INTERVIEW TRANSCRIPT</h3>
+                <div className={styles.transcriptList}>
+                  {transcript.map((msg, i) => (
+                    <div key={i} className={`${styles.transcriptItem} ${msg.role === 'user' ? styles.transcriptStudent : ''}`}>
+                      <span className={styles.transcriptSpeaker} style={{ color: msg.role === 'user' ? '#6c63ff' : '#ff5e7e' }}>
+                        {msg.role === 'user' ? 'You' : 'Panel'}:
+                      </span>{' '}
+                      {msg.text}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* ENDED */}
+        {/* ─── ENDED ─── */}
         {phase === 'ended' && (
-          <div className={styles.lobby}>
-            <div className={styles.lobbyIcon}>{'✅'}</div>
-            <h1 className={styles.lobbyTitle}>Interview Complete!</h1>
-            <p className={styles.lobbySubtitle}>Duration: {formatTime(timer)} | {transcript.filter(t => t.role === 'student').length} responses</p>
-            
-            <div className={styles.reviewTranscript}>
-              <h3>Full Transcript</h3>
-              {transcript.map((entry, i) => (
-                <div key={i} className={`${styles.reviewEntry} ${entry.role === 'student' ? styles.reviewStudent : ''}`}>
-                  <strong>{entry.speaker}:</strong> {entry.text}
-                </div>
-              ))}
+          <div className={styles.endedContainer}>
+            <div className={styles.endedIcon}>✅</div>
+            <h2 className={styles.endedTitle}>Interview Complete!</h2>
+            <p className={styles.endedSubtitle}>Duration: {formatTime(timer)} &bull; {transcript.filter(t => t.role === 'user').length} responses</p>
+
+            <div className={styles.endedActions}>
+              <button className={styles.feedbackBtn} onClick={generateFeedback}>
+                Get AI Feedback & Score
+              </button>
+              <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>
+                Try Again
+              </button>
             </div>
 
-            <div className={styles.endActions}>
-              <button className={styles.startBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); }}>
-                {'🔄'} Practice Again
-              </button>
-              <button className={styles.secondaryBtn} onClick={() => router.push('/pi-prep')}>
-                {'⬅️'} Back to PI Prep
-              </button>
-            </div>
+            {/* Transcript review */}
+            {transcript.length > 0 && (
+              <div className={styles.reviewSection}>
+                <h3 className={styles.reviewTitle}>Interview Transcript</h3>
+                {transcript.map((msg, i) => (
+                  <div key={i} className={`${styles.reviewItem} ${msg.role === 'user' ? styles.reviewStudent : ''}`}>
+                    <strong>{msg.role === 'user' ? 'You' : 'Panel'}:</strong> {msg.text}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─── FEEDBACK ─── */}
+        {phase === 'feedback' && (
+          <div className={styles.endedContainer}>
+            <h2 className={styles.endedTitle}>Performance Feedback</h2>
+            {feedbackLoading ? (
+              <div className={styles.connectingContainer}>
+                <div className={styles.connectingSpinner}></div>
+                <p className={styles.connectingSubtitle}>Panel is reviewing your interview...</p>
+              </div>
+            ) : (
+              <>
+                <div className={styles.feedbackCard}>
+                  {feedback && feedback.split('\n').map((line, i) => (
+                    <p key={i} className={styles.feedbackLine}>{line}</p>
+                  ))}
+                </div>
+                <div className={styles.endedActions}>
+                  <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>
+                    Start New Interview
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
