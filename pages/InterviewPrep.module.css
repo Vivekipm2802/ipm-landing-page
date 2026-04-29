@@ -431,3 +431,77 @@
   .timerBar { padding: 0.5rem 0.75rem; }
   .transcriptScroll { max-height: 180px; }
 }
+
+/* ═══ NEW STYLES FOR SPEECH-TO-TEXT INTERVIEW ═══ */
+
+.studentContext {
+  background: rgba(108, 99, 255, 0.08);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin: 1rem auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+.contextBadge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #22c55e;
+  margin-bottom: 0.25rem;
+}
+
+.contextInfo {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin: 0.25rem 0;
+}
+
+.contextNote {
+  font-size: 0.7rem;
+  color: #888;
+  margin: 0.25rem 0 0;
+  font-style: italic;
+}
+
+.micThinking {
+  background: linear-gradient(135deg, #ff8c42 0%, #ff5e7e 100%) !important;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+.liveTranscript {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #ccc;
+  max-width: 500px;
+  min-height: 36px;
+  text-align: left;
+}
+
+.liveTranscriptLabel {
+  color: #6c63ff;
+  font-weight: 700;
+}
+
+.transcriptStudent {
+  background: rgba(108, 99, 255, 0.06);
+  border-left: 3px solid #6c63ff;
+  padding-left: 0.75rem;
+}
+
+.reviewStudent {
+  background: rgba(108, 99, 255, 0.06);
+  border-left: 3px solid #6c63ff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  margin: 0.25rem 0;
+}
