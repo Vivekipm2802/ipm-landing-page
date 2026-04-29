@@ -276,9 +276,18 @@ export default function InterviewPrep() {
           },
 
           onmessage: (message) => {
+            console.log('MSG:', Object.keys(message), message.setupComplete ? 'SETUP' : '', message.serverContent ? 'SC' : '', message.data ? 'DATA' : '');
+
             // Setup complete signal
             if (message.setupComplete) {
               console.log('Setup complete');
+              return;
+            }
+
+            // Some SDK versions put audio directly on message.data
+            if (message.data && !message.serverContent) {
+              setIsAISpeaking(true);
+              playerRef.current?.playBase64PCM(message.data);
               return;
             }
 
@@ -351,10 +360,8 @@ export default function InterviewPrep() {
 
       // Start mic and send initial trigger AFTER session is assigned
       startMic(session);
-      session.sendClientContent({
-        turns: [{ role: 'user', parts: [{ text: 'Hello, I am ready for my interview. Please begin.' }] }],
-        turnComplete: true
-      });
+      // Use SDK's send() method to trigger the AI panel to start
+      session.send('Hello, I am ready for my interview. Please begin.');
 
     } catch (err) {
       console.error('Start error:', err);
