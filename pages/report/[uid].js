@@ -730,11 +730,11 @@ function Report({ data, error, isFound }) {
         }}
       />
 
-      {/* ═══ VIEW TOGGLE ═══ */}
-      <ViewToggle view={view} setView={setView} />
 
       {/* ═══ MODERN VIEW ═══ */}
       {view === 'modern' && (
+        <>
+        <ViewToggle view={view} setView={setView} />
         <ReportModern
           data={data}
           scores={scores}
@@ -742,11 +742,13 @@ function Report({ data, error, isFound }) {
           jsonData={jsonData}
           router={router}
         />
+        </>
       )}
 
       {/* ═══ CLASSIC VIEW ═══ */}
       {view === 'classic' && (
         <div className={styles.reportPage}>
+          <ViewToggle view={view} setView={setView} />
           {/* Hero */}
           {scores && stats && (
             <HeroReveal scores={scores} stats={stats} studentName={data?.name} testDate={data?.created_at} category={data?.category} />
@@ -842,7 +844,7 @@ function Report({ data, error, isFound }) {
 
           {/* Download */}
           <div className={styles.downloadBar}>
-            <Button className={styles.downloadBtn} onPress={() => { window.print(); }}>📥 Save as PDF</Button>
+            <button className={styles.downloadBtn} onClick={() => { window.print(); }}>📥 Save as PDF</button>
           </div>
         </div>
       )}

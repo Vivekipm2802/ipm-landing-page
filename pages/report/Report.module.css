@@ -1777,16 +1777,16 @@
 .youAreHere {
   position: absolute;
   right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.6rem;
+  top: -16px;
+  font-size: 0.55rem;
   font-weight: 800;
-  color: white;
-  background: rgb(158,65,152);
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: rgb(158,65,152);
+  background: rgba(158,65,152,0.12);
+  padding: 1px 5px;
+  border-radius: 3px;
   letter-spacing: 0.5px;
   z-index: 2;
+  white-space: nowrap;
 }
 
 .barValue {
