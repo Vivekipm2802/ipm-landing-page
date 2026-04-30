@@ -3,7 +3,6 @@ import styles from './Report.module.css';
 import modernStyles from './ReportModern.module.css';
 import { supabase } from '../../utils/supabaseClient';
 import { NextSeo } from 'next-seo';
-import 'tailwindcss/tailwind.css';
 import { Button, Divider, Spacer, Card, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 import axios from 'axios';

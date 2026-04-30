@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { NextSeo } from 'next-seo';
-import 'tailwindcss/tailwind.css';
 import { useRouter } from 'next/router';
 import AppShell from '../components/AppShell';
 import styles from './InterviewPrep.module.css';
