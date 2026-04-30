@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Inter } from "next/font/google";
 import { useState, useEffect } from "react";
 import styles from "./Home.module.css";
 import FAQ from "../components/FAQ";
@@ -11,7 +10,6 @@ import YouTube from "react-youtube";
 import axios from "axios";
 import Section from "../components/Section";
 import cronberryTrigger from "./utilFunctions";
-const inter = Inter({ subsets: ["latin"] });
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper";
 import "swiper/css";

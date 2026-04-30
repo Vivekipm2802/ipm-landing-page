@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Inter } from "next/font/google";
 import { useState, useEffect } from "react";
 import styles from "./Home.module.css";
 import FAQ from "../components/FAQ";
@@ -13,7 +12,6 @@ import Section from "../components/Section";
 import * as performance from "../public/performance.json";
 import * as learning from "../public/learning.json";
 import * as app from "../public/app.json";
-const inter = Inter({ subsets: ["latin"] });
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper";
 import "swiper/css";
