@@ -1,953 +1,706 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Timer from "../components/Timer";
 import st from "./TestPredictor.module.css";
-import styles from "./Call.module.css";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-import CustomSelect from "../components/CustomSelect";
 import Marquee from "react-fast-marquee";
 import axios from "axios";
 import { supabase } from "../utils/supabaseClient";
-
 import { useRouter } from "next/router";
 import "tailwindcss/tailwind.css";
-import { Input, Select, SelectItem, Spacer } from "@nextui-org/react";
 import Confetti from "../components/CanvasCofetti";
+
+const globalStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  .cp-root * { box-sizing: border-box; }
+  .cp-root {
+    font-family: 'DM Sans', sans-serif;
+    background: #FAF5FB;
+    color: #1a0a1e;
+    min-height: 100vh;
+  }
+  .cp-hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  @media (max-width: 768px) {
+    .cp-hero { grid-template-columns: 1fr; }
+    .cp-right { display: none; }
+  }
+  .cp-left {
+    padding: 48px 40px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+  }
+  .cp-right {
+    background: #F3E8F5;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    border-left: 1px solid #E5C9EA;
+  }
+  .cp-logo { width: 120px; margin-bottom: 32px; }
+  .cp-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #833589;
+    margin-bottom: 12px;
+  }
+  .cp-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    color: #1a0a1e;
+    margin: 0 0 8px;
+  }
+  .cp-heading span { color: #833589; }
+  .cp-subheading {
+    font-size: 15px;
+    color: #6B4D72;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .cp-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #F0E0F4;
+    border: 1px solid #D9B3E0;
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #6B4D72;
+    margin-bottom: 28px;
+    width: fit-content;
+  }
+  .cp-counter strong { color: #833589; }
+  .cp-counter-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #833589;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .cp-form { display: flex; flex-direction: column; gap: 14px; }
+  .cp-field { display: flex; flex-direction: column; gap: 6px; }
+  .cp-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: #833589;
+    text-transform: uppercase;
+  }
+  .cp-input, .cp-select {
+    background: #FFFFFF;
+    border: 1.5px solid #E5C9EA;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #1a0a1e;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    appearance: none;
+  }
+  .cp-input:focus, .cp-select:focus {
+    border-color: #833589;
+    box-shadow: 0 0 0 3px rgba(131,53,137,0.1);
+  }
+  .cp-input::placeholder { color: #C9A0D0; }
+  .cp-select option { background: #fff; color: #1a0a1e; }
+  .cp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cp-marks-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .cp-marks-divider {
+    border-top: 1.5px solid #E5C9EA;
+    padding-top: 14px;
+  }
+  .cp-marks-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: #833589;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .cp-error {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #DC2626;
+  }
+  .cp-btn {
+    background: #833589;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 4px;
+    box-shadow: 0 4px 14px rgba(131,53,137,0.25);
+  }
+  .cp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(131,53,137,0.35);
+  }
+  .cp-btn:active { transform: translateY(0); }
+  .cp-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+  .cp-btn-secondary {
+    background: #fff;
+    border: 1.5px solid #E5C9EA;
+    color: #833589;
+    box-shadow: none;
+  }
+  .cp-btn-secondary:hover {
+    border-color: #833589;
+    background: #FAF5FB;
+    box-shadow: none;
+  }
+
+  /* Results */
+  .cp-results { padding: 0; }
+  .cp-results-header { margin-bottom: 20px; }
+  .cp-congrats {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a0a1e;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .cp-congrats-sub { font-size: 14px; color: #6B4D72; }
+  .cp-college-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .cp-college-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #FFFFFF;
+    border: 1.5px solid #E5C9EA;
+    border-radius: 14px;
+    padding: 12px 16px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.4s ease forwards;
+    opacity: 0;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .cp-college-card:hover {
+    border-color: #833589;
+    transform: translateX(4px);
+    box-shadow: 0 2px 12px rgba(131,53,137,0.1);
+  }
+  .cp-college-img {
+    width: 50px; height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #F0E0F4;
+  }
+  .cp-college-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a0a1e;
+    margin-bottom: 2px;
+  }
+  .cp-college-loc { font-size: 12px; color: #6B4D72; }
+  .cp-college-badge {
+    margin-left: auto;
+    background: #F0E0F4;
+    border: 1px solid #D9B3E0;
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #833589;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .cp-no-result { text-align: center; padding: 32px 16px; }
+  .cp-no-result img { width: 80px; margin-bottom: 16px; }
+  .cp-no-result h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: #1a0a1e; margin-bottom: 8px;
+  }
+  .cp-no-result p { font-size: 14px; color: #6B4D72; line-height: 1.6; }
+
+  /* Right panel */
+  .cp-right-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 0 0;
+  }
+  .cp-right-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #B07AB8;
+    padding: 0 32px;
+    margin-bottom: 24px;
+  }
+  .cp-images-col {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+  .cp-marquee-img {
+    height: 90px;
+    width: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    border: 1px solid #E5C9EA;
+  }
+  .cp-promo {
+    background: linear-gradient(135deg, #833589, #A855B5);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cp-promo::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+  .cp-promo h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 800;
+    color: #fff; margin-bottom: 4px;
+  }
+  .cp-promo p { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 14px; }
+  .cp-promo a {
+    display: inline-block;
+    background: #fff;
+    color: #833589;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 100px;
+    text-decoration: none;
+  }
+  .cp-spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+`;
+
 function Call() {
   const [data, setData] = useState();
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
-  const [count, setCount] = useState("loading");
-  const scrolldiv = useRef(null);
+  const [count, setCount] = useState("...");
   const [isVisible, setIsVisible] = useState(false);
+  const scrolldiv = useRef(null);
+
   const categories = [
-    { value: "gen", title: "GEN" },
-    { value: "ews", title: "EWS" },
-    { value: "obc", title: "OBC" },
-    { value: "pwd", title: "PWD" },
-    { value: "sc", title: "SC" },
-    { value: "st", title: "ST" },
+    { value: "gen", title: "GEN — General" },
+    { value: "ews", title: "EWS — Economically Weaker Section" },
+    { value: "obc", title: "OBC — Other Backward Class" },
+    { value: "pwd", title: "PWD — Person with Disability" },
+    { value: "sc", title: "SC — Scheduled Caste" },
+    { value: "st", title: "ST — Scheduled Tribe" },
   ];
   const genders = [
     { value: "male", title: "Male" },
     { value: "female", title: "Female" },
-    { value: "nos", title: "Not Specified" },
+    { value: "nos", title: "Prefer not to say" },
   ];
-  const inputs = [
-    {
-      label: "Full Name",
-      placeholder: "Enter your Full Name",
-      name: "fullname",
-      key: "fullname",
-      type: "text",
-    },
 
-    {
-      label: "Category",
-      placeholder: "Select your Category",
-      name: "category",
-      key: "category",
-      type: "select",
-      objects: categories,
+  const collegesData = {
+    "IIM Indore": {
+      title: "IIM Indore",
+      location: "Indore, Madhya Pradesh",
+      picture: "https://www.iimidr.ac.in/wp-content/uploads/NIRF_IIMIndore.jpg",
     },
-    {
-      label: "Gender",
-      placeholder: "Select your Gender",
-      name: "gender",
-      key: "gender",
-      type: "select",
-      objects: genders,
+    "IIM Rohtak": {
+      title: "IIM Rohtak",
+      location: "Rohtak, Haryana",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1505286258IIM-Rohtak-Campus.jpg",
     },
-    {
-      label: "Mobile Number",
-      placeholder: "Enter your Mobile Number",
-      name: "phone",
-      key: "phone",
-      type: "tel",
+    "IIM Ranchi": {
+      title: "IIM Ranchi",
+      location: "Ranchi, Jharkhand",
+      picture: "https://upload.wikimedia.org/wikipedia/commons/0/0c/IIM_Ranchi_Academic_Building.png",
     },
-    {
-      label: "Email",
-      placeholder: "Enter your Email Address",
-      name: "email",
-      key: "email",
-      type: "email",
+    "IIM Jammu": {
+      title: "IIM Jammu",
+      location: "Jammu, J&K",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1518165498iim-jammu.jpg",
     },
-    {
-      label: "Quanitative Apitutde MCQ",
-      placeholder: "Enter Quanitative Apitutde MCQ Marks",
-      name: "qa",
-      key: "qa",
-      type: "number",
+    "IIM Bodh Gaya": {
+      title: "IIM Bodh Gaya",
+      location: "Bodh Gaya, Bihar",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1539945147IIM-Bodh-Gaya.jpg",
     },
-    {
-      label: "Quantitative Ability SA",
-      placeholder: "Enter Quantitative Ability SA Marks",
-      name: "sa",
-      key: "sa",
-      type: "number",
+    "IIM Sirmaur": {
+      title: "IIM Sirmaur",
+      location: "Sirmaur, Himachal Pradesh",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1559219906iim-sirmaur.jpg",
     },
-    {
-      label: "Verbal Ability VA",
-      placeholder: "Enter Verbal Ability VA Marks",
-      name: "va",
-      key: "va",
-      type: "number",
+    "IIM Sambalpur": {
+      title: "IIM Sambalpur",
+      location: "Sambalpur, Odisha",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1549888338IIM-Sambalpur.jpg",
     },
+    NALSAR: {
+      title: "NALSAR University",
+      location: "Hyderabad, Telangana",
+      picture: "https://www.indcareer.com/files/notices/2015-03/nalsar-university-law-hyderabad.jpg",
+    },
+    IIFT: {
+      title: "IIFT Delhi",
+      location: "Multiple Locations",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/25453_IIFTD_NEW.jpg",
+    },
+    NIRMA: {
+      title: "NIRMA University",
+      location: "Ahmedabad, Gujarat",
+      picture: "https://nirmawebsite.s3.ap-south-1.amazonaws.com/wp-content/uploads/2022/07/Homepage-NU-950x732.jpg",
+    },
+    TAPMI: {
+      title: "TAPMI Manipal",
+      location: "Manipal, Karnataka",
+      picture: "https://www.tapmi.edu.in/wp-content/uploads/2018/04/Tapmi-Images09.jpg",
+    },
+    "Christ University": {
+      title: "Christ University",
+      location: "Bangalore, Karnataka",
+      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1487067423christ-university-bangalore.jpg",
+    },
+  };
+
+  const images = [
+    "/7dr.png", "/1dr_1.png", "/3dr.png", "/4dr.png", "/6dr.png",
+    "https://www.ipmcareer.com/wp-content/uploads/2024/03/coppred.png",
   ];
 
   async function getCount() {
     const { data, error } = await supabase
       .from("predictor")
       .select("id", { count: "exact", head: false });
-
-    if (data) {
-      setCount(550 + data.length);
-    }
-    if (error) {
-    }
+    if (data) setCount(550 + data.length);
   }
 
-  useEffect(() => {
-    getCount();
-  }, []);
-  function cronberryTrigger(
-    username,
-    u_email,
-    u_mobile,
-    u_year,
-    u_city,
-    linke
-  ) {
-    var id = Date.now();
-    var data = JSON.stringify({
-      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
-      audienceId: id,
-      name: username,
-      email: u_email,
-      mobile: u_mobile,
-      ios_fcm_token: "",
-      web_fcm_token: "",
-      android_fcm_token: "",
-      profile_path: "",
-      active: "",
-      audience_id: "",
-      paramList: [
-        {
-          paramKey: "source",
-          paramValue: "",
-        },
-        {
-          paramKey: "city",
-          paramValue: u_city,
-        },
-        {
-          paramKey: "postcode",
-          paramValue: "",
-        },
-        {
-          paramKey: "total_amount",
-          paramValue: "",
-        },
-        {
-          paramKey: "abondon_cart",
-          paramValue: true,
-        },
-        {
-          paramKey: "preparing_for_which_year",
-          paramValue: "",
-        },
-        {
-          paramKey: "subject",
-          paramValue: "",
-        },
-        {
-          paramKey: "formurl",
-          paramValue: linke,
-        },
-        {
-          paramKey: "formname",
-          paramValue: "Call Predictor",
-        },
-      ],
-    });
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("readystatechange", function () {
-      if (this.readyState === 4) {
-      }
-    });
-    xhr.open(
-      "POST",
-      "https://register.cronberry.com/api/campaign/register-audience-data"
-    );
-    xhr.setRequestHeader("Content-Type", "application/json");
+  useEffect(() => { getCount(); }, []);
 
-    xhr.send(data);
-  }
-
-  function validatePhone(phone) {
-    const re = /^[6-9]\d{9}$/;
-    return re.test(phone);
-  }
+  function validatePhone(phone) { return /^[6-9]\d{9}$/.test(phone); }
   function validateEmail(email) {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+    return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(String(email).toLowerCase());
   }
-  async function TestApi(a) {
-    setData();
-    if (a == undefined) {
-      setError("Everything is Empty , Please Fill the form");
-      return;
-    }
-    if (a.fullname == undefined || !validateName(a?.fullname)) {
-      setError("Name is Empty or Invalid");
-      return;
-    }
-
-    if (a.category == undefined) {
-      setError("Please Select Category from the DropDown");
-      return;
-    }
-    if (a.gender == undefined) {
-      setError("Please Select Gender from the DropDown");
-      return;
-    }
-    if (a.phone == undefined || !validatePhone(a.phone)) {
-      setError(
-        "Phone Invalid or Empty Please Fill correctly. Do not use country code or 0 as prefix"
-      );
-      return;
-    }
-    if (a.email == undefined || !validateEmail(a.email)) {
-      setError("Email Invalid or Empty Please Fill correctly.");
-      return;
-    }
-
-    if (a.qa == undefined) {
-      setError("Please Enter your QA Marks between 0 - 100");
-      return;
-    }
-    if (a.sa == undefined) {
-      setError("Please Enter your SA Marks between 0 - 100");
-      return;
-    }
-    if (a.va == undefined) {
-      setError("Please Enter your VA Marks between 0 - 100");
-      return;
-    }
-
-    setLoading(true);
-    submitLead(a);
-    await axios
-      .post("/api/predictor", {
-        category: a.category,
-        sa: a.sa,
-        va: a.va,
-        qa: a.qa,
-      })
-      .then((response) => {
-        // Handle successful response
-
-        cronberryTrigger(
-          a.fullname,
-          a.email,
-          a.phone,
-          "Not Specified",
-          "https://register.ipmcareer.com/call"
-        );
-        setData(response?.data?.colleges);
-        if (response?.data?.colleges?.length > 0) {
-          setIsVisible(true);
-          setTimeout(() => {
-            handleScrollTop();
-          }, 500);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        // Handle error
-        setLoading(false);
-      });
+  function validateName(name) {
+    return name.length >= 2 && name.length <= 50 && /^[a-zA-Z\s]+$/.test(name);
   }
 
   async function submitLead(a) {
-    const { error } = await supabase.from("predictor").insert({
-      fullname: a.fullname,
-      va: a.va,
-      sa: a.sa,
-      qa: a.qa,
-      matric: a.matric,
-      intermediate: a.intermediate,
-      email: a.email,
-      phone: a.phone,
-      age: a.age,
-      gender: a.gender,
-      category: a.category,
+    await supabase.from("predictor").insert({
+      fullname: a.fullname, va: a.va, sa: a.sa, qa: a.qa,
+      email: a.email, phone: a.phone, gender: a.gender, category: a.category,
     });
-
-    if (!error) {
-    }
   }
 
-  function validateName(name) {
-    const minLength = 2;
-    const maxLength = 50;
-    const regex = /^[a-zA-Z\s]+$/;
-
-    if (name.length < minLength || name.length > maxLength) {
-      return false;
-    }
-    if (!regex.test(name)) {
-      return false;
-    }
-    return true;
+  function cronberryTrigger(username, u_email, u_mobile, u_year, u_city, linke) {
+    var id = Date.now();
+    var data = JSON.stringify({
+      projectKey: "VW50aXRsZSBQcm9qZWN0MTY1MDAxMzUxMDU5MQ==",
+      audienceId: id, name: username, email: u_email, mobile: u_mobile,
+      ios_fcm_token: "", web_fcm_token: "", android_fcm_token: "",
+      profile_path: "", active: "", audience_id: "",
+      paramList: [
+        { paramKey: "source", paramValue: "" },
+        { paramKey: "city", paramValue: u_city },
+        { paramKey: "postcode", paramValue: "" },
+        { paramKey: "total_amount", paramValue: "" },
+        { paramKey: "abondon_cart", paramValue: true },
+        { paramKey: "preparing_for_which_year", paramValue: "" },
+        { paramKey: "subject", paramValue: "" },
+        { paramKey: "formurl", paramValue: linke },
+        { paramKey: "formname", paramValue: "Call Predictor" },
+      ],
+    });
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://register.cronberry.com/api/campaign/register-audience-data");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(data);
   }
-  const images = [
-    "/7dr.png",
-    "/1dr_1.png",
 
-    "/3dr.png",
-    "/4dr.png",
-    "/6dr.png",
-    "https://www.ipmcareer.com/wp-content/uploads/2024/03/coppred.png",
-  ];
-  const collegesData = {
-    "IIM Indore": {
-      title: "IIM Indore",
-      location: "Indore, Madhya Pradesh ",
-      picture: "https://www.iimidr.ac.in/wp-content/uploads/NIRF_IIMIndore.jpg",
-    },
-    "IIM Ranchi": {
-      title: "IIM Ranchi",
-      location: "Ranchi , Jharkhand",
-      picture:
-        "https://upload.wikimedia.org/wikipedia/commons/0/0c/IIM_Ranchi_Academic_Building.png",
-    },
-    NALSAR: {
-      title: "NALSAR",
-      location: "Hyderabad, Telangana",
-      picture:
-        "https://www.indcareer.com/files/notices/2015-03/nalsar-university-law-hyderabad.jpg",
-    },
-    IIFT: {
-      title: "IIFT",
-      location: "Multiple Locations",
-      picture:
-        "https://images.collegedunia.com/public/college_data/images/appImage/25453_IIFTD_NEW.jpg",
-    },
-    NIRMA: {
-      title: "NIRMA",
-      location: "Ahmedabad, Gujrat",
-      picture:
-        "https://nirmawebsite.s3.ap-south-1.amazonaws.com/wp-content/uploads/2022/07/Homepage-NU-950x732.jpg",
-    },
-    TAPMI: {
-      title: "TAPMI",
-      location: "Manipal, Karnataka",
-      picture:
-        "https://www.tapmi.edu.in/wp-content/uploads/2018/04/Tapmi-Images09.jpg",
-    },
-  };
+  async function TestApi(a) {
+    setData(); setError();
+    if (!a) { setError("Please fill the form before predicting."); return; }
+    if (!a.fullname || !validateName(a.fullname)) { setError("Name is empty or invalid."); return; }
+    if (!a.category) { setError("Please select your category."); return; }
+    if (!a.gender) { setError("Please select your gender."); return; }
+    if (!a.phone || !validatePhone(a.phone)) { setError("Enter a valid 10-digit mobile number (no country code)."); return; }
+    if (!a.email || !validateEmail(a.email)) { setError("Enter a valid email address."); return; }
+    if (a.qa === undefined || a.qa === "") { setError("Please enter your QA marks."); return; }
+    if (a.sa === undefined || a.sa === "") { setError("Please enter your SA marks."); return; }
+    if (a.va === undefined || a.va === "") { setError("Please enter your VA marks."); return; }
 
-  function resetForm() {
-    setData();
-    setFormData();
+    setLoading(true);
+    submitLead(a);
+    try {
+      const response = await axios.post("/api/predictor", {
+        category: a.category, sa: a.sa, va: a.va, qa: a.qa,
+      });
+      cronberryTrigger(a.fullname, a.email, a.phone, "Not Specified", "https://register.ipmcareer.com/call");
+      setData(response?.data?.colleges);
+      if (response?.data?.colleges?.length > 0) {
+        setIsVisible(true);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
+      }
+    } catch (e) {}
+    setLoading(false);
   }
 
   const router = useRouter();
-  useEffect(() => {
-    if (router?.query?.live) {
-      setLive(router.query.live);
-    }
-  }, [router]);
   const [live, setLive] = useState(true);
-  const handleScrollTop = () => {
-    // Scroll to the top of the scrollable div
-    scrolldiv.current.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+  useEffect(() => {
+    if (router?.query?.live) setLive(router.query.live);
+  }, [router]);
+
+  const updateField = (key, value) => {
+    setError();
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
+
+  if (!live) {
+    return (
+      <div className={st.mainholder}>
+        <div className={st.logo}><img src="/hd-logo.svg" /></div>
+        <h1>IPMAT Call Predictor Launching Soon</h1>
+        <h2>Please Come Back Later</h2>
+        <Timer />
+      </div>
+    );
+  }
+
   return (
     <>
-      {live ? (
-        <div className={styles.mainholder}>
-          <Head>
-            <link rel="icon" href={"/favicon_ipm.svg"} />
-          </Head>
-          {isVisible ? <Confetti></Confetti> : ""}
+      <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
+      <Head><link rel="icon" href="/favicon_ipm.svg" /></Head>
+      <NextSeo
+        title="IPMAT Call Predictor - Best & Easy to Use Predictor"
+        description="IPMAT Call Predictor is a tool for IPMAT Aspirants to analyse their profile and explore their chances of landing an admission in IIM or equivalent colleges."
+        canonical="https://register.ipmcareer.com/call"
+        openGraph={{
+          url: "https://register.ipmcareer.com/call",
+          title: "IPMAT Call Predictor - Best & Easy to Use Predictor",
+          description: "IPMAT Call Predictor for IIM admissions.",
+          images: [{ url: "/callpred.jpg", width: 1200, height: 630, alt: "IPMAT Call Predictor" }],
+        }}
+      />
+      {isVisible && <Confetti />}
 
-          <NextSeo
-            title="IPMAT Call Predictor - Best & Easy to Use Predictor"
-            description="IPMAT Call Predictor is a tool for IPMAT Aspirants using which they can analyse their profile and explore their chances of landing an admission in IIM or any equivalent colleges across India."
-            canonical="https://register.ipmcareer.com/call"
-            openGraph={{
-              url: "https://register.ipmcareer.com/call",
-              title: "IPMAT Call Predictor - Best & Easy to Use Predictor",
-              description:
-                "IPMAT Call Predictor is a tool for IPMAT Aspirants using which they can analyse their profile and explore their chances of landing an admission in IIM or any equivalent colleges across India.",
-              images: [
-                {
-                  url: "/callpred.jpg",
-                  width: 1200,
-                  height: 630,
-                  alt: "IPMAT Call Predictor Tool",
-                },
-              ],
-            }}
-          ></NextSeo>
+      <div className="cp-root">
+        <div className="cp-hero">
 
-          <div className={styles.semi}></div>
-          <div className={styles.inputsholder}>
-            <div className={styles.logo}>
-              <img src="/hd-logo.svg" />
-            </div>
-            <p className={styles.callpara}>Welcome to our</p>
-            <h2 className={styles.callheading + " font-bold"}>
-              IPMAT
-              <br />
-              <div className="w-full text-black max-h-[0px] pointer-events-none text-xs overflow-hidden text">
-                <Content></Content>
-              </div>
-              <span className={styles.col2}>Call Predictor</span>
-            </h2>
-            <div className={styles.inputs} ref={scrolldiv}>
-              {data ? (
-                <div className={styles.colleges}>
-                  <div className={styles.empty}>
-                    {data && data.length == 0 ? (
-                      <div>
-                        <img src="/cry.gif" />
-                        <h2>
-                          As per your submitted data, We couldn't find any
-                          college you are likely to get a call from.
-                        </h2>
-                        <h1>
-                          But You would get a Call from IPM Careers to help you
-                          prepare better for your next attempt.
-                        </h1>
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                  {data && data.length > 0 ? (
-                    <div>
-                      <Spacer y={4}></Spacer>
-                      <h1 className={styles.congrats + " !text-2xl font-bold"}>
-                        YAY !! Congratulations , You are likely to get{" "}
-                        {data.length > 1 ? "" : "a"} call
-                        {data.length > 1 ? "s" : ""} from{" "}
-                        {data.length > 1 ? data.length : "a"} College
-                        {data.length > 1 ? "s" : ""} listed below.
-                      </h1>
-                      <p className="font-medium text-lg mt-2">
-                        IPM Career Congratulates you for your Hard Work &
-                        Success.
-                      </p>
-                      <Spacer y={4}></Spacer>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                  {data &&
-                    data.map((i, d) => {
-                      const c = collegesData[i];
-                      return (
-                        <div className={styles.card}>
-                          <img src={c.picture} />
+          {/* LEFT PANEL */}
+          <div className="cp-left" ref={scrolldiv}>
+            <img src="/hd-logo.svg" className="cp-logo" alt="IPM Careers" />
 
-                          <div className={styles.cardcontent}>
-                            <h3 className="text-2xl font-bold">{c.title}</h3>
-                            <p className="!text-sm !font-medium">
-                              Location : {c.location}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
+            {!data ? (
+              <>
+                <p className="cp-eyebrow">Free Tool · AI Powered</p>
+                <h1 className="cp-heading">IPMAT<br /><span>Call Predictor</span></h1>
+                <p className="cp-subheading">
+                  Enter your scores and profile to instantly find out which IIMs and top colleges are likely to call you for admission.
+                </p>
+
+                <div className="cp-counter">
+                  <div className="cp-counter-dot"></div>
+                  <span><strong>{count}+</strong> students predicted their call</span>
                 </div>
-              ) : (
-                <>
-                  {inputs &&
-                    inputs.map((i, d) => {
-                      if (
-                        i.type == "text" ||
-                        i.type == "number" ||
-                        i.type == "email" ||
-                        i.type == "tel"
-                      ) {
-                        return (
-                          <div
-                            style={{ animationDelay: `${(d + 1) * 100}ms` }}
-                            className={styles.animate}
-                          >
-                            <Input
-                              placeholder={i.placeholder}
-                              label={i.label}
-                              className="my-2"
-                              type={i.type}
-                              name={i.name}
-                              id={i.name}
-                              onChange={(e) => {
-                                setError(),
-                                  setFormData((res) => ({
-                                    ...res,
-                                    [i.key]: e.target.value,
-                                  }));
-                              }}
-                            ></Input>
-                          </div>
-                        );
-                      } else if (i.type == "select") {
-                        return (
-                          <div
-                            style={{ animationDelay: `${(d + 1) * 100}ms` }}
-                            className={styles.animate}
-                          >
-                            <Select
-                              placeholder={i.placeholder}
-                              className="my-2"
-                              label={i.label}
-                              onChange={(e) => {
-                                setError(),
-                                  setFormData((res) => ({
-                                    ...res,
-                                    [i.key]: e.target.value,
-                                  }));
-                              }}
-                            >
-                              {i.objects &&
-                                i.objects.map((z, v) => {
-                                  return (
-                                    <SelectItem key={z.value} value={z.value}>
-                                      {z.title}
-                                    </SelectItem>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        );
-                      }
-                    })}
-                </>
-              )}
-            </div>
-            <div className={styles.buttonsection}>
-              <div className={styles.counter}>
-                <Marquee speed={80} gradient={false}>
-                  {count}+ Students have already predicted their call. &nbsp;
-                  &nbsp; &nbsp;
-                  {count}+ Students have already predicted their call.
+
+                <div className="cp-form">
+                  <div className="cp-field">
+                    <label className="cp-label">Full Name</label>
+                    <input className="cp-input" placeholder="e.g. Rahul Sharma" type="text"
+                      onChange={(e) => updateField("fullname", e.target.value)} />
+                  </div>
+
+                  <div className="cp-row">
+                    <div className="cp-field">
+                      <label className="cp-label">Category</label>
+                      <select className="cp-select" onChange={(e) => updateField("category", e.target.value)}>
+                        <option value="">Select</option>
+                        {categories.map((c) => <option key={c.value} value={c.value}>{c.title}</option>)}
+                      </select>
+                    </div>
+                    <div className="cp-field">
+                      <label className="cp-label">Gender</label>
+                      <select className="cp-select" onChange={(e) => updateField("gender", e.target.value)}>
+                        <option value="">Select</option>
+                        {genders.map((g) => <option key={g.value} value={g.value}>{g.title}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="cp-row">
+                    <div className="cp-field">
+                      <label className="cp-label">Mobile Number</label>
+                      <input className="cp-input" placeholder="10-digit number" type="tel"
+                        onChange={(e) => updateField("phone", e.target.value)} />
+                    </div>
+                    <div className="cp-field">
+                      <label className="cp-label">Email Address</label>
+                      <input className="cp-input" placeholder="you@email.com" type="email"
+                        onChange={(e) => updateField("email", e.target.value)} />
+                    </div>
+                  </div>
+
+                  <div className="cp-marks-divider">
+                    <p className="cp-marks-title">Your IPMAT Scores</p>
+                    <div className="cp-marks-row">
+                      <div className="cp-field">
+                        <label className="cp-label">QA (MCQ)</label>
+                        <input className="cp-input" placeholder="0–100" type="number" min="0" max="100"
+                          onChange={(e) => updateField("qa", e.target.value)} />
+                      </div>
+                      <div className="cp-field">
+                        <label className="cp-label">QA (SA)</label>
+                        <input className="cp-input" placeholder="0–100" type="number" min="0" max="100"
+                          onChange={(e) => updateField("sa", e.target.value)} />
+                      </div>
+                      <div className="cp-field">
+                        <label className="cp-label">Verbal (VA)</label>
+                        <input className="cp-input" placeholder="0–100" type="number" min="0" max="100"
+                          onChange={(e) => updateField("va", e.target.value)} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {error && <div className="cp-error">{error}</div>}
+
+                  <button className="cp-btn" onClick={() => TestApi(formData)} disabled={loading}>
+                    {loading ? (
+                      <div className="cp-spinner"></div>
+                    ) : (
+                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="white" />
+                      </svg>
+                    )}
+                    {loading ? "Predicting..." : "Predict My Calls"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="cp-results">
+                {data.length === 0 ? (
+                  <div className="cp-no-result">
+                    <img src="/cry.gif" alt="sad" />
+                    <h2>No calls predicted</h2>
+                    <p>Based on your scores, we couldn't match any college cutoffs. But don't worry — IPM Careers will reach out to help you prepare better!</p>
+                  </div>
+                ) : (
+                  <div className="cp-results-header">
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#F0E0F4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🎉</div>
+                      <div>
+                        <p className="cp-congrats">You may get {data.length} call{data.length > 1 ? "s" : ""}!</p>
+                        <p className="cp-congrats-sub">IPM Careers congratulates you on your hard work</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="cp-college-grid">
+                  {data.map((name, idx) => {
+                    const c = collegesData[name];
+                    if (!c) return null;
+                    return (
+                      <div className="cp-college-card" key={name} style={{ animationDelay: `${idx * 80}ms` }}>
+                        <img className="cp-college-img" src={c.picture} alt={c.title}
+                          onError={(e) => { e.target.src = "https://via.placeholder.com/50x50/F0E0F4/833589?text=IIM"; }} />
+                        <div style={{ flex: 1 }}>
+                          <div className="cp-college-name">{c.title}</div>
+                          <div className="cp-college-loc">📍 {c.location}</div>
+                        </div>
+                        <div className="cp-college-badge">Likely Call</div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button className="cp-btn cp-btn-secondary"
+                  onClick={() => { setData(); setFormData({}); setIsVisible(false); }}>
+                  ↩ Predict Again
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div className="cp-right">
+            <div className="cp-right-inner">
+              <p className="cp-right-title">Featured in</p>
+              <div className="cp-images-col">
+                <Marquee autoFill speed={40} gradient={false} direction="left">
+                  {images.map((i, d) => <img key={d} src={i} className="cp-marquee-img" alt="" />)}
+                </Marquee>
+                <Marquee autoFill speed={30} gradient={false} direction="right">
+                  {images.map((i, d) => <img key={d} src={i} className="cp-marquee-img" alt="" />)}
+                </Marquee>
+                <Marquee autoFill speed={50} gradient={false} direction="left">
+                  {images.map((i, d) => <img key={d} src={i} className="cp-marquee-img" alt="" />)}
+                </Marquee>
+                <Marquee autoFill speed={35} gradient={false} direction="right">
+                  {images.map((i, d) => <img key={d} src={i} className="cp-marquee-img" alt="" />)}
                 </Marquee>
               </div>
-              {error ? <p className={styles.error}>{error}</p> : ""}
-              <button
-                className="mt-3"
-                onClick={() => {
-                  data ? resetForm() : TestApi(formData);
-                }}
-              >
-                {!data && !loading ? (
-                  <svg
-                    fill="#000000"
-                    height="16px"
-                    width="16px"
-                    version="1.1"
-                    id="Capa_1"
-                    viewBox="0 0 296.789 296.789"
-                  >
-                    <g>
-                      <path d="M55.093,110.761l6.544,17.743c0.246,0.668,0.882,1.111,1.593,1.111c0.711,0,1.347-0.443,1.593-1.111l6.544-17.743   c5.297-14.364,16.62-25.687,30.983-30.983l17.743-6.544c0.667-0.246,1.11-0.882,1.11-1.593c0-0.711-0.443-1.347-1.11-1.593   l-17.744-6.544c-14.363-5.297-25.686-16.619-30.982-30.982l-6.544-17.743c-0.246-0.667-0.882-1.11-1.593-1.11   c-0.711,0-1.347,0.443-1.593,1.11l-6.544,17.743C49.796,46.885,38.474,58.207,24.11,63.504L6.366,70.048   c-0.667,0.246-1.11,0.882-1.11,1.593c0,0.711,0.443,1.347,1.11,1.593l17.743,6.544C38.473,85.074,49.796,96.396,55.093,110.761z" />
-                      <path d="M198.948,185.703l-17.742-6.543c-14.364-5.297-25.687-16.619-30.983-30.982l-6.544-17.743   c-0.246-0.667-0.882-1.11-1.593-1.11c-0.711,0-1.347,0.443-1.593,1.11l-6.544,17.742c-5.297,14.364-16.62,25.686-30.983,30.983   l-17.743,6.543c-0.667,0.246-1.11,0.882-1.11,1.593c0,0.711,0.443,1.347,1.11,1.593l17.744,6.545   c14.363,5.297,25.685,16.619,30.982,30.982l6.544,17.744c0.246,0.667,0.882,1.11,1.593,1.11c0.711,0,1.347-0.443,1.593-1.11   l6.544-17.744c5.297-14.363,16.619-25.686,30.982-30.982l17.744-6.545c0.667-0.246,1.11-0.882,1.11-1.593   C200.059,186.585,199.615,185.949,198.948,185.703z" />
-                      <path d="M290.778,109.811l-12.059-4.447c-9.761-3.6-17.456-11.295-21.056-21.056l-4.447-12.058c-0.168-0.453-0.6-0.755-1.083-0.755   c-0.483,0-0.915,0.302-1.083,0.755l-4.446,12.057c-3.6,9.762-11.295,17.457-21.057,21.057l-12.058,4.447   c-0.453,0.167-0.755,0.599-0.755,1.082s0.302,0.916,0.755,1.083l12.059,4.446c9.761,3.601,17.456,11.296,21.056,21.057l4.446,12.06   c0.168,0.453,0.6,0.755,1.083,0.755c0.483,0,0.915-0.302,1.083-0.755l4.447-12.06c3.6-9.762,11.294-17.456,21.056-21.056   l12.059-4.447c0.453-0.167,0.755-0.6,0.755-1.083S291.231,109.978,290.778,109.811z" />
-                      <path d="M261.567,268.552l-8.412-3.103c-6.809-2.511-12.176-7.878-14.687-14.686l-3.103-8.41c-0.116-0.316-0.418-0.526-0.755-0.526   s-0.639,0.21-0.755,0.526l-3.103,8.41c-2.511,6.809-7.878,12.176-14.686,14.686l-8.412,3.103c-0.316,0.116-0.526,0.418-0.526,0.755   c0,0.337,0.21,0.639,0.526,0.755l8.411,3.103c6.81,2.511,12.177,7.879,14.688,14.688l3.103,8.411   c0.116,0.316,0.418,0.526,0.755,0.526s0.639-0.21,0.755-0.526l3.103-8.411c2.511-6.809,7.878-12.177,14.688-14.688l8.411-3.103   c0.316-0.116,0.526-0.418,0.526-0.755C262.094,268.97,261.884,268.668,261.567,268.552z" />
-                      <path d="M199.533,26.726l-8.412-3.102c-6.809-2.511-12.176-7.878-14.686-14.687l-3.103-8.41C173.216,0.21,172.914,0,172.577,0   c-0.337,0-0.639,0.21-0.755,0.526l-3.102,8.409c-2.511,6.809-7.879,12.177-14.688,14.688l-8.412,3.102   c-0.316,0.116-0.526,0.418-0.526,0.755c0,0.337,0.21,0.639,0.526,0.755l8.411,3.103c6.81,2.511,12.178,7.879,14.689,14.689   l3.102,8.41c0.116,0.316,0.418,0.526,0.755,0.526c0.337,0,0.639-0.21,0.755-0.526l3.103-8.411   c2.511-6.81,7.878-12.177,14.688-14.687l8.411-3.103c0.316-0.116,0.526-0.418,0.526-0.755   C200.06,27.144,199.85,26.842,199.533,26.726z" />
-                      <path d="M96.359,251.26l-10.58-3.9c-8.564-3.158-15.316-9.91-18.476-18.475l-3.901-10.58c-0.147-0.397-0.526-0.662-0.95-0.662   c-0.424,0-0.803,0.265-0.95,0.662l-3.901,10.579c-3.158,8.565-9.91,15.317-18.476,18.476l-10.578,3.9   c-0.399,0.146-0.662,0.526-0.662,0.95c0,0.424,0.264,0.804,0.662,0.95l10.579,3.902c8.564,3.158,15.316,9.91,18.475,18.475   l3.901,10.58c0.147,0.398,0.526,0.662,0.95,0.662c0.424,0,0.804-0.264,0.95-0.662l3.902-10.581   c3.158-8.564,9.909-15.315,18.474-18.474l10.581-3.902c0.398-0.146,0.662-0.526,0.662-0.95   C97.021,251.786,96.758,251.406,96.359,251.26z" />
-                    </g>
-                  </svg>
-                ) : (
-                  ""
-                )}
-                {loading ? (
-                  <svg
-                    className="spinner"
-                    fill="white"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
-                    <g class="spinner_OSmW">
-                      <rect x="11" y="1" width="2" height="5" opacity=".14" />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(30 12 12)"
-                        opacity=".29"
-                      />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(60 12 12)"
-                        opacity=".43"
-                      />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(90 12 12)"
-                        opacity=".57"
-                      />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(120 12 12)"
-                        opacity=".71"
-                      />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(150 12 12)"
-                        opacity=".86"
-                      />
-                      <rect
-                        x="11"
-                        y="1"
-                        width="2"
-                        height="5"
-                        transform="rotate(180 12 12)"
-                      />
-                    </g>
-                  </svg>
-                ) : (
-                  ""
-                )}
-                {data ? "Predict Again" : "Predict Now"}
-              </button>
+              <div className="cp-promo">
+                <h2>Special PI Batch</h2>
+                <p>Ace your IPMAT Personal Interview with expert guidance.</p>
+                <a href="https://register.ipmcareer.com/pi-batch">Enroll Now @ ₹99 →</a>
+              </div>
             </div>
           </div>
-          <div className={styles.featuredmedia}>
-            <div className={styles.media}>
-              <Marquee autoFill={true} delay={-1} speed={80} gradient={false}>
-                {images &&
-                  images.map((i, d) => {
-                    return <img src={i} />;
-                  })}
-              </Marquee>
-              <Marquee autoFill={true} delay={-3} speed={80} gradient={false}>
-                {images &&
-                  images.map((i, d) => {
-                    return <img src={i} />;
-                  })}
-              </Marquee>
-              <Marquee autoFill={true} delay={-5} speed={80} gradient={false}>
-                {images &&
-                  images.map((i, d) => {
-                    return <img src={i} />;
-                  })}
-              </Marquee>
-              <Marquee autoFill={true} speed={80} gradient={false}>
-                {images &&
-                  images.map((i, d) => {
-                    return <img src={i} />;
-                  })}
-              </Marquee>
-              <Marquee autoFill={true} speed={80} gradient={false}>
-                {images &&
-                  images.map((i, d) => {
-                    return <img src={i} />;
-                  })}
-              </Marquee>
-            </div>
-            <div className={styles.mediashadow}></div>
-            <div className={styles.featured_content}>
-              <h2>Special PI Batch</h2>
-              <p>for your IPMAT Personal Interview Preparation.</p>
-              <a href="https://register.ipmcareer.com/pi-batch">
-                Enroll Now @₹99
-              </a>
-            </div>
-          </div>
+
         </div>
-      ) : (
-        <div className={st.mainholder}>
-          <div className={st.logo}>
-            <img src="/hd-logo.svg" />
-          </div>
-          <h1>IPMAT Call Predictor Launching Soon</h1>
-          <h2>Please Come Back Later</h2>
-          <Timer />
-        </div>
-      )}{" "}
+      </div>
     </>
   );
 }
-
-const Content = () => {
-  return (
-    <>
-      <p>
-        <strong>IPM Call Predictor</strong>
-      </p>
-      <p>
-        The IPM Call Predictor is one of the most important tools for
-        determining the college into which you can be admitted after passing the
-        entrance exam.
-      </p>
-      <p>
-        The fundamental idea behind this call predictor is to estimate the
-        likelihood that a candidate with a specific rank and exam score will be
-        accepted into a particular college.
-      </p>
-      <p>
-        <strong>
-          IPM Careers has developed BEST IPMAT/IPM Prediction Tool so far
-        </strong>
-        <br />
-        &nbsp;
-      </p>
-      <p>
-        <strong>Do you know?</strong>&nbsp;
-      </p>
-      <p>
-        <br />
-        An IPMAT Aspirant dives into his/her IPMAT preparation without knowing
-        various possibilities and the selection criteria of an IIM Call. IPM
-        Careers has created an AI Based Profile Calculator called the IPM Call
-        Predictor in order to assist them in learning their chances of receiving
-        an IIM Call based on their target IPMAT Score and Profile using the data
-        gathered over years of experience.
-      </p>
-      <p>
-        Set a target percentile for yourself for your IPMAT preparation so that
-        you can get into the IIM of your dreams.
-      </p>
-      <p>
-        <strong>
-          &nbsp;IPM Call Predictor offers common answers to inquiries like:
-        </strong>
-      </p>
-      <ul>
-        <li>With my current profile, can I expect a call from IIMs?</li>
-        <li>How much do I need to score in order to get into my ideal IIM?</li>
-        <li>
-          Will IIMs call me based on my current profile and score, even though
-          it's high?
-        </li>
-      </ul>
-      <p>
-        <strong>HOW THE IPM CALL PREDICTOR WORKS</strong>
-      </p>
-      <p>&nbsp;</p>
-      <p>
-        Each IIM has its own distinct set of admissions requirements. This
-        selection criteria is the culmination of a number of variables that were
-        taken into account. Here is a list of a few of those elements:
-      </p>
-      <ul>
-        <li>
-          Your Class X, Class XII, Graduation, and/or Post-Graduation Grades in
-          the Past
-        </li>
-        <li>Category/ Sub Category</li>
-        <li>Gender Diversity</li>
-        <li>College Stream Diversity</li>
-        <li>IPMAT Score</li>
-      </ul>
-      <p>
-        IPM Call Predictor gives you almost accurate prediction of the IIM call
-        you will receive based on the aforementioned criteria because it has
-        been equipped with the selection criteria of IIMs. The IPM Call
-        Predictor analyses your profile parameters and compares it with the
-        selection criteria of IIMs and provides you the list of IIMs about your
-        chances of getting a call and the IPMAT Score required for the
-        same.&nbsp;
-      </p>
-      <p>&nbsp;</p>
-      <p>
-        <strong>IPM Call Predictor: IIM Indore</strong>
-      </p>
-      <p>
-        The cutoff score announced by the appropriate authorities should always
-        be the benchmark that candidates compare their final score to.
-      </p>
-      <p>
-        The IPM call predictor will determine who gets an admissions offer if
-        their tentative marks are higher than the minimum cutoff required for
-        their category.
-      </p>
-      <figure className="table">
-        <table className="ck-table-resized">
-          <colgroup>
-            <col style={{ width: "25%" }} />
-            <col style={{ width: "25%" }} />
-            <col style={{ width: "25%" }} />
-            <col style={{ width: "25%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td>Category</td>
-              <td>QA</td>
-              <td>MCQ</td>
-              <td>SA</td>
-            </tr>
-            <tr>
-              <td>GEN</td>
-              <td>24</td>
-              <td>35</td>
-              <td>130</td>
-            </tr>
-            <tr>
-              <td>EWS</td>
-              <td>16</td>
-              <td>23</td>
-              <td>90</td>
-            </tr>
-            <tr>
-              <td>OBC</td>
-              <td>12</td>
-              <td>22</td>
-              <td>70</td>
-            </tr>
-            <tr>
-              <td>SC</td>
-              <td>4</td>
-              <td>12</td>
-              <td>60</td>
-            </tr>
-            <tr>
-              <td>ST</td>
-              <td>4</td>
-              <td>7</td>
-              <td>30</td>
-            </tr>
-            <tr>
-              <td>PwD</td>
-              <td>8</td>
-              <td>17</td>
-              <td>65</td>
-            </tr>
-          </tbody>
-        </table>
-      </figure>
-      <p>
-        <strong>IPM Call Predictor: IIM Rohtak</strong>
-      </p>
-      <p>
-        Candidates should compare their scores with their scorecards in order to
-        determine whether they have a chance of receiving a final admission to
-        the college according to the IPM call predictor.
-      </p>
-      <p>
-        It is important to keep in mind the cutoff scores from the previous
-        year, which we have already mentioned.&nbsp;
-      </p>
-      <figure className="table">
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <strong>Category</strong>
-              </td>
-              <td>
-                <strong>IPMAT Rohtak Cut Off</strong>
-              </td>
-            </tr>
-            <tr>
-              <td>General</td>
-              <td>368</td>
-            </tr>
-            <tr>
-              <td>NC-OBC</td>
-              <td>314</td>
-            </tr>
-            <tr>
-              <td>SC</td>
-              <td>274</td>
-            </tr>
-            <tr>
-              <td>ST</td>
-              <td>201</td>
-            </tr>
-            <tr>
-              <td>EWS</td>
-              <td>338</td>
-            </tr>
-            <tr>
-              <td>PwD</td>
-              <td>185</td>
-            </tr>
-          </tbody>
-        </table>
-      </figure>
-      <p>
-        <br />
-        &nbsp;
-      </p>
-      <p>&nbsp;</p>
-      <p>
-        <strong>How to Use IPM Call Predictor?</strong>
-      </p>
-      <p>
-        The IPM Call Predictor is a crucial tool for determining a candidate's
-        eligibility for admission to the desired college as well as information
-        about the college.&nbsp;
-      </p>
-      <p>
-        It is advantageous to have a predetermined understanding of the top
-        universities so that a candidate is admitted.
-      </p>
-      <p>Refer to the steps listed here to predict the IIM Call getting:</p>
-      <ul>
-        <li>
-          Click on the link-{" "}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://register.ipmcareer.com/call"
-          >
-            <span style={{ color: "#ffcc00" }}>
-              https://register.ipmcareer.com/call
-            </span>
-          </a>
-        </li>
-        <li>IPM Call Predictor page will appear.</li>
-        <li>
-          Fill in the information asked like Full Name, Age, Select your
-          category, and select your gender and Mobile Number.
-        </li>
-        <li>Click on 'Predict Now'.</li>
-      </ul>
-      <p>
-        <strong>Conclusion&nbsp;</strong>
-      </p>
-      <p>
-        The IPM Call Predictor aids applicants in estimating their likelihood of
-        admission (IIM).
-      </p>
-      <p>
-        <br />
-        To calculate the likelihood of admission, the candidate's profile and
-        the cut-off from the previous year are considered.
-      </p>
-      <p>
-        <br />
-        It also offers details on the colleges, the cut-off, the placement
-        opportunities, and other relevant data. Students can effectively learn
-        about the admissions process and use it to inform their decisions.
-      </p>
-    </>
-  );
-};
 
 export default Call;
