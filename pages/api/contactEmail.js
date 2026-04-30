@@ -1,4 +1,10 @@
-import nodemailer from "nodemailer";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -7,55 +13,24 @@ export default async function handler(req, res) {
 
   const { fullname, email, phone, year, city } = req.body;
 
-  const config = {
-    server: process.env.ZEPTOMAIL_SERVER || "smtp.zeptomail.in",
-    port: 465,
-    username: "emailapikey",
-    password: process.env.ZEPTOMAIL_API_KEY,
-    from: process.env.MAIL_FROM_NOREPLY || "noreply@ipmcareer.com",
-  };
-
-  const transporter = nodemailer.createTransport({
-    port: config.port,
-    host: config.server,
-    auth: {
-      user: config.username,
-      pass: config.password,
-    },
-    secure: true,
-  });
-
-  const mailData = {
-    from: {
-      name: "IPM Careers Contact Form",
-      address: config.from,
-    },
-    to: "ipmcareeronline@gmail.com",
-    subject: "New Contact Submission from Landing Page",
-    text: `
-New submission received:
-
-Name: ${fullname}
-Email: ${email}
-Phone: ${phone}
-Year: ${year}
-City: ${city}
-    `,
-    html: `
-      <h2>New Contact Submission</h2>
-      <p><strong>Name:</strong> ${fullname}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>Year:</strong> ${year}</p>
-      <p><strong>City:</strong> ${city}</p>
-    `,
-  };
-
-  try {
-    await transporter.sendMail(mailData);
-    return res.status(200).json({ msg: "Email sent successfully" });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Failed to send email" });
+  if (!fullname || !email || !phone) {
+    return res.status(400).json({ error: "Missing required fields" });
   }
+
+  const { error } = await supabase.from("landing_leads").insert([
+    {
+      fullname,
+      email,
+      phone,
+      year: year || null,
+      city: city || null,
+    },
+  ]);
+
+  if (error) {
+    console.error("Supabase insert error:", error);
+    return res.status(500).json({ error: "Failed to save submission" });
+  }
+
+  return res.status(200).json({ msg: "Submitted successfully" });
 }
