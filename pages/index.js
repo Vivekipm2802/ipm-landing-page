@@ -466,7 +466,7 @@ export default function Home() {
       email: formData.email,
       phone: formData.phone,
       city: formData.city,
-      year: formData.year,
+      class: formData.year,
       source: "IPM Register Page",
     });
     if (!error) {

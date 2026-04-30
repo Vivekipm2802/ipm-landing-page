@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       name: fullname,
       email,
       phone,
-      year: year || null,
+      class: year || null,
       city: city || null,
       source: "IPM Register Page",
     },
