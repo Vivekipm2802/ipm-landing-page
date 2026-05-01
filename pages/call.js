@@ -9,9 +9,9 @@ import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
 import "tailwindcss/tailwind.css";
 import Confetti from "../components/CanvasCofetti";
+import AppShell from "../components/AppShell";
 
 const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
   .cp-root * { box-sizing: border-box; }
   .cp-root {
@@ -384,12 +384,14 @@ function Call() {
       title: "IIM Indore",
       location: "Indore, Madhya Pradesh",
       // Wikimedia Commons - confirmed working
-     picture: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/IIM_Indore_pano.jpg/1200px-IIM_Indore_pano.jpg",
+      picture:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/IIM_Indore_pano.jpg/1200px-IIM_Indore_pano.jpg",
     },
     "IIM Rohtak": {
       title: "IIM Rohtak",
       location: "Rohtak, Haryana",
-      picture: "https://images.collegedunia.com/public/college_data/images/appImage/1498036347IIM_Ranchi.jpg",
+      picture:
+        "https://images.collegedunia.com/public/college_data/images/appImage/1498036347IIM_Ranchi.jpg",
     },
     "IIM Ranchi": {
       title: "IIM Ranchi",
@@ -631,6 +633,142 @@ function Call() {
       </div>
     );
   }
+  if (data) {
+    return (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
+        <Head>
+          <link rel="icon" href="/favicon_ipm.svg" />
+        </Head>
+        <NextSeo
+          title="IPMAT Call Predictor - Best & Easy to Use Predictor"
+          description="IPMAT Call Predictor is a tool for IPMAT Aspirants to analyse their profile and explore their chances of landing an admission in IIM or equivalent colleges."
+          canonical="https://register.ipmcareer.com/call"
+          openGraph={{
+            url: "https://register.ipmcareer.com/call",
+            title: "IPMAT Call Predictor - Best & Easy to Use Predictor",
+            description: "IPMAT Call Predictor for IIM admissions.",
+            images: [
+              {
+                url: "/callpred.jpg",
+                width: 1200,
+                height: 630,
+                alt: "IPMAT Call Predictor",
+              },
+            ],
+          }}
+        />
+        {isVisible && <Confetti />}
+        <AppShell activePage="/call">
+          <div className="cp-root">
+            <div className="cp-hero cp-hero-results">
+              <div className="cp-left">
+                <div className="cp-results">
+                  {data.length === 0 ? (
+                    <div className="cp-no-result">
+                      <img src="/cry.gif" alt="sad" />
+                      <h2>No calls predicted</h2>
+                      <p>
+                        Based on your scores, we couldn't match any college
+                        cutoffs. But don't worry — IPM Careers will reach out to
+                        help you prepare better!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="cp-results-header">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          marginBottom: 16,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 12,
+                            background: "#F0E0F4",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 22,
+                          }}
+                        >
+                          🎉
+                        </div>
+                        <div>
+                          <p className="cp-congrats">
+                            You may get {data.length} call
+                            {data.length > 1 ? "s" : ""}!
+                          </p>
+                          <p className="cp-congrats-sub">
+                            IPM Careers congratulates you on your hard work
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="cp-college-grid">
+                    {data.map((name, idx) => {
+                      const c = collegesData[name];
+                      if (!c) return null;
+                      return (
+                        <div
+                          className="cp-college-card"
+                          key={name}
+                          style={{ animationDelay: `${idx * 80}ms` }}
+                        >
+                          <img
+                            className="cp-college-img"
+                            src={c.picture}
+                            alt={c.title}
+                            onError={(e) => {
+                              e.target.src =
+                                "https://via.placeholder.com/50x50/F0E0F4/833589?text=IIM";
+                            }}
+                          />
+                          <div className="cp-college-name">{c.title}</div>
+                          <div className="cp-college-loc">📍 {c.location}</div>
+                          <div className="cp-college-badge">Likely Call</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div
+                    className="cp-promo"
+                    style={{ margin: "0 0 16px", borderRadius: 14 }}
+                  >
+                    <h2>Special PI Batch</h2>
+                    <p>
+                      Ace your IPMAT Personal Interview with expert guidance.
+                    </p>
+                    <a href="https://register.ipmcareer.com/pi-batch">
+                      Enroll Now @ ₹99 →
+                    </a>
+                  </div>
+
+                  <button
+                    className="cp-btn cp-btn-secondary"
+                    onClick={() => {
+                      setData();
+                      setFormData({});
+                      setIsVisible(false);
+                    }}
+                  >
+                    ↩ Predict Again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </AppShell>
+      </>
+    );
+  }
 
   return (
     <>
@@ -659,261 +797,151 @@ function Call() {
       {isVisible && <Confetti />}
 
       <div className="cp-root">
-        <div className={`cp-hero${data ? " cp-hero-results" : ""}`}>
+        <div className="cp-hero">
           {/* LEFT PANEL */}
           <div className="cp-left" ref={scrolldiv}>
             <img src="/hd-logo.svg" className="cp-logo" alt="IPM Careers" />
 
-            {!data ? (
-              <>
-                <p className="cp-eyebrow">Free Tool · AI Powered</p>
-                <h1 className="cp-heading">
-                  IPMAT
-                  <br />
-                  <span>Call Predictor</span>
-                </h1>
-                <p className="cp-subheading">
-                  Enter your scores and profile to instantly find out which IIMs
-                  and top colleges are likely to call you for admission.
-                </p>
+            <p className="cp-eyebrow">Free Tool · AI Powered</p>
+            <h1 className="cp-heading">
+              IPMAT
+              <br />
+              <span>Call Predictor</span>
+            </h1>
+            <p className="cp-subheading">
+              Enter your scores and profile to instantly find out which IIMs and
+              top colleges are likely to call you for admission.
+            </p>
 
-                <div className="cp-counter">
-                  <div className="cp-counter-dot"></div>
-                  <span>
-                    <strong>{count}+</strong> students predicted their call
-                  </span>
+            <div className="cp-counter">
+              <div className="cp-counter-dot"></div>
+              <span>
+                <strong>{count}+</strong> students predicted their call
+              </span>
+            </div>
+
+            <div className="cp-form">
+              <div className="cp-field">
+                <label className="cp-label">Full Name</label>
+                <input
+                  className="cp-input"
+                  placeholder="Write your Name"
+                  type="text"
+                  onChange={(e) => updateField("fullname", e.target.value)}
+                />
+              </div>
+
+              <div className="cp-row">
+                <div className="cp-field">
+                  <label className="cp-label">Category</label>
+                  <select
+                    className="cp-select"
+                    onChange={(e) => updateField("category", e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    {categories.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+                <div className="cp-field">
+                  <label className="cp-label">Gender</label>
+                  <select
+                    className="cp-select"
+                    onChange={(e) => updateField("gender", e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    {genders.map((g) => (
+                      <option key={g.value} value={g.value}>
+                        {g.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-                <div className="cp-form">
+              <div className="cp-row">
+                <div className="cp-field">
+                  <label className="cp-label">Mobile Number</label>
+                  <input
+                    className="cp-input"
+                    placeholder="10-digit number"
+                    type="tel"
+                    onChange={(e) => updateField("phone", e.target.value)}
+                  />
+                </div>
+                <div className="cp-field">
+                  <label className="cp-label">Email Address</label>
+                  <input
+                    className="cp-input"
+                    placeholder="you@email.com"
+                    type="email"
+                    onChange={(e) => updateField("email", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="cp-marks-divider">
+                <p className="cp-marks-title">Your IPMAT Scores</p>
+                <div className="cp-marks-row">
                   <div className="cp-field">
-                    <label className="cp-label">Full Name</label>
+                    <label className="cp-label">QA (MCQ)</label>
                     <input
                       className="cp-input"
-                      placeholder="e.g. Rahul Sharma"
-                      type="text"
-                      onChange={(e) => updateField("fullname", e.target.value)}
+                      placeholder="0–100"
+                      type="number"
+                      min="0"
+                      max="100"
+                      onChange={(e) => updateField("qa", e.target.value)}
                     />
                   </div>
-
-                  <div className="cp-row">
-                    <div className="cp-field">
-                      <label className="cp-label">Category</label>
-                      <select
-                        className="cp-select"
-                        onChange={(e) =>
-                          updateField("category", e.target.value)
-                        }
-                      >
-                        <option value="">Select</option>
-                        {categories.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.title}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="cp-field">
-                      <label className="cp-label">Gender</label>
-                      <select
-                        className="cp-select"
-                        onChange={(e) => updateField("gender", e.target.value)}
-                      >
-                        <option value="">Select</option>
-                        {genders.map((g) => (
-                          <option key={g.value} value={g.value}>
-                            {g.title}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="cp-field">
+                    <label className="cp-label">QA (SA)</label>
+                    <input
+                      className="cp-input"
+                      placeholder="0–100"
+                      type="number"
+                      min="0"
+                      max="100"
+                      onChange={(e) => updateField("sa", e.target.value)}
+                    />
                   </div>
-
-                  <div className="cp-row">
-                    <div className="cp-field">
-                      <label className="cp-label">Mobile Number</label>
-                      <input
-                        className="cp-input"
-                        placeholder="10-digit number"
-                        type="tel"
-                        onChange={(e) => updateField("phone", e.target.value)}
-                      />
-                    </div>
-                    <div className="cp-field">
-                      <label className="cp-label">Email Address</label>
-                      <input
-                        className="cp-input"
-                        placeholder="you@email.com"
-                        type="email"
-                        onChange={(e) => updateField("email", e.target.value)}
-                      />
-                    </div>
+                  <div className="cp-field">
+                    <label className="cp-label">Verbal (VA)</label>
+                    <input
+                      className="cp-input"
+                      placeholder="0–100"
+                      type="number"
+                      min="0"
+                      max="100"
+                      onChange={(e) => updateField("va", e.target.value)}
+                    />
                   </div>
-
-                  <div className="cp-marks-divider">
-                    <p className="cp-marks-title">Your IPMAT Scores</p>
-                    <div className="cp-marks-row">
-                      <div className="cp-field">
-                        <label className="cp-label">QA (MCQ)</label>
-                        <input
-                          className="cp-input"
-                          placeholder="0–100"
-                          type="number"
-                          min="0"
-                          max="100"
-                          onChange={(e) => updateField("qa", e.target.value)}
-                        />
-                      </div>
-                      <div className="cp-field">
-                        <label className="cp-label">QA (SA)</label>
-                        <input
-                          className="cp-input"
-                          placeholder="0–100"
-                          type="number"
-                          min="0"
-                          max="100"
-                          onChange={(e) => updateField("sa", e.target.value)}
-                        />
-                      </div>
-                      <div className="cp-field">
-                        <label className="cp-label">Verbal (VA)</label>
-                        <input
-                          className="cp-input"
-                          placeholder="0–100"
-                          type="number"
-                          min="0"
-                          max="100"
-                          onChange={(e) => updateField("va", e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {error && <div className="cp-error">{error}</div>}
-
-                  <button
-                    className="cp-btn"
-                    onClick={() => TestApi(formData)}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <div className="cp-spinner"></div>
-                    ) : (
-                      <svg
-                        width="16"
-                        height="16"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                          fill="white"
-                        />
-                      </svg>
-                    )}
-                    {loading ? "Predicting..." : "Predict My Calls"}
-                  </button>
                 </div>
-              </>
-            ) : (
-              <div className="cp-results">
-                {data.length === 0 ? (
-                  <div className="cp-no-result">
-                    <img src="/cry.gif" alt="sad" />
-                    <h2>No calls predicted</h2>
-                    <p>
-                      Based on your scores, we couldn't match any college
-                      cutoffs. But don't worry — IPM Careers will reach out to
-                      help you prepare better!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="cp-results-header">
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        marginBottom: 16,
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 12,
-                          background: "#F0E0F4",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 22,
-                        }}
-                      >
-                        🎉
-                      </div>
-                      <div>
-                        <p className="cp-congrats">
-                          You may get {data.length} call
-                          {data.length > 1 ? "s" : ""}!
-                        </p>
-                        <p className="cp-congrats-sub">
-                          IPM Careers congratulates you on your hard work
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="cp-college-grid">
-                  {data.map((name, idx) => {
-                    const c = collegesData[name];
-                    if (!c) return null;
-                    return (
-                      <div
-                        className="cp-college-card"
-                        key={name}
-                        style={{ animationDelay: `${idx * 80}ms` }}
-                      >
-                        <img
-                          className="cp-college-img"
-                          src={c.picture}
-                          alt={c.title}
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/50x50/F0E0F4/833589?text=IIM";
-                          }}
-                        />
-                        <div style={{ flex: 1 }}>
-                          <div className="cp-college-name">{c.title}</div>
-                          <div className="cp-college-loc">📍 {c.location}</div>
-                        </div>
-                        <div className="cp-college-badge">Likely Call</div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div
-                  className="cp-promo"
-                  style={{ margin: "0 0 16px", borderRadius: 14 }}
-                >
-                  <h2>Special PI Batch</h2>
-                  <p>Ace your IPMAT Personal Interview with expert guidance.</p>
-                  <a href="https://register.ipmcareer.com/pi-batch">
-                    Enroll Now @ ₹99 →
-                  </a>
-                </div>
-
-                <button
-                  className="cp-btn cp-btn-secondary"
-                  onClick={() => {
-                    setData();
-                    setFormData({});
-                    setIsVisible(false);
-                  }}
-                >
-                  ↩ Predict Again
-                </button>
               </div>
-            )}
+
+              {error && <div className="cp-error">{error}</div>}
+
+              <button
+                className="cp-btn"
+                onClick={() => TestApi(formData)}
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="cp-spinner"></div>
+                ) : (
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                    <path
+                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                      fill="white"
+                    />
+                  </svg>
+                )}
+                {loading ? "Predicting..." : "Predict My Calls"}
+              </button>
+            </div>
           </div>
 
           {/* RIGHT PANEL */}
