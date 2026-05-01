@@ -49,7 +49,7 @@ export default function InterviewPrep() {
   }, [router.isReady, router.query.uid]);
 
   // Standalone mock interview app URL
-  const interviewAppUrl = `https://ipm-mock-interview.vercel.app${uid ? `?uid=${uid}` : ''}`;
+  const interviewAppUrl = `https://interview.ipmcareer.com${uid ? `?uid=${uid}` : ''}`;
 
   return (
         <AppShell>
