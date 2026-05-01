@@ -20,7 +20,7 @@ const SOP_SECTIONS = [
   },
   {
     key: 'why_iim',
-    title: 'Why IIM Indore IPM?',
+    title: 'Why IPM (IIM Indore)?',
     hint: 'Be specific — mention the 5-year integrated structure, Indore campus, specific professors, clubs, or events you know about. Generic answers get caught. (60-100 words)',
     maxWords: 100,
   },
@@ -241,3 +241,4 @@ export default function SOPBuilder() {
     </AppShell>
   );
 }
+
