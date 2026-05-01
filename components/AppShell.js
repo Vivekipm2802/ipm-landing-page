@@ -87,7 +87,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     { separator: true, label: 'PI Prep' },
     { icon: '🧑‍🎓', label: 'My Profile', path: '/pi/profile' },
     { icon: '✍️', label: 'SOP Builder', path: '/pi/sop' },
-    { icon: '🤖', label: 'AI Mock Interview', path: '/pi/mock' },
+    { icon: '🤖', label: 'AI Mock Interview', path: '/interview-prep' },
     { icon: '📚', label: 'Question Bank', path: '/pi/questions' },
     { icon: '📅', label: 'Expert Booking', path: '/pi/booking' },
     { icon: '📹', label: 'Sessions', path: '/pi/sessions' },
@@ -96,7 +96,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   const topNavItems = [
     { label: 'Score Analyzer', path: '/response' },
     { label: 'PI Prep', path: '/pi/profile' },
-    { label: 'AI Mock', path: '/pi/mock' },
+    { label: 'AI Mock', path: '/interview-prep' },
 
   ];
 

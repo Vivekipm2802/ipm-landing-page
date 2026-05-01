@@ -1,612 +1,244 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
 import AppShell from '../components/AppShell';
-import styles from './InterviewPrep.module.css';
-import { supabase } from '../utils/supabaseClient';
-
-// ─── Panel Config ───
-const INTERVIEWERS = [
-  { id: 'sharma', name: 'Prof. R.K. Sharma', role: 'Chairperson', avatar: '👨‍🏫', color: '#6c63ff', focus: 'Academics, Current Affairs, Career Goals' },
-  { id: 'gupta', name: 'Prof. Anil Gupta', role: 'Panelist', avatar: '👨‍💼', color: '#00d4ff', focus: 'Personality, Leadership, Situational Questions' },
-  { id: 'mehra', name: 'Dr. Priya Mehra', role: 'Panelist', avatar: '👩‍🏫', color: '#ff5e7e', focus: 'Ethics, Opinion-based, Why MBA/IPM' },
-];
-
-function buildSystemPrompt(studentData) {
-  let contextBlock = '';
-  if (studentData) {
-    const parts = [];
-    if (studentData.name) parts.push(`Student Name: ${studentData.name}`);
-    if (studentData.category) parts.push(`Category: ${studentData.category}`);
-    if (studentData.city) parts.push(`City: ${studentData.city}`);
-    if (studentData.total_score !== undefined) parts.push(`IPMAT Score: ${studentData.total_score}/${studentData.total_max || 360}`);
-    if (studentData.sa_score !== undefined) parts.push(`SA (Quant): ${studentData.sa_score}`);
-    if (studentData.mcq_score !== undefined) parts.push(`MCQ (Quant): ${studentData.mcq_score}`);
-    if (studentData.va_score !== undefined) parts.push(`VA (Verbal): ${studentData.va_score}`);
-    if (studentData.sop) parts.push(`Student's SOP:\n${studentData.sop}`);
-    if (parts.length > 0) {
-      contextBlock = `\n\nSTUDENT CONTEXT (use this to personalize questions — ask about their city, SOP points, score performance, etc.):\n${parts.join('\n')}`;
-    }
-  }
-
-  return `You are simulating a 3-person IIM Indore Personal Interview (PI) panel for IPMAT admission. You play ALL THREE interviewers who take turns naturally.
-
-THE PANEL:
-1. Prof. R.K. Sharma (Chairperson, Male) - Senior economics professor. Asks about academics, current affairs, career goals. Probing, serious tone. Speaks with authority.
-2. Prof. Anil Gupta (Panelist, Male) - Management faculty. Asks about personality, hobbies, leadership, situational/HR questions. Friendly but sharp. Occasionally cracks dry jokes.
-3. Dr. Priya Mehra (Panelist, Female) - Law and Ethics faculty. Asks ethical dilemmas, opinion-based questions, why MBA/IPM. Analytical, warm, encouraging but challenging.
-
-CRITICAL RULES:
-- Start by having Prof. Sharma welcome the student by name (if available) and ask them to introduce themselves.
-- Each interviewer asks 1-2 questions before passing to the next. They may interject or follow up on each other's questions naturally.
-- ALWAYS prefix your speech with the interviewer name in square brackets exactly like: [Prof. Sharma] or [Prof. Gupta] or [Dr. Mehra]. This is critical for the transcript.
-- Ask follow-up questions based on student answers — do not use pre-scripted questions.
-- If you have the student's SOP, reference specific points from it.
-- If you have their IPMAT scores, you may reference their performance.
-- Use natural Indian English — say "kindly", "could you elaborate", "what is your take on", etc.
-- Keep responses concise — each interviewer utterance should be 1-3 sentences max.
-- The interview should last about 15-20 exchanges total (across all 3 panelists).
-- At the end, Prof. Sharma should thank the student and say the interview is over.
-- Be realistic — challenge weak answers, appreciate good ones, probe deeper on vague responses.
-- Cover: Introduction, Academics, Why IPM/IIM, Current Affairs, Ethical dilemma, Career goals, Hobbies/Extracurriculars.
-
-IMPORTANT: You are speaking out loud. Be conversational. No markdown, no bullet points, no formatting. Just natural spoken Indian English.${contextBlock}`;
-}
-
-// ─── AudioPlayer: plays PCM base64 chunks via Web Audio API ───
-class AudioPlayer {
-  constructor() {
-    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-    this.nextTime = 0;
-  }
-  resume() {
-    if (this.context.state === 'suspended') this.context.resume();
-  }
-  playBase64PCM(base64) {
-    try {
-      const binaryString = atob(base64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-      const samples = new Int16Array(bytes.buffer);
-      const float32 = new Float32Array(samples.length);
-      for (let i = 0; i < samples.length; i++) float32[i] = samples[i] / 32768.0;
-      const buffer = this.context.createBuffer(1, float32.length, 24000);
-      buffer.getChannelData(0).set(float32);
-      const source = this.context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(this.context.destination);
-      const currentTime = this.context.currentTime;
-      if (this.nextTime < currentTime) this.nextTime = currentTime + 0.05;
-      source.start(this.nextTime);
-      this.nextTime += buffer.duration;
-    } catch (e) {
-      console.error('Playback error:', e);
-    }
-  }
-  stop() {
-    try { this.context.close(); } catch (e) {}
-  }
-}
-
-// ─── AudioRecorder: captures PCM 16kHz with AudioWorklet + ScriptProcessor fallback ───
-class AudioRecorder {
-  constructor(onAudioData) {
-    this.onAudioData = onAudioData;
-    this.context = null;
-    this.stream = null;
-    this.processor = null;
-  }
-  async start() {
-    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    this.context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-    const source = this.context.createMediaStreamSource(this.stream);
-
-    try {
-      // Try AudioWorklet first (modern browsers)
-      const workletCode = `
-        class PCMProcessor extends AudioWorkletProcessor {
-          process(inputs) {
-            const input = inputs[0];
-            if (input && input.length > 0) this.port.postMessage(input[0]);
-            return true;
-          }
-        }
-        registerProcessor('pcm-processor', PCMProcessor);
-      `;
-      const blob = new Blob([workletCode], { type: 'application/javascript' });
-      const url = URL.createObjectURL(blob);
-      await this.context.audioWorklet.addModule(url);
-      URL.revokeObjectURL(url);
-      this.processor = new AudioWorkletNode(this.context, 'pcm-processor');
-      this.processor.port.onmessage = (e) => this._processFloat32(e.data);
-      source.connect(this.processor);
-      this.processor.connect(this.context.destination);
-    } catch (workletErr) {
-      // Fallback to ScriptProcessorNode
-      console.warn('AudioWorklet failed, using ScriptProcessor fallback:', workletErr);
-      this.processor = this.context.createScriptProcessor(4096, 1, 1);
-      this.processor.onaudioprocess = (e) => {
-        this._processFloat32(e.inputBuffer.getChannelData(0));
-      };
-      source.connect(this.processor);
-      this.processor.connect(this.context.destination);
-    }
-  }
-  _processFloat32(float32) {
-    const int16 = new Int16Array(float32.length);
-    for (let i = 0; i < float32.length; i++) {
-      let s = Math.max(-1, Math.min(1, float32[i]));
-      int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-    }
-    const bytes = new Uint8Array(int16.buffer);
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode.apply(null, chunk);
-    }
-    this.onAudioData(btoa(binary));
-  }
-  stop() {
-    if (this.processor) { this.processor.disconnect(); this.processor = null; }
-    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
-    if (this.context && this.context.state !== 'closed') { this.context.close(); this.context = null; }
-  }
-}
-
-// ─── Detect interviewer from text ───
-function detectInterviewer(text) {
-  if (text.includes('[Prof. Sharma]') || text.includes('Prof. Sharma')) return 0;
-  if (text.includes('[Prof. Gupta]') || text.includes('Prof. Gupta')) return 1;
-  if (text.includes('[Dr. Mehra]') || text.includes('Dr. Mehra')) return 2;
-  return null;
-}
 
 export default function InterviewPrep() {
   const router = useRouter();
-  const [phase, setPhase] = useState('lobby');
-  const [studentData, setStudentData] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const [micActive, setMicActive] = useState(false);
-  const [transcript, setTranscript] = useState([]);
-  const [activeInterviewer, setActiveInterviewer] = useState(0);
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
-  const [error, setError] = useState(null);
-  const [timer, setTimer] = useState(0);
-  const [feedback, setFeedback] = useState(null);
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [missingItems, setMissingItems] = useState([]);
+  const iframeRef = useRef(null);
+  const dataSentRef = useRef(false);
 
-  const sessionRef = useRef(null);
-  const recorderRef = useRef(null);
-  const playerRef = useRef(null);
-  const currentModelTextRef = useRef('');
-  const currentUserTextRef = useRef('');
-  const transcriptRef = useRef([]);
-  const timerRef = useRef(null);
-
-  useEffect(() => { transcriptRef.current = transcript; }, [transcript]);
-
-  // Load student data from Supabase
   useEffect(() => {
-    const loadStudentData = async () => {
-      const uid = router.query.uid;
-      if (!uid) return;
-      try {
-        const { data } = await supabase.rpc('get_response_data', { uuid_arg: uid });
-        if (data && data.length > 0) setStudentData(data[0]);
-      } catch (e) {
-        console.log('Could not load student data:', e);
-      }
+    // Check if profile and SOP are filled in localStorage
+    let profile = null;
+    let sop = null;
+
+    try {
+      const profileStr = localStorage.getItem('pi_profile');
+      if (profileStr) profile = JSON.parse(profileStr);
+    } catch {}
+
+    try {
+      const sopStr = localStorage.getItem('pi_sop');
+      if (sopStr) sop = JSON.parse(sopStr);
+    } catch {}
+
+    // Validate profile completeness — need at least name
+    const missing = [];
+    if (!profile || !profile.name) {
+      missing.push('My Profile');
+    }
+
+    // Validate SOP — need at least 2 sections filled (20+ words each)
+    const sopSections = ['intro', 'why_mba', 'why_iim', 'strengths', 'career', 'conclusion'];
+    const filledSections = sopSections.filter(
+      (key) => sop && sop[key] && sop[key].trim().split(/\s+/).length >= 20
+    );
+    if (filledSections.length < 2) {
+      missing.push('SOP Builder');
+    }
+
+    if (missing.length > 0) {
+      setMissingItems(missing);
+      setLoading(false);
+      return;
+    }
+
+    // Both are ready — build the SOP text for the interview
+    const sopText = sopSections
+      .map((key) => {
+        const labels = {
+          intro: 'Introduction',
+          why_mba: 'Why MBA at 18',
+          why_iim: 'Why IIM Indore IPM',
+          strengths: 'Strengths & Evidence',
+          career: 'Career Goals',
+          conclusion: 'Closing Statement',
+        };
+        return sop[key] ? `${labels[key]}: ${sop[key]}` : '';
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    // Store the data to send via postMessage once iframe is ready
+    window.__interviewStudentData = {
+      name: profile.name || 'Student',
+      city: profile.city || 'India',
+      sop: sopText,
+      profile: {
+        school: profile.school || '',
+        board: profile.board || '',
+        stream: profile.stream || '',
+        class10_pct: profile.class10_pct || '',
+        class12_pct: profile.class12_pct || '',
+        extracurriculars: profile.extracurriculars || [],
+        achievements: profile.achievements || [],
+        why_mba: profile.why_mba || '',
+        career_goal: profile.career_goal || '',
+        strengths: profile.strengths || '',
+        weaknesses: profile.weaknesses || '',
+      },
     };
-    if (router.isReady) loadStudentData();
-  }, [router.isReady, router.query.uid]);
 
-  // Timer
-  useEffect(() => {
-    if (phase === 'live') {
-      timerRef.current = setInterval(() => setTimer(t => t + 1), 1000);
+    // If they also have Score Analyzer scores, include them
+    if (profile.ipmat_score) {
+      window.__interviewStudentData.scores = {
+        total: profile.ipmat_score,
+        sa: profile.sa_score || '',
+        mcq: profile.mcq_score || '',
+        va: profile.va_score || '',
+      };
     }
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [phase]);
 
-  const formatTime = (s) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-  };
-
-  const addTranscript = useCallback((role, text) => {
-    if (!text.trim()) return;
-    setTranscript(prev => [...prev, { role, speaker: role === 'user' ? 'You' : 'Panel', text }]);
-    if (role === 'model') {
-      const idx = detectInterviewer(text);
-      if (idx !== null) setActiveInterviewer(idx);
-    }
+    setReady(true);
+    setLoading(false);
   }, []);
 
-  // ─── Start Interview using @google/genai SDK ───
-  const startInterview = async () => {
-    setPhase('connecting');
-    setError(null);
-    setTranscript([]);
-    setTimer(0);
-
-    try {
-      // 1. Get API key from server
-      const tokenRes = await fetch('/api/gemini-live-token', { method: 'POST' });
-      if (!tokenRes.ok) throw new Error('Failed to get API key');
-      const { token } = await tokenRes.json();
-      if (!token) throw new Error('No API key returned');
-
-      // 2. Dynamically import @google/genai (client-side only, avoids SSR issues)
-      const { GoogleGenAI, Modality } = await import('@google/genai');
-
-      // 3. Create client
-      const client = new GoogleGenAI({ apiKey: token });
-
-      // 4. Create audio player
-      playerRef.current = new AudioPlayer();
-      playerRef.current.resume();
-
-      // 5. Build system prompt
-      const systemPrompt = buildSystemPrompt(studentData);
-
-      // 6. Connect to Gemini Live API via SDK
-      const session = await client.live.connect({
-        model: 'models/gemini-3.1-flash-live-preview',
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Puck' }
-            }
-          }
+  // Send student data to iframe via postMessage
+  const sendDataToIframe = () => {
+    const iframe = iframeRef.current;
+    if (iframe && iframe.contentWindow && window.__interviewStudentData) {
+      iframe.contentWindow.postMessage(
+        {
+          type: 'STUDENT_DATA',
+          payload: window.__interviewStudentData,
         },
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        callbacks: {
-          onopen: () => {
-            console.log('Live API connected');
-            setConnected(true);
-            setPhase('live');
-            // Mic start and initial trigger happen AFTER connect() returns (below)
-          },
-
-          onmessage: (message) => {
-            console.log('MSG:', Object.keys(message), message.setupComplete ? 'SETUP' : '', message.serverContent ? 'SC' : '', message.data ? 'DATA' : '');
-
-            // Setup complete signal
-            if (message.setupComplete) {
-              console.log('Setup complete');
-              return;
-            }
-
-            // Some SDK versions put audio directly on message.data
-            if (message.data && !message.serverContent) {
-              setIsAISpeaking(true);
-              playerRef.current?.playBase64PCM(message.data);
-              return;
-            }
-
-            const sc = message.serverContent;
-            if (!sc) return;
-
-            // Audio data from model — play it
-            if (sc.modelTurn && sc.modelTurn.parts) {
-              for (const part of sc.modelTurn.parts) {
-                if (part.inlineData && part.inlineData.data) {
-                  setIsAISpeaking(true);
-                  playerRef.current?.playBase64PCM(part.inlineData.data);
-                }
-              }
-            }
-
-            // Output transcription (what the model is saying as text)
-            if (sc.outputTranscription && sc.outputTranscription.text) {
-              currentModelTextRef.current += sc.outputTranscription.text;
-            }
-
-            // Input transcription (what the user said as text)
-            if (sc.inputTranscription && sc.inputTranscription.text) {
-              currentUserTextRef.current += sc.inputTranscription.text;
-            }
-
-            // Turn complete — flush transcripts
-            if (sc.turnComplete) {
-              if (currentModelTextRef.current.trim()) {
-                addTranscript('model', currentModelTextRef.current);
-                currentModelTextRef.current = '';
-              }
-              if (currentUserTextRef.current.trim()) {
-                addTranscript('user', currentUserTextRef.current);
-                currentUserTextRef.current = '';
-              }
-              setIsAISpeaking(false);
-            }
-
-            // Interrupted
-            if (sc.interrupted) {
-              if (currentModelTextRef.current.trim()) {
-                addTranscript('model', currentModelTextRef.current);
-                currentModelTextRef.current = '';
-              }
-              setIsAISpeaking(false);
-            }
-          },
-
-          onerror: (err) => {
-            console.error('Live API error:', err);
-            setError('Connection error. Please try again.');
-            setPhase('lobby');
-          },
-
-          onclose: () => {
-            console.log('Live API closed');
-            setConnected(false);
-            setMicActive(false);
-            // Flush any remaining user text
-            if (currentUserTextRef.current.trim()) {
-              addTranscript('user', currentUserTextRef.current);
-              currentUserTextRef.current = '';
-            }
-          }
-        }
-      });
-
-      // Start mic — model will auto-start based on system prompt
-      sessionRef.current = session;
-      startMic(session);
-      console.log('Session methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(session)));
-
-    } catch (err) {
-      console.error('Start error:', err);
-      setError(err.message || 'Failed to start. Try again.');
-      setPhase('lobby');
+        'https://interview.ipmcareer.com'
+      );
     }
   };
 
-  // ─── Start Mic ───
-  const startMic = async (session) => {
-    try {
-      recorderRef.current = new AudioRecorder((base64) => {
-        try {
-          session.sendRealtimeInput({
-            data: base64,
-            mimeType: 'audio/pcm;rate=16000'
-          });
-        } catch (e) {
-          // Session might be closed
-        }
+  // Listen for INTERVIEW_READY message from iframe, then send student data
+  useEffect(() => {
+    if (!ready) return;
+
+    const handleMessage = (event) => {
+      if (event.data?.type === 'INTERVIEW_READY') {
+        sendDataToIframe();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Also send on iframe load (backup for race condition)
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener('load', () => {
+        // Small delay to let iframe set up its listener
+        setTimeout(sendDataToIframe, 500);
       });
-      await recorderRef.current.start();
-      setMicActive(true);
-      console.log('Mic started');
-    } catch (err) {
-      console.error('Mic error:', err);
-      setError('Microphone access denied. Please allow mic and try again.');
     }
-  };
 
-  // ─── Stop Interview ───
-  const stopInterview = useCallback(() => {
-    if (currentModelTextRef.current.trim()) {
-      addTranscript('model', currentModelTextRef.current);
-      currentModelTextRef.current = '';
-    }
-    if (currentUserTextRef.current.trim()) {
-      addTranscript('user', currentUserTextRef.current);
-      currentUserTextRef.current = '';
-    }
-    recorderRef.current?.stop();
-    playerRef.current?.stop();
-    if (sessionRef.current) {
-      try { sessionRef.current.close(); } catch (e) {}
-      sessionRef.current = null;
-    }
-    setConnected(false);
-    setMicActive(false);
-    setIsAISpeaking(false);
-    setPhase('ended');
-  }, [addTranscript]);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [ready]);
 
-  useEffect(() => { return () => { stopInterview(); }; }, [stopInterview]);
+  const interviewAppUrl = 'https://interview.ipmcareer.com?mode=postmessage';
 
-  // ─── Generate Feedback ───
-  const generateFeedback = async () => {
-    setFeedbackLoading(true);
-    setPhase('feedback');
-    try {
-      const transcriptText = transcriptRef.current.map(t => `[${t.role === 'user' ? 'STUDENT' : 'PANEL'}] ${t.text}`).join('\n');
-      const prompt = `You are an expert IIM Interview coach. Review this mock PI transcript for IPMAT admission.
-
-STUDENT PROFILE:
-Name: ${studentData?.name || 'Unknown'}
-City: ${studentData?.city || 'Unknown'}
-IPMAT Scores: ${studentData?.total_score || '?'}/360 (SA: ${studentData?.sa_score || '?'}, MCQ: ${studentData?.mcq_score || '?'}, VA: ${studentData?.va_score || '?'})
-
-TRANSCRIPT:
-${transcriptText}
-
-Provide structured feedback:
-1. Overall Impression (2-3 sentences)
-2. Strengths (3-4 bullet points)
-3. Areas to Improve (3-4 actionable bullet points)
-4. Score out of 10
-Keep it concise and encouraging.`;
-
-      const res = await fetch('/api/gemini-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], systemPrompt: 'You are an expert IIM interview coach. Be constructive and specific.' }),
-      });
-      const data = await res.json();
-      setFeedback(data.text || 'Could not generate feedback.');
-    } catch (e) {
-      setFeedback('Sorry, feedback generation failed. Please try again.');
-    } finally {
-      setFeedbackLoading(false);
-    }
-  };
-
-  // ─── RENDER ───
   return (
     <AppShell>
-      <NextSeo title="AI Mock Interview | IPM Careers" description="Practice for your IIM Indore PI with our AI-powered mock interview panel." />
-      <div className={styles.interviewPage}>
-
-        {phase === 'lobby' && (
-          <div className={styles.lobbyContainer}>
-            <div className={styles.lobbyHeader}>
-              <h1 className={styles.lobbyTitle}>IIM Indore Mock PI Panel</h1>
-              <p className={styles.lobbySubtitle}>AI-powered Personal Interview simulation with real-time voice</p>
-            </div>
-
-            {studentData && (
-              <div className={styles.studentContext}>
-                <div className={styles.contextBadge}>Profile Loaded</div>
-                <p className={styles.contextInfo}>{studentData.name} &bull; {studentData.city || 'India'}</p>
-                <p className={styles.contextInfo}>IPMAT Score: {studentData.total_score}/{studentData.total_max || 360}</p>
-                <p className={styles.contextNote}>Your scores and SOP will be used to personalize the interview</p>
-              </div>
-            )}
-
-            <div className={styles.panelGrid}>
-              {INTERVIEWERS.map((prof) => (
-                <div key={prof.id} className={styles.panelCard}>
-                  <div className={styles.panelAvatar}>{prof.avatar}</div>
-                  <div className={styles.panelName}>{prof.name}</div>
-                  <div className={styles.panelRole}>{prof.role}</div>
-                </div>
-              ))}
-            </div>
-
-            {error && <p className={styles.errorText}>{error}</p>}
-
-            <button className={styles.startBtn} onClick={startInterview}>
-              Start Mock Interview
-            </button>
-            <p className={styles.lobbyNote}>Uses your microphone for real-time voice conversation. Works best in Chrome.</p>
+      <NextSeo
+        title="AI Mock Interview | IPM Careers"
+        description="Practice for your IIM Indore PI with our AI-powered mock interview panel."
+      />
+      <div style={{ width: '100%', height: 'calc(100vh - 64px)', position: 'relative' }}>
+        {loading ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              color: '#999',
+              fontSize: '14px',
+            }}
+          >
+            Loading your interview session...
           </div>
-        )}
-
-        {phase === 'connecting' && (
-          <div className={styles.connectingContainer}>
-            <div className={styles.connectingSpinner}></div>
-            <h2 className={styles.connectingTitle}>Setting up your interview room...</h2>
-            <p className={styles.connectingSubtitle}>Requesting mic access and connecting to the panel</p>
-          </div>
-        )}
-
-        {phase === 'live' && (
-          <div className={styles.liveContainer}>
-            <div className={styles.liveTopBar}>
-              <div className={styles.liveStatus}>
-                <span className={styles.liveDot}></span>
-                <span>LIVE</span>
-              </div>
-              <div className={styles.liveTimer}>{formatTime(timer)}</div>
-              <button className={styles.endBtn} onClick={stopInterview}>End Interview</button>
+        ) : missingItems.length > 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              gap: '20px',
+              padding: '24px',
+            }}
+          >
+            <p
+              style={{
+                color: '#999',
+                fontSize: '16px',
+                textAlign: 'center',
+                maxWidth: '400px',
+                lineHeight: '1.6',
+              }}
+            >
+              Please complete{' '}
+              <strong style={{ color: '#C5A059' }}>
+                {missingItems.join(' and ')}
+              </strong>{' '}
+              first to set up your interview profile.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {missingItems.includes('My Profile') && (
+                <a
+                  href="/pi/profile"
+                  style={{
+                    padding: '12px 28px',
+                    background: '#C5A059',
+                    color: '#000',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}
+                >
+                  Fill My Profile
+                </a>
+              )}
+              {missingItems.includes('SOP Builder') && (
+                <a
+                  href="/pi/sop"
+                  style={{
+                    padding: '12px 28px',
+                    background: missingItems.includes('My Profile')
+                      ? 'transparent'
+                      : '#C5A059',
+                    color: missingItems.includes('My Profile') ? '#C5A059' : '#000',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    border: '2px solid #C5A059',
+                  }}
+                >
+                  Build Your SOP
+                </a>
+              )}
             </div>
-
-            <div className={styles.interviewerRow}>
-              {INTERVIEWERS.map((prof, i) => (
-                <div key={prof.id} className={`${styles.interviewerCard} ${activeInterviewer === i ? styles.activeInterviewer : ''}`}>
-                  <div className={styles.interviewerAvatar} style={{ borderColor: activeInterviewer === i ? prof.color : 'transparent' }}>
-                    {prof.avatar}
-                  </div>
-                  <div className={styles.interviewerName}>{prof.name}</div>
-                  <div className={styles.interviewerRole}>{prof.role}</div>
-                </div>
-              ))}
-            </div>
-
-            {isAISpeaking && (
-              <div className={styles.speakingIndicator}>
-                <div className={styles.soundWave}><span></span><span></span><span></span><span></span><span></span></div>
-                <span>{INTERVIEWERS[activeInterviewer].name} is speaking...</span>
-              </div>
-            )}
-
-            <div className={styles.micSection}>
-              <button
-                className={`${styles.micBtn} ${micActive ? styles.micActive : ''} ${isAISpeaking ? styles.micThinking : ''}`}
-                onClick={() => {
-                  if (micActive) {
-                    recorderRef.current?.stop();
-                    setMicActive(false);
-                  } else if (sessionRef.current) {
-                    startMic(sessionRef.current);
-                  }
-                }}
-              >
-                {micActive ? '🎙️' : '🎤'}
-              </button>
-              <p className={styles.micLabel}>{micActive ? (isAISpeaking ? 'Panel is speaking...' : 'Listening...') : 'Tap mic to speak'}</p>
-            </div>
-
-            {transcript.length > 0 && (
-              <div className={styles.transcriptSection}>
-                <h3 className={styles.transcriptTitle}>INTERVIEW TRANSCRIPT</h3>
-                <div className={styles.transcriptList}>
-                  {transcript.map((msg, i) => (
-                    <div key={i} className={`${styles.transcriptItem} ${msg.role === 'user' ? styles.transcriptStudent : ''}`}>
-                      <span className={styles.transcriptSpeaker} style={{ color: msg.role === 'user' ? '#6c63ff' : '#ff5e7e' }}>
-                        {msg.role === 'user' ? 'You' : 'Panel'}:
-                      </span>{' '}
-                      {msg.text}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-        )}
-
-        {phase === 'ended' && (
-          <div className={styles.endedContainer}>
-            <div className={styles.endedIcon}>✅</div>
-            <h2 className={styles.endedTitle}>Interview Complete!</h2>
-            <p className={styles.endedSubtitle}>Duration: {formatTime(timer)} &bull; {transcript.filter(t => t.role === 'user').length} responses</p>
-            <div className={styles.endedActions}>
-              <button className={styles.feedbackBtn} onClick={generateFeedback}>Get AI Feedback & Score</button>
-              <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>Try Again</button>
-            </div>
-            {transcript.length > 0 && (
-              <div className={styles.reviewSection}>
-                <h3 className={styles.reviewTitle}>Interview Transcript</h3>
-                {transcript.map((msg, i) => (
-                  <div key={i} className={`${styles.reviewItem} ${msg.role === 'user' ? styles.reviewStudent : ''}`}>
-                    <strong>{msg.role === 'user' ? 'You' : 'Panel'}:</strong> {msg.text}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {phase === 'feedback' && (
-          <div className={styles.endedContainer}>
-            <h2 className={styles.endedTitle}>Performance Feedback</h2>
-            {feedbackLoading ? (
-              <div className={styles.connectingContainer}>
-                <div className={styles.connectingSpinner}></div>
-                <p className={styles.connectingSubtitle}>Panel is reviewing your interview...</p>
-              </div>
-            ) : (
-              <>
-                <div className={styles.feedbackCard}>
-                  {feedback && feedback.split('\n').map((line, i) => (
-                    <p key={i} className={styles.feedbackLine}>{line}</p>
-                  ))}
-                </div>
-                <div className={styles.endedActions}>
-                  <button className={styles.restartBtn} onClick={() => { setPhase('lobby'); setTranscript([]); setTimer(0); setFeedback(null); }}>Start New Interview</button>
-                </div>
-              </>
-            )}
-          </div>
+        ) : (
+          <iframe
+            ref={iframeRef}
+            src={interviewAppUrl}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              borderRadius: '12px',
+            }}
+            allow="microphone; autoplay"
+            title="AI Mock Interview"
+          />
         )}
       </div>
     </AppShell>
