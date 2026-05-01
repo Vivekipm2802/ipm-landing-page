@@ -45,7 +45,7 @@ Important: Be tough but constructive. IIM panels are sharp — flag anything tha
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,3 +94,4 @@ Important: Be tough but constructive. IIM panels are sharp — flag anything tha
     return res.status(500).json({ error: 'Failed to connect to Gemini: ' + err.message });
   }
 }
+
