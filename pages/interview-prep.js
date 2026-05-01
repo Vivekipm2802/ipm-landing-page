@@ -1,103 +1,232 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
-import { createClient } from '@supabase/supabase-js';
 import AppShell from '../components/AppShell';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  );
-
 export default function InterviewPrep() {
-    const router = useRouter();
-    const [uid, setUid] = useState('');
-    const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [missingItems, setMissingItems] = useState([]);
+  const iframeRef = useRef(null);
+  const dataSentRef = useRef(false);
 
   useEffect(() => {
-        // Priority: URL param uid > logged-in user's response uid
-                const getUid = async () => {
-                        if (router.isReady && router.query.uid) {
-                                  setUid(router.query.uid);
-                                  setLoading(false);
-                                  return;
-                        }
+    // Check if profile and SOP are filled in localStorage
+    let profile = null;
+    let sop = null;
 
-                        // Try to get uid from logged-in user's latest response
-                        try {
-                                  const { data: { user } } = await supabase.auth.getUser();
-                                  if (user) {
-                                              const { data } = await supabase
-                                                .from('responses')
-                                                .select('uid')
-                                                .eq('email', user.email)
-                                                .order('created_at', { ascending: false })
-                                                .limit(1)
-                                                .single();
+    try {
+      const profileStr = localStorage.getItem('pi_profile');
+      if (profileStr) profile = JSON.parse(profileStr);
+    } catch {}
 
-                                    if (data?.uid) {
-                                                  setUid(data.uid);
-                                    }
-                                  }
-                        } catch (e) {
-                                  console.log('Could not auto-fetch uid:', e);
-                        }
-                        setLoading(false);
-                };
+    try {
+      const sopStr = localStorage.getItem('pi_sop');
+      if (sopStr) sop = JSON.parse(sopStr);
+    } catch {}
 
-                getUid();
-  }, [router.isReady, router.query.uid]);
+    // Validate profile completeness — need at least name
+    const missing = [];
+    if (!profile || !profile.name) {
+      missing.push('My Profile');
+    }
 
-  // Standalone mock interview app URL
-  const interviewAppUrl = `https://interview.ipmcareer.com${uid ? `?uid=${uid}` : ''}`;
+    // Validate SOP — need at least 2 sections filled (20+ words each)
+    const sopSections = ['intro', 'why_mba', 'why_iim', 'strengths', 'career', 'conclusion'];
+    const filledSections = sopSections.filter(
+      (key) => sop && sop[key] && sop[key].trim().split(/\s+/).length >= 20
+    );
+    if (filledSections.length < 2) {
+      missing.push('SOP Builder');
+    }
+
+    if (missing.length > 0) {
+      setMissingItems(missing);
+      setLoading(false);
+      return;
+    }
+
+    // Both are ready — build the SOP text for the interview
+    const sopText = sopSections
+      .map((key) => {
+        const labels = {
+          intro: 'Introduction',
+          why_mba: 'Why MBA at 18',
+          why_iim: 'Why IIM Indore IPM',
+          strengths: 'Strengths & Evidence',
+          career: 'Career Goals',
+          conclusion: 'Closing Statement',
+        };
+        return sop[key] ? `${labels[key]}: ${sop[key]}` : '';
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    // Store the data to send via postMessage once iframe is ready
+    window.__interviewStudentData = {
+      name: profile.name || 'Student',
+      city: profile.city || 'India',
+      sop: sopText,
+      profile: {
+        school: profile.school || '',
+        board: profile.board || '',
+        stream: profile.stream || '',
+        class10_pct: profile.class10_pct || '',
+        class12_pct: profile.class12_pct || '',
+        extracurriculars: profile.extracurriculars || [],
+        achievements: profile.achievements || [],
+        why_mba: profile.why_mba || '',
+        career_goal: profile.career_goal || '',
+        strengths: profile.strengths || '',
+        weaknesses: profile.weaknesses || '',
+      },
+    };
+
+    // If they also have Score Analyzer scores, include them
+    if (profile.ipmat_score) {
+      window.__interviewStudentData.scores = {
+        total: profile.ipmat_score,
+        sa: profile.sa_score || '',
+        mcq: profile.mcq_score || '',
+        va: profile.va_score || '',
+      };
+    }
+
+    setReady(true);
+    setLoading(false);
+  }, []);
+
+  // Listen for INTERVIEW_READY message from iframe, then send student data
+  useEffect(() => {
+    if (!ready) return;
+
+    const handleMessage = (event) => {
+      if (event.data?.type === 'INTERVIEW_READY' && !dataSentRef.current) {
+        dataSentRef.current = true;
+        const iframe = iframeRef.current;
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage(
+            {
+              type: 'STUDENT_DATA',
+              payload: window.__interviewStudentData,
+            },
+            'https://interview.ipmcareer.com'
+          );
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [ready]);
+
+  const interviewAppUrl = 'https://interview.ipmcareer.com?mode=postmessage';
 
   return (
-        <AppShell>
-          <NextSeo
-          title="AI Mock Interview | IPM Careers"
-          description="Practice for your IIM Indore PI with our AI-powered mock interview panel."
-        />
-                  <div style={{ width: '100%', height: 'calc(100vh - 64px)', position: 'relative' }}>
-{loading ? (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          height: '100%', color: '#999', fontSize: '14px'
-            }}>
+    <AppShell>
+      <NextSeo
+        title="AI Mock Interview | IPM Careers"
+        description="Practice for your IIM Indore PI with our AI-powered mock interview panel."
+      />
+      <div style={{ width: '100%', height: 'calc(100vh - 64px)', position: 'relative' }}>
+        {loading ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              color: '#999',
+              fontSize: '14px',
+            }}
+          >
             Loading your interview session...
-  </div>
-          ) : !uid ? (
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-                          justifyContent: 'center', height: '100%', gap: '16px', padding: '24px'
-            }}>
-            <p style={{ color: '#999', fontSize: '16px', textAlign: 'center' }}>
-              Please complete the Score Analyzer first to set up your interview profile.
-  </p>
-             <a
-               href="https://register.ipmcareer.com"
-               style={{
-                                 padding: '12px 32px', background: '#C5A059', color: '#000',
-                                 borderRadius: '12px', fontWeight: 700, textDecoration: 'none',
-                                 fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px'
-               }}
+          </div>
+        ) : missingItems.length > 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              gap: '20px',
+              padding: '24px',
+            }}
+          >
+            <p
+              style={{
+                color: '#999',
+                fontSize: '16px',
+                textAlign: 'center',
+                maxWidth: '400px',
+                lineHeight: '1.6',
+              }}
             >
-              Take Score Analyzer
+              Please complete{' '}
+              <strong style={{ color: '#C5A059' }}>
+                {missingItems.join(' and ')}
+              </strong>{' '}
+              first to set up your interview profile.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {missingItems.includes('My Profile') && (
+                <a
+                  href="/pi/profile"
+                  style={{
+                    padding: '12px 28px',
+                    background: '#C5A059',
+                    color: '#000',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}
+                >
+                  Fill My Profile
                 </a>
-                </div>
+              )}
+              {missingItems.includes('SOP Builder') && (
+                <a
+                  href="/pi/sop"
+                  style={{
+                    padding: '12px 28px',
+                    background: missingItems.includes('My Profile')
+                      ? 'transparent'
+                      : '#C5A059',
+                    color: missingItems.includes('My Profile') ? '#C5A059' : '#000',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    border: '2px solid #C5A059',
+                  }}
+                >
+                  Build Your SOP
+                </a>
+              )}
+            </div>
+          </div>
         ) : (
-                    <iframe
-                      src={interviewAppUrl}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                        borderRadius: '12px',
-        }}
+          <iframe
+            ref={iframeRef}
+            src={interviewAppUrl}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              borderRadius: '12px',
+            }}
             allow="microphone; autoplay"
             title="AI Mock Interview"
           />
-                      )}
-              </div>
-              </AppShell>
+        )}
+      </div>
+    </AppShell>
   );
 }
