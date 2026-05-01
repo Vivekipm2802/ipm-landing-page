@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
         .from('pi_admins')
         .select('email')
         .eq('email', email)
-        .single();
+        .maybeSingle();
       setIsAdmin(!!data);
     } catch {
       setIsAdmin(false);
@@ -145,3 +145,4 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
+
