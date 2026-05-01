@@ -97,27 +97,41 @@ export default function InterviewPrep() {
     setLoading(false);
   }, []);
 
+  // Send student data to iframe via postMessage
+  const sendDataToIframe = () => {
+    const iframe = iframeRef.current;
+    if (iframe && iframe.contentWindow && window.__interviewStudentData) {
+      iframe.contentWindow.postMessage(
+        {
+          type: 'STUDENT_DATA',
+          payload: window.__interviewStudentData,
+        },
+        'https://interview.ipmcareer.com'
+      );
+    }
+  };
+
   // Listen for INTERVIEW_READY message from iframe, then send student data
   useEffect(() => {
     if (!ready) return;
 
     const handleMessage = (event) => {
-      if (event.data?.type === 'INTERVIEW_READY' && !dataSentRef.current) {
-        dataSentRef.current = true;
-        const iframe = iframeRef.current;
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage(
-            {
-              type: 'STUDENT_DATA',
-              payload: window.__interviewStudentData,
-            },
-            'https://interview.ipmcareer.com'
-          );
-        }
+      if (event.data?.type === 'INTERVIEW_READY') {
+        sendDataToIframe();
       }
     };
 
     window.addEventListener('message', handleMessage);
+
+    // Also send on iframe load (backup for race condition)
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener('load', () => {
+        // Small delay to let iframe set up its listener
+        setTimeout(sendDataToIframe, 500);
+      });
+    }
+
     return () => window.removeEventListener('message', handleMessage);
   }, [ready]);
 
