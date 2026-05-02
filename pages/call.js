@@ -438,17 +438,6 @@ function Call() {
                   <p className="cp-marks-title">Your IPMAT Scores</p>
                   <div className="cp-marks-row">
                     <div className="cp-field">
-                      <label className="cp-label">QA (MCQ)</label>
-                      <input
-                        className="cp-input"
-                        placeholder="0-120"
-                        type="number"
-                        min="0"
-                        max="120"
-                        onChange={(e) => updateField("qa", e.target.value)}
-                      />
-                    </div>
-                    <div className="cp-field">
                       <label className="cp-label">QA (SA)</label>
                       <input
                         className="cp-input"
@@ -457,6 +446,17 @@ function Call() {
                         min="0"
                         max="60"
                         onChange={(e) => updateField("sa", e.target.value)}
+                      />
+                    </div>
+                    <div className="cp-field">
+                      <label className="cp-label">QA (MCQ)</label>
+                      <input
+                        className="cp-input"
+                        placeholder="0-120"
+                        type="number"
+                        min="0"
+                        max="120"
+                        onChange={(e) => updateField("qa", e.target.value)}
                       />
                     </div>
                     <div className="cp-field">
