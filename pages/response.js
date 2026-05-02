@@ -144,7 +144,7 @@ function Response() {
           const to =
             calculateScores(data.data.sa, 0, 4) +
             calculateScores(data.data.mcq, 1, 4) +
-            calculateScores(data.data.va, 1, 4, true);
+            calculateScores(data.data.va, 1, 4);
           submitResponse(data.data, formData, to, url);
           setData(data.data);
           setLoading(false);
@@ -173,7 +173,7 @@ function Response() {
     try {
       saVal = calculateScores(a.sa, 0, 4);
       mcqVal = calculateScores(a.mcq, 1, 4);
-      vaVal = calculateScores(a.va, 1, 4, true);
+      vaVal = calculateScores(a.va, 1, 4);
     } catch (e) {
       console.error("Score calculation error:", e);
     }
@@ -227,17 +227,13 @@ function Response() {
     return re.test(String(email).toLowerCase());
   }
 
-  function calculateScores(d, subtractScore, addScore, special) {
+  function calculateScores(d, subtractScore, addScore) {
     if (!d || !Array.isArray(d)) return 0;
     return d.reduce((sum, i) => {
       if (i.status === "Answered" || i.status === "Marked For Review") {
         if (i.rightAnswer == i.givenAnswer) {
           return sum + addScore;
-        } else if (
-          i.rightAnswer != i.givenAnswer &&
-          subtractScore > 0 &&
-          !(special == true && i.givenAnswer.length > 1)
-        ) {
+        } else if (i.rightAnswer != i.givenAnswer && subtractScore > 0) {
           return sum - subtractScore;
         }
       }
@@ -247,7 +243,7 @@ function Response() {
 
   const saScore = data ? calculateScores(data.sa, 0, 4) : 0;
   const mcqScore = data ? calculateScores(data.mcq, 1, 4) : 0;
-  const vaScore = data ? calculateScores(data.va, 1, 4, true) : 0;
+  const vaScore = data ? calculateScores(data.va, 1, 4) : 0;
   const totalScore = saScore + mcqScore + vaScore;
 
   return (
