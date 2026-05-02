@@ -172,62 +172,111 @@ export const callGlobalStyles = `
     margin-bottom: 4px;
   }
   .cp-congrats-sub { font-size: 14px; color: #6B4D72; }
+
+  /* ---- College Grid: Air1CommandCenter-style cards (LIGHT) ---- */
   .cp-college-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 20px;
   }
   @media (max-width: 500px) { .cp-college-grid { grid-template-columns: 1fr; } }
-  .cp-college-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+
+  .cp-dark-card {
     background: #FFFFFF;
     border: 1.5px solid #E5C9EA;
-    border-radius: 14px;
-    padding: 14px;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     animation: slideIn 0.4s ease forwards;
     opacity: 0;
+    position: relative;
   }
-  .cp-college-img {
-    width: 100%;
-    height: 110px;
-    border-radius: 10px;
-    object-fit: cover;
+  .cp-dark-card:hover {
+    border-color: #833589;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(131,53,137,0.12);
+  }
+
+  .cp-dark-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a0a1e;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .cp-dark-card-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cp-dark-card-icon {
+    font-size: 14px;
+    opacity: 0.6;
     flex-shrink: 0;
-    background: #F0E0F4;
   }
+  .cp-dark-card-label {
+    font-size: 13px;
+    color: #6B4D72;
+    flex-shrink: 0;
+  }
+  .cp-dark-card-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a0a1e;
+    margin-left: auto;
+    text-align: right;
+  }
+  .cp-dark-card-date {
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .cp-dark-card-divider {
+    width: 100%;
+    height: 1px;
+    background: #E5C9EA;
+  }
+
+  .cp-dark-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cp-dark-card-status {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+  .cp-dark-card-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #833589;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.2s;
+  }
+  .cp-dark-card-link:hover {
+    opacity: 0.7;
+  }
+
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .cp-college-card:hover {
-    border-color: #833589;
-    transform: translateX(4px);
-    box-shadow: 0 2px 12px rgba(131,53,137,0.1);
-  }
-  .cp-college-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #1a0a1e;
-    margin-bottom: 2px;
-  }
-  .cp-college-loc { font-size: 12px; color: #6B4D72; }
-  .cp-college-badge {
-    background: #F0E0F4;
-    border: 1px solid #D9B3E0;
-    border-radius: 100px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #833589;
-    white-space: nowrap;
-    align-self: flex-start;
-  }
+
   .cp-no-result { text-align: center; padding: 32px 16px; }
   .cp-no-result img { width: 80px; margin-bottom: 16px; }
   .cp-no-result h2 {
@@ -312,9 +361,9 @@ export const callGlobalStyles = `
   @keyframes spin { to { transform: rotate(360deg); } }
   .cp-hero-results { grid-template-columns: 1fr !important; }
   .cp-hero-results .cp-right { display: none !important; }
-  .cp-hero-results .cp-left { max-width: 860px; margin: 0 auto; width: 100%; }
-  .cp-hero-results .cp-college-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .cp-hero-results .cp-left { max-width: 900px; margin: 0 auto; width: 100%; }
+  .cp-hero-results .cp-college-grid { grid-template-columns: 1fr 1fr; }
   @media (max-width: 768px) {
-    .cp-hero-results .cp-college-grid { grid-template-columns: 1fr 1fr; }
+    .cp-hero-results .cp-college-grid { grid-template-columns: 1fr; }
   }
 `;
