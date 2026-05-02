@@ -3,7 +3,6 @@ import Timer from "../components/Timer";
 import st from "./TestPredictor.module.css";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-import Marquee from "react-fast-marquee";
 import axios from "axios";
 import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
@@ -29,15 +28,6 @@ function Call() {
     { value: "pwd", title: "PWD — Person with Disability" },
     { value: "sc", title: "SC — Scheduled Caste" },
     { value: "st", title: "ST — Scheduled Tribe" },
-  ];
-
-  const images = [
-    "/7dr.png",
-    "/1dr_1.png",
-    "/3dr.png",
-    "/4dr.png",
-    "/6dr.png",
-    "https://www.ipmcareer.com/wp-content/uploads/2024/03/coppred.png",
   ];
 
   async function getCount() {
@@ -317,18 +307,6 @@ function Call() {
                     })}
                   </div>
 
-                  <div
-                    className="cp-promo"
-                    style={{ margin: "0 0 16px", borderRadius: 14 }}
-                  >
-                    <h2>Special PI Batch</h2>
-                    <p>
-                      Ace your IPMAT Personal Interview with expert guidance.
-                    </p>
-                    <a href="https://register.ipmcareer.com/pi-batch">
-                      Enroll Now @ ₹99 →
-                    </a>
-                  </div>
                   <button
                     className="cp-btn cp-btn-secondary"
                     onClick={() => {
@@ -376,9 +354,9 @@ function Call() {
 
       <AppShell activePage="/call">
         <div className="cp-root">
-          <div className="cp-hero">
+          <div className="cp-hero" style={{gridTemplateColumns: '1fr'}}>
             {/* LEFT PANEL */}
-            <div className="cp-left" ref={scrolldiv}>
+            <div className="cp-left" ref={scrolldiv} style={{maxWidth: 680, margin: '0 auto'}}>
               <p className="cp-eyebrow">Free Tool · AI Powered</p>
               <h1 className="cp-heading">
                 IPMAT
@@ -495,41 +473,6 @@ function Call() {
               </div>
             </div>
 
-            {/* RIGHT PANEL */}
-            <div className="cp-right">
-              <div className="cp-right-inner">
-                <p className="cp-right-title">Featured in</p>
-                <div className="cp-images-col">
-                  <Marquee autoFill speed={40} gradient={false} direction="left">
-                    {images.map((i, d) => (
-                      <img key={d} src={i} className="cp-marquee-img" alt="" />
-                    ))}
-                  </Marquee>
-                  <Marquee autoFill speed={30} gradient={false} direction="right">
-                    {images.map((i, d) => (
-                      <img key={d} src={i} className="cp-marquee-img" alt="" />
-                    ))}
-                  </Marquee>
-                  <Marquee autoFill speed={50} gradient={false} direction="left">
-                    {images.map((i, d) => (
-                      <img key={d} src={i} className="cp-marquee-img" alt="" />
-                    ))}
-                  </Marquee>
-                  <Marquee autoFill speed={35} gradient={false} direction="right">
-                    {images.map((i, d) => (
-                      <img key={d} src={i} className="cp-marquee-img" alt="" />
-                    ))}
-                  </Marquee>
-                </div>
-                <div className="cp-promo">
-                  <h2>Special PI Batch</h2>
-                  <p>Ace your IPMAT Personal Interview with expert guidance.</p>
-                  <a href="https://register.ipmcareer.com/pi-batch">
-                    Enroll Now @ ₹99 →
-                  </a>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </AppShell>
