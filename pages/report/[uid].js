@@ -637,7 +637,7 @@ function Report({ data, error, isFound }) {
     return d.reduce((sum, i) => {
       if (i.status === 'Answered' || i.status === 'Marked For Review') {
         if (i.rightAnswer == i.givenAnswer) return sum + addScore;
-        else if (i.rightAnswer != i.givenAnswer && subtractScore > 0)
+        else if (i.rightAnswer != i.givenAnswer && subtractScore > 0 )
           return sum - subtractScore;
       }
       return sum;
