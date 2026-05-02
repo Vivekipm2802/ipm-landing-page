@@ -32,22 +32,19 @@ const router = useRouter()
       }
       
     },[data])
-    function calculateScores(d, subtractScore,addScore,special) {
+    function calculateScores(d, subtractScore,addScore) {
         if (!d || !Array.isArray(d)) {
           return 0;
         }
-     
-
-        
         return d.reduce((sum, i) => {
           if (i.status === "Answered" || i.status === "Marked For Review") {
             if (i.rightAnswer == i.givenAnswer) {
-              return sum + addScore; // Increase the score by 1 if the answer is correct
-            } else if(i.rightAnswer != i.givenAnswer && subtractScore > 0 && !(special == true && i.givenAnswer.length > 1)) {
-              return sum - subtractScore; // Subtract the given score if the answer is incorrect
+              return sum + addScore;
+            } else if(i.rightAnswer != i.givenAnswer && subtractScore > 0) {
+              return sum - subtractScore;
             }
           }
-          return sum; // Keep the same score for unanswered questions
+          return sum;
         }, 0);
       }
     function convertCamelCaseToNormalText(camelCaseString) {
@@ -128,12 +125,12 @@ return <div className='flex flex-col bg-gray-100 h-screen w-full justify-center 
     <div className={styles.scorewrapper}>
     <div><h3>SA(QA)</h3><p>{calculateScores(jsonData.sa,0,4)}</p></div>
     <div><h3>MCQ(QA)</h3><p>{calculateScores(jsonData.mcq,1,4)}</p></div>
-    <div><h3>VA(MCQ)</h3><p>{calculateScores(jsonData.va,1,4,true)}
+    <div><h3>VA(MCQ)</h3><p>{calculateScores(jsonData.va,1,4)}
        
         </p></div>
 
         <div><h3>Total</h3><p>
-        {calculateScores(jsonData.sa,0,4) + calculateScores(jsonData.mcq,1,4) + calculateScores(jsonData.va,1,4,true)}
+        {calculateScores(jsonData.sa,0,4) + calculateScores(jsonData.mcq,1,4) + calculateScores(jsonData.va,1,4)}
         </p></div>
         </div>
 
