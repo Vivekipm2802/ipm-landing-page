@@ -206,12 +206,12 @@ const s = StyleSheet.create({
 });
 
 /* ─── Helpers ─── */
-function calculateScores(d, subtractScore, addScore, special) {
+function calculateScores(d, subtractScore, addScore) {
   if (!d || !Array.isArray(d)) return 0;
   return d.reduce((sum, i) => {
     if (i.status === 'Answered' || i.status === 'Marked For Review') {
       if (i.rightAnswer == i.givenAnswer) return sum + addScore;
-      else if (i.rightAnswer != i.givenAnswer && subtractScore > 0 && !(special && i.givenAnswer.length > 1))
+      else if (i.rightAnswer != i.givenAnswer && subtractScore > 0)
         return sum - subtractScore;
     }
     return sum;
@@ -484,7 +484,7 @@ export default async function handler(req, res) {
     // 2. Calculate scores
     const saScore  = calculateScores(saData, 0, 4);
     const mcqScore = calculateScores(mcqData, 1, 4);
-    const vaScore  = calculateScores(vaData, 1, 4, true);
+    const vaScore  = calculateScores(vaData, 1, 4);
     const totalScore = saScore + mcqScore + vaScore;
 
     const scores = {
