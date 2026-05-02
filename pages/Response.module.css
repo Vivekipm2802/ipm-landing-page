@@ -1,13 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════════
    Response Page — Modern Gen-Z Redesign
-   Design System: IPM Careers purple (#6c63ff) + gold (#f5a623)
+   Design System: IPM Careers purple (#833589) + gold (#f5a623)
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Base Layout ── */
 .page {
   min-height: 100vh;
-  background: linear-gradient(165deg, #f8f7ff 0%, #fff 40%, #fef9f0 100%);
-  font-family: 'Inter', 'Poppins', -apple-system, sans-serif;
+  background: linear-gradient(165deg, #FAF5FB 0%, #fff 35%, #F3E8F5 70%, #FAF5FB 100%);
+  font-family: 'DM Sans', 'Inter', -apple-system, sans-serif;
 }
 
 /* ── Hero Section — Animated Gradient Mesh ── */
@@ -24,10 +24,10 @@
   position: absolute;
   inset: -40%;
   background:
-    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(108,99,255,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 80% 20%, rgba(139,92,246,0.14) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 40% at 50% 70%, rgba(245,166,35,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse 35% 35% at 70% 80%, rgba(34,197,94,0.08) 0%, transparent 50%);
+    radial-gradient(ellipse 55% 45% at 25% 30%, rgba(131,53,137,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 55% at 75% 25%, rgba(168,85,181,0.09) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 35% at 50% 75%, rgba(245,166,35,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 30% 30% at 80% 70%, rgba(34,197,94,0.05) 0%, transparent 45%);
   animation: meshRotate 12s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
@@ -49,7 +49,7 @@
 .heroGlow1 {
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, #6c63ff50, #8b5cf630, transparent 70%);
+  background: radial-gradient(circle, rgba(131,53,137,0.3), rgba(168,85,181,0.18), transparent 70%);
   top: -80px;
   right: -100px;
   animation: glowFloat1 6s ease-in-out infinite;
@@ -57,7 +57,7 @@
 .heroGlow2 {
   width: 240px;
   height: 240px;
-  background: radial-gradient(circle, #f5a62340, #fbbf2430, transparent 70%);
+  background: radial-gradient(circle, rgba(245,166,35,0.25), rgba(251,191,36,0.18), transparent 70%);
   bottom: -60px;
   left: -80px;
   animation: glowFloat2 8s ease-in-out infinite;
@@ -65,7 +65,7 @@
 .heroGlow3 {
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, #22c55e25, #10b98118, transparent 65%);
+  background: radial-gradient(circle, rgba(34,197,94,0.14), rgba(16,185,129,0.09), transparent 65%);
   top: 25%;
   left: 45%;
   animation: glowFloat3 7s ease-in-out infinite;
@@ -89,14 +89,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 20px;
-  background: rgba(108, 99, 255, 0.06);
+  background: rgba(131, 53, 137, 0.06);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(108, 99, 255, 0.18);
+  border: 1.5px solid rgba(131, 53, 137, 0.18);
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #6c63ff;
+  color: #833589;
   letter-spacing: 0.5px;
   margin-bottom: 1.5rem;
   position: relative;
@@ -111,7 +111,7 @@
   left: -100%;
   width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(108,99,255,0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(131,53,137,0.12), transparent);
   animation: shimmer 3s ease-in-out infinite 1s;
 }
 @keyframes shimmer {
@@ -141,7 +141,7 @@
 .heroTitle {
   font-size: 2.6rem;
   font-weight: 900;
-  color: #1a1a2e;
+  color: #1a0a1e;
   line-height: 1.12;
   margin: 0 0 1rem;
   letter-spacing: -0.03em;
@@ -152,7 +152,7 @@
 
 /* Animated gradient text with color shifting */
 .heroTitleAccent {
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6, #a855f7, #6c63ff);
+  background: linear-gradient(135deg, #833589, #9B45A3, #A855B5, #833589);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -167,7 +167,7 @@
   left: 5%;
   width: 90%;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #6c63ff60, #8b5cf660, transparent);
+  background: linear-gradient(90deg, transparent, rgba(131,53,137,0.37), rgba(155,69,163,0.37), transparent);
   border-radius: 2px;
   animation: underlineGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
 }
@@ -182,7 +182,7 @@
 
 .heroSubtitle {
   font-size: 1.05rem;
-  color: #64748b;
+  color: #6B4D72;
   margin: 0 0 1.75rem;
   line-height: 1.6;
   font-weight: 500;
@@ -208,7 +208,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: #475569;
+  color: #5A3D62;
   font-weight: 600;
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.65);
@@ -216,17 +216,17 @@
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(108, 99, 255, 0.06);
+  box-shadow: 0 2px 12px rgba(131, 53, 137, 0.06);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .proofStat:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 18px rgba(108, 99, 255, 0.12);
+  box-shadow: 0 4px 18px rgba(131, 53, 137, 0.12);
 }
 .proofStatNum {
   font-size: 1.15rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+  background: linear-gradient(135deg, #833589, #9B45A3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -235,7 +235,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #cbd5e1;
+  background: #D9B3E0;
 }
 
 /* ── Main Content ── */
@@ -252,7 +252,7 @@
   -webkit-backdrop-filter: blur(16px);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 8px 32px rgba(108, 99, 255, 0.08), 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 8px 32px rgba(131, 53, 137, 0.08), 0 2px 8px rgba(0,0,0,0.04);
   border: 1px solid rgba(255, 255, 255, 0.6);
   margin-bottom: 1.5rem;
   animation: fadeSlideUp 1s ease-out;
@@ -260,12 +260,12 @@
 .formTitle {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
   margin: 0 0 4px;
 }
 .formSubtitle {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #9B7BA3;
   margin: 0 0 1.5rem;
   font-weight: 500;
 }
@@ -286,15 +286,15 @@
 .formLabel {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #475569;
+  color: #5A3D62;
   letter-spacing: 0.2px;
 }
 .formInput {
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #E5C9EA;
   border-radius: 12px;
   font-size: 0.92rem;
-  color: #1a1a2e;
+  color: #1a0a1e;
   background: #fff;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
@@ -302,18 +302,18 @@
   font-family: inherit;
 }
 .formInput:focus {
-  border-color: #6c63ff;
-  box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+  border-color: #833589;
+  box-shadow: 0 0 0 3px rgba(131,53,137,0.1);
 }
 .formInput::placeholder {
-  color: #94a3b8;
+  color: #9B7BA3;
 }
 .formSelect {
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #E5C9EA;
   border-radius: 12px;
   font-size: 0.92rem;
-  color: #1a1a2e;
+  color: #1a0a1e;
   background: #fff;
   transition: border-color 0.2s;
   outline: none;
@@ -327,11 +327,11 @@
   font-family: inherit;
 }
 .formSelect:focus {
-  border-color: #6c63ff;
+  border-color: #833589;
 }
 .urlHint {
   font-size: 0.76rem;
-  color: #94a3b8;
+  color: #9B7BA3;
   margin-top: 2px;
   line-height: 1.4;
 }
@@ -345,7 +345,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+  background: linear-gradient(135deg, #833589, #9B45A3);
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 8px;
@@ -358,7 +358,7 @@
 }
 .generateBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(108,99,255,0.35);
+  box-shadow: 0 8px 24px rgba(131,53,137,0.35);
 }
 .generateBtn:active {
   transform: translateY(0);
@@ -429,7 +429,7 @@
 
 /* ── Scorecard Result ── */
 .scorecardResult {
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #833589, #9B45A3, #6B2D73);
   border-radius: 20px;
   padding: 2rem;
   color: #fff;
@@ -534,7 +534,7 @@
   border-radius: 16px;
   padding: 1.25rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5C9EA;
   text-align: center;
   transition: all 0.2s;
   cursor: pointer;
@@ -547,7 +547,7 @@
 .actionCard:hover {
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   transform: translateY(-2px);
-  border-color: #6c63ff30;
+  border-color: rgba(131,53,137,0.18);
 }
 .actionCardFull {
   grid-column: 1 / -1;
@@ -558,11 +558,11 @@
 .actionLabel {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
 }
 .actionDesc {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: #9B7BA3;
 }
 .actionBtnPrimary {
   display: inline-flex;
@@ -574,25 +574,25 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+  background: linear-gradient(135deg, #833589, #9B45A3);
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
   font-family: inherit;
 }
 .actionBtnPrimary:hover {
-  box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+  box-shadow: 0 4px 16px rgba(131,53,137,0.3);
 }
 .actionBtnSecondary {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 10px 24px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #E5C9EA;
   border-radius: 12px;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #475569;
+  color: #5A3D62;
   background: #fff;
   cursor: pointer;
   transition: all 0.2s;
@@ -600,8 +600,8 @@
   font-family: inherit;
 }
 .actionBtnSecondary:hover {
-  border-color: #6c63ff;
-  color: #6c63ff;
+  border-color: #833589;
+  color: #833589;
 }
 
 /* ── How-To Steps ── */
@@ -610,7 +610,7 @@
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5C9EA;
   margin-bottom: 1.5rem;
 }
 .stepsToggle {
@@ -623,7 +623,7 @@
 .stepsTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -632,12 +632,12 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: #f1f5f9;
+  background: #F3E8F5;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  color: #64748b;
+  color: #6B4D72;
   transition: transform 0.3s;
 }
 .stepsArrowOpen {
@@ -653,7 +653,7 @@
   display: flex;
   gap: 14px;
   padding: 14px 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #F3E8F5;
   align-items: flex-start;
 }
 .step:last-child {
@@ -664,8 +664,8 @@
   height: 30px;
   min-width: 30px;
   border-radius: 10px;
-  background: #6c63ff12;
-  color: #6c63ff;
+  background: rgba(131,53,137,0.07);
+  color: #833589;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -674,12 +674,12 @@
 }
 .stepText {
   font-size: 0.9rem;
-  color: #475569;
+  color: #5A3D62;
   line-height: 1.6;
   flex: 1;
 }
 .stepLink {
-  color: #6c63ff;
+  color: #833589;
   font-weight: 600;
   text-decoration: none;
   word-break: break-all;
@@ -689,7 +689,7 @@
 }
 .stepBold {
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
 }
 
 /* ── Feature Cards (bottom) ── */
@@ -704,7 +704,7 @@
   border-radius: 16px;
   padding: 1.25rem;
   box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5C9EA;
   text-align: center;
   transition: all 0.2s;
   text-decoration: none;
@@ -716,7 +716,7 @@
 .featureCard:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   transform: translateY(-2px);
-  border-color: #6c63ff20;
+  border-color: rgba(131,53,137,0.12);
 }
 .featureIcon {
   font-size: 1.8rem;
@@ -724,11 +724,11 @@
 .featureName {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
 }
 .featureDesc {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #9B7BA3;
   line-height: 1.4;
 }
 
@@ -739,8 +739,8 @@
   justify-content: center;
   gap: 10px;
   padding: 10px 18px;
-  background: linear-gradient(135deg, #6c63ff08, #8b5cf608);
-  border: 1px solid #6c63ff15;
+  background: linear-gradient(135deg, rgba(131,53,137,0.03), rgba(155,69,163,0.03));
+  border: 1px solid rgba(131,53,137,0.08);
   border-radius: 14px;
   margin-bottom: 1.5rem;
 }
@@ -754,12 +754,12 @@
 }
 .liveTickerText {
   font-size: 0.82rem;
-  color: #475569;
+  color: #5A3D62;
   font-weight: 500;
 }
 .liveTickerName {
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
 }
 
 /* ── Topper Badges ── */
@@ -777,10 +777,10 @@
   padding: 8px 14px;
   background: #fff;
   border-radius: 100px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5C9EA;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: #5A3D62;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .topperRank {
@@ -795,15 +795,15 @@
   color: #fff;
 }
 .topperRank1 { background: linear-gradient(135deg, #f5a623, #f59e0b); }
-.topperRank2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+.topperRank2 { background: linear-gradient(135deg, #9B7BA3, #6B4D72); }
 .topperRank3 { background: linear-gradient(135deg, #d97706, #b45309); }
 .topperScore {
-  color: #6c63ff;
+  color: #833589;
   font-weight: 800;
 }
 .topperOurs {
   padding: 2px 8px;
-  background: #f5a62320;
+  background: rgba(245,166,35,0.12);
   color: #d97706;
   border-radius: 100px;
   font-size: 0.65rem;
@@ -840,28 +840,28 @@
   width: 32px;
   height: 32px;
   border: none;
-  background: #f1f5f9;
+  background: #F3E8F5;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: #6B4D72;
   transition: background 0.2s;
 }
 .modalClose:hover {
-  background: #e2e8f0;
+  background: #E5D0EA;
 }
 .modalTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1a0a1e;
   margin: 0 0 8px;
 }
 .modalText {
   font-size: 0.88rem;
-  color: #64748b;
+  color: #6B4D72;
   line-height: 1.6;
   margin: 0 0 1.5rem;
 }
@@ -875,7 +875,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+  background: linear-gradient(135deg, #833589, #9B45A3);
   cursor: pointer;
   text-decoration: none;
   font-family: inherit;
