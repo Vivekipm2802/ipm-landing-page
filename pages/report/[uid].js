@@ -632,12 +632,12 @@ function Report({ data, error, isFound }) {
   const router = useRouter();
 
   // Score calculation
-  const calculateScores = (d, subtractScore, addScore, special) => {
+  const calculateScores = (d, subtractScore, addScore) => {
     if (!d || !Array.isArray(d)) return 0;
     return d.reduce((sum, i) => {
       if (i.status === 'Answered' || i.status === 'Marked For Review') {
         if (i.rightAnswer == i.givenAnswer) return sum + addScore;
-        else if (i.rightAnswer != i.givenAnswer && subtractScore > 0 && !(special == true && i.givenAnswer.length > 1))
+        else if (i.rightAnswer != i.givenAnswer && subtractScore > 0)
           return sum - subtractScore;
       }
       return sum;
@@ -653,8 +653,7 @@ function Report({ data, error, isFound }) {
       else {
         attempted++;
         if (i.rightAnswer == i.givenAnswer) correct++;
-        else if (subtractScore > 0 && !(type === 'va' && i.givenAnswer.length > 1)) incorrect++;
-        else if (type === 'va' && i.givenAnswer.length > 1) incorrect++;
+        else incorrect++;
       }
     });
     return { correct, incorrect, unattempted, attempted, total: d.length };
@@ -671,7 +670,7 @@ function Report({ data, error, isFound }) {
 
         const saScore = calculateScores(saData, 0, 4);
         const mcqScore = calculateScores(mcqData, 1, 4);
-        const vaScore = calculateScores(vaData, 1, 4, true);
+        const vaScore = calculateScores(vaData, 1, 4);
         const totalScore = saScore + mcqScore + vaScore;
         const saMax = saData.length * 4;
         const mcqMax = mcqData.length * 4;
