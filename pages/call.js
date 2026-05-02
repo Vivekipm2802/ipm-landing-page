@@ -30,11 +30,6 @@ function Call() {
     { value: "sc", title: "SC — Scheduled Caste" },
     { value: "st", title: "ST — Scheduled Tribe" },
   ];
-  const genders = [
-    { value: "male", title: "Male" },
-    { value: "female", title: "Female" },
-    { value: "nos", title: "Prefer not to say" },
-  ];
 
   const images = [
     "/7dr.png",
@@ -59,11 +54,6 @@ function Call() {
   function validatePhone(phone) {
     return /^[6-9]\d{9}$/.test(phone);
   }
-  function validateEmail(email) {
-    return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      String(email).toLowerCase(),
-    );
-  }
   function validateName(name) {
     return name.length >= 2 && name.length <= 50 && /^[a-zA-Z\s]+$/.test(name);
   }
@@ -74,9 +64,7 @@ function Call() {
       va: a.va,
       sa: a.sa,
       qa: a.qa,
-      email: a.email,
       phone: a.phone,
-      gender: a.gender,
       category: a.category,
     });
   }
@@ -138,16 +126,8 @@ function Call() {
       setError("Please select your category.");
       return;
     }
-    if (!a.gender) {
-      setError("Please select your gender.");
-      return;
-    }
     if (!a.phone || !validatePhone(a.phone)) {
       setError("Enter a valid 10-digit mobile number (no country code).");
-      return;
-    }
-    if (!a.email || !validateEmail(a.email)) {
-      setError("Enter a valid email address.");
       return;
     }
     if (a.qa === undefined || a.qa === "") {
@@ -175,7 +155,7 @@ function Call() {
       console.log("API response:", response?.data);
       cronberryTrigger(
         a.fullname,
-        a.email,
+        "",
         a.phone,
         "Not Specified",
         "https://register.ipmcareer.com/call",
@@ -214,6 +194,7 @@ function Call() {
       </div>
     );
   }
+
   if (data) {
     return (
       <>
@@ -291,115 +272,42 @@ function Call() {
                       </div>
                     </div>
                   )}
-              
+
                   <div className="cp-college-grid">
                     {data.map((name, idx) => {
                       const c = collegesData[name];
                       if (!c) return null;
+                      const statusColor = c.status === "OPEN" ? "#22c55e" : c.status === "CLOSED" ? "#ef4444" : "#f59e0b";
+                      const statusBg = c.status === "OPEN" ? "rgba(34,197,94,0.15)" : c.status === "CLOSED" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)";
+                      const dateColor = c.status === "OPEN" ? "#22c55e" : c.status === "CLOSED" ? "#ef4444" : "#f59e0b";
                       return (
-                        <div
-                          className="cp-college-card"
-                          key={name}
-                          style={{
-                            animationDelay: `${idx * 80}ms`,
-                            position: "relative",
-                            overflow: "hidden",
-                          }}
-                        >
-                          {/* Active dot - green if link exists, orange if coming soon */}
-                          <div
-                            style={{ position: "absolute", top: 10, right: 10 }}
-                          >
-                            <span
-                              style={{ display: "flex", height: 10, width: 10 }}
-                            >
-                              <span
-                                style={{
-                                  position: "absolute",
-                                  display: "inline-flex",
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: "50%",
-                                  backgroundColor: c.link
-                                    ? "#22c55e"
-                                    : "#f59e0b",
-                                  opacity: 0.75,
-                                  animation:
-                                    "ping 1.5s cubic-bezier(0,0,0.2,1) infinite",
-                                }}
-                              />
-                              <span
-                                style={{
-                                  position: "relative",
-                                  display: "inline-flex",
-                                  borderRadius: "50%",
-                                  height: 10,
-                                  width: 10,
-                                  backgroundColor: c.link
-                                    ? "#16a34a"
-                                    : "#d97706",
-                                }}
-                              />
-                            </span>
+                        <div className="cp-dark-card" key={name} style={{ animationDelay: `${idx * 80}ms` }}>
+                          <h3 className="cp-dark-card-title">{c.title}</h3>
+
+                          <div className="cp-dark-card-row">
+                            <div className="cp-dark-card-icon">📅</div>
+                            <span className="cp-dark-card-label">Exam Accepted</span>
+                            <span className="cp-dark-card-value">{c.exam || "IPMAT"}</span>
                           </div>
 
-                          <img
-                            className="cp-college-img"
-                            src={c.picture}
-                            alt={c.title}
-                            onError={(e) => {
-                              e.target.src =
-                                "https://via.placeholder.com/400x110/F0E0F4/833589?text=College";
-                            }}
-                          />
-                          <div className="cp-college-name">{c.title}</div>
-                          <div className="cp-college-loc">📍 {c.location}</div>
+                          <div className="cp-dark-card-row">
+                            <div className="cp-dark-card-icon">🕐</div>
+                            <span className="cp-dark-card-label">Last Date</span>
+                            <span className="cp-dark-card-date" style={{ color: dateColor }}>{c.lastDate || "TBA"}</span>
+                          </div>
 
-                          {/* Updated footer with Apply Now / Coming Soon */}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              width: "100%",
-                              marginTop: "auto",
-                              gap: "8px",
-                            }}
-                          >
-                            <div className="cp-college-badge">Likely Call</div>
+                          <div className="cp-dark-card-divider"></div>
+
+                          <div className="cp-dark-card-footer">
+                            <span className="cp-dark-card-status" style={{ color: statusColor, background: statusBg }}>
+                              {c.status || "OPEN"}
+                            </span>
                             {c.link ? (
-                              <a
-                                href={c.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  color: "#833589",
-                                  background: "#F0E0F4",
-                                  border: "1px solid #D9B3E0",
-                                  borderRadius: 100,
-                                  padding: "4px 12px",
-                                  textDecoration: "none",
-                                  whiteSpace: "nowrap",
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                Apply Now →
+                              <a href={c.link} target="_blank" rel="noopener noreferrer" className="cp-dark-card-link">
+                                Official Website <span style={{ fontSize: 10 }}>↗</span>
                               </a>
                             ) : (
-                              <span
-                                style={{
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  color: "#d97706",
-                                  background: "#FEF3C7",
-                                  border: "1px solid #FCD34D",
-                                  borderRadius: 100,
-                                  padding: "4px 12px",
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
+                              <span className="cp-dark-card-link" style={{ opacity: 0.4, cursor: "default" }}>
                                 Coming Soon
                               </span>
                             )}
@@ -408,6 +316,7 @@ function Call() {
                       );
                     })}
                   </div>
+
                   <div
                     className="cp-promo"
                     style={{ margin: "0 0 16px", borderRadius: 14 }}
@@ -465,191 +374,165 @@ function Call() {
       />
       {isVisible && <Confetti />}
 
-      <div className="cp-root">
-        <div className="cp-hero">
-          {/* LEFT PANEL */}
-          <div className="cp-left" ref={scrolldiv}>
-            <img src="/hd-logo.svg" className="cp-logo" alt="IPM Careers" />
+      <AppShell activePage="/call">
+        <div className="cp-root">
+          <div className="cp-hero">
+            {/* LEFT PANEL */}
+            <div className="cp-left" ref={scrolldiv}>
+              <p className="cp-eyebrow">Free Tool · AI Powered</p>
+              <h1 className="cp-heading">
+                IPMAT
+                <br />
+                <span>Call Predictor</span>
+              </h1>
+              <p className="cp-subheading">
+                Enter your scores and profile to instantly find out which IIMs and
+                top colleges are likely to call you for admission.
+              </p>
 
-            <p className="cp-eyebrow">Free Tool · AI Powered</p>
-            <h1 className="cp-heading">
-              IPMAT
-              <br />
-              <span>Call Predictor</span>
-            </h1>
-            <p className="cp-subheading">
-              Enter your scores and profile to instantly find out which IIMs and
-              top colleges are likely to call you for admission.
-            </p>
-
-            <div className="cp-counter">
-              <div className="cp-counter-dot"></div>
-              <span>
-                <strong>{count}+</strong> students predicted their call
-              </span>
-            </div>
-
-            <div className="cp-form">
-              <div className="cp-field">
-                <label className="cp-label">Full Name</label>
-                <input
-                  className="cp-input"
-                  placeholder="Write your Name"
-                  type="text"
-                  onChange={(e) => updateField("fullname", e.target.value)}
-                />
+              <div className="cp-counter">
+                <div className="cp-counter-dot"></div>
+                <span>
+                  <strong>{count}+</strong> students predicted their call
+                </span>
               </div>
 
-              <div className="cp-row">
+              <div className="cp-form">
                 <div className="cp-field">
-                  <label className="cp-label">Category</label>
-                  <select
-                    className="cp-select"
-                    onChange={(e) => updateField("category", e.target.value)}
-                  >
-                    <option value="">Select</option>
-                    {categories.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="cp-field">
-                  <label className="cp-label">Gender</label>
-                  <select
-                    className="cp-select"
-                    onChange={(e) => updateField("gender", e.target.value)}
-                  >
-                    <option value="">Select</option>
-                    {genders.map((g) => (
-                      <option key={g.value} value={g.value}>
-                        {g.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="cp-row">
-                <div className="cp-field">
-                  <label className="cp-label">Mobile Number</label>
+                  <label className="cp-label">Full Name</label>
                   <input
                     className="cp-input"
-                    placeholder="10-digit number"
-                    type="tel"
-                    onChange={(e) => updateField("phone", e.target.value)}
+                    placeholder="Write your Name"
+                    type="text"
+                    onChange={(e) => updateField("fullname", e.target.value)}
                   />
                 </div>
-                <div className="cp-field">
-                  <label className="cp-label">Email Address</label>
-                  <input
-                    className="cp-input"
-                    placeholder="you@email.com"
-                    type="email"
-                    onChange={(e) => updateField("email", e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <div className="cp-marks-divider">
-                <p className="cp-marks-title">Your IPMAT Scores</p>
-                <div className="cp-marks-row">
+                <div className="cp-row">
                   <div className="cp-field">
-                    <label className="cp-label">QA (MCQ)</label>
-                    <input
-                      className="cp-input"
-                      placeholder="0–120"
-                      type="number"
-                      min="0"
-                      max="120"
-                      onChange={(e) => updateField("qa", e.target.value)}
-                    />
+                    <label className="cp-label">Category</label>
+                    <select
+                      className="cp-select"
+                      onChange={(e) => updateField("category", e.target.value)}
+                    >
+                      <option value="">Select</option>
+                      {categories.map((c) => (
+                        <option key={c.value} value={c.value}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="cp-field">
-                    <label className="cp-label">QA (SA)</label>
+                    <label className="cp-label">Mobile Number</label>
                     <input
                       className="cp-input"
-                      placeholder="0–60"
-                      type="number"
-                      min="0"
-                      max="60"
-                      onChange={(e) => updateField("sa", e.target.value)}
-                    />
-                  </div>
-                  <div className="cp-field">
-                    <label className="cp-label">Verbal (VA)</label>
-                    <input
-                      className="cp-input"
-                      placeholder="0–180"
-                      type="number"
-                      min="0"
-                      max="180"
-                      onChange={(e) => updateField("va", e.target.value)}
+                      placeholder="10-digit number"
+                      type="tel"
+                      onChange={(e) => updateField("phone", e.target.value)}
                     />
                   </div>
                 </div>
+
+                <div className="cp-marks-divider">
+                  <p className="cp-marks-title">Your IPMAT Scores</p>
+                  <div className="cp-marks-row">
+                    <div className="cp-field">
+                      <label className="cp-label">QA (MCQ)</label>
+                      <input
+                        className="cp-input"
+                        placeholder="0-120"
+                        type="number"
+                        min="0"
+                        max="120"
+                        onChange={(e) => updateField("qa", e.target.value)}
+                      />
+                    </div>
+                    <div className="cp-field">
+                      <label className="cp-label">QA (SA)</label>
+                      <input
+                        className="cp-input"
+                        placeholder="0-60"
+                        type="number"
+                        min="0"
+                        max="60"
+                        onChange={(e) => updateField("sa", e.target.value)}
+                      />
+                    </div>
+                    <div className="cp-field">
+                      <label className="cp-label">Verbal (VA)</label>
+                      <input
+                        className="cp-input"
+                        placeholder="0-180"
+                        type="number"
+                        min="0"
+                        max="180"
+                        onChange={(e) => updateField("va", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {error && <div className="cp-error">{error}</div>}
+
+                <button
+                  className="cp-btn"
+                  onClick={() => TestApi(formData)}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="cp-spinner"></div>
+                  ) : (
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                        fill="white"
+                      />
+                    </svg>
+                  )}
+                  {loading ? "Predicting..." : "Predict My Calls"}
+                </button>
               </div>
-
-              {error && <div className="cp-error">{error}</div>}
-
-              <button
-                className="cp-btn"
-                onClick={() => TestApi(formData)}
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="cp-spinner"></div>
-                ) : (
-                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                      fill="white"
-                    />
-                  </svg>
-                )}
-                {loading ? "Predicting..." : "Predict My Calls"}
-              </button>
             </div>
-          </div>
 
-          {/* RIGHT PANEL */}
-          <div className="cp-right">
-            <div className="cp-right-inner">
-              <p className="cp-right-title">Featured in</p>
-              <div className="cp-images-col">
-                <Marquee autoFill speed={40} gradient={false} direction="left">
-                  {images.map((i, d) => (
-                    <img key={d} src={i} className="cp-marquee-img" alt="" />
-                  ))}
-                </Marquee>
-                <Marquee autoFill speed={30} gradient={false} direction="right">
-                  {images.map((i, d) => (
-                    <img key={d} src={i} className="cp-marquee-img" alt="" />
-                  ))}
-                </Marquee>
-                <Marquee autoFill speed={50} gradient={false} direction="left">
-                  {images.map((i, d) => (
-                    <img key={d} src={i} className="cp-marquee-img" alt="" />
-                  ))}
-                </Marquee>
-                <Marquee autoFill speed={35} gradient={false} direction="right">
-                  {images.map((i, d) => (
-                    <img key={d} src={i} className="cp-marquee-img" alt="" />
-                  ))}
-                </Marquee>
-              </div>
-              <div className="cp-promo">
-                <h2>Special PI Batch</h2>
-                <p>Ace your IPMAT Personal Interview with expert guidance.</p>
-                <a href="https://register.ipmcareer.com/pi-batch">
-                  Enroll Now @ ₹99 →
-                </a>
+            {/* RIGHT PANEL */}
+            <div className="cp-right">
+              <div className="cp-right-inner">
+                <p className="cp-right-title">Featured in</p>
+                <div className="cp-images-col">
+                  <Marquee autoFill speed={40} gradient={false} direction="left">
+                    {images.map((i, d) => (
+                      <img key={d} src={i} className="cp-marquee-img" alt="" />
+                    ))}
+                  </Marquee>
+                  <Marquee autoFill speed={30} gradient={false} direction="right">
+                    {images.map((i, d) => (
+                      <img key={d} src={i} className="cp-marquee-img" alt="" />
+                    ))}
+                  </Marquee>
+                  <Marquee autoFill speed={50} gradient={false} direction="left">
+                    {images.map((i, d) => (
+                      <img key={d} src={i} className="cp-marquee-img" alt="" />
+                    ))}
+                  </Marquee>
+                  <Marquee autoFill speed={35} gradient={false} direction="right">
+                    {images.map((i, d) => (
+                      <img key={d} src={i} className="cp-marquee-img" alt="" />
+                    ))}
+                  </Marquee>
+                </div>
+                <div className="cp-promo">
+                  <h2>Special PI Batch</h2>
+                  <p>Ace your IPMAT Personal Interview with expert guidance.</p>
+                  <a href="https://register.ipmcareer.com/pi-batch">
+                    Enroll Now @ ₹99 →
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </AppShell>
     </>
   );
 }
