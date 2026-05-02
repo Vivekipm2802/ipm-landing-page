@@ -36,15 +36,18 @@ const router = useRouter()
         if (!d || !Array.isArray(d)) {
           return 0;
         }
+     
+
+        
         return d.reduce((sum, i) => {
           if (i.status === "Answered" || i.status === "Marked For Review") {
             if (i.rightAnswer == i.givenAnswer) {
-              return sum + addScore;
-            } else if(i.rightAnswer != i.givenAnswer && subtractScore > 0) {
-              return sum - subtractScore;
+              return sum + addScore; // Increase the score by 1 if the answer is correct
+            } else if(i.rightAnswer != i.givenAnswer && subtractScore > 0 ) {
+              return sum - subtractScore; // Subtract the given score if the answer is incorrect
             }
           }
-          return sum;
+          return sum; // Keep the same score for unanswered questions
         }, 0);
       }
     function convertCamelCaseToNormalText(camelCaseString) {
