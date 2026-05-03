@@ -1,13 +1,22 @@
-// Blog card used on /blogs grid.
-// Visual: dark glassy card, gradient cover (CSS only, no image asset),
-// bold title, small tagline, "ipmcareer.com" mark in cover bottom-right,
-// category pill, tag chips, reading time + date in footer.
+// Blog card used on /magazine grid.
+// Cover is a real PNG rendered by /api/og/[slug] (cached forever by Vercel
+// after first generation, so subsequent loads are instant). The PNG already
+// contains the category pill, title, brand mark, and tagline — we just
+// surround it with a hover frame and the body (excerpt, tags, date).
 
 import Link from 'next/link';
-import { gradientCss, gradientFor, timeAgo } from '../lib/gradients';
+import { gradientFor } from '../lib/gradients';
 
 export default function BlogCard({ blog, featured = false }) {
   const g = gradientFor(blog.cover_gradient || blog.category);
+
+  // Build OG image URL with category param so the gradient + accent match
+  const ogParams = new URLSearchParams();
+  if (blog.category)        ogParams.set('category', blog.category);
+  if (blog.cover_title)     ogParams.set('title', blog.cover_title);
+  if (blog.cover_subtitle)  ogParams.set('subtitle', blog.cover_subtitle);
+  const ogUrl = `/api/og/${blog.slug}?${ogParams.toString()}`;
+
   return (
     <Link
       href={`/magazine/${blog.slug}`}
@@ -18,56 +27,32 @@ export default function BlogCard({ blog, featured = false }) {
         (featured ? 'md:col-span-2 md:row-span-2' : '')
       }
     >
-      {/* Cover */}
+      {/* Cover — real PNG via /api/og */}
       <div
-        className={'relative w-full ' + (featured ? 'aspect-[16/9]' : 'aspect-[16/10]')}
-        style={{ backgroundImage: gradientCss(blog.cover_gradient || blog.category) }}
+        className={'relative w-full overflow-hidden ' + (featured ? 'aspect-[16/9]' : 'aspect-[16/10]')}
+        style={{ backgroundColor: g.stops[0] }}
       >
-        {/* faint noise / grid overlay for "magazine" feel */}
-        <div
-          className="absolute inset-0 opacity-[0.18] mix-blend-screen pointer-events-none"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.6) 1px, transparent 0)',
-            backgroundSize: '22px 22px',
-          }}
+        <img
+          src={ogUrl}
+          alt={blog.cover_title || blog.title}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-6">
-          <span
-            className="self-start text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full"
-            style={{ color: g.accent, background: 'rgba(255,255,255,0.06)', border: `1px solid ${g.accent}55` }}
-          >
-            {blog.category}
-          </span>
-          <div>
-            <h3
-              className={
-                'font-extrabold leading-tight text-white ' +
-                (featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl')
-              }
-              style={{ textShadow: '0 2px 18px rgba(0,0,0,0.55)' }}
-            >
-              {blog.cover_title || blog.title}
-            </h3>
-            {blog.cover_subtitle && (
-              <p className="mt-1.5 text-xs sm:text-[13px] text-white/70 max-w-[90%]">
-                {blog.cover_subtitle}
-              </p>
-            )}
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-widest text-white/55 font-semibold">
-                ipmcareer.com
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-white/55 font-semibold">
-                {blog.reading_time || 5} min read
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Body */}
       <div className="p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.16em] px-2 py-0.5 rounded-full"
+            style={{ color: g.accent, background: g.accent + '14', border: `1px solid ${g.accent}40` }}
+          >
+            {blog.category}
+          </span>
+          <span className="text-[11px] text-[#64748b] font-semibold">
+            {blog.reading_time || 5} min read
+          </span>
+        </div>
         <h4 className="text-[#f1f5f9] font-bold text-base sm:text-lg leading-snug group-hover:text-[#f9a01b] transition-colors">
           {blog.title}
         </h4>
