@@ -337,38 +337,34 @@ function Call() {
                       className="cp-btn"
                       style={{ flex: 1, minWidth: 180, fontSize: '0.85rem', padding: '12px 18px', background: 'linear-gradient(135deg, #833589, #6c63ff)' }}
                       onClick={async () => {
-                        const colleges = data.filter(n => collegesData[n]).map(n => ({
+                        const sortedData = [...data].sort((a, b) => (COLLEGE_RANK[a] || 99) - (COLLEGE_RANK[b] || 99));
+                        const colleges = sortedData.filter(n => collegesData[n]).map(n => ({
                           name: collegesData[n].title,
                           exam: collegesData[n].exam || 'IPMAT Indore',
                           lastDate: collegesData[n].lastDate || 'TBA',
                           status: collegesData[n].status || 'OPEN',
                         }));
                         const total = parseFloat(formData.sa||0)+parseFloat(formData.qa||0)+parseFloat(formData.va||0);
-                        try {
-                          const res = await fetch('/api/predictor-pdf', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              name: formData.fullname || 'Student',
-                              category: (formData.category || '').toUpperCase(),
-                              sa: formData.sa || 0,
-                              qa: formData.qa || 0,
-                              va: formData.va || 0,
-                              total,
-                              colleges,
-                            }),
-                          });
-                          const blob = await res.blob();
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `IPMAT_Call_Prediction_${(formData.fullname||'Student').replace(/\s+/g,'_')}.pdf`;
-                          a.click();
-                          URL.revokeObjectURL(url);
-                        } catch (err) {
-                          console.error('PDF error:', err);
-                          alert('Failed to generate PDF. Please try again.');
-                        }
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/api/predictor-pdf';
+                        form.target = '_blank';
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'data';
+                        input.value = JSON.stringify({
+                          name: formData.fullname || 'Student',
+                          category: (formData.category || '').toUpperCase(),
+                          sa: formData.sa || 0,
+                          qa: formData.qa || 0,
+                          va: formData.va || 0,
+                          total,
+                          colleges,
+                        });
+                        form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                        document.body.removeChild(form);
                       }}
                     >
                       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style={{marginRight:6}}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
