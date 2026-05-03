@@ -104,14 +104,16 @@ ${existingSummary || '(none yet)'}
 Now write the JSON object per the schema in the system prompt.
 `.trim();
 
-    const { text } = await gemini({
-      model:       'gemini-2.5-pro',
-      system:      SYSTEM_PROMPT,
-      prompt:      userMsg,
-      max_tokens:  8192,
-      temperature: 0.7,
-      json:        true,             // forces strict JSON via responseMimeType
+    const { text, modelUsed } = await gemini({
+      model:         'gemini-2.5-pro',
+      fallbackModel: 'gemini-2.5-flash', // when Pro is in capacity crunch, fall back so blogs still publish
+      system:        SYSTEM_PROMPT,
+      prompt:        userMsg,
+      max_tokens:    8192,
+      temperature:   0.7,
+      json:          true,
     });
+    console.log(`[generate-blog] used model: ${modelUsed}`);
 
     const blog = extractJson(text);
 
