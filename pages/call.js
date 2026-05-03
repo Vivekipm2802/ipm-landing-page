@@ -32,10 +32,13 @@ function Call() {
   ];
 
   async function getCount() {
-    const { data, error } = await supabase
-      .from("predictor")
-      .select("id", { count: "exact", head: false });
-    if (data) setCount(550 + data.length);
+    try {
+      const res = await fetch("/api/predictor-count");
+      const json = await res.json();
+      if (json.count !== undefined) setCount(550 + json.count);
+    } catch (err) {
+      console.error("Failed to fetch count:", err);
+    }
   }
 
   useEffect(() => {
