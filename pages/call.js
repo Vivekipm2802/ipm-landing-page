@@ -193,19 +193,19 @@ function Call() {
           <link rel="icon" href="/favicon_ipm.svg" />
         </Head>
         <NextSeo
-          title="IPMAT Call Predictor - Best & Easy to Use Predictor"
-          description="IPMAT Call Predictor is a tool for IPMAT Aspirants to analyse their profile and explore their chances of landing an admission in IIM or equivalent colleges."
+          title="IPMAT Call Predictor 2026 — Your Results | IPM Careers"
+          description="Your IPMAT Call Predictor results are ready. See which IIMs and top IPM colleges will call you for interview based on your IPMAT Indore scores."
           canonical="https://register.ipmcareer.com/call"
           openGraph={{
             url: "https://register.ipmcareer.com/call",
-            title: "IPMAT Call Predictor - Best & Easy to Use Predictor",
-            description: "IPMAT Call Predictor for IIM admissions.",
+            title: "IPMAT Call Predictor 2026 — Your Results",
+            description: "See which IIMs will call you based on your IPMAT scores.",
             images: [
               {
                 url: "/callpred.jpg",
                 width: 1200,
                 height: 630,
-                alt: "IPMAT Call Predictor",
+                alt: "IPMAT Call Predictor 2026",
               },
             ],
           }}
@@ -333,22 +333,26 @@ function Call() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="IPMAT Call Predictor - Best & Easy to Use Predictor"
-        description="IPMAT Call Predictor is a tool for IPMAT Aspirants to analyse their profile and explore their chances of landing an admission in IIM or equivalent colleges."
+        title="IPMAT Call Predictor 2026 — Free IPM Call Predictor Tool | IPM Careers"
+        description="Use the free IPMAT Call Predictor 2026 to check which IIMs and top colleges will call you for interview. Enter your IPMAT Indore scores and get instant results. Trusted by 500+ IPM aspirants."
         canonical="https://register.ipmcareer.com/call"
         openGraph={{
           url: "https://register.ipmcareer.com/call",
-          title: "IPMAT Call Predictor - Best & Easy to Use Predictor",
-          description: "IPMAT Call Predictor for IIM admissions.",
+          title: "IPMAT Call Predictor 2026 — Free IPM Call Predictor Tool",
+          description: "Enter your IPMAT Indore scores and instantly check which IIMs will call you for PI. Free IPMAT Call Predictor by IPM Careers.",
           images: [
             {
               url: "/callpred.jpg",
               width: 1200,
               height: 630,
-              alt: "IPMAT Call Predictor",
+              alt: "IPMAT Call Predictor 2026",
             },
           ],
         }}
+        additionalMetaTags={[
+          { name: "keywords", content: "IPMAT call predictor, IPM call predictor, IPMAT call predictor 2026, IPM call predictor 2026, IPMAT cutoff predictor, IIM call predictor, IPMAT Indore predictor, IPMAT college predictor" },
+          { name: "robots", content: "index, follow" },
+        ]}
       />
       {isVisible && <Confetti />}
 
@@ -475,9 +479,101 @@ function Call() {
 
           </div>
         </div>
+
+        {/* ── SEO Blog Section ── */}
+        <div style={{ maxWidth: 800, margin: '60px auto 0', padding: '0 20px 60px', fontFamily: 'DM Sans, sans-serif', color: '#333', lineHeight: 1.75 }}>
+          <article>
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#833589', marginBottom: 8 }}>
+              IPMAT Call Predictor 2026 — Know Your IIM Interview Chances Instantly
+            </h2>
+            <p style={{ fontSize: '0.95rem', color: '#666', marginBottom: 20 }}>
+              Updated for IPMAT Indore 2026 with RTI-confirmed cutoff data
+            </p>
+
+            <p>
+              The <strong>IPMAT Call Predictor</strong> by IPM Careers is India's most accurate free tool that tells you which IIMs and top management colleges are likely to send you an interview call based on your IPMAT Indore scores. Whether you call it an <strong>IPM Call Predictor</strong> or an IPMAT college predictor, this tool uses real cutoff data across all reservation categories to give you reliable, instant results.
+            </p>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>How Does the IPMAT Call Predictor Work?</h3>
+            <p>
+              The predictor matches your sectional scores against actual admission cutoffs for each college. IPMAT Indore has three scored sections: QA Short Answer (out of 60), QA MCQ (out of 120), and Verbal Ability (out of 180), totalling 360 marks. Different colleges use different selection methods. IIM Indore checks all three sectional cutoffs independently. IIM Ranchi and IIM Shillong use a composite score based on total marks. IIM Sirmaur and IIM Amritsar use an Aptitude Test Score (ATS) formula that weights the sections differently. Our <strong>IPMAT Call Predictor 2026</strong> handles all of these methods automatically.
+            </p>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>Which Colleges Does the IPM Call Predictor Cover?</h3>
+            <p>
+              The <strong>IPM Call Predictor 2026</strong> covers every college that accepts IPMAT Indore scores for admission. This includes IIM Indore, IIM Ranchi, IIM Shillong, IIM Sirmaur, IIM Amritsar, IIM Sambalpur, Nirma University, IIFT Kakinada, NALSAR Hyderabad, TAPMI Manipal, Alliance University, Krea University (IFMR), LM Thapar School of Management, and NICMAR University. Cutoffs are updated with each admission cycle, so the results you see reflect the latest available data.
+            </p>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>Why Use This Tool Before Results Day?</h3>
+            <p>
+              Most IPMAT aspirants start panicking after the exam, wondering whether their scores are good enough. The <strong>IPMAT Call Predictor</strong> eliminates that uncertainty. Enter your expected scores right after the exam and get a realistic picture of where you stand. This helps you plan your PI preparation early and focus on colleges where you have a strong chance of getting shortlisted.
+            </p>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>Category-Wise Cutoff Predictions</h3>
+            <p>
+              Every prediction is category-specific. Whether you belong to General, EWS, OBC, SC, ST, or PwD category, the tool applies the correct cutoffs for your reservation group. This is critical because cutoffs can differ significantly across categories. For example, IIM Indore's General VA cutoff was 112 in 2025, while the ST cutoff was 48 — a difference of 64 marks.
+            </p>
+          </article>
+
+          {/* ── FAQ Section with Schema ── */}
+          <section style={{ marginTop: 48 }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#833589', marginBottom: 20 }}>
+              Frequently Asked Questions — IPMAT Call Predictor
+            </h2>
+            {[
+              { q: "What is the IPMAT Call Predictor?", a: "The IPMAT Call Predictor is a free tool by IPM Careers that predicts which IIMs and top management colleges are likely to call you for a personal interview based on your IPMAT Indore scores. It uses actual cutoff data across all reservation categories." },
+              { q: "Is this IPM Call Predictor accurate?", a: "Yes. The IPM Call Predictor uses 2025 RTI-confirmed cutoff data for IIM Indore and verified cutoffs for other colleges. While cutoffs may shift slightly each year, the predictions are based on the most reliable available data." },
+              { q: "How is the IPMAT Call Predictor 2026 different from last year?", a: "The IPMAT Call Predictor 2026 includes updated cutoffs, adds newly participating colleges like IIM Sambalpur (which started accepting IPMAT Indore from 2026), and uses the latest category-wise data from the 2025 admission cycle." },
+              { q: "Which colleges accept IPMAT Indore scores?", a: "As of 2026, colleges accepting IPMAT Indore scores include IIM Indore, IIM Ranchi, IIM Shillong, IIM Sirmaur, IIM Amritsar, IIM Sambalpur, Nirma University, IIFT Kakinada, NALSAR Hyderabad, TAPMI Manipal, Alliance University, Krea University (IFMR), LM Thapar, and NICMAR University." },
+              { q: "What scores do I need to enter in the IPM Call Predictor?", a: "You need to enter three scores: QA Short Answer (out of 60), QA MCQ (out of 120), and Verbal Ability (out of 180). The tool calculates your total (out of 360) and checks it against each college's cutoff criteria." },
+              { q: "Can I use the IPMAT Call Predictor before results are out?", a: "Absolutely. You can enter your expected scores based on the answer key and get a prediction. This helps you start PI preparation early for colleges where you have a strong chance." },
+              { q: "What is the ATS formula used by some IIMs?", a: "ATS (Aptitude Test Score) is used by IIM Sirmaur and IIM Amritsar. The formula is: 25% of (MCQ/120 x 100) + 25% of (SA/60 x 100) + 50% of (VA/180 x 100). It gives higher weight to Verbal Ability." },
+              { q: "Is this tool free to use?", a: "Yes, the IPMAT Call Predictor is completely free. No login or payment required. Just enter your scores and get instant results." },
+            ].map((faq, i) => (
+              <details key={i} style={{ marginBottom: 12, background: '#FAF5FB', borderRadius: 10, padding: '14px 18px', border: '1px solid #E5C9EA', cursor: 'pointer' }}>
+                <summary style={{ fontWeight: 600, fontSize: '0.95rem', color: '#5A2D62', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {faq.q}
+                  <span style={{ fontSize: '1.2rem', color: '#833589' }}>+</span>
+                </summary>
+                <p style={{ marginTop: 10, fontSize: '0.9rem', color: '#555', lineHeight: 1.7 }}>{faq.a}</p>
+              </details>
+            ))}
+          </section>
+
+          {/* ── JSON-LD FAQPage Schema ── */}
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              { "@type": "Question", "name": "What is the IPMAT Call Predictor?", "acceptedAnswer": { "@type": "Answer", "text": "The IPMAT Call Predictor is a free tool by IPM Careers that predicts which IIMs and top management colleges are likely to call you for a personal interview based on your IPMAT Indore scores." }},
+              { "@type": "Question", "name": "Is this IPM Call Predictor accurate?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The IPM Call Predictor uses 2025 RTI-confirmed cutoff data for IIM Indore and verified cutoffs for other colleges." }},
+              { "@type": "Question", "name": "How is the IPMAT Call Predictor 2026 different from last year?", "acceptedAnswer": { "@type": "Answer", "text": "The IPMAT Call Predictor 2026 includes updated cutoffs, adds newly participating colleges like IIM Sambalpur, and uses the latest category-wise data from the 2025 admission cycle." }},
+              { "@type": "Question", "name": "Which colleges accept IPMAT Indore scores?", "acceptedAnswer": { "@type": "Answer", "text": "IIM Indore, IIM Ranchi, IIM Shillong, IIM Sirmaur, IIM Amritsar, IIM Sambalpur, Nirma University, IIFT Kakinada, NALSAR Hyderabad, TAPMI Manipal, Alliance University, Krea University (IFMR), LM Thapar, and NICMAR University." }},
+              { "@type": "Question", "name": "What scores do I need to enter?", "acceptedAnswer": { "@type": "Answer", "text": "QA Short Answer (out of 60), QA MCQ (out of 120), and Verbal Ability (out of 180). The tool calculates your total out of 360." }},
+              { "@type": "Question", "name": "Can I use the IPMAT Call Predictor before results are out?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter your expected scores based on the answer key and get a prediction to start PI preparation early." }},
+              { "@type": "Question", "name": "What is the ATS formula?", "acceptedAnswer": { "@type": "Answer", "text": "ATS = 25% of (MCQ/120 x 100) + 25% of (SA/60 x 100) + 50% of (VA/180 x 100). Used by IIM Sirmaur and IIM Amritsar." }},
+              { "@type": "Question", "name": "Is this tool free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely free. No login or payment required." }},
+            ]
+          }) }} />
+
+          {/* ── WebApplication Schema ── */}
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "IPMAT Call Predictor 2026",
+            "url": "https://register.ipmcareer.com/call",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "All",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+            "description": "Free IPMAT Call Predictor tool to check which IIMs will call you for interview based on your IPMAT Indore scores. Category-wise cutoff predictions for 14+ colleges.",
+            "creator": { "@type": "Organization", "name": "IPM Careers", "url": "https://ipmcareer.com" }
+          }) }} />
+        </div>
+
       </AppShell>
     </>
   );
 }
 
 export default Call;
+
