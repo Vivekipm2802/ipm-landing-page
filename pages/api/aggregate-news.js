@@ -105,8 +105,23 @@ function hashUrl(url) {
 }
 
 // ───────── batched classification + summary via Gemini Flash ─────────
-async function summariseBatch(items) {
+// Process items in chunks of 8 — keeps each Gemini response small enough
+// to reliably stay within JSON output budget (Flash sometimes truncates
+// when asked to emit 25+ JSON objects in one go, leading to unbalanced
+// brackets that break parsing).
+const CHUNK_SIZE = 8;
+
+async function summariseBatch(items, supabaseAdmin) {
   if (items.length === 0) return [];
+  const out = [];
+  for (let i = 0; i < items.length; i += CHUNK_SIZE) {
+    const chunk = items.slice(i, i + CHUNK_SIZE);
+    out.push(...await summariseChunk(chunk, supabaseAdmin));
+  }
+  return out;
+}
+
+async function summariseChunk(items, supabaseAdmin) {
   const prompt = `
 You are the news editor for IPM Careers (ipmcareer.com). For EACH news item below, output:
 - category: one of ${CATEGORIES.join(' | ')}
@@ -116,24 +131,43 @@ You are the news editor for IPM Careers (ipmcareer.com). For EACH news item belo
 Hard rules:
 - Never name competitors (PhysicsWallah, PW, Toprankers, Unacademy, BYJU'S, Aakash, ALLEN). If the source mentions them, omit the brand and refer to "a major coaching brand".
 - If an item is irrelevant to IPMAT/IIM/BBA/management/board exams/govt exams aspirants, set category="SKIP".
-- Output ONLY a JSON array. Same order as the input. Length must equal input length.
+- Output ONLY a JSON array. Same order as the input. Length must equal input length (${items.length} items).
+- Use straight ASCII quotes, no smart quotes inside string values.
 
 Schema per item: {"category": string, "summary": string, "why_it_matters": string}
 
 INPUT (numbered):
-${items.map((it, i) => `[${i + 1}] TITLE: ${it.title}\nSOURCE: ${it.source_name}\nRAW: ${it.summary_raw.slice(0, 400)}`).join('\n\n')}
+${items.map((it, i) => `[${i + 1}] TITLE: ${it.title}\nSOURCE: ${it.source_name}\nRAW: ${it.summary_raw.slice(0, 350)}`).join('\n\n')}
 `.trim();
 
   const { text } = await gemini({
     model:       'gemini-2.5-flash',
-    system:      'You are a precise news classifier. Output ONLY valid JSON arrays.',
+    system:      'You are a precise news classifier. Output ONLY valid JSON arrays. Never truncate. Never include prose.',
     prompt:      prompt,
-    max_tokens:  4096,
-    temperature: 0.3,
+    max_tokens:  6000,
+    temperature: 0.2,
     json:        true,
   });
 
-  return extractJson(text);
+  try {
+    const parsed = extractJson(text);
+    if (!Array.isArray(parsed)) throw new Error('Classifier did not return an array.');
+    if (parsed.length !== items.length) {
+      throw new Error(`Classifier returned ${parsed.length} items for ${items.length} inputs.`);
+    }
+    return parsed;
+  } catch (err) {
+    // Save the raw text so we can inspect it post-mortem instead of guessing.
+    if (supabaseAdmin) {
+      await supabaseAdmin.from('content_log').insert({
+        kind: 'news_aggregate', status: 'error',
+        payload: { stage: 'classifier_parse', chunk_size: items.length, raw_first_400: text.slice(0, 400), raw_last_200: text.slice(-200) },
+        error: String(err.message || err),
+      }).then(() => {}, () => {});
+    }
+    // Skip this chunk — return SKIP for each item so the pipeline keeps moving.
+    return items.map(() => ({ category: 'SKIP', summary: '', why_it_matters: '' }));
+  }
 }
 
 // ───────── handler ─────────
@@ -183,7 +217,7 @@ export default async function handler(req, res) {
     }
 
     // 4. Classify + summarise in one batched LLM call
-    const enriched = await summariseBatch(items);
+    const enriched = await summariseBatch(items, supabaseAdmin);
     if (enriched.length !== items.length) throw new Error(`Classifier returned ${enriched.length} for ${items.length} inputs.`);
 
     // 5. Build rows; drop SKIPs; final brand-safety check
