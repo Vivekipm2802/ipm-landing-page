@@ -255,23 +255,26 @@ function Response() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="IPMAT Score Analyzer — Check Your Score in 10 Seconds | IPM Careers"
-        description="Paste your IPMAT response sheet URL and get your sectional scores, detailed analysis, and performance report instantly. Used by 500+ IPMAT aspirants."
+        title="IPMAT Score Calculator 2026 — Free Response Sheet Tool | IPM Careers"
+        description="Free IPMAT Score Calculator and Response Sheet Tool. Paste your IPMAT response sheet URL and get sectional scores, detailed analysis, and predicted AIR instantly. Trusted by 500+ IPM aspirants."
         canonical="https://register.ipmcareer.com/response"
         openGraph={{
           url: "https://register.ipmcareer.com/response",
-          title: "IPMAT Score Analyzer — Check Your Score in 10 Seconds | IPM Careers",
-          description:
-            "Paste your IPMAT response sheet URL and get your sectional scores, detailed analysis, and performance report instantly.",
+          title: "IPMAT Score Calculator 2026 — Free Response Sheet Analyzer",
+          description: "Paste your IPMAT response sheet URL and get sectional scores, analysis, and predicted AIR instantly. Free IPM Score Calculator by IPM Careers.",
           images: [
             {
               url: "/scorecard_ss.png",
               width: 1200,
               height: 630,
-              alt: "IPMAT Score Analyzer by IPM Careers",
+              alt: "IPMAT Score Calculator 2026",
             },
           ],
         }}
+        additionalMetaTags={[
+          { name: "keywords", content: "IPMAT score calculator, IPMAT response sheet tool, IPM score calculator, IPMAT score analyzer, IPMAT score checker, IPMAT response sheet analyzer, IPMAT marks calculator 2026, IPM score calculator 2026" },
+          { name: "robots", content: "index, follow" },
+        ]}
       />
 
       <div className={styles.page}>
@@ -560,6 +563,96 @@ function Response() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* ── SEO Blog Section ── */}
+      <div style={{ maxWidth: 800, margin: '60px auto 0', padding: '0 20px 60px', fontFamily: 'DM Sans, sans-serif', color: '#333', lineHeight: 1.75 }}>
+        <article>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#833589', marginBottom: 8 }}>
+            IPMAT Score Calculator 2026 — Analyse Your Response Sheet in Seconds
+          </h2>
+          <p style={{ fontSize: '0.95rem', color: '#666', marginBottom: 20 }}>
+            Free IPMAT response sheet tool used by 500+ aspirants every exam cycle
+          </p>
+
+          <p>
+            The <strong>IPMAT Score Calculator</strong> by IPM Careers is the fastest way to find out your exact IPMAT Indore score without waiting for official results. Simply paste your response sheet URL from the IIM Indore website, and our tool parses every question, applies the marking scheme (+4 for correct, -1 for wrong MCQs, no negative for SA), and gives you a complete breakdown within seconds. Whether you search for an <strong>IPMAT response sheet tool</strong> or an <strong>IPM score calculator</strong>, this is the only tool that gives you section-wise scores, a detailed scorecard, and a predicted All India Rank.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>How the IPMAT Response Sheet Tool Works</h3>
+          <p>
+            After you take the IPMAT Indore exam, IIM Indore publishes your response sheet as an HTML page. Our <strong>IPMAT Score Calculator 2026</strong> reads this page, identifies every question you attempted, checks your answers against the official answer key, and calculates your score section by section. The three sections scored are QA Short Answer (60 marks, +4 per correct, no negative), QA MCQ (120 marks, +4/-1), and Verbal Ability (180 marks, +4/-1). Your total is out of 360.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>What You Get from the IPM Score Calculator</h3>
+          <p>
+            Beyond just a total score, the <strong>IPM Score Calculator</strong> generates a full scorecard that includes your section-wise marks, accuracy percentage per section, number of correct, wrong, and unattempted questions, a predicted All India Rank based on score distribution data, and a downloadable PDF scorecard you can share. The scorecard is shareable via a unique URL, making it easy to share with mentors or coaching institutes.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>Why Accuracy Matters</h3>
+          <p>
+            Other calculators ask you to manually enter your answers one by one. That process is slow and error-prone. Our <strong>IPMAT response sheet tool</strong> reads your actual response sheet directly, so there is zero chance of manual entry errors. The score you see is the score you got.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#5A2D62', marginTop: 28, marginBottom: 8 }}>After Your Score — What Next?</h3>
+          <p>
+            Once you have your score, use our <a href="/call" style={{ color: '#833589', fontWeight: 600, textDecoration: 'underline' }}>IPMAT Call Predictor</a> to check which IIMs and colleges will call you for interview. Then head to the <a href="/pi/profile" style={{ color: '#833589', fontWeight: 600, textDecoration: 'underline' }}>PI Prep section</a> to start preparing for your personal interview with AI-powered mock interviews, SOP building, and question banks.
+          </p>
+        </article>
+
+        {/* ── FAQ Section ── */}
+        <section style={{ marginTop: 48 }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#833589', marginBottom: 20 }}>
+            Frequently Asked Questions — IPMAT Score Calculator
+          </h2>
+          {[
+            { q: "What is the IPMAT Score Calculator?", a: "The IPMAT Score Calculator is a free tool by IPM Careers that automatically calculates your IPMAT Indore score from your official response sheet. It gives you section-wise marks, accuracy data, and a predicted All India Rank." },
+            { q: "How do I use the IPMAT response sheet tool?", a: "After your IPMAT exam, IIM Indore publishes your response sheet URL. Copy that URL and paste it into our tool. Within seconds, you'll see your complete score breakdown." },
+            { q: "Is this IPM Score Calculator free?", a: "Yes, completely free. No login, no payment, no hidden charges. Just paste your response sheet URL and get your scores." },
+            { q: "What is the IPMAT 2026 marking scheme?", a: "IPMAT Indore has three sections: QA Short Answer (15 questions, +4 each, no negative = 60 marks), QA MCQ (30 questions, +4/-1 = 120 marks), and Verbal Ability (45 questions, +4/-1 = 180 marks). Total: 360 marks." },
+            { q: "How accurate is the IPMAT Score Calculator 2026?", a: "Extremely accurate. Unlike manual calculators where you type answers one by one, our tool reads your actual response sheet directly from IIM Indore's system, eliminating any chance of manual entry errors." },
+            { q: "Can I get a PDF scorecard?", a: "Yes. After your score is calculated, you can download a professional PDF scorecard that includes all sections, accuracy data, and your predicted rank." },
+            { q: "What is the predicted AIR feature?", a: "Based on score distribution data from thousands of past IPMAT test-takers, the tool estimates your All India Rank. This helps you understand where you stand relative to other aspirants." },
+            { q: "Where do I find my IPMAT response sheet URL?", a: "After the exam, visit the IIM Indore IPMAT portal. Log in with your credentials, navigate to the response sheet section, and copy the HTML page URL. Our tool accepts this URL directly." },
+          ].map((faq, i) => (
+            <details key={i} style={{ marginBottom: 12, background: '#FAF5FB', borderRadius: 10, padding: '14px 18px', border: '1px solid #E5C9EA', cursor: 'pointer' }}>
+              <summary style={{ fontWeight: 600, fontSize: '0.95rem', color: '#5A2D62', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {faq.q}
+                <span style={{ fontSize: '1.2rem', color: '#833589' }}>+</span>
+              </summary>
+              <p style={{ marginTop: 10, fontSize: '0.9rem', color: '#555', lineHeight: 1.7 }}>{faq.a}</p>
+            </details>
+          ))}
+        </section>
+
+        {/* ── JSON-LD FAQPage Schema ── */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "What is the IPMAT Score Calculator?", "acceptedAnswer": { "@type": "Answer", "text": "The IPMAT Score Calculator is a free tool by IPM Careers that automatically calculates your IPMAT Indore score from your official response sheet. It gives section-wise marks, accuracy data, and predicted AIR." }},
+            { "@type": "Question", "name": "How do I use the IPMAT response sheet tool?", "acceptedAnswer": { "@type": "Answer", "text": "Copy your response sheet URL from IIM Indore's portal and paste it into our tool. Within seconds, you get your complete score breakdown." }},
+            { "@type": "Question", "name": "Is this IPM Score Calculator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely free. No login, no payment. Just paste your URL and get scores instantly." }},
+            { "@type": "Question", "name": "What is the IPMAT 2026 marking scheme?", "acceptedAnswer": { "@type": "Answer", "text": "QA Short Answer: 15 questions, +4, no negative (60 marks). QA MCQ: 30 questions, +4/-1 (120 marks). Verbal Ability: 45 questions, +4/-1 (180 marks). Total: 360 marks." }},
+            { "@type": "Question", "name": "How accurate is the IPMAT Score Calculator 2026?", "acceptedAnswer": { "@type": "Answer", "text": "Extremely accurate. It reads your actual response sheet directly, eliminating manual entry errors." }},
+            { "@type": "Question", "name": "Can I get a PDF scorecard?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Download a professional PDF scorecard with sections, accuracy data, and predicted rank." }},
+            { "@type": "Question", "name": "What is the predicted AIR feature?", "acceptedAnswer": { "@type": "Answer", "text": "Based on score distribution data, the tool estimates your All India Rank relative to other aspirants." }},
+            { "@type": "Question", "name": "Where do I find my IPMAT response sheet URL?", "acceptedAnswer": { "@type": "Answer", "text": "Log in to the IIM Indore IPMAT portal, go to the response sheet section, and copy the HTML page URL." }},
+          ]
+        }) }} />
+
+        {/* ── WebApplication Schema ── */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "IPMAT Score Calculator 2026",
+          "url": "https://register.ipmcareer.com/response",
+          "applicationCategory": "EducationalApplication",
+          "operatingSystem": "All",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+          "description": "Free IPMAT Score Calculator and Response Sheet Analyzer. Paste your IPMAT Indore response sheet URL and get sectional scores, accuracy analysis, and predicted All India Rank instantly.",
+          "creator": { "@type": "Organization", "name": "IPM Careers", "url": "https://ipmcareer.com" }
+        }) }} />
       </div>
 
       {/* ── Help Modal ── */}
