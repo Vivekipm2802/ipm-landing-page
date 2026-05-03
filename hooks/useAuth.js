@@ -20,6 +20,8 @@ export function AuthProvider({ children }) {
       } else {
         setLoading(false);
       }
+    }).catch(() => {
+      setLoading(false);
     });
 
     // Listen for auth changes
@@ -51,8 +53,8 @@ export function AuthProvider({ children }) {
 
       if (data) {
         setPiUser(data);
-      } else {
-        // First login — create user with 1-day trial
+      } else if (error && error.code === 'PGRST116') {
+        // No row found — first login, create user with 1-day trial
         const { data: newUser, error: insertError } = await supabase
           .from('pi_users')
           .insert({
@@ -64,6 +66,10 @@ export function AuthProvider({ children }) {
           .single();
 
         if (newUser) setPiUser(newUser);
+        else console.error('Insert pi_user failed:', insertError);
+      } else if (error) {
+        // RLS or other error — log but don't block
+        console.error('fetchPiUser query error:', error);
       }
     } catch (err) {
       console.error('fetchPiUser error:', err);
@@ -73,12 +79,17 @@ export function AuthProvider({ children }) {
 
   async function checkAdmin(email) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('pi_admins')
         .select('email')
         .eq('email', email)
         .maybeSingle();
-      setIsAdmin(!!data);
+      if (error) {
+        console.error('checkAdmin error:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(!!data);
+      }
     } catch {
       setIsAdmin(false);
     }
