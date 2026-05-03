@@ -1,4 +1,5 @@
 // /hooks/useAuth.js — Supabase Auth hook for PI Prep
+// Uses server-side /api/pi-auth for pi_users/pi_admins (bypasses RLS)
 import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '../utils/supabaseClient';
 
@@ -11,88 +12,67 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       if (session?.user) {
         setUser(session.user);
-        fetchPiUser(session.user.email);
-        checkAdmin(session.user.email);
+        fetchPiUser(session.user);
       } else {
         setLoading(false);
       }
     }).catch(() => {
-      setLoading(false);
+      if (mounted) setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
         if (session?.user) {
           setUser(session.user);
-          await fetchPiUser(session.user.email);
-          await checkAdmin(session.user.email);
+          await fetchPiUser(session.user);
         } else {
           setUser(null);
           setPiUser(null);
           setIsAdmin(false);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  async function fetchPiUser(email) {
+  async function fetchPiUser(authUser) {
     try {
-      const { data, error } = await supabase
-        .from('pi_users')
-        .select('*')
-        .eq('email', email)
-        .single();
+      const res = await fetch('/api/pi-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: authUser.email,
+          name: authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+          avatar_url: authUser.user_metadata?.avatar_url || null,
+          action: 'check',
+        }),
+      });
 
-      if (data) {
-        setPiUser(data);
-      } else if (error && error.code === 'PGRST116') {
-        // No row found — first login, create user with 1-day trial
-        const { data: newUser, error: insertError } = await supabase
-          .from('pi_users')
-          .insert({
-            email,
-            name: user?.user_metadata?.full_name || email.split('@')[0],
-            avatar_url: user?.user_metadata?.avatar_url || null,
-          })
-          .select()
-          .single();
-
-        if (newUser) setPiUser(newUser);
-        else console.error('Insert pi_user failed:', insertError);
-      } else if (error) {
-        // RLS or other error — log but don't block
-        console.error('fetchPiUser query error:', error);
+      if (res.ok) {
+        const data = await res.json();
+        setPiUser(data.piUser || null);
+        setIsAdmin(data.isAdmin || false);
+      } else {
+        console.error('pi-auth API error:', res.status);
       }
     } catch (err) {
       console.error('fetchPiUser error:', err);
     }
     setLoading(false);
-  }
-
-  async function checkAdmin(email) {
-    try {
-      const { data, error } = await supabase
-        .from('pi_admins')
-        .select('email')
-        .eq('email', email)
-        .maybeSingle();
-      if (error) {
-        console.error('checkAdmin error:', error);
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(!!data);
-      }
-    } catch {
-      setIsAdmin(false);
-    }
   }
 
   async function signInWithGoogle() {
@@ -144,7 +124,7 @@ export function AuthProvider({ children }) {
       hasAccess: hasAccess(),
       trialTimeLeft: trialTimeLeft(),
       isPremium: piUser?.is_premium || false,
-      refreshUser: () => user && fetchPiUser(user.email),
+      refreshUser: () => user && fetchPiUser(user),
     }}>
       {children}
     </AuthContext.Provider>
@@ -156,4 +136,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-
