@@ -2,161 +2,150 @@
 // Renders a branded 1200×630 cover at request time using @vercel/og.
 // Used for og:image and twitter:image on blog posts.
 //
-// Notes for Satori (the SVG renderer behind @vercel/og):
-//   - Every parent of mixed/multiple children needs `display: 'flex'`.
-//   - Text inside an element with siblings must be wrapped in its own <span>/<div>.
-//   - Don't reference custom fonts unless we load them explicitly — otherwise
-//     Satori falls back silently and may emit empty bytes.
-//
-// We deliberately don't import Supabase here. Edge runtime + Supabase JS has
-// occasionally produced empty responses; the slug already encodes the title
-// (with hyphens) so we can render the cover without a DB lookup. Cover title
-// can also be passed via ?title=, ?subtitle=, ?category= for previewing.
+// Design notes:
+//   - Built progressively from the proven /api/og-test pattern that we know
+//     renders cleanly. Removed the Supabase REST fetch — it was suspected of
+//     hanging silently in edge runtime, and we don't actually need it: the
+//     slug already encodes the title (with hyphens), and category we read
+//     from a query param when needed.
+//   - Every parent of mixed/multiple children has display:flex (Satori req).
+//   - All text wrapped in <span> with parent display:flex.
+//   - No custom fontFamily — Satori uses its default sans, which renders fine.
 
 import { ImageResponse } from '@vercel/og';
-import { gradientFor } from '../../../lib/gradients';
 
 export const config = { runtime: 'edge' };
 
-// Pull blog metadata from Supabase via REST (no SDK = no edge-runtime gotchas).
-async function fetchBlogMeta(slug) {
-  const url  = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon || !slug) return null;
-  try {
-    const r = await fetch(
-      `${url}/rest/v1/blogs?slug=eq.${encodeURIComponent(slug)}&select=cover_title,cover_subtitle,category&limit=1`,
-      { headers: { apikey: anon, authorization: `Bearer ${anon}` } }
-    );
-    if (!r.ok) return null;
-    const rows = await r.json();
-    return Array.isArray(rows) && rows[0] ? rows[0] : null;
-  } catch { return null; }
-}
+// Category gradients duplicated inline so we don't import from outside.
+// Edge runtime is happiest when the route is fully self-contained.
+const GRADIENTS = {
+  'IPMAT':        { stops: ['#0a0c14', '#2b0e0a', '#4d1408'], accent: '#f9a01b' },
+  'IIM News':     { stops: ['#070b1a', '#0d1638', '#1a2a6b'], accent: '#7aa2ff' },
+  'BBA/BMS':      { stops: ['#06141a', '#0a2a36', '#0d4854'], accent: '#34d2cc' },
+  'Boards':       { stops: ['#150a1c', '#2a0e3a', '#4a1a66'], accent: '#c084fc' },
+  'Govt Exams':   { stops: ['#0a1408', '#0e2a14', '#184a1f'], accent: '#4ade80' },
+  'Career':       { stops: ['#0e1408', '#1d2a08', '#3a4a0d'], accent: '#facc15' },
+  'Scholarships': { stops: ['#1a0a0d', '#3a0d1a', '#660d2a'], accent: '#fb7185' },
+  'Industry':     { stops: ['#0a0e14', '#101a2a', '#1a2a4a'], accent: '#94a3b8' },
+  'default':      { stops: ['#0a0c14', '#1a0d05', '#3d1f08'], accent: '#f9a01b' },
+};
 
-// Slug "iim-indore-ipm-cutoffs-..." → "Iim Indore Ipm Cutoffs ..."
-// Used as a fallback title when the blog row is missing.
+// Slug "iim-rohtak-ipm-placements-2025-...-cp8ib" → "Iim Rohtak Ipm Placements 2025 ..."
 function titleFromSlug(slug) {
   return (slug || '')
-    .replace(/-[a-z0-9]{5}$/, '')        // strip random suffix
+    .replace(/-[a-z0-9]{5}$/, '') // strip 5-char random suffix
     .split('-')
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
-export default async function handler(req) {
-  try {
-    const { searchParams, pathname } = new URL(req.url);
-    const slug = pathname.split('/').pop();
+export default function handler(req) {
+  const { searchParams, pathname } = new URL(req.url);
+  const slug = pathname.split('/').pop();
 
-    let title    = searchParams.get('title')    || titleFromSlug(slug) || 'IPM Careers';
-    let subtitle = searchParams.get('subtitle') || 'Built for the future IIMer';
-    let category = searchParams.get('category') || 'IPMAT';
+  const titleParam    = searchParams.get('title');
+  const subtitleParam = searchParams.get('subtitle');
+  const categoryParam = searchParams.get('category');
 
-    if (!searchParams.get('title') && slug) {
-      const meta = await fetchBlogMeta(slug);
-      if (meta) {
-        title    = meta.cover_title    || title;
-        subtitle = meta.cover_subtitle || subtitle;
-        category = meta.category       || category;
-      }
-    }
+  const title    = titleParam    || titleFromSlug(slug) || 'IPM Careers';
+  const subtitle = subtitleParam || 'Built for the future IIMer';
+  const category = categoryParam || 'IPMAT';
+  const g = GRADIENTS[category] || GRADIENTS['default'];
 
-    const g = gradientFor(category);
-
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
-            justifyContent: 'space-between', padding: '64px 72px',
-            backgroundImage: `linear-gradient(135deg, ${g.stops[0]} 0%, ${g.stops[1]} 50%, ${g.stops[2]} 100%)`,
-            color: 'white', position: 'relative',
-          }}
-        >
-          {/* dot grid overlay */}
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '64px 72px',
+          backgroundImage: `linear-gradient(135deg, ${g.stops[0]} 0%, ${g.stops[1]} 50%, ${g.stops[2]} 100%)`,
+          color: 'white',
+        }}
+      >
+        {/* Top: category pill + brand mark */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div
             style={{
-              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.18,
-              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.7) 1px, transparent 0)',
-              backgroundSize: '28px 28px', display: 'flex',
+              display: 'flex',
+              padding: '10px 22px',
+              borderRadius: 999,
+              border: `2px solid ${g.accent}`,
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              color: g.accent,
+              fontSize: 22,
+              fontWeight: 800,
+              letterSpacing: 4,
             }}
-          />
-
-          {/* top row: category pill + brand mark */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-            <div
-              style={{
-                display: 'flex', padding: '8px 18px', borderRadius: 999,
-                border: `2px solid ${g.accent}`, backgroundColor: 'rgba(255,255,255,0.08)',
-                color: g.accent, fontSize: 22, fontWeight: 800, letterSpacing: 4,
-              }}
-            >
-              <span style={{ textTransform: 'uppercase' }}>{category}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', color: 'rgba(255,255,255,0.7)', fontSize: 22, fontWeight: 700 }}>
-              <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: g.accent, marginRight: 12, display: 'flex' }} />
-              <span>ipmcareer.com</span>
-            </div>
+          >
+            <span style={{ textTransform: 'uppercase' }}>{category}</span>
           </div>
-
-          {/* center: title + subtitle */}
-          <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: 22,
+              fontWeight: 700,
+            }}
+          >
             <div
               style={{
-                display: 'flex', fontSize: title.length > 55 ? 60 : 76,
-                fontWeight: 900, lineHeight: 1.05, color: 'white',
-                textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+                width: 14,
+                height: 14,
+                borderRadius: 999,
+                backgroundColor: g.accent,
+                marginRight: 12,
+                display: 'flex',
               }}
-            >
-              <span>{title}</span>
-            </div>
-            <div
-              style={{
-                display: 'flex', marginTop: 24, fontSize: 28, color: 'rgba(255,255,255,0.78)',
-                fontWeight: 500, lineHeight: 1.3, maxWidth: 1000,
-              }}
-            >
-              <span>{subtitle}</span>
-            </div>
-          </div>
-
-          {/* bottom: brand footer */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-            <div style={{ display: 'flex', fontSize: 26, fontWeight: 800 }}>
-              <span>IPM</span>
-              <span style={{ color: g.accent }}>Careers</span>
-            </div>
-            <div style={{ display: 'flex', fontSize: 18, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
-              <span style={{ textTransform: 'uppercase', letterSpacing: 4 }}>Built for the future IIMer</span>
-            </div>
+            />
+            <span>ipmcareer.com</span>
           </div>
         </div>
-      ),
-      { width: 1200, height: 630 }
-    );
-  } catch (err) {
-    // Fall back to a simple solid image with the error short-circuited so
-    // we never serve content-length: 0 again.
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            backgroundColor: '#0a0c14', color: '#f9a01b', padding: 60,
-          }}
-        >
-          <div style={{ display: 'flex', fontSize: 64, fontWeight: 900 }}><span>IPM Careers</span></div>
-          <div style={{ display: 'flex', fontSize: 22, marginTop: 24, color: '#94a3b8' }}>
-            <span>Built for the future IIMer</span>
+
+        {/* Middle: title + subtitle */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div
+            style={{
+              display: 'flex',
+              fontSize: title.length > 55 ? 60 : 76,
+              fontWeight: 900,
+              lineHeight: 1.05,
+              color: 'white',
+            }}
+          >
+            <span>{title}</span>
           </div>
-          <div style={{ display: 'flex', fontSize: 14, marginTop: 60, color: '#64748b' }}>
-            <span>(cover render error: {String(err?.message || err).slice(0, 80)})</span>
+          <div
+            style={{
+              display: 'flex',
+              marginTop: 24,
+              fontSize: 28,
+              color: 'rgba(255,255,255,0.78)',
+              fontWeight: 500,
+              lineHeight: 1.3,
+              maxWidth: 1000,
+            }}
+          >
+            <span>{subtitle}</span>
           </div>
         </div>
-      ),
-      { width: 1200, height: 630 }
-    );
-  }
+
+        {/* Bottom: brand */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', fontSize: 28, fontWeight: 800 }}>
+            <span>IPM</span>
+            <span style={{ color: g.accent }}>Careers</span>
+          </div>
+          <div style={{ display: 'flex', fontSize: 18, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
+            <span style={{ textTransform: 'uppercase', letterSpacing: 4 }}>Built for the future IIMer</span>
+          </div>
+        </div>
+      </div>
+    ),
+    { width: 1200, height: 630 }
+  );
 }
