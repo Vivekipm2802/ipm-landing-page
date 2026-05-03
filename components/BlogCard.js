@@ -27,9 +27,11 @@ export default function BlogCard({ blog, featured = false }) {
         (featured ? 'md:col-span-2 md:row-span-2' : '')
       }
     >
-      {/* Cover — real PNG via /api/og */}
+      {/* Cover — real PNG via /api/og.
+          Aspect locked to 1200/630 (the OG image's native ratio) so the title
+          and brand mark never get clipped on either featured or regular cards. */}
       <div
-        className={'relative w-full overflow-hidden ' + (featured ? 'aspect-[16/9]' : 'aspect-[16/10]')}
+        className="relative w-full overflow-hidden aspect-[1200/630]"
         style={{ backgroundColor: g.stops[0] }}
       >
         <img
