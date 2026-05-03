@@ -3,6 +3,11 @@
 // summarises in IPM Careers voice, and inserts into Supabase.
 //
 // Designed to be safe to run hourly — uses URL-hash dedupe.
+//
+// Runtime config: 60s timeout (Vercel Hobby max). RSS pulls can be slow if a
+// feed is down, plus the batched Gemini Flash call can take 5–15s.
+
+export const config = { maxDuration: 60 };
 
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin';

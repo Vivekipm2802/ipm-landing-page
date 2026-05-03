@@ -9,6 +9,12 @@
 //     If body is empty, picks the next topic from blog_topic_pool (LRU).
 //
 // Response: { ok, slug, title, category, log_id } | { ok:false, error }
+//
+// Runtime config: bump function timeout to 60s (Vercel Hobby max). Needed because
+// Gemini Pro can take 20–40s for a 1500-word blog, plus our retry backoff if Pro
+// is throttled. Default is 10s which kills the function mid-generation.
+
+export const config = { maxDuration: 60 };
 
 import { supabaseAdmin } from '../../lib/supabaseAdmin';
 import { gemini, extractJson } from '../../lib/gemini';
