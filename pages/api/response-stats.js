@@ -18,9 +18,15 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: "Failed to fetch stats" });
     }
 
+    // SECURITY: Only return name + total — never expose emails, phones, or full data
+    const safeToppers = (toppers || []).slice(0, 3).map((t) => ({
+      name: t.name || "Anonymous",
+      total: t.total || 0,
+    }));
+
     return res.status(200).json({
       count: countData || 0,
-      toppers: (toppers || []).slice(0, 3),
+      toppers: safeToppers,
     });
   } catch (err) {
     return res.status(500).json({ message: "Server error" });
