@@ -36,7 +36,9 @@ function Response() {
   useEffect(() => {
     getCount();
     getToppers();
-    supabase
+    // Remove any existing channel first to avoid "cannot add callbacks after subscribe" error
+    supabase.removeChannel(supabase.channel("room1"));
+    const channel = supabase
       .channel("room1")
       .on(
         "postgres_changes",
@@ -60,6 +62,7 @@ function Response() {
         }
       )
       .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const categories = [
