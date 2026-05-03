@@ -36,33 +36,7 @@ function Response() {
   useEffect(() => {
     getCount();
     getToppers();
-    // Remove any existing channel first to avoid "cannot add callbacks after subscribe" error
-    supabase.removeChannel(supabase.channel("room1"));
-    const channel = supabase
-      .channel("room1")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "who_submitted" },
-        (payload) => {
-          toast.custom(
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px',
-              background: '#fff', borderRadius: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              border: '1px solid #e5e7eb', fontSize: '0.82rem', fontFamily: 'inherit', zIndex: 50
-            }}>
-              <span style={{ fontSize: '1.2rem' }}>🎯</span>
-              <div>
-                <strong>{payload.new.name}</strong> just generated their scorecard
-                <div style={{ color: '#6c63ff', fontWeight: 700, fontSize: '0.78rem' }}>
-                  Scored: {payload.new.total}
-                </div>
-              </div>
-            </div>
-          );
-        }
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    // Realtime toast removed for security — prevents exposing student names/scores via RLS
   }, []);
 
   const categories = [
