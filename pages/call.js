@@ -275,8 +275,8 @@ function Call() {
                         </div>
                         <div>
                           <p className="cp-congrats">
-                            You may get {data.length} call
-                            {data.length > 1 ? "s" : ""}!
+                            You may get {data.filter(n => collegesData[n]).length} call
+                            {data.filter(n => collegesData[n]).length > 1 ? "s" : ""}!
                           </p>
                           <p className="cp-congrats-sub">
                             IPM Careers congratulates you on your hard work
@@ -328,6 +328,80 @@ function Call() {
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* ── PI Batch Promo ── */}
+                  <div style={{
+                    margin: '24px 0 0',
+                    padding: '20px 24px',
+                    borderRadius: 18,
+                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      position: 'absolute', top: -30, right: -30,
+                      width: 120, height: 120,
+                      background: 'radial-gradient(circle, rgba(249,160,27,0.25) 0%, transparent 70%)',
+                      borderRadius: '50%',
+                    }} />
+                    <div style={{
+                      position: 'absolute', bottom: -20, left: '30%',
+                      width: 100, height: 100,
+                      background: 'radial-gradient(circle, rgba(108,99,255,0.2) 0%, transparent 70%)',
+                      borderRadius: '50%',
+                    }} />
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.4rem' }}>🎓</span>
+                        <span style={{
+                          fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase',
+                          letterSpacing: '2px', color: '#f9a01b',
+                        }}>Next Step</span>
+                      </div>
+                      <h3 style={{
+                        fontSize: '1.15rem', fontWeight: 800, color: '#fff',
+                        lineHeight: 1.3, marginBottom: 6, letterSpacing: '-0.5px',
+                      }}>
+                        Got predicted calls? Now <span style={{ color: '#f9a01b' }}>ace your PI.</span>
+                      </h3>
+                      <p style={{
+                        fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)',
+                        lineHeight: 1.5, marginBottom: 14, maxWidth: 400,
+                      }}>
+                        AI Mock Interviews, SOP Builder, Question Bank & Expert Sessions — everything you need to convert your call into an admit.
+                      </p>
+                      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                        <a
+                          href="/pi/profile"
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '10px 22px', borderRadius: 12,
+                            background: 'linear-gradient(135deg, #f9a01b, #e08e15)',
+                            color: '#1a1a2e', fontSize: '0.82rem', fontWeight: 800,
+                            textDecoration: 'none', border: 'none', cursor: 'pointer',
+                            boxShadow: '0 4px 14px rgba(249,160,27,0.3)',
+                          }}
+                        >
+                          🚀 Start PI Prep — Free Trial
+                        </a>
+                        <a
+                          href="https://rzp.io/rzp/pi-batch"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '10px 22px', borderRadius: 12,
+                            background: 'transparent',
+                            color: '#fff', fontSize: '0.82rem', fontWeight: 700,
+                            textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.2)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Enroll in PI Batch — ₹99
+                        </a>
+                      </div>
+                    </div>
                   </div>
 
                   {/* ── Share / Download Row ── */}
