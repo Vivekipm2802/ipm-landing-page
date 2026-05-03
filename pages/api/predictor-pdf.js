@@ -7,7 +7,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { name, category, sa, qa, va, total, colleges } = req.body;
+  // Handle both JSON and form POST
+  let payload;
+  if (req.body.data) {
+    // Form POST — data is a JSON string in a form field
+    payload = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body.data;
+  } else {
+    payload = req.body;
+  }
+  const { name, category, sa, qa, va, total, colleges } = payload;
   const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const collegeRows = (colleges || []).map((c, i) => {
