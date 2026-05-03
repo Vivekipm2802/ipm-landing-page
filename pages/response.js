@@ -35,7 +35,6 @@ function Response() {
 
   useEffect(() => {
     getCount();
-    getToppers();
     // Realtime toast removed for security — prevents exposing student names/scores via RLS
   }, []);
 
@@ -56,18 +55,17 @@ function Response() {
   }, [router]);
 
   async function getCount() {
-    const { data, error } = await supabase.rpc("get_total_responses");
-    if (data) {
-      setIndex(550 + data);
+    try {
+      const res = await fetch("/api/response-stats");
+      const json = await res.json();
+      if (json.count !== undefined) setIndex(550 + json.count);
+      if (json.toppers) setToppersList(json.toppers);
+    } catch (err) {
+      console.error("Failed to fetch stats:", err);
     }
   }
 
-  async function getToppers() {
-    const { data, error } = await supabase.rpc("get_top_10");
-    if (data) {
-      setToppersList(data.slice(0, 3));
-    }
-  }
+  // getToppers is now handled by getCount() via /api/response-stats
 
   async function handleGenerate(url, b, c) {
     const { data, error } = await axios.post(
