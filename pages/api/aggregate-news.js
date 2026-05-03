@@ -6,7 +6,7 @@
 
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin';
-import { anthropic, extractJson } from '../../lib/anthropic';
+import { gemini, extractJson } from '../../lib/gemini';
 import { requireAuth } from '../../lib/auth';
 import { FEEDS, COMPETITOR_DOMAINS, RELEVANCE_KEYWORDS, CATEGORIES } from '../../lib/feeds';
 
@@ -99,7 +99,7 @@ function hashUrl(url) {
   return crypto.createHash('sha256').update(url).digest('hex').slice(0, 24);
 }
 
-// ───────── batched classification + summary via Claude Haiku ─────────
+// ───────── batched classification + summary via Gemini Flash ─────────
 async function summariseBatch(items) {
   if (items.length === 0) return [];
   const prompt = `
@@ -119,20 +119,16 @@ INPUT (numbered):
 ${items.map((it, i) => `[${i + 1}] TITLE: ${it.title}\nSOURCE: ${it.source_name}\nRAW: ${it.summary_raw.slice(0, 400)}`).join('\n\n')}
 `.trim();
 
-  const { text } = await anthropic({
-    model: 'claude-haiku-4-5-20251001',
-    system: 'You are a precise news classifier. Output ONLY valid JSON arrays.',
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 3000,
+  const { text } = await gemini({
+    model:       'gemini-2.5-flash',
+    system:      'You are a precise news classifier. Output ONLY valid JSON arrays.',
+    prompt:      prompt,
+    max_tokens:  4096,
     temperature: 0.3,
+    json:        true,
   });
 
-  // Extract JSON array (Claude sometimes wraps with ```)
-  const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
-  const start = cleaned.indexOf('[');
-  const end   = cleaned.lastIndexOf(']');
-  if (start === -1 || end === -1) throw new Error('No JSON array in classifier response.');
-  return JSON.parse(cleaned.slice(start, end + 1));
+  return extractJson(text);
 }
 
 // ───────── handler ─────────

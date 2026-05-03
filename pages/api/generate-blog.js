@@ -11,7 +11,7 @@
 // Response: { ok, slug, title, category, log_id } | { ok:false, error }
 
 import { supabaseAdmin } from '../../lib/supabaseAdmin';
-import { anthropic, extractJson } from '../../lib/anthropic';
+import { gemini, extractJson } from '../../lib/gemini';
 import { mdToHtml, injectInternalLinks, readingTime } from '../../lib/markdown';
 import { requireAuth, slugify, randSuffix } from '../../lib/auth';
 
@@ -104,12 +104,13 @@ ${existingSummary || '(none yet)'}
 Now write the JSON object per the schema in the system prompt.
 `.trim();
 
-    const { text } = await anthropic({
-      model: 'claude-sonnet-4-6',
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMsg }],
-      max_tokens: 6000,
+    const { text } = await gemini({
+      model:       'gemini-2.5-pro',
+      system:      SYSTEM_PROMPT,
+      prompt:      userMsg,
+      max_tokens:  8192,
       temperature: 0.7,
+      json:        true,             // forces strict JSON via responseMimeType
     });
 
     const blog = extractJson(text);
