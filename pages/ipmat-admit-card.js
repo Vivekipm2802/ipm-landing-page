@@ -13,10 +13,10 @@ import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import ShareButton from "../components/ShareButton";
 import { Document, Page ,pdfjs,View} from 'react-pdf';
-import "react-pdf/dist/esm/Page/TextLayer.css";
+
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css'
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';

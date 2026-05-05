@@ -1,4 +1,4 @@
-import { Pagination } from 'swiper';
+import { Pagination } from 'swiper/modules';
 import styles from './Paginator.module.css';
 import { useState } from 'react';
 import { useEffect } from 'react';

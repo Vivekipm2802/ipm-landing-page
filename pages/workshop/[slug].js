@@ -11,7 +11,7 @@ import axios from 'axios';
 import Section from '../../components/Section'
 import qs from 'qs';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css'
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
