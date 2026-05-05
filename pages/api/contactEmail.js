@@ -1,4 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+// pages/api/contactEmail.js
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -11,26 +14,25 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY
-  );
+  try {
+    await resend.emails.send({
+      from: "onboarding@resend.dev", 
+      to: ["ipmcareeronline@gmail.com"],     // your notification inbox
+      subject: `New Lead: ${fullname}`,
+      html: `
+        <h2>New Registration</h2>
+        <p><strong>Name:</strong> ${fullname}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Year:</strong> ${year}</p>
+        <p><strong>City:</strong> ${city}</p>
+        <p><strong>Source:</strong> PI Batch Landing Page</p>
+      `,
+    });
 
-  const { error } = await supabase.from("ipm_leads").insert([
-    {
-      name: fullname,
-      email,
-      phone,
-      class: year || null,
-      city: city || null,
-      source: "IPM Register Page",
-    },
-  ]);
-
-  if (error) {
-    console.error("Supabase insert error:", error);
-    return res.status(500).json({ error: "Failed to save submission" });
+    return res.status(200).json({ msg: "Email sent successfully" });
+  } catch (err) {
+    console.error("Email error:", err);
+    return res.status(500).json({ error: "Failed to send email" });
   }
-
-  return res.status(200).json({ msg: "Submitted successfully" });
 }

@@ -13,7 +13,7 @@ import * as performance from "../public/performance.json";
 import * as learning from "../public/learning.json";
 import * as app from "../public/app.json";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
