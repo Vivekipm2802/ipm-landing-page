@@ -1,10 +1,11 @@
-// /blogs/[slug] → redirect to /magazine/[slug]
-// The blog system uses /magazine/ routes. This redirect catches old /blogs/ links.
-
-export async function getServerSideProps({ params, res }) {
-  res.writeHead(301, { Location: `/magazine/${params.slug}` });
-  res.end();
-  return { props: {} };
+// /blogs/[slug] → permanent redirect to /magazine/[slug]
+export async function getServerSideProps({ params }) {
+  return {
+    redirect: {
+      destination: `/magazine/${params.slug}`,
+      permanent: true,
+    },
+  };
 }
 
 export default function BlogRedirect() {
