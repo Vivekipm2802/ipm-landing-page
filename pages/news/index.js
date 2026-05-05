@@ -3,16 +3,13 @@
 
 import Head from 'next/head';
 import { useState, useMemo } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
 import NewsCard from '../../components/NewsCard';
 import { CATEGORY_ORDER, gradientFor, timeAgo } from '../../lib/gradients';
 
 export async function getServerSideProps({ res }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const supabase = getSupabaseServer();
   const { data } = await supabase
     .from('recent_news')
     .select('*')
