@@ -17,6 +17,17 @@ const CATEGORIES = ['SOP', 'Academics', 'GK', 'Situational', 'Why IIM'];
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 const ADMIN_PASSWORD = 'PIPrep@dmin!';
+
+// Helper to call server-side admin API
+async function adminAPI(action, email, payload = null) {
+  const res = await fetch('/api/pi-admin-data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, email, payload }),
+  });
+  return res.json();
+}
+
 export default function AdminPortal() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -41,7 +52,7 @@ export default function AdminPortal() {
   const [editItem, setEditItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Auth check
+  // Auth check — uses server-side API to bypass RLS
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) {
@@ -50,75 +61,47 @@ export default function AdminPortal() {
       }
       setUser(session.user);
 
-      // Check if admin
-      const { data } = await supabase
-        .from('pi_admins')
-        .select('email')
-        .eq('email', session.user.email)
-        .single();
-
-      if (!data) {
+      // Check if admin via server-side API
+      const result = await adminAPI('check', session.user.email);
+      if (!result.isAdmin) {
         router.push('/pi/profile');
         return;
       }
       setIsAdmin(true);
       setLoading(false);
-      loadData();
+      loadData(session.user.email);
     });
   }, []);
 
-  async function loadData() {
-    const [usersRes, questionsRes, sessionsRes, expertsRes, adminsRes, paymentsRes] = await Promise.all([
-      supabase.from('pi_users').select('*').order('created_at', { ascending: false }),
-      supabase.from('pi_questions').select('*').order('sort_order', { ascending: true }),
-      supabase.from('pi_sessions').select('*').order('session_date', { ascending: false }),
-      supabase.from('pi_experts').select('*').order('id', { ascending: true }),
-      supabase.from('pi_admins').select('*').order('added_at', { ascending: true }),
-      supabase.from('pi_payments').select('*').eq('status', 'paid').order('created_at', { ascending: false }),
-    ]);
+  async function loadData(emailOverride) {
+    const email = emailOverride || user?.email;
+    if (!email) return;
+    const result = await adminAPI('loadAll', email);
+    if (result.error) return;
 
-    setUsers(usersRes.data || []);
-    setQuestions(questionsRes.data || []);
-    setSessions(sessionsRes.data || []);
-    setExperts(expertsRes.data || []);
-    setAdmins(adminsRes.data || []);
-    setPayments(paymentsRes.data || []);
+    setUsers(result.users || []);
+    setQuestions(result.questions || []);
+    setSessions(result.sessions || []);
+    setExperts(result.experts || []);
+    setAdmins(result.admins || []);
+    setPayments(result.payments || []);
 
     // Compute stats
-    const totalUsers = (usersRes.data || []).length;
-    const premiumUsers = (usersRes.data || []).filter(u => u.is_premium).length;
-    const totalRevenue = (paymentsRes.data || []).reduce((s, p) => s + (p.amount || 0), 0);
-    const activeTrials = (usersRes.data || []).filter(u => !u.is_premium && new Date(u.trial_expires_at) > new Date()).length;
+    const totalUsers = (result.users || []).length;
+    const premiumUsers = (result.users || []).filter(u => u.is_premium).length;
+    const totalRevenue = (result.payments || []).reduce((s, p) => s + (p.amount || 0), 0);
+    const activeTrials = (result.users || []).filter(u => !u.is_premium && new Date(u.trial_expires_at) > new Date()).length;
     setStats({ totalUsers, premiumUsers, totalRevenue, activeTrials });
   }
 
-  // ── CRUD Helpers ──
-  async function togglePremium(email, currentStatus) {
-    await supabase.from('pi_users').update({ is_premium: !currentStatus }).eq('email', email);
+  // ── CRUD Helpers (all via server-side API) ──
+  async function togglePremium(targetEmail, currentStatus) {
+    await adminAPI('togglePremium', user.email, { targetEmail, currentStatus });
     loadData();
   }
 
   async function saveQuestion(formData) {
-    if (formData.id) {
-      await supabase.from('pi_questions').update({
-        category: formData.category,
-        question_text: formData.question_text,
-        model_answer: formData.model_answer,
-        difficulty: formData.difficulty,
-        sort_order: formData.sort_order || 0,
-        is_published: formData.is_published,
-        updated_at: new Date().toISOString(),
-      }).eq('id', formData.id);
-    } else {
-      await supabase.from('pi_questions').insert({
-        category: formData.category,
-        question_text: formData.question_text,
-        model_answer: formData.model_answer,
-        difficulty: formData.difficulty,
-        sort_order: formData.sort_order || 0,
-        is_published: formData.is_published !== false,
-      });
-    }
+    await adminAPI('saveQuestion', user.email, formData);
     setShowForm(false);
     setEditItem(null);
     loadData();
@@ -126,31 +109,12 @@ export default function AdminPortal() {
 
   async function deleteQuestion(id) {
     if (!confirm('Delete this question?')) return;
-    await supabase.from('pi_questions').delete().eq('id', id);
+    await adminAPI('deleteQuestion', user.email, { id });
     loadData();
   }
 
   async function saveSession(formData) {
-    const payload = {
-      session_type: formData.session_type,
-      title: formData.title,
-      speaker: formData.speaker || 'Vivek Sharma',
-      session_date: formData.session_date || null,
-      session_time: formData.session_time || null,
-      duration: formData.duration || null,
-      youtube_id: formData.youtube_id || null,
-      youtube_link: formData.youtube_link || null,
-      description: formData.description || null,
-      tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-      is_published: formData.is_published !== false,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (formData.id) {
-      await supabase.from('pi_sessions').update(payload).eq('id', formData.id);
-    } else {
-      await supabase.from('pi_sessions').insert(payload);
-    }
+    await adminAPI('saveSession', user.email, formData);
     setShowForm(false);
     setEditItem(null);
     loadData();
@@ -158,33 +122,12 @@ export default function AdminPortal() {
 
   async function deleteSession(id) {
     if (!confirm('Delete this session?')) return;
-    await supabase.from('pi_sessions').delete().eq('id', id);
+    await adminAPI('deleteSession', user.email, { id });
     loadData();
   }
 
   async function saveExpert(formData) {
-    let slotsObj = {};
-    try { slotsObj = typeof formData.slots === 'string' ? JSON.parse(formData.slots) : (formData.slots || {}); } catch {}
-
-    const payload = {
-      name: formData.name,
-      title: formData.title || '',
-      bio: formData.bio || '',
-      specialties: formData.specialties ? (typeof formData.specialties === 'string' ? formData.specialties.split(',').map(s => s.trim()) : formData.specialties) : [],
-      rating: parseFloat(formData.rating) || 4.5,
-      sessions_count: parseInt(formData.sessions_count) || 0,
-      price: parseInt(formData.price) || 499,
-      slots: slotsObj,
-      phone: formData.phone || '',
-      is_active: formData.is_active !== false,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (formData.id) {
-      await supabase.from('pi_experts').update(payload).eq('id', formData.id);
-    } else {
-      await supabase.from('pi_experts').insert(payload);
-    }
+    await adminAPI('saveExpert', user.email, formData);
     setShowForm(false);
     setEditItem(null);
     loadData();
@@ -192,20 +135,20 @@ export default function AdminPortal() {
 
   async function deleteExpert(id) {
     if (!confirm('Delete this expert?')) return;
-    await supabase.from('pi_experts').delete().eq('id', id);
+    await adminAPI('deleteExpert', user.email, { id });
     loadData();
   }
 
   async function addAdmin(email) {
     if (!email || !email.includes('@')) return;
-    await supabase.from('pi_admins').insert({ email: email.trim() });
+    await adminAPI('addAdmin', user.email, { newEmail: email.trim() });
     loadData();
   }
 
-  async function removeAdmin(email) {
-    if (email === user?.email) { alert("Can't remove yourself"); return; }
-    if (!confirm(`Remove admin access for ${email}?`)) return;
-    await supabase.from('pi_admins').delete().eq('email', email);
+  async function removeAdmin(targetEmail) {
+    if (targetEmail === user?.email) { alert("Can't remove yourself"); return; }
+    if (!confirm(`Remove admin access for ${targetEmail}?`)) return;
+    await adminAPI('removeAdmin', user.email, { targetEmail });
     loadData();
   }
 
@@ -219,13 +162,22 @@ export default function AdminPortal() {
         <Head><title>Admin Login — IPM Careers</title></Head>
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f23', fontFamily: 'Inter, sans-serif' }}>
           <div style={{ background: '#1a1a3e', borderRadius: 16, padding: '48px 40px', maxWidth: 400, width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>&#x1F510;</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔐</div>
             <h1 style={{ color: '#fff', fontSize: 22, margin: '0 0 8px' }}>Admin Access</h1>
             <p style={{ color: '#9999bb', fontSize: 14, margin: '0 0 28px' }}>Enter the admin password to continue</p>
             <form onSubmit={(e) => { e.preventDefault(); if (passwordInput === ADMIN_PASSWORD) { setPasswordVerified(true); setPasswordError(''); } else { setPasswordError('Incorrect password'); setPasswordInput(''); } }}>
-              <input type='password' placeholder='Enter admin password' value={passwordInput} onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(''); }} autoFocus style={{ width: '100%', padding: '14px 16px', fontSize: 16, borderRadius: 10, border: passwordError ? '2px solid #ff4d6a' : '2px solid #2d2d5e', background: '#12122a', color: '#fff', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
+              <input
+                type="password"
+                placeholder="Enter admin password"
+                value={passwordInput}
+                onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(''); }}
+                autoFocus
+                style={{ width: '100%', padding: '14px 16px', fontSize: 16, borderRadius: 10, border: passwordError ? '2px solid #ff4d6a' : '2px solid #2d2d5e', background: '#12122a', color: '#fff', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }}
+              />
               {passwordError && <p style={{ color: '#ff4d6a', fontSize: 13, margin: '4px 0 8px', textAlign: 'left' }}>{passwordError}</p>}
-              <button type='submit' style={{ width: '100%', padding: '14px', fontSize: 16, fontWeight: 600, borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #6c5ce7, #a855f7)', color: '#fff', cursor: 'pointer', marginTop: 8 }}>Unlock Admin Panel</button>
+              <button type="submit" style={{ width: '100%', padding: '14px', fontSize: 16, fontWeight: 600, borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #6c5ce7, #a855f7)', color: '#fff', cursor: 'pointer', marginTop: 8, transition: 'opacity 0.2s' }} onMouseOver={(e) => e.target.style.opacity='0.9'} onMouseOut={(e) => e.target.style.opacity='1'}>
+                Unlock Admin Panel
+              </button>
             </form>
             <p style={{ color: '#555577', fontSize: 12, marginTop: 20 }}>Logged in as {user?.email}</p>
           </div>
@@ -233,7 +185,6 @@ export default function AdminPortal() {
       </>
     );
   }
-
 
   return (
     <>
