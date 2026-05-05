@@ -6,16 +6,13 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
 import BlogCard from '../../components/BlogCard';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const supabase = getSupabaseServer();
   const { data: blog } = await supabase
     .from('blogs')
     .select('*')
