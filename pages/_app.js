@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import { AuthProvider } from '../hooks/useAuth'
+import { Analytics } from '@vercel/analytics/react'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -28,6 +29,7 @@ export default function App({ Component, pageProps }) {
         <NextUIProvider>
           <AuthProvider>
             <Component {...pageProps} />
+            <Analytics />
           </AuthProvider>
         </NextUIProvider>
       </Scrollbar>
