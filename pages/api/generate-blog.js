@@ -33,6 +33,13 @@ Voice: punchy, confident, specific. Talk to the student as a "future IIMer".
 Concrete numbers > vague claims. Real names of IIMs and exams. No fluff.
 
 Hard rules:
+- TIMELINE RULE: Always use the calendar year supplied in the brief. Do NOT default
+  to your training-data year. If the brief says "today's date is 2026-05-05", every
+  year reference (exam year, cutoff year, placement year) must be 2026 unless the
+  topic itself says otherwise (e.g. a "2021–2026 trend analysis" or a "2027
+  forward-looking" piece). Never write "IPMAT 2025", "2025 cutoffs", "2025 result"
+  if the calendar year passed in is later than 2025. The current year overrides
+  any year you remember from training.
 - NEVER mention competitors by name: PhysicsWallah, PW, Toprankers, Unacademy, BYJU'S, Aakash, ALLEN.
   (When you would have said "vs PW", say "vs generic mass coaching" or just compare facts.)
 - NEVER fabricate stats. If you state a placement figure or cutoff, mark it as "approximate
@@ -97,8 +104,17 @@ export default async function handler(req, res) {
       .join('\n')
       .slice(0, 4000);
 
+    // Inject today's date so Gemini stops defaulting to its training-cutoff year.
+    const now = new Date();
+    const todayIso = now.toISOString().slice(0, 10);   // 2026-05-05
+    const currentYear = now.getUTCFullYear();          // 2026
+    const nextYear = currentYear + 1;                  // 2027
+
     // 3. Generate
     const userMsg = `
+Today's date: ${todayIso}
+Current calendar year: ${currentYear}. Next exam cycle year (forward-looking content): ${nextYear}.
+
 Today's brief:
 - Topic:    ${topic}
 - Category: ${category}
