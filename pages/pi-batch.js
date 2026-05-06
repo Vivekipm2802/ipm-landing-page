@@ -75,7 +75,7 @@ export default function Home() {
     u_mobile,
     u_year,
     u_city,
-    linke
+    linke,
   ) {
     console.log(arguments);
 
@@ -142,7 +142,7 @@ export default function Home() {
     });
     xhr.open(
       "POST",
-      "https://register.cronberry.com/api/campaign/register-audience-data"
+      "https://register.cronberry.com/api/campaign/register-audience-data",
     );
     xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -206,8 +206,7 @@ export default function Home() {
 
   const slides = [
     {
-      image:
-        "banners/pi-1.png",
+      image: "banners/pi-1.png",
       alt: "IPM Careers IIM Banglore UG Special Batch ",
     },
     // {
@@ -254,7 +253,7 @@ export default function Home() {
 
     setNotificationText(de);
     const id = setTimeout(() => {
-      setNotificationText(), setTimeoutId(null), console.log("notcall");
+      (setNotificationText(), setTimeoutId(null), console.log("notcall"));
     }, 2500);
     setTimeoutId(id);
   }
@@ -446,10 +445,10 @@ export default function Home() {
       formData.phone,
       formData.year,
       formData.city,
-      "https://register.ipmcareer.com"
+      "https://register.ipmcareer.com",
     );
     const { data, error } = await supabase
-      .from("ipm_leads")
+      .from("pi_leads")
       .insert({
         name: formData.fullname,
         email: formData.email,
@@ -460,20 +459,28 @@ export default function Home() {
       })
       .select();
 
-          // Trigger notification email
-          try {
-            await axios.post("/api/contactEmail", {
-              fullname: formData.fullname,
-              email: formData.email,
-              phone: formData.phone,
-              year: formData.year,
-              city: formData.city,
-            });
-            console.log("Notification email sent");
-                  window.location.href = "https://pages.razorpay.com/iimb-pi-batch"
-          } catch (err) {
-            console.error("Email sending failed", err);
-          }
+    // ADD THIS BEFORE the contactEmail try block
+    console.log("Supabase result:", data, error);
+    if (error) {
+      setNotification("DB Error: " + error.message);
+      setLoader(false);
+      return; // STOP here so you can see the error
+    }
+
+    // Trigger notification email
+    try {
+      await axios.post("/api/contactEmail", {
+        fullname: formData.fullname,
+        email: formData.email,
+        phone: formData.phone,
+        year: formData.year,
+        city: formData.city,
+      });
+      console.log("Notification email sent");
+      window.location.href = "https://pages.razorpay.com/iimb-pi-batch";
+    } catch (err) {
+      console.error("Email sending failed", err);
+    }
 
     if (data) {
       console.log("inserted");
@@ -520,7 +527,7 @@ export default function Home() {
             "Content-Type": "application-x-www-form-urlencoded",
             "Access-Control-Allow-Origin": "*",
           },
-        }
+        },
       )
       .then((res) => {})
       .catch((res) => {
@@ -707,8 +714,7 @@ export default function Home() {
           <div className={styles.c2}>
             <div className={styles.formcont}>
               <h1 className={styles.team_heading}>
-                Fill out the form to register for Interview Preparation
-                Batch
+                Fill out the form to register for Interview Preparation Batch
               </h1>
               <input
                 name={"name"}
