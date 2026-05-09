@@ -30,6 +30,10 @@
   ],
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/home"
+    },
+    {
       "source": "/air1commandcenter/:tab",
       "destination": "/air1commandcenter"
     },
