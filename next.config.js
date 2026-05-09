@@ -10,9 +10,11 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      { source: '/', destination: '/home' },
-    ];
+    return {
+      beforeFiles: [
+        { source: '/', destination: '/home' },
+      ],
+    };
   },
 };
 
