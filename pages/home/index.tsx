@@ -595,62 +595,6 @@ const AdsLandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SEO: FAQ SECTION — IPMAT COACHING */}
-        <section className="py-24 bg-[#05070a]">
-          <div className="container mx-auto px-6 max-w-3xl">
-            <div className="text-center mb-14">
-              <span className="text-brand-gold font-black uppercase tracking-widest text-xs mb-4 block">Know Before You Enrol</span>
-              <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
-                IPMAT Coaching — <span className="text-brand-gold italic">FAQs</span>
-              </h2>
-              <p className="text-slate-400 mt-4 text-lg">Everything you want to know about our IPMAT online coaching programme</p>
-            </div>
-            <div className="space-y-4">
-              {[
-                {
-                  q: "What makes IPM Careers the best IPMAT coaching in India?",
-                  a: "IPM Careers is founded by IIM-A alumni who have produced All India Rank 1 at IIM Indore IPM. Our IPMAT coaching focuses on Quantitative Intuition over rote memory, directly mirroring the actual exam pattern. Over 1,000 students have secured IIM admissions through our programme."
-                },
-                {
-                  q: "Is IPMAT online coaching as effective as offline?",
-                  a: "Yes. Our IPMAT online coaching offers live interactive classes, weekly mock tests, recorded sessions for revision, and direct WhatsApp access to faculty — equally effective as offline, with the flexibility of learning from anywhere in India."
-                },
-                {
-                  q: "How many months of IPMAT coaching is enough?",
-                  a: "A focused 6-month programme is ideal for most students. Class 11 students benefit from a 12-month foundation course. For Class 12 droppers or repeaters, our intensive 3–4 month IPMAT crash course is available."
-                },
-                {
-                  q: "What does IPM Careers' IPMAT coaching include?",
-                  a: "Our IPMAT online coaching includes live Quant & Verbal classes, 50+ full-length mock tests, previous year paper analysis, doubt sessions, printed study material, and personal mentoring from the faculty who produced AIR 1."
-                },
-                {
-                  q: "Can Class 11 students join IPMAT coaching?",
-                  a: "Yes. We have a dedicated Class 11 IPMAT foundation programme. Starting early gives a decisive edge in Quantitative Aptitude — the section that takes the most time to master."
-                },
-                {
-                  q: "Does IPM Careers also cover JIPMAT and IIM Rohtak coaching?",
-                  a: "Yes. Our coaching covers IPMAT Indore, IPMAT Rohtak, and JIPMAT (IIM Jammu & IIM Bodhgaya) as a single integrated programme — one preparation, all three exams."
-                },
-                {
-                  q: "What is the fee for IPMAT coaching at IPM Careers?",
-                  a: "IPM Careers offers multiple course tiers to suit every budget. Visit this page or call 8299470392 for current batch details and early-enrolment pricing."
-                }
-              ].map((item, idx) => (
-                <details key={idx} className="group border border-slate-800 rounded-2xl overflow-hidden">
-                  <summary className="flex items-center justify-between cursor-pointer p-6 text-white font-bold text-lg list-none hover:bg-slate-900/50 transition-colors">
-                    <span>{item.q}</span>
-                    <span className="ml-4 text-brand-gold text-2xl font-light group-open:rotate-45 transition-transform">+</span>
-                  </summary>
-                  <div className="px-6 pb-6 text-slate-400 leading-relaxed">
-                    {item.a}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
         {/* SEO FAQ — IPMAT COACHING */}
         <section className="py-24 bg-[#05070a]">
           <div className="container mx-auto px-6 max-w-3xl">
