@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import Head from "next/head";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ShieldCheck,
@@ -66,6 +67,53 @@ const AdsLandingPage: React.FC = () => {
 
   return (
     <>
+      <Head>
+        <title>Best IPMAT Online Coaching 2026 | IIM IPM Preparation | IPM Careers</title>
+        <meta name="description" content="India's #1 IPMAT online coaching for IIM Indore, Rohtak, Shillong and JIPMAT 2026. Produced All India Rank 1. Live classes, mock tests and 1,000+ IIM selections. Enrol now." />
+        <meta name="keywords" content="IPMAT coaching, IPMAT online coaching, IPM online coaching, best IPMAT coaching, IPMAT coaching 2026, IIM IPM coaching, IPMAT preparation online, IPM coaching institute" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://register.ipmcareer.com/" />
+        <meta property="og:title" content="Best IPMAT Online Coaching 2026 | IPM Careers" />
+        <meta property="og:description" content="India's #1 IPMAT online coaching. Produced All India Rank 1. 1,000+ IIM selections. Live classes and mock tests for IIM Indore IPM." />
+        <meta property="og:url" content="https://register.ipmcareer.com/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://register.ipmcareer.com/ipm.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "EducationalOrganization",
+              "@id": "https://register.ipmcareer.com/#organization",
+              "name": "IPM Careers",
+              "url": "https://register.ipmcareer.com/",
+              "logo": "https://register.ipmcareer.com/whitelogoipm.svg",
+              "description": "India's #1 IPMAT online coaching institute. Produced All India Rank 1 at IIM Indore IPM. 1000+ IIM selections.",
+              "telephone": "+918299470392",
+              "sameAs": ["https://ipmcareer.com"]
+            },
+            {
+              "@type": "Course",
+              "name": "IPMAT Online Coaching 2026",
+              "description": "Comprehensive IPMAT online coaching for IIM Indore, IIM Rohtak and JIPMAT 2026. Live classes, mock tests and personal mentoring by AIR 1 producing faculty.",
+              "provider": { "@type": "EducationalOrganization", "name": "IPM Careers", "url": "https://register.ipmcareer.com/" },
+              "educationalLevel": "Undergraduate Entrance Exam",
+              "url": "https://register.ipmcareer.com/"
+            },
+            {
+              "@type": "FAQPage",
+              "mainEntity": [
+                { "@type": "Question", "name": "What makes IPM Careers the best IPMAT coaching in India?", "acceptedAnswer": { "@type": "Answer", "text": "IPM Careers is founded by IIM-A alumni who produced All India Rank 1 at IIM Indore IPM. Our IPMAT coaching focuses on Quantitative Intuition over rote memory. 1,000+ students have secured IIM admissions through our programme." } },
+                { "@type": "Question", "name": "Is IPMAT online coaching as effective as offline?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. IPM Careers online coaching offers live interactive classes, weekly mock tests, recorded sessions and direct WhatsApp access to faculty — equally effective as offline, with the flexibility of learning from anywhere." } },
+                { "@type": "Question", "name": "How many months of IPMAT coaching is enough?", "acceptedAnswer": { "@type": "Answer", "text": "A focused 6-month IPMAT coaching programme is ideal for most students. Class 11 students benefit from a 12-month course. For repeaters, a 3-4 month crash course is available." } },
+                { "@type": "Question", "name": "What does IPM Careers IPMAT coaching include?", "acceptedAnswer": { "@type": "Answer", "text": "Our IPMAT online coaching includes live Quant and Verbal classes, 50+ mock tests, PYQ analysis, doubt sessions, study material and personal mentoring from the faculty who produced AIR 1." } },
+                { "@type": "Question", "name": "Does IPM Careers cover JIPMAT and IIM Rohtak coaching too?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. IPM Careers covers IPMAT Indore, IPMAT Rohtak and JIPMAT as a single integrated programme — one preparation, all three exams." } },
+                { "@type": "Question", "name": "Can Class 11 students join IPMAT coaching at IPM Careers?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We have a dedicated Class 11 IPMAT foundation programme. Starting in Class 11 gives a major advantage in mastering Quantitative Aptitude." } }
+              ]
+            }
+          ]
+        }) }} />
+      </Head>
       <nav
         className={`h-20 border-b border-slate-800/50 bg-slate-900 backdrop-blur-md fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 md:px-8 transition-transform duration-300 ${
           isVisible ? "translate-y-0" : "-translate-y-full"
@@ -197,7 +245,7 @@ const AdsLandingPage: React.FC = () => {
                   transition={{ delay: 0.1 }}
                   className="text-6xl md:text-8xl xl:text-9xl font-serif font-black mb-8 leading-[0.9] tracking-tighter"
                 >
-                  IPMAT is a <br />
+                  IPMAT Online <br />
                   <span
                     className="bg-clip-text text-transparent italic"
                     style={{
@@ -207,7 +255,10 @@ const AdsLandingPage: React.FC = () => {
                       WebkitTextFillColor: "transparent",
                     }}
                   >
-                    Battle of Logic.
+                    Coaching.{" "}
+                  </span>
+                  <span className="block text-2xl md:text-3xl xl:text-4xl text-slate-500 font-sans font-light tracking-normal mt-3 not-italic">
+                    A Battle of Logic. Won with Strategy.
                   </span>
                 </motion.h1>
 
@@ -217,11 +268,11 @@ const AdsLandingPage: React.FC = () => {
                   transition={{ delay: 0.2 }}
                   className="text-slate-400 text-xl md:text-2xl mb-12 max-w-xl leading-relaxed font-light"
                 >
-                  The 2025 pattern shift proved that memory fails, but{" "}
+                  India's #1 <span className="text-white font-semibold">IPMAT online coaching</span> institute. The 2025 pattern shift proved that memory fails, but{" "}
                   <span className="text-white font-bold">
                     Quantitative Intuition
                   </span>{" "}
-                  wins. Trained by founders who have produced All India Rank 1.
+                  wins. Our IPMAT coaching is led by IIM-A alumni who produced All India Rank 1.
                 </motion.p>
 
                 <div className="flex flex-wrap gap-8 items-center">
@@ -317,6 +368,7 @@ const AdsLandingPage: React.FC = () => {
                 <span className="text-brand-gold font-black uppercase tracking-widest text-sm mb-6 block">
                   The Pedigree of Success
                 </span>
+                <p className="text-brand-gold font-black uppercase tracking-widest text-xs mb-2">IPMAT Online Coaching — Results That Speak</p>
                 <h2 className="text-5xl md:text-7xl font-serif font-black mb-8 leading-tight tracking-tighter">
                   We Don't Guess. <br />
                   <span className="text-brand-gold italic">We Predict.</span>
@@ -542,6 +594,96 @@ const AdsLandingPage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* SEO: FAQ SECTION — IPMAT COACHING */}
+        <section className="py-24 bg-[#05070a]">
+          <div className="container mx-auto px-6 max-w-3xl">
+            <div className="text-center mb-14">
+              <span className="text-brand-gold font-black uppercase tracking-widest text-xs mb-4 block">Know Before You Enrol</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
+                IPMAT Coaching — <span className="text-brand-gold italic">FAQs</span>
+              </h2>
+              <p className="text-slate-400 mt-4 text-lg">Everything you want to know about our IPMAT online coaching programme</p>
+            </div>
+            <div className="space-y-4">
+              {[
+                {
+                  q: "What makes IPM Careers the best IPMAT coaching in India?",
+                  a: "IPM Careers is founded by IIM-A alumni who have produced All India Rank 1 at IIM Indore IPM. Our IPMAT coaching focuses on Quantitative Intuition over rote memory, directly mirroring the actual exam pattern. Over 1,000 students have secured IIM admissions through our programme."
+                },
+                {
+                  q: "Is IPMAT online coaching as effective as offline?",
+                  a: "Yes. Our IPMAT online coaching offers live interactive classes, weekly mock tests, recorded sessions for revision, and direct WhatsApp access to faculty — equally effective as offline, with the flexibility of learning from anywhere in India."
+                },
+                {
+                  q: "How many months of IPMAT coaching is enough?",
+                  a: "A focused 6-month programme is ideal for most students. Class 11 students benefit from a 12-month foundation course. For Class 12 droppers or repeaters, our intensive 3–4 month IPMAT crash course is available."
+                },
+                {
+                  q: "What does IPM Careers' IPMAT coaching include?",
+                  a: "Our IPMAT online coaching includes live Quant & Verbal classes, 50+ full-length mock tests, previous year paper analysis, doubt sessions, printed study material, and personal mentoring from the faculty who produced AIR 1."
+                },
+                {
+                  q: "Can Class 11 students join IPMAT coaching?",
+                  a: "Yes. We have a dedicated Class 11 IPMAT foundation programme. Starting early gives a decisive edge in Quantitative Aptitude — the section that takes the most time to master."
+                },
+                {
+                  q: "Does IPM Careers also cover JIPMAT and IIM Rohtak coaching?",
+                  a: "Yes. Our coaching covers IPMAT Indore, IPMAT Rohtak, and JIPMAT (IIM Jammu & IIM Bodhgaya) as a single integrated programme — one preparation, all three exams."
+                },
+                {
+                  q: "What is the fee for IPMAT coaching at IPM Careers?",
+                  a: "IPM Careers offers multiple course tiers to suit every budget. Visit this page or call 8299470392 for current batch details and early-enrolment pricing."
+                }
+              ].map((item, idx) => (
+                <details key={idx} className="group border border-slate-800 rounded-2xl overflow-hidden">
+                  <summary className="flex items-center justify-between cursor-pointer p-6 text-white font-bold text-lg list-none hover:bg-slate-900/50 transition-colors">
+                    <span>{item.q}</span>
+                    <span className="ml-4 text-brand-gold text-2xl font-light group-open:rotate-45 transition-transform">+</span>
+                  </summary>
+                  <div className="px-6 pb-6 text-slate-400 leading-relaxed">
+                    {item.a}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* SEO FAQ — IPMAT COACHING */}
+        <section className="py-24 bg-[#05070a]">
+          <div className="container mx-auto px-6 max-w-3xl">
+            <div className="text-center mb-14">
+              <span className="text-brand-gold font-black uppercase tracking-widest text-xs mb-4 block">Know Before You Enrol</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
+                IPMAT Coaching{" "}
+                <span className="text-brand-gold italic">FAQs</span>
+              </h2>
+              <p className="text-slate-400 mt-4 text-lg">Everything about our IPMAT online coaching programme</p>
+            </div>
+            <div className="space-y-4">
+              {[
+                { q: "What makes IPM Careers the best IPMAT coaching in India?", a: "IPM Careers is founded by IIM-A alumni who produced All India Rank 1 at IIM Indore IPM. Our IPMAT coaching focuses on Quantitative Intuition over rote memory, directly mirroring the exam pattern. 1,000+ students have secured IIM admissions through our programme." },
+                { q: "Is IPMAT online coaching as effective as offline?", a: "Yes. Our IPMAT online coaching includes live interactive classes, weekly mock tests, recorded sessions for revision, and direct WhatsApp access to faculty — equally effective as offline, with the flexibility of studying from anywhere in India." },
+                { q: "How many months of IPMAT coaching is enough?", a: "A focused 6-month IPMAT coaching programme is ideal for most students. Class 11 students benefit from a 12-month foundation course. For Class 12 droppers or repeaters, our 3–4 month intensive crash course is available." },
+                { q: "What does IPM Careers IPMAT coaching include?", a: "Live Quant and Verbal Ability classes, 50+ full-length mock tests, previous year question paper analysis, doubt-clearing sessions, printed study material, and personal mentoring from the faculty who produced AIR 1." },
+                { q: "Can Class 11 students join IPMAT coaching?", a: "Yes. We have a dedicated Class 11 IPMAT foundation programme. Starting in Class 11 gives a decisive advantage in Quantitative Aptitude — the section that takes the most time to master." },
+                { q: "Does IPM Careers also cover JIPMAT and IIM Rohtak?", a: "Yes. Our programme covers IPMAT Indore, IPMAT Rohtak, and JIPMAT (IIM Jammu and IIM Bodhgaya) as a single integrated coaching — one preparation, all three exams." },
+                { q: "What is the fee for IPMAT coaching at IPM Careers?", a: "IPM Careers offers multiple course tiers. Call 8299470392 or scroll to the courses section for current batch details and early-enrolment pricing." }
+              ].map((item, idx) => (
+                <details key={idx} className="group border border-slate-800 rounded-2xl overflow-hidden">
+                  <summary className="flex items-center justify-between cursor-pointer p-6 text-white font-bold text-lg list-none hover:bg-slate-900/60 transition-colors">
+                    <span>{item.q}</span>
+                    <span className="ml-4 text-brand-gold text-2xl font-light group-open:rotate-45 transition-transform duration-200 flex-shrink-0">+</span>
+                  </summary>
+                  <div className="px-6 pb-6 text-slate-400 leading-relaxed">{item.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* 4. FINAL HIGH-CONVERSION CTA */}
         <section className="py-20 relative overflow-hidden bg-brand-gold text-brand-900">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/pinstripe-dark.png')] opacity-10" />
