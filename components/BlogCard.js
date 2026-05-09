@@ -7,6 +7,14 @@
 import Link from 'next/link';
 import { gradientFor } from '../lib/gradients';
 
+// "3 May 2026" or empty string if the value isn't a real date.
+function safeDate(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function BlogCard({ blog, featured = false }) {
   const g = gradientFor(blog.cover_gradient || blog.category);
 
@@ -16,6 +24,8 @@ export default function BlogCard({ blog, featured = false }) {
   if (blog.cover_title)     ogParams.set('title', blog.cover_title);
   if (blog.cover_subtitle)  ogParams.set('subtitle', blog.cover_subtitle);
   const ogUrl = `/api/og/${blog.slug}?${ogParams.toString()}`;
+
+  const date = safeDate(blog.published_at) || safeDate(blog.created_at);
 
   return (
     <Link
@@ -28,17 +38,19 @@ export default function BlogCard({ blog, featured = false }) {
       }
     >
       {/* Cover — real PNG via /api/og.
-          Aspect locked to 1200/630 (the OG image's native ratio) so the title
-          and brand mark never get clipped on either featured or regular cards. */}
+          Aspect locked to 1200/630 (OG image native ratio). Inline aspectRatio
+          style is used instead of Tailwind's aspect-[..] arbitrary class so it
+          works regardless of Tailwind JIT scanning. */}
       <div
-        className="relative w-full overflow-hidden aspect-[1200/630]"
-        style={{ backgroundColor: g.stops[0] }}
+        className="relative w-full overflow-hidden"
+        style={{ backgroundColor: g.stops[0], aspectRatio: '1200 / 630' }}
       >
         <img
           src={ogUrl}
           alt={blog.cover_title || blog.title}
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          className="transition-transform duration-500 group-hover:scale-[1.03]"
         />
       </div>
 
@@ -74,7 +86,7 @@ export default function BlogCard({ blog, featured = false }) {
           </div>
         )}
         <div className="mt-4 pt-3 border-t border-[#1e2533] flex items-center justify-between text-[11px] text-[#64748b]">
-          <span>{new Date(blog.published_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <span>{date || 'New'}</span>
           <span className="text-[#f9a01b] font-semibold opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all">Read →</span>
         </div>
       </div>
