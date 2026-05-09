@@ -68,12 +68,12 @@ const AdsLandingPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Best IPMAT Online Coaching 2026 | IIM IPM Preparation | IPM Careers</title>
-        <meta name="description" content="India's #1 IPMAT online coaching for IIM Indore, Rohtak, Shillong and JIPMAT 2026. Produced All India Rank 1. Live classes, mock tests and 1,000+ IIM selections. Enrol now." />
-        <meta name="keywords" content="IPMAT coaching, IPMAT online coaching, IPM online coaching, best IPMAT coaching, IPMAT coaching 2026, IIM IPM coaching, IPMAT preparation online, IPM coaching institute" />
+        <title>Best IPMAT Online Coaching 2027 | IIM IPM Preparation | IPM Careers</title>
+        <meta name="description" content="India's #1 IPMAT online coaching for IIM Indore, Rohtak, Shillong and JIPMAT 2027. Produced All India Rank 1. Live classes, mock tests and 1,000+ IIM selections. Enrol now." />
+        <meta name="keywords" content="IPMAT coaching, IPMAT online coaching, IPM online coaching, best IPMAT coaching, IPMAT coaching 2027, IIM IPM coaching, IPMAT preparation online, IPM coaching institute" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://register.ipmcareer.com/" />
-        <meta property="og:title" content="Best IPMAT Online Coaching 2026 | IPM Careers" />
+        <meta property="og:title" content="Best IPMAT Online Coaching 2027 | IPM Careers" />
         <meta property="og:description" content="India's #1 IPMAT online coaching. Produced All India Rank 1. 1,000+ IIM selections. Live classes and mock tests for IIM Indore IPM." />
         <meta property="og:url" content="https://register.ipmcareer.com/" />
         <meta property="og:type" content="website" />
@@ -94,7 +94,7 @@ const AdsLandingPage: React.FC = () => {
             },
             {
               "@type": "Course",
-              "name": "IPMAT Online Coaching 2026",
+              "name": "IPMAT Online Coaching 2027",
               "description": "Comprehensive IPMAT online coaching for IIM Indore, IIM Rohtak and JIPMAT 2026. Live classes, mock tests and personal mentoring by AIR 1 producing faculty.",
               "provider": { "@type": "EducationalOrganization", "name": "IPM Careers", "url": "https://register.ipmcareer.com/" },
               "educationalLevel": "Undergraduate Entrance Exam",
