@@ -67,5 +67,100 @@
   </head>
   <body>
     <div id="root"></div>
-  </body>
+  
+<!-- air1commandcenter-url-sync -->
+<script>
+(function() {
+  var SLUG_TO_LABEL = {
+    'pyq': 'PYQ',
+    'cheatsheets': 'CheatSheets',
+    'toppers': "Topper's Mouth",
+    'mindjournal': 'Mind Journals',
+    'forms': 'Forms',
+    'formsanddeadlines': 'Forms',
+    'eligibility': 'Eligibility',
+    'cutoffs': 'Cut Offs',
+    'learnflix': 'LearnFlix',
+    'contact': 'Contact Us',
+    'cuet': 'Cuet',
+    'colleges': 'Know your college',
+    'videohub': 'Video Hub'
+  };
+  var LABEL_TO_SLUG = {
+    'pyq': 'pyq',
+    'cheatsheets': 'cheatsheets',
+    "topper's mouth": 'toppers',
+    'mind journals': 'mindjournal',
+    'forms': 'forms',
+    'forms & deadlines': 'forms',
+    'eligibility': 'eligibility',
+    'cut offs': 'cutoffs',
+    'learnflix': 'learnflix',
+    'contact us': 'contact',
+    'cuet': 'cuet',
+    'know your college': 'colleges',
+    'video hub': 'videohub'
+  };
+
+  function getSlug() {
+    var m = window.location.pathname.match(/\/air1commandcenter\/([^\/]+)/);
+    return m ? m[1].toLowerCase() : null;
+  }
+
+  function findAndClickTab(label) {
+    var lower = label.toLowerCase();
+    var els = document.querySelectorAll('button, [role="tab"]');
+    for (var i = 0; i < els.length; i++) {
+      var txt = els[i].textContent.replace(/\s+/g, ' ').trim().toLowerCase();
+      if (txt === lower || txt.startsWith(lower)) {
+        els[i].click();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function activateFromURL() {
+    var slug = getSlug();
+    if (!slug) return;
+    var label = SLUG_TO_LABEL[slug];
+    if (!label) return;
+    [200, 500, 1000, 2000, 3500].forEach(function(d) {
+      setTimeout(function() { findAndClickTab(label); }, d);
+    });
+  }
+
+  function hookClicks() {
+    document.addEventListener('click', function(e) {
+      var el = e.target.closest && e.target.closest('button, [role="tab"]');
+      if (!el) return;
+      var txt = el.textContent.replace(/\s+/g, ' ').trim().toLowerCase();
+      var slug = LABEL_TO_SLUG[txt];
+      if (!slug) {
+        for (var key in LABEL_TO_SLUG) {
+          if (txt.startsWith(key)) { slug = LABEL_TO_SLUG[key]; break; }
+        }
+      }
+      if (slug) {
+        var newPath = '/air1commandcenter/' + slug;
+        if (window.location.pathname !== newPath) {
+          history.pushState({ tab: slug }, '', newPath);
+        }
+      }
+    }, true);
+    window.addEventListener('popstate', activateFromURL);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      activateFromURL();
+      hookClicks();
+    });
+  } else {
+    activateFromURL();
+    hookClicks();
+  }
+})();
+</script>
+</body>
 </html>
