@@ -6,6 +6,8 @@ import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import { AuthProvider } from '../hooks/useAuth'
 import { Analytics } from '@vercel/analytics/react'
+import dynamic from 'next/dynamic';
+const VoiceWidget = dynamic(() => import('../components/VoiceWidget'), { ssr: false });
 
 export default function App({ Component, pageProps }) {
   return (
@@ -33,6 +35,7 @@ export default function App({ Component, pageProps }) {
           </AuthProvider>
         </NextUIProvider>
       </Scrollbar>
+      <VoiceWidget />
     </>
   )
 }
