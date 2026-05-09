@@ -1,7 +1,6 @@
 // /pages/api/pi-admin-data.js — Server-side admin API (bypasses RLS)
 // SECURITY: Verifies Supabase JWT before processing any admin action.
 // The email is extracted from the verified token, NOT from req.body.
-import { createClient } from "@supabase/supabase-js";
 import { getSupabaseServer } from "../../utils/supabaseClient";
 
 export default async function handler(req, res) {
@@ -18,15 +17,13 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Authentication required" });
   }
 
-  // Create a temporary client to verify the token
+  // Verify the JWT using the service-role client (which has auth.admin powers)
   let verifiedEmail;
   try {
-    const authClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
-    const { data: { user }, error } = await authClient.auth.getUser(token);
+    const supabaseAuth = getSupabaseServer();
+    const { data: { user }, error } = await supabaseAuth.auth.getUser(token);
     if (error || !user || !user.email) {
+      console.error("JWT verify failed:", error?.message || "no user");
       return res.status(401).json({ error: "Invalid or expired session" });
     }
     verifiedEmail = user.email;
