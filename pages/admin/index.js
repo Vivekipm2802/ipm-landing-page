@@ -18,11 +18,17 @@ const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 const ADMIN_PASSWORD = 'PIPrep@dmin!';
 
-// Helper to call server-side admin API
+// Helper to call server-side admin API (passes Supabase JWT for auth)
 async function adminAPI(action, email, payload = null) {
+  // Get current session token for server-side verification
+  const { data: { session } } = await supabase.auth.getSession();
+  const accessToken = session?.access_token || '';
   const res = await fetch('/api/pi-admin-data', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
     body: JSON.stringify({ action, email, payload }),
   });
   return res.json();
@@ -647,3 +653,4 @@ const S = {
   formLabel: { fontSize: '0.75rem', fontWeight: 600, color: '#64748b' },
   formInput: { padding: '9px 14px', border: '2px solid #e5e7eb', borderRadius: 10, fontSize: '0.85rem', outline: 'none', fontFamily: 'inherit', width: '100%', boxSizing: 'border-box' },
 };
+
