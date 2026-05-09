@@ -6,7 +6,7 @@ import Head from 'next/head';
 import { useState, useMemo } from 'react';
 import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
-import BlogCard from '../../components/BlogCard';
+import MagazineCard from '../../components/MagazineCard';
 import { CATEGORY_ORDER } from '../../lib/gradients';
 
 export async function getServerSideProps({ res }) {
@@ -122,8 +122,8 @@ export default function BlogsIndex({ blogs }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-              {featured && <BlogCard blog={featured} featured />}
-              {rest.map(b => <BlogCard key={b.id} blog={b} />)}
+              {featured && <MagazineCard blog={featured} featured />}
+              {rest.map(b => <MagazineCard key={b.id} blog={b} />)}
             </div>
           )}
         </section>

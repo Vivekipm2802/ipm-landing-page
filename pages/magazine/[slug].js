@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
-import BlogCard from '../../components/BlogCard';
+import MagazineCard from '../../components/MagazineCard';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
@@ -212,7 +212,7 @@ export default function BlogReader({ blog, related }) {
           <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
             <h2 className="text-2xl font-extrabold text-[#f1f5f9] mb-6">More in {blog.category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-              {related.map(b => <BlogCard key={b.id} blog={b} />)}
+              {related.map(b => <MagazineCard key={b.id} blog={b} />)}
             </div>
           </section>
         )}
