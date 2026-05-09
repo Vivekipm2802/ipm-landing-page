@@ -1,11 +1,13 @@
 /**
- * GET /api/send-exam-alerts?secret=YOUR_CRON_SECRET
+ * GET /api/send-exam-alerts
  *
- * Called daily by a cron job / Vercel cron.
+ * Called daily by Vercel cron.
  * Checks Supabase for subscriptions whose deadline is approaching,
  * sends reminder emails at: 7 days, 3 days, 1 day, and 0 days before.
  *
- * Protect with a secret to prevent public access.
+ * SECURITY: Uses Vercel's built-in CRON_SECRET header for authentication.
+ * Set CRON_SECRET in Vercel env vars — Vercel automatically sends it
+ * in the Authorization header for cron-triggered requests.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -15,8 +17,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
-
-const CRON_SECRET = process.env.CRON_SECRET || 'ipm-cron-2026';
 
 // ── Email config (ZeptoMail) ─────────────────────────────────────────────────
 function createTransporter() {
@@ -165,8 +165,16 @@ async function sendReminderEmail({ to, examName, lastDate, daysLeft }) {
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
-  // Auth check
-  if (req.query.secret !== CRON_SECRET) {
+  // Auth check — verify Vercel cron secret from Authorization header
+  // Vercel sends: Authorization: Bearer <CRON_SECRET>
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return res.status(500).json({ error: 'CRON_SECRET env var not set' });
+  }
+  const authHeader = req.headers.authorization || '';
+  const bearerToken = authHeader.replace(/^Bearer\s+/i, '');
+  // Accept secret from either Authorization header (Vercel cron) or query param (manual trigger)
+  if (bearerToken !== cronSecret && req.query.secret !== cronSecret) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -242,3 +250,4 @@ export default async function handler(req, res) {
     ...results,
   });
 }
+
