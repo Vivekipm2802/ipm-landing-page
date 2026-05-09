@@ -85,7 +85,7 @@ const DataInsights = ({ score, maxScore }) => {
           <div className={styles.airCardTitle}>Predicted All India Rank</div>
           <div className={styles.airCardRank}>{insights.predictedAIR.label}</div>
           <div className={styles.airCardNote}>
-            out of ~50,000 applicants • Based on historical IPMAT trends
+            AIR prediction is as per our database. Check your predicted AIR on 12 May for a more accurate prediction.
           </div>
         </div>
       </div>
