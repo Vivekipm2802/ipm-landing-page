@@ -5,7 +5,13 @@ import { NextSeo } from "next-seo";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
-import { uuid } from "uuidv4";
+// Inline UUID generator — replaces uuidv4 package (avoids build issues)
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
 import ShareButton from "../components/ShareButton";
 import AppShell from "../components/AppShell";
 import { toast } from "react-hot-toast";
