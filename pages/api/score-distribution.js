@@ -1,6 +1,6 @@
 import { getSupabaseServer } from '../../utils/supabaseClient';
 
-// Hardcoded IPMAT score distribution estimates
+// Hardcoded IPMAT score distribution estimates (fallback)
 const ESTIMATED_DISTRIBUTION = {
   '250+': 10, '220-250': 20, '200-220': 25, '170-200': 22,
   '140-170': 15, 'Below 140': 8,
@@ -15,17 +15,14 @@ const BRACKETS = [
   { label: 'Below 140', min: 0, max: 139 },
 ];
 
-function predictAIR(score) {
-  if (score >= 320) return { min: 1, max: 50, label: 'Top 50' };
-  if (score >= 300) return { min: 50, max: 200, label: 'Top 200' };
-  if (score >= 280) return { min: 200, max: 500, label: '200-500' };
-  if (score >= 260) return { min: 500, max: 1200, label: '500-1,200' };
-  if (score >= 240) return { min: 1200, max: 2500, label: '1,200-2,500' };
-  if (score >= 220) return { min: 2500, max: 5000, label: '2,500-5,000' };
-  if (score >= 200) return { min: 5000, max: 10000, label: '5,000-10,000' };
-  if (score >= 180) return { min: 10000, max: 18000, label: '10,000-18,000' };
-  if (score >= 160) return { min: 18000, max: 28000, label: '18,000-28,000' };
-  return { min: 28000, max: 50000, label: '28,000+' };
+// Predicted AIR based on database rank:
+// - Rank 1-10: show exact rank
+// - Rank 11+: show rank × 3
+function predictAIRFromRank(rank) {
+  if (!rank || rank <= 0) return { rank: null, label: 'N/A' };
+  if (rank <= 10) return { rank, label: `AIR ${rank}` };
+  const air = rank * 3;
+  return { rank: air, label: `AIR ${air}` };
 }
 
 function estimatePercentile(score) {
@@ -56,7 +53,6 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
 
   const userScore = parseInt(req.query.score) || 0;
-  const air = predictAIR(userScore);
   const percentile = estimatePercentile(userScore);
 
   try {
@@ -68,15 +64,14 @@ export default async function handler(req, res) {
       responses = cachedDistribution;
     } else {
       const supabase = getSupabaseServer();
-      // Only fetch the total column, limit to 500 most recent for speed
+      // Fetch all totals to compute rank and distribution
       const { data, error } = await supabase
         .from('responses')
         .select('total')
         .not('total', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(500);
+        .order('total', { ascending: false });
 
-      if (!error && data && data.length >= 10) {
+      if (!error && data && data.length >= 1) {
         cachedDistribution = data;
         cacheTimestamp = now;
         responses = data;
@@ -89,7 +84,25 @@ export default async function handler(req, res) {
     let totalStudents = 0;
     let studentsAbove = 0;
 
-    if (responses && responses.length >= 10) {
+    if (responses && responses.length >= 1) {
+      // Calculate rank: position among all students sorted by total descending
+      // Students with the same score get the same rank (dense ranking)
+      let rank = 1;
+      for (let i = 0; i < responses.length; i++) {
+        if (responses[i].total > userScore) {
+          rank = i + 2; // rank is 1-indexed, and this student is after all who scored higher
+        } else {
+          rank = i + 1;
+          break;
+        }
+        if (i === responses.length - 1) {
+          rank = responses.length + 1; // user scored lower than everyone
+        }
+      }
+
+      const air = predictAIRFromRank(rank);
+
+      // Build distribution
       BRACKETS.forEach(b => { distribution[b.label] = 0; });
       responses.forEach(r => {
         const s = r.total;
@@ -99,19 +112,22 @@ export default async function handler(req, res) {
           if (s >= b.min && s <= b.max) { distribution[b.label]++; break; }
         }
       });
+
       return res.status(200).json({
         distribution, userBracket: getBracket(userScore), userScore,
         predictedAIR: air, percentile, totalStudents, studentsAbove,
+        dbRank: rank,
         isRealData: true, sampleSize: responses.length,
       });
     }
 
-    // Fallback to estimates
+    // Fallback — no data
     return res.status(200).json({
       distribution: ESTIMATED_DISTRIBUTION,
       userBracket: getBracket(userScore), userScore,
-      predictedAIR: air, percentile,
-      totalStudents: 100, studentsAbove: 0,
+      predictedAIR: { rank: null, label: 'N/A' }, percentile,
+      totalStudents: 0, studentsAbove: 0,
+      dbRank: null,
       isRealData: false, sampleSize: 0,
     });
 
@@ -120,8 +136,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       distribution: ESTIMATED_DISTRIBUTION,
       userBracket: getBracket(userScore), userScore,
-      predictedAIR: air, percentile,
-      totalStudents: 100, studentsAbove: 0,
+      predictedAIR: { rank: null, label: 'N/A' }, percentile,
+      totalStudents: 0, studentsAbove: 0,
+      dbRank: null,
       isRealData: false, sampleSize: 0,
     });
   }
