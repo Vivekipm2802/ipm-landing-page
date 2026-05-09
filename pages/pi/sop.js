@@ -14,14 +14,14 @@ const SOP_SECTIONS = [
   },
   {
     key: 'why_mba',
-    title: 'Why MBA at 18?',
-    hint: 'Why not engineering/medicine/CA? What specifically about management excites you? Connect it to a real experience. (60-100 words)',
+    title: 'Why IPM?',
+    hint: 'Why not engineering/medicine/CA? What specifically about the IPM programme and management at 18 excites you? Connect it to a real experience. (60-100 words)',
     maxWords: 100,
   },
   {
     key: 'why_iim',
-    title: 'Why IPM (IIM Indore)?',
-    hint: 'Be specific — mention the 5-year integrated structure, Indore campus, specific professors, clubs, or events you know about. Generic answers get caught. (60-100 words)',
+    title: 'Why IIM?',
+    hint: 'Be specific — mention the 5-year integrated structure, IIM Indore campus, specific professors, clubs, or events you know about. Generic answers get caught. (60-100 words)',
     maxWords: 100,
   },
   {
@@ -241,4 +241,5 @@ export default function SOPBuilder() {
     </AppShell>
   );
 }
+
 
