@@ -1,16 +1,44 @@
 // /pages/api/pi-admin-data.js — Server-side admin API (bypasses RLS)
+// SECURITY: Verifies Supabase JWT before processing any admin action.
+// The email is extracted from the verified token, NOT from req.body.
+import { createClient } from "@supabase/supabase-js";
 import { getSupabaseServer } from "../../utils/supabaseClient";
 
 export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const { action, email, payload } = req.body;
-  if (!email) return res.status(400).json({ error: "Email required" });
+  const { action, payload } = req.body;
 
+  // ── Step 1: Extract and verify Supabase JWT ──
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '');
+
+  if (!token) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
+  // Create a temporary client to verify the token
+  let verifiedEmail;
+  try {
+    const authClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+    const { data: { user }, error } = await authClient.auth.getUser(token);
+    if (error || !user || !user.email) {
+      return res.status(401).json({ error: "Invalid or expired session" });
+    }
+    verifiedEmail = user.email;
+  } catch (err) {
+    console.error("JWT verification error:", err);
+    return res.status(401).json({ error: "Authentication failed" });
+  }
+
+  // ── Step 2: Use the verified email (not from body) to check admin status ──
+  const email = verifiedEmail;
   const supabase = getSupabaseServer();
 
-  // ── Verify caller is admin ──
   const { data: adminRow } = await supabase
     .from("pi_admins")
     .select("email")
