@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/send-exam-alerts?secret=ipm-cron-2026",
+      "path": "/api/send-exam-alerts",
       "schedule": "0 7 * * *"
     }
   ],
