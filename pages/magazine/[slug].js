@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
 import MagazineCard from '../../components/MagazineCard';
+import MagazineInquiryForm from '../../components/MagazineInquiryForm';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
@@ -182,6 +183,8 @@ export default function BlogReader({ blog, related }) {
               </div>
             </section>
           )}
+
+          <MagazineInquiryForm blog={blog} />
 
           {/* WhatsApp CTA */}
           <aside className="mt-14 rounded-2xl p-6 sm:p-8 border" style={{
