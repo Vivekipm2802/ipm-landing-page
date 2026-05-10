@@ -4,89 +4,7 @@ import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
 import PIAuthGuard from '../../components/PIAuthGuard';
-
-// ── Session Data (editable — add/remove sessions here) ──
-const PAST_SESSIONS = [
-  {
-    id: 'ps1',
-    title: 'How to Crack the IIM Indore PI — Complete Strategy',
-    speaker: 'Vivek Sharma',
-    date: '2026-03-15',
-    duration: '45 min',
-    youtubeId: '',
-    tags: ['Strategy', 'PI Tips'],
-    description: 'Full breakdown of the IIM Indore PI process — what panels look for, common mistakes, and how to structure your answers.',
-  },
-  {
-    id: 'ps2',
-    title: 'SOP Masterclass — How to Write an SOP That Survives Cross-Questioning',
-    speaker: 'Vivek Sharma',
-    date: '2026-03-22',
-    duration: '38 min',
-    youtubeId: '',
-    tags: ['SOP', 'Writing'],
-    description: 'Step-by-step guide to writing an SOP that the panel can\'t poke holes in. With live examples and rewrites.',
-  },
-  {
-    id: 'ps3',
-    title: 'Current Affairs Rapid Fire — Top 30 GK Questions for PI',
-    speaker: 'Vivek Sharma',
-    date: '2026-04-01',
-    duration: '30 min',
-    youtubeId: '',
-    tags: ['GK', 'Current Affairs'],
-    description: 'Quick-fire session covering the 30 most likely current affairs questions you\'ll face in your PI.',
-  },
-  {
-    id: 'ps4',
-    title: 'Mock PI Live — Watch a Real Student Get Grilled',
-    speaker: 'Vivek Sharma',
-    date: '2026-04-10',
-    duration: '55 min',
-    youtubeId: '',
-    tags: ['Mock PI', 'Live Demo'],
-    description: 'Live mock PI with a real IPMAT student. Panel asks tough questions, student answers, expert breaks down what worked and what didn\'t.',
-  },
-];
-
-const UPCOMING_SESSIONS = [
-  {
-    id: 'us1',
-    title: 'Body Language & Confidence Hacks for PI Day',
-    speaker: 'Vivek Sharma',
-    date: '2026-04-28',
-    time: '6:00 PM IST',
-    duration: '40 min',
-    youtubeLink: '',
-    tags: ['Soft Skills', 'Confidence'],
-    description: 'Non-verbal cues that make or break your PI. How to sit, where to look, when to smile, and how to handle awkward silences.',
-    isLive: false,
-  },
-  {
-    id: 'us2',
-    title: 'Live Mock PI — Open Slots for 3 Students',
-    speaker: 'Vivek Sharma',
-    date: '2026-05-03',
-    time: '5:00 PM IST',
-    duration: '60 min',
-    youtubeLink: '',
-    tags: ['Mock PI', 'Interactive'],
-    description: 'Live mock PI on YouTube. 3 students will be selected to face the panel live — submit your name to participate!',
-    isLive: false,
-  },
-  {
-    id: 'us3',
-    title: 'Last-Minute PI Checklist — 48 Hours Before Your Interview',
-    speaker: 'Vivek Sharma',
-    date: '2026-05-10',
-    time: '7:00 PM IST',
-    duration: '35 min',
-    youtubeLink: '',
-    tags: ['Strategy', 'Last Minute'],
-    description: 'Everything you need to do in the final 48 hours. Document checklist, revision plan, sleep schedule, and mental preparation.',
-    isLive: false,
-  },
-];
+import { supabase } from '../../utils/supabaseClient';
 
 const TAG_COLORS = {
   'Strategy': '#6c63ff',
@@ -116,6 +34,7 @@ function getCountdown(dateStr) {
 }
 
 function formatDate(dateStr) {
+  if (!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00+05:30');
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
@@ -125,24 +44,78 @@ export default function Sessions() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedSession, setSelectedSession] = useState(null);
   const [countdowns, setCountdowns] = useState({});
+  const [pastSessions, setPastSessions] = useState([]);
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch sessions from Supabase
+  useEffect(() => {
+    async function fetchSessions() {
+      try {
+        const { data, error } = await supabase
+          .from('pi_sessions')
+          .select('*')
+          .eq('is_published', true)
+          .order('session_date', { ascending: false });
+        if (!error && data) {
+          const past = [];
+          const upcoming = [];
+          data.forEach(s => {
+            if (s.session_type === 'recorded') {
+              past.push({
+                id: s.id,
+                title: s.title,
+                speaker: s.speaker || 'Vivek Sharma',
+                date: s.session_date,
+                duration: s.duration,
+                youtubeId: s.youtube_id || '',
+                tags: Array.isArray(s.tags) ? s.tags : [],
+                description: s.description || '',
+              });
+            } else {
+              upcoming.push({
+                id: s.id,
+                title: s.title,
+                speaker: s.speaker || 'Vivek Sharma',
+                date: s.session_date,
+                time: s.session_time || '',
+                duration: s.duration,
+                youtubeLink: s.youtube_link || '',
+                tags: Array.isArray(s.tags) ? s.tags : [],
+                description: s.description || '',
+                isLive: false,
+              });
+            }
+          });
+          setPastSessions(past);
+          setUpcomingSessions(upcoming);
+        }
+      } catch (err) {
+        console.error('Error fetching sessions:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSessions();
+  }, []);
 
   // Update countdowns every minute
   useEffect(() => {
     const updateCountdowns = () => {
       const cd = {};
-      UPCOMING_SESSIONS.forEach(s => {
-        cd[s.id] = getCountdown(s.date);
+      upcomingSessions.forEach(s => {
+        if (s.date) cd[s.id] = getCountdown(s.date);
       });
       setCountdowns(cd);
     };
     updateCountdowns();
     const interval = setInterval(updateCountdowns, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [upcomingSessions]);
 
   const tabs = [
-    { key: 'upcoming', label: '🔴 Upcoming Live', count: UPCOMING_SESSIONS.length },
-    { key: 'past', label: '📼 Recorded', count: PAST_SESSIONS.length },
+    { key: 'upcoming', label: '🔴 Upcoming Live', count: upcomingSessions.length },
+    { key: 'past', label: '📼 Recorded', count: pastSessions.length },
   ];
 
   return (
@@ -171,26 +144,34 @@ export default function Sessions() {
           ))}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>⏳</div>
+            <div className={styles.emptyTitle}>Loading sessions...</div>
+          </div>
+        )}
+
         {/* Upcoming Sessions */}
-        {activeTab === 'upcoming' && (
+        {!loading && activeTab === 'upcoming' && (
           <div className={styles.sessionList}>
-            {UPCOMING_SESSIONS.map(session => (
+            {upcomingSessions.map(session => (
               <div key={session.id} className={styles.sessionCard}>
                 <div className={styles.sessionCardHeader}>
                   <div className={styles.sessionDate}>
                     <div className={styles.sessionDateDay}>
-                      {new Date(session.date + 'T00:00:00+05:30').getDate()}
+                      {session.date ? new Date(session.date + 'T00:00:00+05:30').getDate() : '--'}
                     </div>
                     <div className={styles.sessionDateMonth}>
-                      {new Date(session.date + 'T00:00:00+05:30').toLocaleString('en-IN', { month: 'short' })}
+                      {session.date ? new Date(session.date + 'T00:00:00+05:30').toLocaleString('en-IN', { month: 'short' }) : ''}
                     </div>
                   </div>
                   <div className={styles.sessionInfo}>
                     <h3 className={styles.sessionTitle}>{session.title}</h3>
                     <div className={styles.sessionMeta}>
-                      <span>🎤 {session.speaker}</span>
+                      <span>🎙 {session.speaker}</span>
                       <span>⏱ {session.duration}</span>
-                      <span>🕐 {session.time}</span>
+                      {session.time && <span>🕐 {session.time}</span>}
                     </div>
                     <div className={styles.sessionTags}>
                       {session.tags.map(tag => (
@@ -219,7 +200,7 @@ export default function Sessions() {
                     </button>
                   )}
                   <button className={styles.btnSecondary} onClick={() => {
-                    const text = `📅 Reminder: "${session.title}" on ${formatDate(session.date)} at ${session.time}. Don't miss it!`;
+                    const text = `📅 Reminder: "${session.title}" on ${formatDate(session.date)}${session.time ? ` at ${session.time}` : ''}. Don't miss it!`;
                     if (navigator.share) {
                       navigator.share({ text });
                     } else {
@@ -233,7 +214,7 @@ export default function Sessions() {
               </div>
             ))}
 
-            {UPCOMING_SESSIONS.length === 0 && (
+            {upcomingSessions.length === 0 && (
               <div className={styles.emptyState}>
                 <div className={styles.emptyIcon}>📅</div>
                 <div className={styles.emptyTitle}>No upcoming sessions</div>
@@ -244,9 +225,9 @@ export default function Sessions() {
         )}
 
         {/* Past Sessions */}
-        {activeTab === 'past' && (
+        {!loading && activeTab === 'past' && (
           <div className={styles.sessionList}>
-            {PAST_SESSIONS.map(session => (
+            {pastSessions.map(session => (
               <div key={session.id} className={styles.sessionCard}>
                 {/* YouTube Embed */}
                 {session.youtubeId ? (
@@ -269,7 +250,7 @@ export default function Sessions() {
                 <div className={styles.sessionInfo} style={{ padding: '1rem 0 0' }}>
                   <h3 className={styles.sessionTitle}>{session.title}</h3>
                   <div className={styles.sessionMeta}>
-                    <span>🎤 {session.speaker}</span>
+                    <span>🎙 {session.speaker}</span>
                     <span>⏱ {session.duration}</span>
                     <span>📅 {formatDate(session.date)}</span>
                   </div>
