@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
@@ -95,6 +95,7 @@ export default function PIProfile() {
   };
 
   // Load from localStorage on mount
+  const hasLoaded = useRef(false);
   useEffect(() => {
     try {
       const stored = localStorage.getItem('pi_profile');
@@ -103,7 +104,17 @@ export default function PIProfile() {
         setProfile(prev => ({ ...prev, ...parsed }));
       }
     } catch {}
+    // Mark loaded after a tick so the auto-save effect skips the initial load
+    setTimeout(() => { hasLoaded.current = true; }, 0);
   }, []);
+
+  // Auto-save to localStorage whenever profile changes (after initial load)
+  useEffect(() => {
+    if (!hasLoaded.current) return;
+    try {
+      localStorage.setItem('pi_profile', JSON.stringify(profile));
+    } catch {}
+  }, [profile]);
 
   return (
     <AppShell>
