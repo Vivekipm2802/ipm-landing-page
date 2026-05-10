@@ -4,66 +4,12 @@ import AppShell from '../../components/AppShell';
 import styles from './PIPrep.module.css';
 import { NextSeo } from 'next-seo';
 import PIAuthGuard from '../../components/PIAuthGuard';
-
-// ── Expert Profiles (editable — add/remove experts here) ──
-const EXPERTS = [
-  {
-    id: 'vivek',
-    name: 'Vivek Sharma',
-    title: 'Founder & Lead PI Coach',
-    photo: '/experts/vivek.jpg',
-    bio: 'IIM Indore IPM alumnus. 5+ years coaching IPMAT aspirants. Has trained 200+ students who cracked IPM interviews. Specializes in SOP strategy, mock PI, and confidence building.',
-    specialties: ['Full Mock PI', 'SOP Review', 'Career Guidance'],
-    rating: 4.9,
-    sessions: 350,
-    price: 499,
-    slots: {
-      Mon: ['4:00 PM', '5:00 PM', '6:00 PM'],
-      Wed: ['4:00 PM', '5:00 PM', '6:00 PM'],
-      Fri: ['4:00 PM', '5:00 PM'],
-      Sat: ['10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM'],
-    },
-    phone: '918299470392',
-  },
-  {
-    id: 'expert2',
-    name: 'Priya Mehta',
-    title: 'PI Strategy Expert',
-    photo: '/experts/priya.jpg',
-    bio: 'MBA from IIM Lucknow. Former corporate recruiter turned PI coach. Expert at turning average profiles into compelling stories. Known for her "Story-First" SOP approach.',
-    specialties: ['SOP Deep-Dive', 'Profile Building', 'HR Questions'],
-    rating: 4.8,
-    sessions: 210,
-    price: 399,
-    slots: {
-      Tue: ['4:00 PM', '5:00 PM', '6:00 PM'],
-      Thu: ['4:00 PM', '5:00 PM', '6:00 PM'],
-      Sat: ['3:00 PM', '4:00 PM', '5:00 PM'],
-    },
-    phone: '918299470392',
-  },
-  {
-    id: 'expert3',
-    name: 'Arjun Kapoor',
-    title: 'GK & Current Affairs Coach',
-    photo: '/experts/arjun.jpg',
-    bio: 'UPSC prelims cleared. Deep expertise in current affairs, economics, and polity. Prepares students for the GK grilling that trips most IPM candidates.',
-    specialties: ['Current Affairs', 'GK Prep', 'Opinion Questions'],
-    rating: 4.7,
-    sessions: 180,
-    price: 349,
-    slots: {
-      Mon: ['5:00 PM', '6:00 PM', '7:00 PM'],
-      Wed: ['5:00 PM', '6:00 PM', '7:00 PM'],
-      Fri: ['5:00 PM', '6:00 PM'],
-    },
-    phone: '918299470392',
-  },
-];
+import { supabase } from '../../utils/supabaseClient';
 
 function getNextDates(dayName, count = 3) {
   const dayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
   const targetDay = dayMap[dayName];
+  if (targetDay === undefined) return [];
   const dates = [];
   const today = new Date();
   let d = new Date(today);
@@ -97,6 +43,42 @@ export default function ExpertBooking() {
   const [bookedSessions, setBookedSessions] = useState([]);
   const [studentName, setStudentName] = useState('');
   const [studentPhone, setStudentPhone] = useState('');
+  const [experts, setExperts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch experts from Supabase
+  useEffect(() => {
+    async function fetchExperts() {
+      try {
+        const { data, error } = await supabase
+          .from('pi_experts')
+          .select('*')
+          .eq('is_active', true)
+          .order('id', { ascending: true });
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(e => ({
+            id: e.id,
+            name: e.name,
+            title: e.title || '',
+            photo: '/experts/' + (e.name || '').split(' ')[0].toLowerCase() + '.jpg',
+            bio: e.bio || '',
+            specialties: Array.isArray(e.specialties) ? e.specialties : [],
+            rating: e.rating || 4.5,
+            sessions: e.sessions_count || 0,
+            price: e.price || 499,
+            slots: typeof e.slots === 'object' && e.slots ? e.slots : {},
+            phone: e.phone || '918299470392',
+          }));
+          setExperts(mapped);
+        }
+      } catch (err) {
+        console.error('Error fetching experts:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchExperts();
+  }, []);
 
   // Load student info from profile
   useEffect(() => {
@@ -115,7 +97,7 @@ export default function ExpertBooking() {
   const availableDates = useMemo(() => {
     if (!selectedExpert) return [];
     const dates = [];
-    const expert = EXPERTS.find(e => e.id === selectedExpert);
+    const expert = experts.find(e => e.id === selectedExpert);
     if (!expert) return [];
 
     Object.keys(expert.slots).forEach(day => {
@@ -132,9 +114,9 @@ export default function ExpertBooking() {
 
     dates.sort((a, b) => a.date - b.date);
     return dates;
-  }, [selectedExpert]);
+  }, [selectedExpert, experts]);
 
-  const expert = EXPERTS.find(e => e.id === selectedExpert);
+  const expert = experts.find(e => e.id === selectedExpert);
 
   const confirmBooking = () => {
     if (!selectedExpert || !selectedDate || !selectedTime) return;
@@ -190,8 +172,16 @@ export default function ExpertBooking() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>⏳</div>
+            <div className={styles.emptyTitle}>Loading experts...</div>
+          </div>
+        )}
+
         {/* ── Step: Browse Experts ── */}
-        {bookingStep === 'browse' && (
+        {!loading && bookingStep === 'browse' && (
           <>
             {/* Upcoming Bookings */}
             {bookedSessions.length > 0 && (
@@ -212,7 +202,7 @@ export default function ExpertBooking() {
 
             {/* Expert Cards */}
             <div className={styles.expertGrid}>
-              {EXPERTS.map(exp => (
+              {experts.map(exp => (
                 <div key={exp.id} className={styles.expertCard}>
                   <div className={styles.expertHeader}>
                     <div className={styles.expertAvatar}>
@@ -248,6 +238,14 @@ export default function ExpertBooking() {
                 </div>
               ))}
             </div>
+
+            {experts.length === 0 && (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>👤</div>
+                <div className={styles.emptyTitle}>No experts available</div>
+                <div className={styles.emptyDesc}>Check back soon — new experts are being added.</div>
+              </div>
+            )}
           </>
         )}
 
@@ -403,7 +401,7 @@ export default function ExpertBooking() {
         )}
 
         {/* Help Banner */}
-        {bookingStep === 'browse' && (
+        {!loading && bookingStep === 'browse' && (
           <div className={styles.card} style={{ textAlign: 'center', marginTop: '1.5rem' }}>
             <div className={styles.cardTitle} style={{ textAlign: 'center' }}>Not sure which expert to pick?</div>
             <div className={styles.cardSubtitle} style={{ textAlign: 'center' }}>
