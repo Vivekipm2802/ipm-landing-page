@@ -178,7 +178,7 @@ const HeroReveal = ({ scores, stats, studentName, testDate, category }) => {
                 style={{ strokeDasharray: `${(pct / 100) * 326.7} 326.7` }}
               />
             </svg>
-            <div className={styles.heroGradeLetter}>{grade.letter}</div>
+            <div className={styles.heroGradeLetter}>{grade.letter}<span className={styles.heroGradeLabel}>GRADE</span></div>
           </div>
           <div className={styles.heroScoreRight}>
             <div className={styles.heroScoreValue}>
