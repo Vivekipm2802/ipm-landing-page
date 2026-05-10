@@ -190,7 +190,7 @@ const FlashCards = ({ jsonData }) => {
               <div className={s.flashBack}>
                 <div className={s.flashBackLabel}>Correct Answer</div>
                 <div className={s.flashCorrectAns}>{q.rightAnswer}</div>
-                <div className={s.flashNote}>You lost 4 marks here — remember this for your prep journey</div>
+                <div className={s.flashNote}>-4 marks · review this 📝</div>
               </div>
             </div>
           </div>
@@ -691,3 +691,4 @@ const ReportModern = ({ data, scores, stats, jsonData, router }) => {
 };
 
 export default ReportModern;
+
