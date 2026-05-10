@@ -52,7 +52,7 @@ const DataInsights = ({ score, maxScore }) => {
         <h3 className={styles.chartTitle}>Score Distribution</h3>
         <p className={styles.chartSubtitle}>
           {insights.isRealData 
-            ? `Based on ${insights.sampleSize} students on IPM Careers` 
+            ? `Based on students who analysed their performance`
             : 'Based on estimated IPMAT score patterns'}
         </p>
         <div className={styles.barChart}>
@@ -137,13 +137,13 @@ function useCountUp(target, duration = 1600) {
 // Grade & Vibe Helpers
 function getGrade(score, max) {
   const pct = (score / max) * 100;
-  if (pct >= 80) return { letter: 'S+', vibe: 'Absolute legend status 🔥', emoji: '👑', color: '#ffd700' };
-  if (pct >= 70) return { letter: 'S',  vibe: 'You cooked. IIM bound.', emoji: '🚀', color: '#00d4ff' };
-  if (pct >= 60) return { letter: 'A+', vibe: 'Strong game. Lock in PI prep.', emoji: '💪', color: '#00ff88' };
-  if (pct >= 50) return { letter: 'A',  vibe: 'Solid. One more push.', emoji: '⚡', color: '#a855f7' };
-  if (pct >= 40) return { letter: 'B',  vibe: 'In the fight. Refine strategy.', emoji: '🎯', color: '#ff8c42' };
-  if (pct >= 25) return { letter: 'C',  vibe: 'Foundation laid. Time to level up.', emoji: '📈', color: '#ff5e7e' };
-  return { letter: 'D', vibe: 'Every topper started here. Let\'s build.', emoji: '🌱', color: '#6c63ff' };
+  if (pct >= 80) return { letter: 'S+', vibe: 'Absolute legend. IIM is calling! 🔥', emoji: '👑', color: '#ffd700' };
+  if (pct >= 70) return { letter: 'S',  vibe: 'You nailed it. IIM bound.', emoji: '🚀', color: '#00d4ff' };
+  if (pct >= 60) return { letter: 'A+', vibe: 'Strong performance. PI prep time!', emoji: '💪', color: '#00ff88' };
+  if (pct >= 50) return { letter: 'A',  vibe: 'Well played. Great effort.', emoji: '⚡', color: '#a855f7' };
+  if (pct >= 40) return { letter: 'B',  vibe: 'Decent show. Explore your options.', emoji: '🎯', color: '#ff8c42' };
+  if (pct >= 25) return { letter: 'C',  vibe: 'Tough paper. Keep your head up.', emoji: '📈', color: '#ff5e7e' };
+  return { letter: 'D', vibe: 'This is just one exam. Your journey continues.', emoji: '🌱', color: '#6c63ff' };
 }
 
 // Hero Reveal (Classic)
@@ -309,7 +309,7 @@ const Flashcards = ({ jsonData }) => {
       <div className={styles.flashHeader}>
         <div>
           <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Review Cards 🃏</h2>
-          <p className={styles.flashSubtitle}>Tap any card to flip. Focus on these in your next mock.</p>
+          <p className={styles.flashSubtitle}>Tap any card to flip. These are the questions you got wrong — learn from them.</p>
         </div>
         <span className={styles.flashCount}>{top.length} to review</span>
       </div>
@@ -332,7 +332,7 @@ const Flashcards = ({ jsonData }) => {
               <div className={styles.flashBack}>
                 <div className={styles.flashBackLabel}>Correct answer</div>
                 <div className={styles.flashRightAns}>{q.rightAnswer}</div>
-                <div className={styles.flashNote}>+4 marks up for grabs next time 💰</div>
+                <div className={styles.flashNote}>You lost 4 marks here — remember this for your prep journey 📝</div>
               </div>
             </div>
           </div>
