@@ -818,7 +818,7 @@ function Report({ data, error, isFound }) {
               <div className={styles.bentoGrid}>
                 <BentoDonut correct={stats.totalCorrect} incorrect={stats.totalIncorrect} unattempted={stats.totalUnattempted} total={stats.total} />
                 <BentoStat tone="green" emoji="✅" label="Positive marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
-                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="negative marking" />
+                <BentoStat tone="pink" emoji="💔" label="Marks lost" value={`-${stats.marksLost}`} sub="incorrect questions" />
                 <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
                 <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
                 <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
