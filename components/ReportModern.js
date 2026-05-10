@@ -167,7 +167,7 @@ const FlashCards = ({ jsonData }) => {
             <div className={s.sectionIcon}>🃏</div>
             <h2 className={s.sectionTitle}>Review Cards</h2>
           </div>
-          <p className={s.sectionSub} style={{ margin: '4px 0 0 48px' }}>Tap any card to flip. Focus on these next.</p>
+          <p className={s.sectionSub} style={{ margin: '4px 0 0 48px' }}>Tap any card to flip. These are the questions you got wrong — learn from them.</p>
         </div>
         <span className={s.flashCount}>{top.length} to review</span>
       </div>
@@ -190,7 +190,7 @@ const FlashCards = ({ jsonData }) => {
               <div className={s.flashBack}>
                 <div className={s.flashBackLabel}>Correct Answer</div>
                 <div className={s.flashCorrectAns}>{q.rightAnswer}</div>
-                <div className={s.flashNote}>+4 marks up for grabs next time</div>
+                <div className={s.flashNote}>You lost 4 marks here — remember this for your prep journey</div>
               </div>
             </div>
           </div>
