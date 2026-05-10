@@ -174,6 +174,11 @@ export default function SOPBuilder() {
             {wordCount(sop[currentSection.key])}/{currentSection.maxWords} words
             {wordCount(sop[currentSection.key]) > currentSection.maxWords && ' — too long, trim it down'}
           </div>
+          {wordCount(sop[currentSection.key]) > 0 && wordCount(sop[currentSection.key]) < 20 && (
+            <div style={{ fontSize: 13, color: '#f59e0b', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+              ✍️ Write at least 20 words to mark this section complete
+            </div>
+          )}
         </div>
 
         {/* Navigation */}
@@ -241,5 +246,6 @@ export default function SOPBuilder() {
     </AppShell>
   );
 }
+
 
 
