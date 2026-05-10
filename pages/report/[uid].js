@@ -332,7 +332,7 @@ const Flashcards = ({ jsonData }) => {
               <div className={styles.flashBack}>
                 <div className={styles.flashBackLabel}>Correct answer</div>
                 <div className={styles.flashRightAns}>{q.rightAnswer}</div>
-                <div className={styles.flashNote}>You lost 4 marks here — remember this for your prep journey 📝</div>
+                <div className={styles.flashNote}>-4 marks · review this 📝</div>
               </div>
             </div>
           </div>
@@ -897,3 +897,4 @@ export async function getServerSideProps(context) {
     }
   };
 }
+
