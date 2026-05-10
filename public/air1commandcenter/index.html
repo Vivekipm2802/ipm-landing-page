@@ -579,7 +579,22 @@
     allow="microphone"
     frameborder="0"
     allowtransparency="true"
-    style="position:fixed;bottom:0;right:0;border:none;width:400px;height:460px;z-index:9999;background:transparent;overflow:hidden;"
+    style="position:fixed;bottom:0;right:0;border:none;width:80px;height:80px;z-index:9999;background:transparent;overflow:hidden;transition:width 0.3s,height 0.3s;"
   ></iframe>
+  <script>
+    window.addEventListener('message', function(e) {
+      if (e.data && typeof e.data.vivekOpen !== 'undefined') {
+        var f = document.getElementById('vivek-ai-widget');
+        if (!f) return;
+        if (e.data.vivekOpen) {
+          f.style.width  = '380px';
+          f.style.height = '460px';
+        } else {
+          f.style.width  = '80px';
+          f.style.height = '80px';
+        }
+      }
+    });
+  </script>
 </body>
 </html>

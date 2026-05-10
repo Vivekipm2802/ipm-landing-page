@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mic, X, Phone } from 'lucide-react';
 import { useLiveAPI } from '../hooks/useLiveAPI';
 
 export default function VoiceWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const { isLiveActive, startLive, stopLive } = useLiveAPI();
+
+  // Notify parent window (iframe resize) whenever panel opens or closes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.parent !== window) {
+      window.parent.postMessage({ vivekOpen: isOpen }, '*');
+    }
+  }, [isOpen]);
 
   const handleToggle = () => {
     if (isOpen) {
