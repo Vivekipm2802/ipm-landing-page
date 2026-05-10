@@ -629,6 +629,7 @@ function Report({ data, error, isFound }) {
   const [scores, setScores] = useState(null);
   const [stats, setStats] = useState(null);
   const [view, setView] = useState('classic'); // 'modern' or 'classic'
+  const [showCutoffPopup, setShowCutoffPopup] = useState(false);
   const router = useRouter();
 
   // Score calculation
@@ -706,6 +707,20 @@ function Report({ data, error, isFound }) {
     }
   }, [data, isFound]);
 
+  // ── Cutoff-based PI Batch popup (shows after 5 seconds if score qualifies) ──
+  const PI_CUTOFFS = { General: 164, EWS: 121, 'NC-OBC': 105, SC: 87, ST: 62, PwD: 60 };
+  useEffect(() => {
+    if (!scores) return;
+    const totalScore = scores.total.score;
+    // Check if score meets ANY category cutoff
+    const qualifies = Object.values(PI_CUTOFFS).some(c => totalScore >= c);
+    if (!qualifies) return;
+    const dismissed = sessionStorage.getItem('pi_popup_dismissed');
+    if (dismissed) return;
+    const timer = setTimeout(() => setShowCutoffPopup(true), 5000);
+    return () => clearTimeout(timer);
+  }, [scores]);
+
   if (isFound === false) {
     return (
       <div className="flex flex-col bg-gray-100 h-screen w-full justify-center items-center">
@@ -727,6 +742,26 @@ function Report({ data, error, isFound }) {
           images: [{ url: '/scorecard_ss.png', width: 1200, height: 630, alt: 'IPM Careers IPMAT Report' }]
         }}
       />
+
+      {/* ── PI Batch Cutoff Popup ── */}
+      {showCutoffPopup && scores && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', animation: 'fadeIn 0.3s ease' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1a2e, #16213e)', borderRadius: 20, padding: '2.5rem 2rem', maxWidth: 420, width: '90%', textAlign: 'center', position: 'relative', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <button onClick={() => { setShowCutoffPopup(false); sessionStorage.setItem('pi_popup_dismissed', '1'); }} style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }} aria-label="Close">x</button>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>&#127881;</div>
+            <h2 style={{ color: '#fff', fontSize: '1.4rem', fontWeight: 800, margin: '0 0 8px', lineHeight: 1.3 }}>Congratulations!</h2>
+            <p style={{ color: '#fbbf24', fontSize: '1.05rem', fontWeight: 700, margin: '0 0 12px' }}>You scored {scores.total.score}/{scores.total.max} in IPMAT 2026</p>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.92rem', lineHeight: 1.6, margin: '0 0 20px' }}>
+              Based on last year's cutoffs, you have a strong chance of being shortlisted for the <strong style={{ color: '#fff' }}>IIM Indore Personal Interview</strong>. Start your PI preparation now with our expert-led batch.
+            </p>
+            <div style={{ background: 'linear-gradient(135deg, #f5a623, #ff6b35)', borderRadius: 12, padding: '14px 24px', display: 'inline-block', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', color: '#fff', letterSpacing: '0.02em', boxShadow: '0 4px 15px rgba(245,166,35,0.4)' }} onClick={() => router.push('/pi-batch')}>
+              Join PI Batch @ &#8377;99 &#8594;
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: 12, marginBottom: 0 }}>Limited seats available. Don't miss out.</p>
+          </div>
+          <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
+        </div>
+      )}
 
 
       {/* ═══ MODERN VIEW ═══ */}
