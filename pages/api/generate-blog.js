@@ -216,6 +216,12 @@ Now write the JSON object per the schema in the system prompt.
       body_html = injectInternalLinks(body_html, links);
     }
 
+    // 5b. Pick the author for this blog by category.
+    //   Ashutosh (academic / IIM voice): IPMAT, IIM News, Boards, Govt Exams
+    //   Vivek    (admissions / career voice): BBA/BMS, Career, Scholarships, Industry
+    const ASHUTOSH_CATEGORIES = new Set(['IPMAT', 'IIM News', 'Boards', 'Govt Exams']);
+    const author_slug = ASHUTOSH_CATEGORIES.has(category) ? 'ashutosh-mishra' : 'vivek-arora';
+
     // 6. Slug + insert
     const slug = `${slugify(blog.title)}-${randSuffix()}`;
     const insertRow = {
@@ -236,6 +242,7 @@ Now write the JSON object per the schema in the system prompt.
       faq:             blog.faq || [],
       schema_org:      null,                       // reader page builds JSON-LD on the fly
       internal_links:  null,
+      author_slug,                                  // E-E-A-T — real Person author for schema.org
       status:          'published',
       published_at:    new Date().toISOString(),
     };

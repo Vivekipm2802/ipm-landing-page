@@ -10,12 +10,15 @@ import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
 import MagazineCard from '../../components/MagazineCard';
 import MagazineInquiryForm from '../../components/MagazineInquiryForm';
+import AuthorByline from '../../components/AuthorByline';
+import AuthorBio from '../../components/AuthorBio';
+import LastReviewedFooter from '../../components/LastReviewedFooter';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
   const supabase = getSupabaseServer();
   const { data: blog } = await supabase
-    .from('blogs')
+    .from('blog_with_author')
     .select('*')
     .eq('slug', params.slug)
     .eq('status', 'published')
@@ -159,12 +162,18 @@ export default function BlogReader({ blog, related }) {
           </div>
         </header>
 
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <AuthorByline blog={blog} />
+        </div>
+
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div
             id="blog-body"
             className="ipm-blog-body prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: blog.body_html }}
           />
+
+          <LastReviewedFooter blog={blog} />
 
           {/* FAQ accordion */}
           {blog.faq?.length > 0 && (
@@ -183,6 +192,8 @@ export default function BlogReader({ blog, related }) {
               </div>
             </section>
           )}
+
+          <AuthorBio blog={blog} />
 
           <MagazineInquiryForm blog={blog} />
 
