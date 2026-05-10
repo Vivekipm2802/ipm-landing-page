@@ -1442,12 +1442,36 @@
   }
 
   .flashCard {
-    height: 160px;
+    height: 190px;
   }
 
-  .flashFront,
-  .flashBack {
+  .flashFront {
     padding: 14px;
+  }
+
+  .flashBack {
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .flashCorrectAns {
+    font-size: 22px;
+  }
+
+  .flashBackLabel {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+
+  .flashNote {
+    font-size: 10px;
+    margin-top: 6px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .cutoffCard,
@@ -1458,12 +1482,14 @@
   }
 
   .togglePill {
-    font-size: 12px;
+    font-size: 11px;
+    gap: 2px;
+    padding: 3px;
   }
 
   .toggleBtn {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 11px;
   }
 }
 
@@ -1519,45 +1545,17 @@
     padding: 8px 0 6px;
     background: transparent;
   }
-  .togglePill {
-    gap: 2px;
-    padding: 3px;
-  }
-  .toggleBtn {
-    padding: 6px 14px;
-    font-size: 11px;
-    min-height: 36px;
-  }
-  .flashCard {
-    height: 180px;
-  }
-  .flashBack {
-    padding: 12px;
-    overflow: hidden;
-  }
-  .flashCorrectAns {
-    font-size: 24px;
-  }
-  .flashNote {
-    font-size: 10px;
-    margin-top: 6px;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-  .flashBackLabel {
-    font-size: 9px;
-    margin-bottom: 4px;
-  }
 }
 
 /* ── Touch targets ── */
-@media (max-width: 768px) {
+@media (min-width: 481px) and (max-width: 768px) {
   .heroChip { min-height: 40px; display: inline-flex; align-items: center; }
   .toggleBtn { min-height: 40px; display: inline-flex; align-items: center; }
+  .shareWhatsApp, .shareCopy { min-height: 44px; }
+}
+@media (max-width: 480px) {
+  .heroChip { min-height: 36px; display: inline-flex; align-items: center; }
+  .toggleBtn { min-height: 34px; display: inline-flex; align-items: center; }
   .shareWhatsApp, .shareCopy { min-height: 44px; }
 }
 
