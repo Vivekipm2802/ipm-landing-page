@@ -1519,6 +1519,39 @@
     padding: 8px 0 6px;
     background: transparent;
   }
+  .togglePill {
+    gap: 2px;
+    padding: 3px;
+  }
+  .toggleBtn {
+    padding: 6px 14px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+  .flashCard {
+    height: 180px;
+  }
+  .flashBack {
+    padding: 12px;
+    overflow: hidden;
+  }
+  .flashCorrectAns {
+    font-size: 24px;
+  }
+  .flashNote {
+    font-size: 10px;
+    margin-top: 6px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  .flashBackLabel {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
 }
 
 /* ── Touch targets ── */
@@ -1537,3 +1570,4 @@
 .footer {
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
+
