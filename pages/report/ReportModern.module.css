@@ -1493,34 +1493,331 @@
   }
 }
 
-/* ── PRINT ── */
+/* ── PRINT / PDF ── */
 @media print {
-  .modernReport {
-    background: #fff;
-    color: #222;
+  /* Force color printing */
+  .modernReport,
+  .modernReport *,
+  .modernReport *::before,
+  .modernReport *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
+  .modernReport {
+    background: #f8f9fc !important;
+    color: #1a1a2e !important;
+    padding: 0 1rem 2rem !important;
+  }
+
+  /* Hide non-print elements */
   .ambientGlow,
   .viewToggle,
   .downloadBar,
-  .shareButtons {
-    display: none;
-  }
-
-  .bentoCard,
-  .subjectCard,
-  .cutoffCard,
-  .recCard,
+  .shareButtons,
   .shareCard,
-  .footer {
-    background: #fff;
-    border-color: #ddd;
-    color: #222;
+  .heroMesh {
+    display: none !important;
   }
 
+  /* ── Hero: branded dark header ── */
   .hero {
-    background: #f8f8ff;
-    color: #222;
+    background: linear-gradient(165deg, #12102e 0%, #1a0f3d 40%, #0f1a3d 100%) !important;
+    color: #fff !important;
+    border-radius: 20px !important;
+    margin: 0 !important;
+    padding: 32px 28px !important;
+    page-break-inside: avoid;
+  }
+
+  .heroGreeting {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: unset !important;
+    color: #ffffff !important;
+    font-size: 36px !important;
+  }
+
+  .heroSub {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  .heroPill {
+    background: rgba(168, 85, 247, 0.25) !important;
+    color: #c084fc !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+  }
+
+  .heroDate {
+    color: rgba(255,255,255,0.5) !important;
+  }
+
+  .heroScoreNum {
+    color: #ffffff !important;
+    font-size: 48px !important;
+  }
+
+  .heroScoreMax {
+    color: rgba(255,255,255,0.4) !important;
+  }
+
+  .heroVibe {
+    background: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.8) !important;
+    border-color: rgba(255,255,255,0.15) !important;
+  }
+
+  .heroChip {
+    background: rgba(255,255,255,0.08) !important;
+    color: rgba(255,255,255,0.8) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+  }
+
+  /* Grade ring */
+  .gradeLetter {
+    color: var(--grade-color, #a855f7) !important;
+    text-shadow: none !important;
+  }
+
+  .gradeLabel {
+    color: rgba(255,255,255,0.5) !important;
+  }
+
+  .ringTrack {
+    stroke: rgba(255,255,255,0.1) !important;
+  }
+
+  .ringProgress {
+    filter: none !important;
+  }
+
+  /* ── Section headers ── */
+  .sectionHeader {
+    page-break-after: avoid;
+  }
+
+  .sectionTitle {
+    color: #1a1a2e !important;
+  }
+
+  .sectionSub {
+    color: #64748b !important;
+  }
+
+  .sectionIcon {
+    background: rgba(168, 85, 247, 0.1) !important;
+  }
+
+  /* ── Bento stat cards ── */
+  .bentoGrid {
+    page-break-inside: avoid;
+  }
+
+  .bentoCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    page-break-inside: avoid;
+  }
+
+  .bentoCard::before {
+    opacity: 1 !important;
+    background: var(--card-accent, #a855f7) !important;
+  }
+
+  .bentoValue {
+    color: #1a1a2e !important;
+  }
+
+  .bentoLabel {
+    color: #64748b !important;
+  }
+
+  .bentoSub {
+    color: #94a3b8 !important;
+  }
+
+  /* ── Donut chart card ── */
+  .donutCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    page-break-inside: avoid;
+  }
+
+  .donutLegend span {
+    color: #1a1a2e !important;
+  }
+
+  /* ── Subject cards ── */
+  .subjectCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    page-break-inside: avoid;
+  }
+
+  .subjectName {
+    color: #1a1a2e !important;
+  }
+
+  .subjectType {
+    color: #94a3b8 !important;
+  }
+
+  .subjectScore {
+    color: #1a1a2e !important;
+  }
+
+  .subjectMax {
+    color: #94a3b8 !important;
+  }
+
+  .subjectStat {
+    color: #64748b !important;
+  }
+
+  .subjectBarTrack {
+    background: #e2e8f0 !important;
+  }
+
+  /* ── Flash / Review Cards: show FRONT only ── */
+  .flashSection {
+    page-break-inside: avoid;
+  }
+
+  .flashCard {
+    page-break-inside: avoid;
+  }
+
+  .flashInner {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .flashFlipped .flashInner {
+    transform: none !important;
+  }
+
+  .flashFront {
+    position: relative !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  .flashBack {
+    display: none !important;
+  }
+
+  .flashTag {
+    background: var(--card-color, #a855f7) !important;
+    color: #ffffff !important;
+  }
+
+  .flashQNum {
+    color: var(--card-color, #a855f7) !important;
+  }
+
+  .flashYourAns {
+    color: #ef4444 !important;
+  }
+
+  .flashHint {
+    display: none !important;
+  }
+
+  .flashCount {
+    color: #a855f7 !important;
+  }
+
+  /* ── Cutoff / Recommendation card ── */
+  .cutoffCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    color: #1a1a2e !important;
+    page-break-inside: avoid;
+  }
+
+  .recCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    color: #1a1a2e !important;
+    page-break-inside: avoid;
+  }
+
+  .recTitle {
+    color: #1a1a2e !important;
+  }
+
+  .recDesc {
+    color: #475569 !important;
+  }
+
+  /* ── Question table ── */
+  .questionTable {
+    page-break-inside: auto;
+  }
+
+  .questionTable th {
+    color: #64748b !important;
+    border-bottom-color: #e2e8f0 !important;
+  }
+
+  .questionTable td {
+    color: #1a1a2e !important;
+    border-bottom-color: #f1f5f9 !important;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #64748b !important;
+    page-break-inside: avoid;
+  }
+
+  .footerBrand {
+    color: #1a1a2e !important;
+  }
+
+  .footerTagline {
+    color: #64748b !important;
+  }
+
+  .footerMeta {
+    color: #94a3b8 !important;
+  }
+
+  /* ── Compare grid ── */
+  .compareCard {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1a1a2e !important;
+  }
+
+  .compareLabel {
+    color: #64748b !important;
+  }
+
+  .compareValue {
+    color: #1a1a2e !important;
+  }
+
+  /* ── Probability bar ── */
+  .probBarTrack {
+    background: #e2e8f0 !important;
+  }
+
+  .probLabel {
+    color: #1a1a2e !important;
+  }
+
+  .probValue {
+    color: #1a1a2e !important;
   }
 }
 
