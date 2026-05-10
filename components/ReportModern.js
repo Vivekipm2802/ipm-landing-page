@@ -307,8 +307,6 @@ const ReportModern = ({ data, scores, stats, jsonData, router }) => {
           unattempted={stats.totalUnattempted}
           total={stats.total}
         />
-        <BentoStat tone="green" emoji="✅" label="Positive Marks" value={`+${stats.positiveScore}`} sub="from correct answers" />
-        <BentoStat tone="pink" emoji="💔" label="Marks Lost" value={`-${stats.marksLost}`} sub="incorrect questions" />
         <BentoStat tone="violet" emoji="🎯" label="Accuracy" value={`${stats.accuracy}%`} sub={`${stats.totalCorrect}/${stats.attempted} attempted`} />
         <BentoStat tone="blue" emoji="📝" label="Attempted" value={`${stats.attempted}`} sub={`of ${stats.total} questions`} />
         <BentoStat tone="amber" emoji="⏭️" label="Skipped" value={`${stats.totalUnattempted}`} sub="left untouched" />
