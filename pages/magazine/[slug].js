@@ -6,17 +6,13 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseServer } from '../../utils/supabaseClient';
 import IPMNav from '../../components/IPMNav';
 import MagazineCard from '../../components/MagazineCard';
-import MagazineInquiryForm from '../../components/MagazineInquiryForm';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const supabase = getSupabaseServer();
   const { data: blog } = await supabase
     .from('blogs')
     .select('*')
@@ -187,9 +183,6 @@ export default function BlogReader({ blog, related }) {
             </section>
           )}
 
-          {/* Lead capture — name / mobile / email / IPMAT target year */}
-          <MagazineInquiryForm blog={blog} />
-
           {/* WhatsApp CTA */}
           <aside className="mt-14 rounded-2xl p-6 sm:p-8 border" style={{
             borderColor: '#25d36633',
@@ -219,7 +212,7 @@ export default function BlogReader({ blog, related }) {
           <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
             <h2 className="text-2xl font-extrabold text-[#f1f5f9] mb-6">More in {blog.category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-              {related.map(b => <BlogCard key={b.id} blog={b} />)}
+              {related.map(b => <MagazineCard key={b.id} blog={b} />)}
             </div>
           </section>
         )}
