@@ -64,6 +64,64 @@
       }
     </script>
     <script type="module" crossorigin src="/air1commandcenter/assets/index-CZwdpQ0N.js"></script>
+  
+    <!-- SEO: dynamic meta per tab (injected by script below) -->
+    <meta id="seo-title-tag" name="x-page-title" content="" />
+    <meta id="seo-desc" name="description" content="Download IPMAT previous year question papers with solutions. IPMAT PYQ 2025, 2024, 2023, 2022, 2021, 2020, 2019 — free PDF download for IIM Indore IPM preparation." />
+    <script>
+      // Update <title> and meta description dynamically based on active tab
+      (function() {
+        var TAB_SEO = {
+          'pyq': {
+            title: 'IPMAT Previous Year Question Papers 2019-2025 | Free PYQ PDF Download | IPM Careers',
+            desc:  'Download IPMAT PYQ free — official question papers with solutions for 2019, 2020, 2021, 2022, 2023, 2024 & 2025. Includes IPMAT Indore, JIPMAT and IIM Rohtak papers.'
+          },
+          'cheatsheets': {
+            title: 'IPMAT Cheat Sheets 2026 | Quick Revision Formulas | IPM Careers',
+            desc:  'Free IPMAT cheat sheets and formula booklets for Quantitative Ability and Verbal. Download and revise fast.'
+          },
+          'toppers': {
+            title: "Topper's Mouth — IPMAT Toppers Share Their Strategy | IPM Careers",
+            desc:  "Learn directly from IPMAT toppers and IIM IPM students. Real strategies, tips and AIR 1 insights."
+          },
+          'mindjournal': {
+            title: 'IPM Mind Journals | Student Stories from IIM | IPM Careers',
+            desc:  'Read authentic student journals from IIM Indore and IIM Rohtak IPM students.'
+          },
+          'forms': {
+            title: 'IPM & BBA Application Forms 2026 | Deadlines & Apply Links | AIR 1 Commandcenter',
+            desc:  'All IPM and BBA application forms in one place — IIM Indore, Rohtak, NMIMS, Masters Union, NALSAR and 25+ more. Live deadlines and direct apply links.'
+          },
+          'eligibility': {
+            title: 'IPMAT Eligibility 2026 | Age, Marks & Category Checker | IPM Careers',
+            desc:  'Check your IPMAT eligibility instantly — age limit, 10th/12th percentage, category criteria for all IIMs.'
+          },
+          'cutoffs': {
+            title: 'IPMAT Expected Cutoffs 2026 | Section-wise Category Score | IPM Careers',
+            desc:  'IPMAT 2026 expected cutoffs for IIM Indore, Rohtak, JIPMAT — General, OBC, SC, ST category-wise.'
+          },
+          'learnflix': {
+            title: 'IPM LearnFlix — Free IPMAT Video Lectures | IPM Careers',
+            desc:  'Free IPMAT preparation video lectures covering Quantitative Ability, Verbal Ability and Logical Reasoning.'
+          }
+        };
+        function updateSEO() {
+          var hash = window.location.hash.replace('#','') || window.location.pathname.split('/').pop() || 'pyq';
+          var slug = hash.split('?')[0];
+          var seo  = TAB_SEO[slug] || TAB_SEO['pyq'];
+          document.title = seo.title;
+          var d = document.querySelector('meta[name="description"]');
+          if (d) d.setAttribute('content', seo.desc);
+          // canonical
+          var c = document.querySelector('link[rel="canonical"]');
+          if (!c) { c = document.createElement('link'); c.rel='canonical'; document.head.appendChild(c); }
+          c.href = 'https://register.ipmcareer.com/air1commandcenter/' + slug;
+        }
+        window.addEventListener('hashchange', updateSEO);
+        window.addEventListener('popstate', updateSEO);
+        document.addEventListener('DOMContentLoaded', updateSEO);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
