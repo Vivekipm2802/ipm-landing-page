@@ -1200,5 +1200,141 @@
   </script>
   <script type="application/ld+json" id="ipm-faq-jsonld"></script>
 
+  
+  <!-- ipm-form-fees-v1: Application fee badges on Forms tab tiles -->
+  <style>
+    .ipm-fee-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 14px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .ipm-fee-badge.free {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #22c55e;
+    }
+    .ipm-fee-badge.low {
+      background: rgba(249, 160, 27, 0.08);
+      border: 1px solid rgba(249, 160, 27, 0.25);
+      color: #f9a01b;
+    }
+    .ipm-fee-badge.mid {
+      background: rgba(148, 163, 184, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+    .ipm-fee-badge.exam {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      color: #a78bfa;
+    }
+    .ipm-fee-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+  </style>
+
+  <script>
+  (function() {
+    // ── Fee data (sourced from official websites, May 2026) ─────────────────
+    var FEE_DATA = {
+      // Open colleges
+      "IIM Shillong":              { label: "Form fee ₹2,000", type: "low",  note: "₹1,000 for reserved" },
+      "Masters' Union":            { label: "Form fee ₹2,900",  type: "low",  note: "Verify on mastersunion.org" },
+      "NMIMS (NPAT 2026)":         { label: "NPAT ₹2,000/school", type: "exam", note: "+ ₹1,000 per extra school" },
+      "IIM Sambalpur":             { label: "via IPMAT ₹4,130", type: "exam", note: "Separate form post-IPMAT" },
+      "Doon Business School":      { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
+      "Alliance University":       { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
+      "UPES":                      { label: "Form fee ₹1,750",  type: "low",  note: "Verify on upes.ac.in" },
+      "Ashoka University":         { label: "Free to apply",    type: "free", note: "No application fee" },
+      "IFMR (Krea University)":    { label: "Form fee ₹1,500",  type: "low",  note: "Accepts IPMAT/SAT/KAT" },
+      "IIM Bangalore (BBA DBE)":   { label: "Form fee ₹3,000",  type: "mid",  note: "₹1,500 for SC/ST/PwD" },
+      "IIM Udaipur":               { label: "Form fee ₹1,000",  type: "low",  note: "4-yr BBA, no entrance exam" },
+      "Bennett University":        { label: "Form fee ₹1,500",  type: "low",  note: "12th merit-based" },
+      "IIT Patna":                 { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
+      "NALSAR":                    { label: "Form fee ₹2,200",  type: "low",  note: "Accepts IPMAT/NMET" },
+
+      // Closed colleges
+      "IIM Indore":                { label: "IPMAT ₹4,130",     type: "exam", note: "₹2,065 for SC/ST/PwD" },
+      "IIM Rohtak":                { label: "IPMAT ₹4,937",     type: "exam", note: "No category concession" },
+      "IIM Ranchi":                { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
+      "IIM Kozhikode":             { label: "BMSAT ~₹1,000",    type: "exam", note: "Verify on iimk.ac.in" },
+      "IIM Jammu":                 { label: "JIPMAT ₹2,200",    type: "exam", note: "₹1,100 for SC/ST/PwD" },
+      "IIM Bodhgaya":              { label: "JIPMAT ₹2,200",    type: "exam", note: "Same exam as IIM Jammu" },
+      "IIM Amritsar":              { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
+      "IIM Sirmaur":               { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
+      "IIFT":                      { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
+      "Symbiosis (SET 2026)":      { label: "SET ₹2,250",       type: "exam", note: "+ ₹1,000 per college" },
+      "Christ University Entrance Test": { label: "Form fee ~₹1,500", type: "low", note: "Verify on christuniversity.in" },
+      "TAPMI":                     { label: "Form fee ~₹2,000", type: "low",  note: "Verify on tapmi.edu.in" },
+      "NIRMA University":          { label: "Form fee ~₹1,500", type: "low",  note: "Verify on nirmauni.ac.in" },
+      "NFSU":                      { label: "Form fee ~₹500",   type: "low",  note: "Verify on nfsu.ac.in" },
+      "IIM Bangalore":             { label: "BSc prog closed",  type: "mid",  note: "Applications closed Nov 2025" },
+    };
+
+    // ── Icons per type ─────────────────────────────────────────────────────
+    var ICONS = {
+      free: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+      low:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+      mid:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+      exam: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    };
+
+    function addFeeToCard(card) {
+      if (card.querySelector('.ipm-fee-row')) return; // already done
+
+      var h3 = card.querySelector('h3');
+      if (!h3) return;
+      var name = h3.textContent.trim();
+      var data = FEE_DATA[name];
+      if (!data) return;
+
+      // Build badge
+      var badge = document.createElement('span');
+      badge.className = 'ipm-fee-badge ' + data.type;
+      badge.title = data.note;
+      badge.innerHTML = ICONS[data.type] + ' ' + data.label;
+
+      // Wrap in a row div and append to card
+      var row = document.createElement('div');
+      row.className = 'ipm-fee-row';
+      row.appendChild(badge);
+
+      // Insert after the last child of the card's inner div
+      // (after the status chip / last-date row)
+      card.appendChild(row);
+    }
+
+    function scanCards() {
+      document.querySelectorAll('.rounded-3xl.p-8').forEach(addFeeToCard);
+    }
+
+    // MutationObserver watches for React rendering the cards
+    var observer = new MutationObserver(scanCards);
+    observer.observe(document.getElementById('root'), {
+      childList: true,
+      subtree: true,
+    });
+
+    // Also run after delays to catch initial render and tab switches
+    setTimeout(scanCards, 800);
+    setTimeout(scanCards, 2000);
+    setTimeout(scanCards, 4000);
+
+    // Re-scan on tab change (hash change)
+    window.addEventListener('hashchange', function() { setTimeout(scanCards, 500); });
+  })();
+  </script>
+
   </body>
 </html>
