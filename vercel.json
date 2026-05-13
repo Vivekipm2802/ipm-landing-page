@@ -51,5 +51,12 @@
       "maxDuration": 30,
       "memory": 1024
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/magazine/ipmat-2026-topper-ishwar-singh-s-238-480-score-iim-strategy-inwbb",
+      "destination": "/magazine/ipmat-2026-score-ishwar-singh-secures-238-360-ranks-3rd-at-ipm-careers-0xf21",
+      "permanent": true
+    }
+  ]
 }
