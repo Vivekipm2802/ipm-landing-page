@@ -183,7 +183,7 @@ Now write the JSON object per the schema in the system prompt.
       fallbackModel: 'gemini-2.5-flash', // when Pro is in capacity crunch, fall back so blogs still publish
       system:        buildSystemPrompt(variation),
       prompt:        userMsg,
-      max_tokens:    8192,
+      max_tokens:    16384,
       temperature:   0.75,
       json:          true,
     });
