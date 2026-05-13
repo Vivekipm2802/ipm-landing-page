@@ -122,6 +122,151 @@
         document.addEventListener('DOMContentLoaded', updateSEO);
       })();
     </script>
+  
+    <!-- air1-seo-enhanced-v2 -->
+    <script>
+    (function() {
+      var TAB_SEO = {
+        'pyq': {
+          title: 'IPMAT Previous Year Question Papers 2019–2025 | Free PYQ PDF | IPM Careers',
+          desc:  'Download IPMAT PYQ free — official question papers with solutions for 2019–2025. Includes IPMAT Indore, JIPMAT and IIM Rohtak papers.',
+          keywords: 'IPMAT previous year question papers, IPMAT PYQ, IPMAT PYQ PDF download, IPMAT 2026 question paper, IIM Indore IPM previous papers',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/pyq',
+          h1: 'IPMAT Previous Year Question Papers — Free PDF Download (2019–2025)'
+        },'cutoffs': {
+          title: 'IPMAT Expected Cutoffs 2026 | Section-wise & Category Score | IPM Careers',
+          desc:  'IPMAT 2026 expected cutoffs for IIM Indore, Rohtak, JIPMAT — General, OBC, SC, ST category-wise scores. Live predictor based on 5 years of data.',
+          keywords: 'IPMAT cutoff 2026, IIM Indore IPM cutoff, IPMAT sectional cutoff, IPMAT cutoff OBC SC ST, JIPMAT cutoff 2026',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/cutoffs',
+          h1: 'IPMAT Cutoff 2026 — Expected Section-wise & Category-wise Scores'
+        },'eligibility': {
+          title: 'IPMAT Eligibility 2026 | Age Limit, Percentage & Category Checker | IPM Careers',
+          desc:  'Check your IPMAT 2026 eligibility instantly — age limit, 10th and 12th percentage criteria, Math requirement and category rules for all 10 IIMs.',
+          keywords: 'IPMAT eligibility 2026, IPMAT age limit, IPMAT 12th percentage, who can apply IPMAT, IIM IPM eligibility criteria',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/eligibility',
+          h1: 'IPMAT Eligibility 2026 — Age, Percentage & Category Criteria for All IIMs'
+        },'forms': {
+          title: 'IPM & BBA Application Forms 2026 | Live Deadlines & Apply Links | AIR 1 Commandcenter',
+          desc:  'All IPM and BBA application forms 2026 in one place — IIM Indore, Rohtak, NMIMS, Masters Union, NALSAR and 25+ colleges. Live deadlines and direct apply links.',
+          keywords: 'IIM Indore IPM application form 2026, IPMAT registration 2026, IPM application last date, BBA application forms 2026',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/forms',
+          h1: 'IPM & BBA Application Forms 2026 — All Colleges, Live Deadlines, Direct Links'
+        },'cheatsheets': {
+          title: 'IPMAT Cheat Sheets 2026 | Quick Revision Formulas & Notes | IPM Careers',
+          desc:  'Free IPMAT cheat sheets and formula booklets for Quantitative Ability and Verbal Ability. Download, print and revise fast for IPMAT 2026.',
+          keywords: 'IPMAT cheat sheet 2026, IPMAT formula sheet, IPMAT QA formulas, IPMAT revision notes, IPMAT quick revision',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/cheatsheets',
+          h1: 'IPMAT Cheat Sheets & Formula Booklets — Free Download for 2026 Revision'
+        },'learnflix': {
+          title: 'IPM LearnFlix — Free IPMAT Video Lectures & Online Preparation | IPM Careers',
+          desc:  'Free IPMAT video lectures covering Quantitative Ability, Verbal Ability and Logical Reasoning. Curated by IIM graduates and IPMAT toppers.',
+          keywords: 'free IPMAT video lectures, IPMAT online preparation, IPMAT LearnFlix, IPMAT coaching videos free, IPMAT QA online classes',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/learnflix',
+          h1: 'IPM LearnFlix — Free IPMAT Video Lectures from IIM Graduates'
+        },'toppers': {
+          title: "IPMAT Toppers' Strategy | AIR 1 & IIM IPM Student Insights | IPM Careers",
+          desc:  'Learn directly from IPMAT toppers and IIM IPM students. Real strategies, study plans and AIR 1 insights from students who cracked IIM Indore IPM.',
+          keywords: 'IPMAT topper strategy, IPMAT AIR 1 strategy, IIM Indore IPM topper tips, how to crack IPMAT, IPMAT preparation strategy',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/toppers',
+          h1: "IPMAT Toppers' Mouth — Real Strategies from IIM IPM AIR 1 Holders"
+        },'mindjournal': {
+          title: 'IPM Mind Journals — Real Student Life at IIM Indore & Rohtak | IPM Careers',
+          desc:  'Read authentic mind journals from IIM Indore and IIM Rohtak IPM students. Real campus life, placement stories and honest insights from current students.',
+          keywords: 'IIM Indore IPM student life, IIM IPM campus life, IPM student journal, IIM Indore IPM review, life at IIM Indore IPM',
+          canonical: 'https://register.ipmcareer.com/air1commandcenter/mindjournal',
+          h1: 'IPM Mind Journals — Life Inside IIM Indore & Rohtak, Written by Students'
+        }
+      };
+
+      function getTab() {
+        var hash = window.location.hash.replace('#','');
+        var path = window.location.pathname.split('/').pop();
+        var t = (hash || path || 'pyq').split('?')[0];
+        return TAB_SEO[t] ? t : 'pyq';
+      }
+
+      function updateSEO() {
+        var t   = getTab();
+        var seo = TAB_SEO[t];
+
+        // Title
+        document.title = seo.title;
+
+        // Meta description
+        var d = document.querySelector('meta[name="description"]');
+        if (!d) { d = document.createElement('meta'); d.name='description'; document.head.appendChild(d); }
+        d.content = seo.desc;
+
+        // Meta keywords
+        var k = document.querySelector('meta[name="keywords"]');
+        if (!k) { k = document.createElement('meta'); k.name='keywords'; document.head.appendChild(k); }
+        k.content = seo.keywords;
+
+        // Canonical
+        var c = document.querySelector('link[rel="canonical"]');
+        if (!c) { c = document.createElement('link'); c.rel='canonical'; document.head.appendChild(c); }
+        c.href = seo.canonical;
+
+        // OG tags
+        var ogMap = {
+          'og:title': seo.title,
+          'og:description': seo.desc,
+          'og:url': seo.canonical,
+          'og:type': 'website',
+          'og:image': 'https://register.ipmcareer.com/favicon_ipm.svg',
+          'og:site_name': 'IPM Careers',
+        };
+        Object.entries(ogMap).forEach(function([prop, val]) {
+          var el = document.querySelector('meta[property="'+prop+'"]');
+          if (!el) { el = document.createElement('meta'); el.setAttribute('property',prop); document.head.appendChild(el); }
+          el.content = val;
+        });
+
+        // Twitter card
+        var twMap = {
+          'twitter:card': 'summary',
+          'twitter:title': seo.title,
+          'twitter:description': seo.desc,
+        };
+        Object.entries(twMap).forEach(function([name, val]) {
+          var el = document.querySelector('meta[name="'+name+'"]');
+          if (!el) { el = document.createElement('meta'); el.setAttribute('name',name); document.head.appendChild(el); }
+          el.content = val;
+        });
+
+        // H1 — visually hidden, crawlable
+        var h1 = document.getElementById('ipm-seo-h1');
+        if (h1) h1.textContent = seo.h1;
+
+        // Show correct FAQ section
+        document.querySelectorAll('.ipm-seo-faq[data-tab]').forEach(function(el) {
+          el.style.display = el.dataset.tab === t ? 'block' : 'none';
+        });
+
+        // Update FAQ JSON-LD
+        var faqLd = document.getElementById('ipm-faq-jsonld');
+        if (faqLd && window.IPM_FAQ_DATA && window.IPM_FAQ_DATA[t]) {
+          faqLd.textContent = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": window.IPM_FAQ_DATA[t].map(function(q) {
+              return {
+                "@type": "Question",
+                "name": q[0],
+                "acceptedAnswer": { "@type": "Answer", "text": q[1] }
+              };
+            })
+          });
+        }
+      }
+
+      window.addEventListener('hashchange', updateSEO);
+      window.addEventListener('popstate',   updateSEO);
+      document.addEventListener('DOMContentLoaded', updateSEO);
+      setTimeout(updateSEO, 300);
+    })();
+    </script>
+
   </head>
   <body>
     <div id="root"></div>
@@ -654,5 +799,406 @@
       }
     });
   </script>
-</body>
+
+  <!-- AIR 1 SEO: Visually-hidden H1 (crawlable, no visual impact) -->
+  <h1 id="ipm-seo-h1" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;color:#fff;font-size:1px;">IPMAT Previous Year Question Papers</h1>
+
+  <!-- AIR 1 SEO: FAQ sections per tab -->
+  <style>
+    .ipm-seo-faq {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+      border-top: 1px solid #1e2533;
+    }
+    .ipm-faq-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0 0 28px 0;
+    }
+    .ipm-faq-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #0f1117;
+    }
+    .ipm-faq-item:last-child { border-bottom: none; }
+    .ipm-faq-q {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f9a01b;
+      margin: 0 0 10px 0;
+      line-height: 1.5;
+    }
+    .ipm-faq-a {
+      font-size: 14px;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.7;
+    }
+  </style>
+
+  <div id="ipm-faq-container">
+  <section class="ipm-seo-faq" data-tab="pyq" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Where can I download IPMAT previous year question papers for free?</h3>
+      <p class="ipm-faq-a">All IPMAT previous year question papers from 2019 to 2025 are available for free on this page. Click on any year to download the official PDF with answer keys and detailed solutions.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How many years of IPMAT PYQ should I solve before the exam?</h3>
+      <p class="ipm-faq-a">Solve at least the last 5 years of IPMAT papers (2021–2025). The 2024 and 2025 papers are especially important as they reflect the current difficulty level and pattern. IPMAT Indore changed its pattern in 2022, so papers before that have limited value.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Are IPMAT PYQ solutions provided along with the question papers?</h3>
+      <p class="ipm-faq-a">Yes, every paper on this page comes with official answer keys and detailed solutions. For Short Answer questions, worked solutions with step-by-step methods are included.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is there a separate JIPMAT and IIM Rohtak PYQ section?</h3>
+      <p class="ipm-faq-a">Yes. The AIR 1 Commandcenter includes PYQs for IPMAT Indore (IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong, IIFT), IPMAT Rohtak and JIPMAT (IIM Jammu and Bodh Gaya) — all in one place.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is solving IPMAT PYQs enough for 2026 preparation?</h3>
+      <p class="ipm-faq-a">PYQs are essential but not sufficient alone. Use them to understand the pattern, build speed and identify weak areas. Supplement with topic-wise practice, mock tests and the free cheat sheets available on this page.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="cutoffs" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the expected IPMAT Indore cutoff for General category in 2026?</h3>
+      <p class="ipm-faq-a">Based on 2022–2025 trends, the expected overall cutoff for IIM Indore IPM (General category) is 200–230 out of 400. However, sectional cutoffs apply independently — you must clear QA MCQ, QA SA and VA cutoffs separately. All figures are indicative; verify against official IIM Indore results.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is there a sectional cutoff in IPMAT 2026?</h3>
+      <p class="ipm-faq-a">Yes, and this is the most common reason candidates fail to convert despite a good overall score. IPMAT Indore has independent sectional cutoffs for Quantitative Ability (MCQ), Quantitative Ability (Short Answer) and Verbal Ability. Clearing all three is mandatory.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the IPMAT cutoff for OBC, SC and ST category students?</h3>
+      <p class="ipm-faq-a">Category-wise cutoffs are typically 10–20% lower than General category. OBC candidates generally need 5–15 marks less, SC/ST candidates 25–40 marks less than the General cutoff. The exact relaxation varies by IIM and year. Check the live cutoff predictor above for current estimates.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How is the IPMAT Indore cutoff calculated each year?</h3>
+      <p class="ipm-faq-a">The cutoff is set after normalisation based on the difficulty of that year's paper and the number of candidates appearing. A harder paper results in a lower cutoff. IIM Indore announces the cutoff along with WAT-PI shortlist results, typically in June.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is a safe score for IIM Rohtak IPM 2026?</h3>
+      <p class="ipm-faq-a">IIM Rohtak conducts IPMAT Rohtak (separate from IPMAT Indore). Based on previous years, a total score of 65–75+ out of 160 is considered safe for the General category shortlist. Rohtak also has sectional cutoffs across its three sections.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="eligibility" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the age limit for IPMAT 2026?</h3>
+      <p class="ipm-faq-a">For IPMAT Indore 2026, candidates must have been born on or after August 1, 2004 (General/EWS/OBC) or August 1, 2002 (SC/ST/PwD). This means General category candidates must be 20 years old or younger at the time of admission. Use the eligibility checker above to verify your DOB instantly.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the minimum percentage required for IPMAT eligibility?</h3>
+      <p class="ipm-faq-a">IPMAT Indore requires a minimum of 60% in both Class 10 and Class 12 for General/EWS/OBC candidates, and 55% for SC/ST/PwD candidates. IIM Rohtak requires 60% in Class 12 (50% for SC/ST). Candidates appearing in Class 12 in 2026 are also eligible to apply.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is Mathematics compulsory for IPMAT eligibility?</h3>
+      <p class="ipm-faq-a">Mathematics is NOT compulsory for IPMAT Indore eligibility — students from any stream (Science, Commerce, Arts/Humanities) can apply. However, the exam has a heavy Quantitative Ability section, so students with a Math background have a natural advantage. IIM Rohtak also does not mandate Math.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Can a student currently in Class 12 apply for IPMAT 2026?</h3>
+      <p class="ipm-faq-a">Yes. Students appearing in their Class 12 board exams in 2026 are eligible to apply for IPMAT 2026, provided they meet the age criteria. However, admission will be conditional on scoring the required percentage in the final board results.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How many attempts are allowed for IPMAT?</h3>
+      <p class="ipm-faq-a">IIM Indore IPM allows a maximum of 2 attempts for General/EWS/OBC candidates and 3 attempts for SC/ST/PwD. IIM Rohtak allows up to 3 attempts for all categories. Each year's exam counts as one attempt, so plan carefully if you are considering a repeat year.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the eligibility for JIPMAT 2026 (IIM Jammu and Bodh Gaya)?</h3>
+      <p class="ipm-faq-a">JIPMAT 2026 requires candidates to have passed or be appearing in Class 12 with at least 60% marks (55% for SC/ST). There is no separate age limit for JIPMAT. Both IIM Jammu and IIM Bodh Gaya accept JIPMAT scores for their IPM programs.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="forms" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How do I apply for IIM Indore IPM 2026?</h3>
+      <p class="ipm-faq-a">Applications for IIM Indore IPM 2026 are submitted through the official IIM Indore admissions portal (iimidr.ac.in). The process involves: (1) Register and fill the form, (2) Upload documents, (3) Pay the application fee, (4) Appear for IPMAT on the scheduled date. The form and deadline are listed in the tracker above.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Can I apply to multiple IPM programs with one registration?</h3>
+      <p class="ipm-faq-a">No — each institution has a separate application process. IPMAT Indore scores are used by IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong and IIFT. JIPMAT is a separate exam for IIM Jammu and Bodh Gaya. IPMAT Rohtak is separate for IIM Rohtak. You need to register for each exam individually.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the application fee for IPMAT 2026?</h3>
+      <p class="ipm-faq-a">The IPMAT Indore 2026 application fee is typically ₹4,130 for General/OBC/EWS candidates and ₹2,065 for SC/ST/PwD. Fees are paid online through the DigiAlm portal. Exact fees are confirmed at the time of registration — check the official IIM Indore notification.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What documents are required for the IPM application form?</h3>
+      <p class="ipm-faq-a">You will need: (1) Class 10 marksheet and certificate, (2) Class 12 marksheet (or admit card if appearing), (3) Category certificate (if applicable), (4) PwD certificate (if applicable), (5) Passport-size photograph, (6) Signature in the prescribed format. Keep scanned copies ready before starting the form.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Which BBA programs are still open for applications in 2026?</h3>
+      <p class="ipm-faq-a">Check the "Open" section in the tracker above — it shows all institutes with live application windows including NMIMS (NPAT), Masters' Union, IIM Shillong, IIM Sambalpur, Ashoka University, NALSAR and more with exact last dates. New applications open regularly, so bookmark this page.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="cheatsheets" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What formulas are most important for IPMAT Quantitative Ability?</h3>
+      <p class="ipm-faq-a">The highest-weightage QA topics in IPMAT are: Number Theory (HCF, LCM, divisibility, remainders), Arithmetic (percentages, profit-loss, SI/CI, ratio-proportion), Algebra (linear equations, quadratics, progressions), Geometry (triangles, circles, mensuration) and Modern Maths (permutation-combination, probability). The cheat sheets above cover all of these in compact format.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How should I use IPMAT cheat sheets in the last week before the exam?</h3>
+      <p class="ipm-faq-a">In the final 7 days: Day 1–2: review formula sheets and attempt 1 full PYQ. Day 3–4: topic-wise revision of weak areas using cheat sheets. Day 5: 1 full mock test under timed conditions. Day 6: review wrong answers, re-read cheat sheets. Day 7: light revision only, no new concepts.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What verbal topics should I revise using the IPMAT cheat sheets?</h3>
+      <p class="ipm-faq-a">Focus on: Reading Comprehension (inference-based questions), Para-jumbles, Sentence Correction (subject-verb agreement, tense errors), Vocabulary in context, and Critical Reasoning. The VA cheat sheet above covers rules, common error patterns and RC strategies in one quick-reference format.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Are these cheat sheets useful for JIPMAT and IPMAT Rohtak too?</h3>
+      <p class="ipm-faq-a">Yes. The QA cheat sheets apply to all three exams since the syllabus overlaps significantly. The VA cheat sheet is most tailored to IPMAT Indore, but the core grammar rules and reading comprehension strategies work for JIPMAT and Rohtak as well.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="learnflix" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Are the IPM LearnFlix video lectures completely free?</h3>
+      <p class="ipm-faq-a">Yes, all LearnFlix videos are 100% free. No login, no payment, no hidden fees. They are curated and uploaded by IPM Careers to help IPMAT aspirants access quality preparation content without the cost of full coaching.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Which topics are covered in the IPMAT video lectures?</h3>
+      <p class="ipm-faq-a">LearnFlix covers: Quantitative Ability (number theory, algebra, geometry, arithmetic, data interpretation), Verbal Ability (reading comprehension, para-jumbles, grammar, vocabulary) and Logical Reasoning (for IPMAT Rohtak and JIPMAT). Videos are organised by topic and difficulty level.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Can I prepare for IPMAT Rohtak and JIPMAT using these videos?</h3>
+      <p class="ipm-faq-a">Yes. While some videos are tailored for IPMAT Indore, the QA content applies across all three exams. The Logical Reasoning videos are specifically useful for IPMAT Rohtak and JIPMAT, which include an LR section that IPMAT Indore does not.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How many hours of video content is available on LearnFlix?</h3>
+      <p class="ipm-faq-a">LearnFlix is continuously updated. The current library covers 50+ hours of structured video content across QA, VA and LR. New videos are added regularly — bookmark this page and check back for fresh content close to the exam.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="toppers" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is the study strategy of IPMAT AIR 1 holders?</h3>
+      <p class="ipm-faq-a">Common patterns across AIR 1 holders: (1) Solve 5+ years of PYQs thoroughly, (2) Prioritise accuracy over speed in the first 3 months, (3) Take 1 full mock per week in the final 2 months, (4) Spend 70% of QA time on Number Theory and Algebra, (5) Read a quality newspaper daily for VA and current affairs for WAT.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How many hours do IPMAT toppers study per day?</h3>
+      <p class="ipm-faq-a">Most toppers report 4–6 focused hours per day during the peak preparation phase (3–4 months before the exam), with 2–3 hours daily in the initial phase. Quality of practice matters more than hours — 4 hours of deliberate practice with analysis outperforms 8 hours of passive reading.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What books and resources did IPMAT toppers use?</h3>
+      <p class="ipm-faq-a">Most toppers recommend: QA — Arun Sharma (CAT level, not all chapters needed), NCERT Math 9–12, PYQs. VA — Word Power Made Easy (Norman Lewis), any standard grammar book, daily newspaper reading. For mocks — official IPMAT mock and coaching-specific mocks. Avoid using too many books simultaneously.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Can I crack IPMAT in 6 months of preparation?</h3>
+      <p class="ipm-faq-a">6 months is sufficient for most candidates if preparation is structured and consistent. Students who struggle with Math may need 8–12 months. The key milestones: Month 1–2: concept building, Month 3–4: topic-wise practice, Month 5: full mocks and analysis, Month 6: revision and PYQ solving.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How do IPMAT toppers manage QA and VA preparation together?</h3>
+      <p class="ipm-faq-a">The recommended split is 60% QA and 40% VA for most candidates, especially those from non-Math backgrounds. Commerce and Arts students often need to invert this to 70% QA and 30% VA to close the Math gap. VA can be improved faster; QA requires sustained practice over months.</p>
+    </div>
+  </section>
+  <section class="ipm-seo-faq" data-tab="mindjournal" style="display:none">
+    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What is life like at IIM Indore IPM?</h3>
+      <p class="ipm-faq-a">IIM Indore IPM is a 5-year integrated programme combining BBA (3 years) and MBA (2 years). The first two years focus on foundation courses, Years 3–4 on core management, and Year 5 on specialisation and placements. Campus life is intense — club activities, case competitions, live projects and a diverse peer group make it different from a regular BBA.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How are IIM Indore IPM students placed after completing the programme?</h3>
+      <p class="ipm-faq-a">IPM students graduate with an MBA degree from IIM Indore, which means they access the same placement process as the flagship PGP (MBA) batch. Average placements are in the ₹25–30 LPA range, with top roles in consulting (McKinsey, BCG, Bain), finance (Goldman Sachs, JP Morgan) and product management.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is the IIM Indore IPM worth it compared to a regular BBA + MBA?</h3>
+      <p class="ipm-faq-a">For students certain about management careers, IPM offers a clear advantage: IIM brand from age 18, access to IIM alumni networks, top placement outcomes and a structured 5-year journey. The opportunity cost is locking in at 17–18 without exploring other fields. Students who later discover different interests sometimes find this limiting.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">What do IPM students say about the workload and pressure?</h3>
+      <p class="ipm-faq-a">The programme is academically rigorous. First-year students often describe the workload as a significant adjustment from school — heavy reading lists, assignments, group projects and exams run simultaneously. By Year 3, most students feel more comfortable managing the load. The peer group quality is consistently cited as the biggest advantage.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">How is campus life at IIM Rohtak IPM different from IIM Indore?</h3>
+      <p class="ipm-faq-a">IIM Rohtak's IPM is a newer programme (started 2019) with a smaller batch size. Campus infrastructure is still maturing compared to IIM Indore's established campus. However, IIM Rohtak offers the same IIM-affiliation advantage, and placements have been improving year-on-year with average packages in the ₹12–18 LPA range.</p>
+    </div>
+  </section>
+  </div>
+
+  <!-- AIR 1 SEO: FAQ JSON-LD structured data -->
+  <script>
+  window.IPM_FAQ_DATA = {
+  "pyq": [
+    [
+      "Where can I download IPMAT previous year question papers for free?",
+      "All IPMAT previous year question papers from 2019 to 2025 are available for free on this page. Click on any year to download the official PDF with answer keys and detailed solutions."
+    ],
+    [
+      "How many years of IPMAT PYQ should I solve before the exam?",
+      "Solve at least the last 5 years of IPMAT papers (2021–2025). The 2024 and 2025 papers are especially important as they reflect the current difficulty level and pattern. IPMAT Indore changed its pattern in 2022, so papers before that have limited value."
+    ],
+    [
+      "Are IPMAT PYQ solutions provided along with the question papers?",
+      "Yes, every paper on this page comes with official answer keys and detailed solutions. For Short Answer questions, worked solutions with step-by-step methods are included."
+    ],
+    [
+      "Is there a separate JIPMAT and IIM Rohtak PYQ section?",
+      "Yes. The AIR 1 Commandcenter includes PYQs for IPMAT Indore (IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong, IIFT), IPMAT Rohtak and JIPMAT (IIM Jammu and Bodh Gaya) — all in one place."
+    ],
+    [
+      "Is solving IPMAT PYQs enough for 2026 preparation?",
+      "PYQs are essential but not sufficient alone. Use them to understand the pattern, build speed and identify weak areas. Supplement with topic-wise practice, mock tests and the free cheat sheets available on this page."
+    ]
+  ],
+  "cutoffs": [
+    [
+      "What is the expected IPMAT Indore cutoff for General category in 2026?",
+      "Based on 2022–2025 trends, the expected overall cutoff for IIM Indore IPM (General category) is 200–230 out of 400. However, sectional cutoffs apply independently — you must clear QA MCQ, QA SA and VA cutoffs separately. All figures are indicative; verify against official IIM Indore results."
+    ],
+    [
+      "Is there a sectional cutoff in IPMAT 2026?",
+      "Yes, and this is the most common reason candidates fail to convert despite a good overall score. IPMAT Indore has independent sectional cutoffs for Quantitative Ability (MCQ), Quantitative Ability (Short Answer) and Verbal Ability. Clearing all three is mandatory."
+    ],
+    [
+      "What is the IPMAT cutoff for OBC, SC and ST category students?",
+      "Category-wise cutoffs are typically 10–20% lower than General category. OBC candidates generally need 5–15 marks less, SC/ST candidates 25–40 marks less than the General cutoff. The exact relaxation varies by IIM and year. Check the live cutoff predictor above for current estimates."
+    ],
+    [
+      "How is the IPMAT Indore cutoff calculated each year?",
+      "The cutoff is set after normalisation based on the difficulty of that year's paper and the number of candidates appearing. A harder paper results in a lower cutoff. IIM Indore announces the cutoff along with WAT-PI shortlist results, typically in June."
+    ],
+    [
+      "What is a safe score for IIM Rohtak IPM 2026?",
+      "IIM Rohtak conducts IPMAT Rohtak (separate from IPMAT Indore). Based on previous years, a total score of 65–75+ out of 160 is considered safe for the General category shortlist. Rohtak also has sectional cutoffs across its three sections."
+    ]
+  ],
+  "eligibility": [
+    [
+      "What is the age limit for IPMAT 2026?",
+      "For IPMAT Indore 2026, candidates must have been born on or after August 1, 2004 (General/EWS/OBC) or August 1, 2002 (SC/ST/PwD). This means General category candidates must be 20 years old or younger at the time of admission. Use the eligibility checker above to verify your DOB instantly."
+    ],
+    [
+      "What is the minimum percentage required for IPMAT eligibility?",
+      "IPMAT Indore requires a minimum of 60% in both Class 10 and Class 12 for General/EWS/OBC candidates, and 55% for SC/ST/PwD candidates. IIM Rohtak requires 60% in Class 12 (50% for SC/ST). Candidates appearing in Class 12 in 2026 are also eligible to apply."
+    ],
+    [
+      "Is Mathematics compulsory for IPMAT eligibility?",
+      "Mathematics is NOT compulsory for IPMAT Indore eligibility — students from any stream (Science, Commerce, Arts/Humanities) can apply. However, the exam has a heavy Quantitative Ability section, so students with a Math background have a natural advantage. IIM Rohtak also does not mandate Math."
+    ],
+    [
+      "Can a student currently in Class 12 apply for IPMAT 2026?",
+      "Yes. Students appearing in their Class 12 board exams in 2026 are eligible to apply for IPMAT 2026, provided they meet the age criteria. However, admission will be conditional on scoring the required percentage in the final board results."
+    ],
+    [
+      "How many attempts are allowed for IPMAT?",
+      "IIM Indore IPM allows a maximum of 2 attempts for General/EWS/OBC candidates and 3 attempts for SC/ST/PwD. IIM Rohtak allows up to 3 attempts for all categories. Each year's exam counts as one attempt, so plan carefully if you are considering a repeat year."
+    ],
+    [
+      "What is the eligibility for JIPMAT 2026 (IIM Jammu and Bodh Gaya)?",
+      "JIPMAT 2026 requires candidates to have passed or be appearing in Class 12 with at least 60% marks (55% for SC/ST). There is no separate age limit for JIPMAT. Both IIM Jammu and IIM Bodh Gaya accept JIPMAT scores for their IPM programs."
+    ]
+  ],
+  "forms": [
+    [
+      "How do I apply for IIM Indore IPM 2026?",
+      "Applications for IIM Indore IPM 2026 are submitted through the official IIM Indore admissions portal (iimidr.ac.in). The process involves: (1) Register and fill the form, (2) Upload documents, (3) Pay the application fee, (4) Appear for IPMAT on the scheduled date. The form and deadline are listed in the tracker above."
+    ],
+    [
+      "Can I apply to multiple IPM programs with one registration?",
+      "No — each institution has a separate application process. IPMAT Indore scores are used by IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong and IIFT. JIPMAT is a separate exam for IIM Jammu and Bodh Gaya. IPMAT Rohtak is separate for IIM Rohtak. You need to register for each exam individually."
+    ],
+    [
+      "What is the application fee for IPMAT 2026?",
+      "The IPMAT Indore 2026 application fee is typically ₹4,130 for General/OBC/EWS candidates and ₹2,065 for SC/ST/PwD. Fees are paid online through the DigiAlm portal. Exact fees are confirmed at the time of registration — check the official IIM Indore notification."
+    ],
+    [
+      "What documents are required for the IPM application form?",
+      "You will need: (1) Class 10 marksheet and certificate, (2) Class 12 marksheet (or admit card if appearing), (3) Category certificate (if applicable), (4) PwD certificate (if applicable), (5) Passport-size photograph, (6) Signature in the prescribed format. Keep scanned copies ready before starting the form."
+    ],
+    [
+      "Which BBA programs are still open for applications in 2026?",
+      "Check the \"Open\" section in the tracker above — it shows all institutes with live application windows including NMIMS (NPAT), Masters' Union, IIM Shillong, IIM Sambalpur, Ashoka University, NALSAR and more with exact last dates. New applications open regularly, so bookmark this page."
+    ]
+  ],
+  "cheatsheets": [
+    [
+      "What formulas are most important for IPMAT Quantitative Ability?",
+      "The highest-weightage QA topics in IPMAT are: Number Theory (HCF, LCM, divisibility, remainders), Arithmetic (percentages, profit-loss, SI/CI, ratio-proportion), Algebra (linear equations, quadratics, progressions), Geometry (triangles, circles, mensuration) and Modern Maths (permutation-combination, probability). The cheat sheets above cover all of these in compact format."
+    ],
+    [
+      "How should I use IPMAT cheat sheets in the last week before the exam?",
+      "In the final 7 days: Day 1–2: review formula sheets and attempt 1 full PYQ. Day 3–4: topic-wise revision of weak areas using cheat sheets. Day 5: 1 full mock test under timed conditions. Day 6: review wrong answers, re-read cheat sheets. Day 7: light revision only, no new concepts."
+    ],
+    [
+      "What verbal topics should I revise using the IPMAT cheat sheets?",
+      "Focus on: Reading Comprehension (inference-based questions), Para-jumbles, Sentence Correction (subject-verb agreement, tense errors), Vocabulary in context, and Critical Reasoning. The VA cheat sheet above covers rules, common error patterns and RC strategies in one quick-reference format."
+    ],
+    [
+      "Are these cheat sheets useful for JIPMAT and IPMAT Rohtak too?",
+      "Yes. The QA cheat sheets apply to all three exams since the syllabus overlaps significantly. The VA cheat sheet is most tailored to IPMAT Indore, but the core grammar rules and reading comprehension strategies work for JIPMAT and Rohtak as well."
+    ]
+  ],
+  "learnflix": [
+    [
+      "Are the IPM LearnFlix video lectures completely free?",
+      "Yes, all LearnFlix videos are 100% free. No login, no payment, no hidden fees. They are curated and uploaded by IPM Careers to help IPMAT aspirants access quality preparation content without the cost of full coaching."
+    ],
+    [
+      "Which topics are covered in the IPMAT video lectures?",
+      "LearnFlix covers: Quantitative Ability (number theory, algebra, geometry, arithmetic, data interpretation), Verbal Ability (reading comprehension, para-jumbles, grammar, vocabulary) and Logical Reasoning (for IPMAT Rohtak and JIPMAT). Videos are organised by topic and difficulty level."
+    ],
+    [
+      "Can I prepare for IPMAT Rohtak and JIPMAT using these videos?",
+      "Yes. While some videos are tailored for IPMAT Indore, the QA content applies across all three exams. The Logical Reasoning videos are specifically useful for IPMAT Rohtak and JIPMAT, which include an LR section that IPMAT Indore does not."
+    ],
+    [
+      "How many hours of video content is available on LearnFlix?",
+      "LearnFlix is continuously updated. The current library covers 50+ hours of structured video content across QA, VA and LR. New videos are added regularly — bookmark this page and check back for fresh content close to the exam."
+    ]
+  ],
+  "toppers": [
+    [
+      "What is the study strategy of IPMAT AIR 1 holders?",
+      "Common patterns across AIR 1 holders: (1) Solve 5+ years of PYQs thoroughly, (2) Prioritise accuracy over speed in the first 3 months, (3) Take 1 full mock per week in the final 2 months, (4) Spend 70% of QA time on Number Theory and Algebra, (5) Read a quality newspaper daily for VA and current affairs for WAT."
+    ],
+    [
+      "How many hours do IPMAT toppers study per day?",
+      "Most toppers report 4–6 focused hours per day during the peak preparation phase (3–4 months before the exam), with 2–3 hours daily in the initial phase. Quality of practice matters more than hours — 4 hours of deliberate practice with analysis outperforms 8 hours of passive reading."
+    ],
+    [
+      "What books and resources did IPMAT toppers use?",
+      "Most toppers recommend: QA — Arun Sharma (CAT level, not all chapters needed), NCERT Math 9–12, PYQs. VA — Word Power Made Easy (Norman Lewis), any standard grammar book, daily newspaper reading. For mocks — official IPMAT mock and coaching-specific mocks. Avoid using too many books simultaneously."
+    ],
+    [
+      "Can I crack IPMAT in 6 months of preparation?",
+      "6 months is sufficient for most candidates if preparation is structured and consistent. Students who struggle with Math may need 8–12 months. The key milestones: Month 1–2: concept building, Month 3–4: topic-wise practice, Month 5: full mocks and analysis, Month 6: revision and PYQ solving."
+    ],
+    [
+      "How do IPMAT toppers manage QA and VA preparation together?",
+      "The recommended split is 60% QA and 40% VA for most candidates, especially those from non-Math backgrounds. Commerce and Arts students often need to invert this to 70% QA and 30% VA to close the Math gap. VA can be improved faster; QA requires sustained practice over months."
+    ]
+  ],
+  "mindjournal": [
+    [
+      "What is life like at IIM Indore IPM?",
+      "IIM Indore IPM is a 5-year integrated programme combining BBA (3 years) and MBA (2 years). The first two years focus on foundation courses, Years 3–4 on core management, and Year 5 on specialisation and placements. Campus life is intense — club activities, case competitions, live projects and a diverse peer group make it different from a regular BBA."
+    ],
+    [
+      "How are IIM Indore IPM students placed after completing the programme?",
+      "IPM students graduate with an MBA degree from IIM Indore, which means they access the same placement process as the flagship PGP (MBA) batch. Average placements are in the ₹25–30 LPA range, with top roles in consulting (McKinsey, BCG, Bain), finance (Goldman Sachs, JP Morgan) and product management."
+    ],
+    [
+      "Is the IIM Indore IPM worth it compared to a regular BBA + MBA?",
+      "For students certain about management careers, IPM offers a clear advantage: IIM brand from age 18, access to IIM alumni networks, top placement outcomes and a structured 5-year journey. The opportunity cost is locking in at 17–18 without exploring other fields. Students who later discover different interests sometimes find this limiting."
+    ],
+    [
+      "What do IPM students say about the workload and pressure?",
+      "The programme is academically rigorous. First-year students often describe the workload as a significant adjustment from school — heavy reading lists, assignments, group projects and exams run simultaneously. By Year 3, most students feel more comfortable managing the load. The peer group quality is consistently cited as the biggest advantage."
+    ],
+    [
+      "How is campus life at IIM Rohtak IPM different from IIM Indore?",
+      "IIM Rohtak's IPM is a newer programme (started 2019) with a smaller batch size. Campus infrastructure is still maturing compared to IIM Indore's established campus. However, IIM Rohtak offers the same IIM-affiliation advantage, and placements have been improving year-on-year with average packages in the ₹12–18 LPA range."
+    ]
+  ]
+};
+  </script>
+  <script type="application/ld+json" id="ipm-faq-jsonld"></script>
+
+  </body>
 </html>
