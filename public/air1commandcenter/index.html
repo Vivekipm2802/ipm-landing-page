@@ -1207,13 +1207,14 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      margin-top: 14px;
       padding: 5px 12px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.01em;
       white-space: nowrap;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .ipm-fee-badge.free {
       background: rgba(34, 197, 94, 0.1);
@@ -1240,7 +1241,13 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 4px;
+      margin-top: 10px;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .ipm-fee-badge { font-size: 11px; padding: 4px 9px; gap: 3px; }
+      .ipm-fee-row   { margin-top: 8px; }
     }
   </style>
 
