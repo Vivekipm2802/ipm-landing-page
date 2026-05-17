@@ -1318,9 +1318,14 @@
       row.className = 'ipm-fee-row';
       row.appendChild(badge);
 
-      // Insert after the last child of the card's inner div
-      // (after the status chip / last-date row)
-      card.appendChild(row);
+      // Insert before the apply/link button (last anchor in card) if present,
+      // otherwise append — keeps badge inside card flow without breaking flex
+      var lastLink = card.querySelector('a:last-of-type');
+      if (lastLink && lastLink.parentNode === card) {
+        card.insertBefore(row, lastLink);
+      } else {
+        card.appendChild(row);
+      }
     }
 
     function scanCards() {
