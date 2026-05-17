@@ -1201,52 +1201,29 @@
   <script type="application/ld+json" id="ipm-faq-jsonld"></script>
 
   
-  <!-- ipm-form-fees-v1: Application fee badges on Forms tab tiles -->
-  <style>
-    .ipm-fee-badge {
+      .ipm-fee-pin {
+      position: absolute;
+      top: 18px;
+      right: 18px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px 12px;
+      gap: 4px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       letter-spacing: 0.01em;
       white-space: nowrap;
-      max-width: 100%;
-      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 2;
     }
-    .ipm-fee-badge.free {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #22c55e;
-    }
-    .ipm-fee-badge.low {
-      background: rgba(249, 160, 27, 0.08);
-      border: 1px solid rgba(249, 160, 27, 0.25);
-      color: #f9a01b;
-    }
-    .ipm-fee-badge.mid {
-      background: rgba(148, 163, 184, 0.08);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      color: #94a3b8;
-    }
-    .ipm-fee-badge.exam {
-      background: rgba(139, 92, 246, 0.1);
-      border: 1px solid rgba(139, 92, 246, 0.25);
-      color: #a78bfa;
-    }
-    .ipm-fee-row {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-      max-width: 100%;
-      overflow: hidden;
-    }
-    @media (max-width: 640px) {
-      .ipm-fee-badge { font-size: 11px; padding: 4px 9px; gap: 3px; }
+    .ipm-fee-pin.free { background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e; }
+    .ipm-fee-pin.low  { background:rgba(249,160,27,.10);border:1px solid rgba(249,160,27,.3);color:#f9a01b; }
+    .ipm-fee-pin.mid  { background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);color:#94a3b8; }
+    .ipm-fee-pin.exam { background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.28);color:#a78bfa; }
+  <!-- ipm-form-fees-v1: Application fee badges on Forms tab tiles -->
+  <style>
+
       .ipm-fee-row   { margin-top: 8px; }
     }
   </style>
@@ -1299,7 +1276,7 @@
     };
 
     function addFeeToCard(card) {
-      if (card.querySelector('.ipm-fee-row')) return; // already done
+      if (card.querySelector('.ipm-fee-pin')) return; // already done
 
       var h3 = card.querySelector('h3');
       if (!h3) return;
@@ -1307,25 +1284,13 @@
       var data = FEE_DATA[name];
       if (!data) return;
 
-      // Build badge
-      var badge = document.createElement('span');
-      badge.className = 'ipm-fee-badge ' + data.type;
-      badge.title = data.note;
-      badge.innerHTML = ICONS[data.type] + ' ' + data.label;
-
-      // Wrap in a row div and append to card
-      var row = document.createElement('div');
-      row.className = 'ipm-fee-row';
-      row.appendChild(badge);
-
-      // Insert before the apply/link button (last anchor in card) if present,
-      // otherwise append — keeps badge inside card flow without breaking flex
-      var lastLink = card.querySelector('a:last-of-type');
-      if (lastLink && lastLink.parentNode === card) {
-        card.insertBefore(row, lastLink);
-      } else {
-        card.appendChild(row);
-      }
+      // Pin badge top-right — position:absolute, zero layout impact
+      card.style.position = 'relative';
+      var pin = document.createElement('span');
+      pin.className = 'ipm-fee-pin ' + data.type;
+      pin.title = data.note;
+      pin.innerHTML = ICONS[data.type] + ' ' + data.label;
+      card.appendChild(pin);
     }
 
     function scanCards() {
