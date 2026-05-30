@@ -588,7 +588,7 @@ export default function Bangalore() {
               </h1>
 
               <p className="mt-12 text-lg lg:text-xl font-bold text-[#0F121E] tracking-widest uppercase">
-                Only 50 seats in the director's batch.
+                2 Centres in Bangalore — Malleswaram &amp; Jayanagar.
               </p>
 
               <div className="mt-10">
