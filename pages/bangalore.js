@@ -206,11 +206,11 @@ export default function Bangalore() {
   return (
     <>
       <Head>
-        <title>IPM Careers — New Delhi Centre | IPMAT Coaching from the Makers of AIR 1</title>
+        <title>IPM Careers — Bangalore Centre | IPMAT Coaching from the Makers of AIR 1</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="IPMAT coaching in New Delhi from the makers of AIR 1. Join the Director's Special Batch — limited to 50 students. Direct founder mentorship from IIM alumni."
+          content="IPMAT coaching in Bangalore from the makers of AIR 1. 2 centres — Malleswaram & Jayanagar. Direct founder mentorship from IIM alumni."
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -680,7 +680,7 @@ export default function Bangalore() {
                 <ShieldIcon className="w-5 h-5" />
                 <span>IPM <span className="text-[#E89624]">CAREERS</span></span>
               </div>
-              <div className="text-gray-500 text-sm mt-2">© 2026 IPM Careers Delhi Centre. All rights reserved.</div>
+              <div className="text-gray-500 text-sm mt-2">© 2026 IPM Careers Bangalore Centre. All rights reserved.</div>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-400 font-medium">
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
