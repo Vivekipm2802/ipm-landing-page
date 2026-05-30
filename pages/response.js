@@ -229,6 +229,13 @@ function Response() {
 
   return (
     <AppShell activePage="/response">
+      {/* ipm-answer-key-banner-v1 */}
+      <a href="/magazine/ipmat-indore-answer-key-2026-response-sheet-score-calculator"
+        style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"10px",background:"#1a1a2e",borderBottom:"1px solid rgba(249,160,27,0.3)",padding:"10px 16px",fontSize:"13px",textDecoration:"none",flexWrap:"wrap"}}>
+        <span style={{color:"#f9a01b",fontWeight:600}}>IPMAT 2026 Answer Key</span>
+        <span style={{color:"#fff"}}>Official cutoffs + score analysis &#8594;</span>
+      </a>
+      
       <Head>
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
