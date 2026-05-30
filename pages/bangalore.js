@@ -587,9 +587,23 @@ export default function Bangalore() {
                 </span>
               </h1>
 
-              <p className="mt-12 text-lg lg:text-xl font-bold text-[#0F121E] tracking-widest uppercase">
-                2 Centres in Bangalore — Malleswaram &amp; Jayanagar.
-              </p>
+              <div className="mt-12">
+                <div className="text-[11px] font-bold text-[#0F121E]/70 tracking-[0.2em] uppercase mb-3">2 Centres in Bangalore</div>
+                <div className="flex flex-wrap gap-3">
+                  <div className="inline-flex items-center gap-2.5 bg-[#0F121E] text-white rounded-full pl-2 pr-6 py-2 shadow-lg">
+                    <span className="w-8 h-8 rounded-full bg-[#E89624] text-[#0F121E] flex items-center justify-center flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                    </span>
+                    <span className="font-bold font-heading tracking-wide text-base lg:text-lg">Malleswaram</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2.5 bg-[#0F121E] text-white rounded-full pl-2 pr-6 py-2 shadow-lg">
+                    <span className="w-8 h-8 rounded-full bg-[#E89624] text-[#0F121E] flex items-center justify-center flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                    </span>
+                    <span className="font-bold font-heading tracking-wide text-base lg:text-lg">Jayanagar</span>
+                  </div>
+                </div>
+              </div>
 
               <div className="mt-10">
                 <a href="#registration-form" className="inline-flex bg-[#0F121E] text-white rounded-full px-10 py-5 font-bold text-lg tracking-wide items-center gap-3 hover:bg-black transition-transform hover:-translate-y-1">
