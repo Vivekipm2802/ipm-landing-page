@@ -34,6 +34,18 @@ export default function Document() {
 
       </Head>
       <body>
+
+        {/* ipm-answer-key-banner-v1 */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            if (window.location.pathname === '/response') {
+              var b = document.createElement('div');
+              b.style.cssText = 'background:#1a1a2e;border-bottom:1px solid rgba(249,160,27,.3);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:13px;flex-wrap:wrap;font-family:sans-serif;';
+              b.innerHTML = '<span style="color:#f9a01b;font-weight:600;">IPMAT 2026 Answer Key & Official Cutoffs</span> <a href="https://register.ipmcareer.com/magazine/ipmat-indore-answer-key-2026-response-sheet-score-calculator" style="color:#fff;text-decoration:underline;font-weight:500;">Read the complete analysis →</a>';
+              document.body.insertBefore(b, document.body.firstChild);
+            }
+          })();
+        ` } />
         <Main />
         <NextScript />
         <noscript dangerouslySetInnerHTML={{__html:`<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N57BJSC"
