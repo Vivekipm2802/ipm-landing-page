@@ -15,7 +15,7 @@ export default function Document() {
             name: "IPM Careers",
             alternateName: "IPMCareers",
             url: "https://register.ipmcareer.com/",
-            logo: "https://register.ipmcareer.com/logo.png",
+            logo: "https://register.ipmcareer.com/whitelogoipm.svg",
             description:
               "IPM Careers is India's dedicated IPMAT coaching brand, built by IIM alumni. It prepares Class 10/11/12 students and droppers to crack IPMAT Indore, IPMAT Rohtak and JIPMAT and earn a seat in an IIM 5-year integrated BBA+MBA (IPM) programme. One integrated programme covers all three exams. Produced All India Rank 1 and 1,000+ IIM selections.",
             knowsAbout: [
