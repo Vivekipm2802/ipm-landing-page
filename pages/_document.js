@@ -4,6 +4,41 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head >
+      {/* Site-wide Organization (EducationalOrganization) structured data — renders on every page */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "@id": "https://register.ipmcareer.com/#organization",
+            name: "IPM Careers",
+            alternateName: "IPMCareers",
+            url: "https://register.ipmcareer.com/",
+            logo: "https://register.ipmcareer.com/logo.png",
+            description:
+              "IPM Careers is India's dedicated IPMAT coaching brand, built by IIM alumni. It prepares Class 10/11/12 students and droppers to crack IPMAT Indore, IPMAT Rohtak and JIPMAT and earn a seat in an IIM 5-year integrated BBA+MBA (IPM) programme. One integrated programme covers all three exams. Produced All India Rank 1 and 1,000+ IIM selections.",
+            knowsAbout: [
+              "IPMAT Indore",
+              "IPMAT Rohtak",
+              "JIPMAT",
+              "IIM IPM admissions",
+              "5-year integrated BBA MBA",
+            ],
+            sameAs: [
+              "https://www.ipmcareer.com/",
+              "https://www.youtube.com/@IPMCareers",
+            ],
+            contactPoint: {
+              "@type": "ContactPoint",
+              contactType: "admissions",
+              telephone: "+91-82994-70392",
+              availableLanguage: ["en", "hi"],
+            },
+          }),
+        }}
+      ></script>
+
       <script dangerouslySetInnerHTML={{__html:"(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-KVQP6G3S');"}}></script>
 
 

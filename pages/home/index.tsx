@@ -83,16 +83,6 @@ const AdsLandingPage: React.FC = () => {
           "@context": "https://schema.org",
           "@graph": [
             {
-              "@type": "EducationalOrganization",
-              "@id": "https://register.ipmcareer.com/#organization",
-              "name": "IPM Careers",
-              "url": "https://register.ipmcareer.com/",
-              "logo": "https://register.ipmcareer.com/whitelogoipm.svg",
-              "description": "India's #1 IPMAT online coaching institute. Produced All India Rank 1 at IIM Indore IPM. 1000+ IIM selections.",
-              "telephone": "+918299470392",
-              "sameAs": ["https://ipmcareer.com"]
-            },
-            {
               "@type": "Course",
               "name": "IPMAT Online Coaching 2027",
               "description": "Comprehensive IPMAT online coaching for IIM Indore, IIM Rohtak and JIPMAT 2026. Live classes, mock tests and personal mentoring by AIR 1 producing faculty.",
