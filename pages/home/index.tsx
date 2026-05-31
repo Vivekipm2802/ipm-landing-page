@@ -139,6 +139,12 @@ const AdsLandingPage: React.FC = () => {
               Courses
             </a>
             <a
+              href="/best-online-ipmat-coaching-india"
+              className="hover:text-white transition-colors"
+            >
+              Best Online IPMAT Coaching
+            </a>
+            <a
               href="https://www.ipmcareer.com/ipmat-2025-selection/"
               className="hover:text-white transition-colors"
             >
