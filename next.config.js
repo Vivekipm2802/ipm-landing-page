@@ -1,4 +1,14 @@
 /** @type {import('next').NextConfig} */
+const fs = require('fs');
+const path = require('path');
+
+let redirectList = [];
+try {
+  redirectList = JSON.parse(fs.readFileSync(path.join(__dirname, 'redirects.json'), 'utf8'));
+} catch (e) {
+  console.warn('[next.config] redirects.json not found or invalid — no redirects loaded.');
+}
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -10,15 +20,7 @@ const nextConfig = {
     return { beforeFiles: [ { source: '/', destination: '/home' } ] };
   },
   async redirects() {
-    const jfzqj = '/magazine/best-bba-colleges-in-india-2026-placements-roi-fees-compared-jfzqj';
-    const studymat = '/magazine/free-ipmat-2027-study-material-best-books-pdfs-resources-30ra2';
-    const bodhgaya = '/magazine/iim-bodh-gaya-ipm-2026-jipmat-cutoffs-fees-placements-qxnc7';
-    return [
-      { source: '/magazine/best-bba-colleges-in-india-2026-a-guide-to-placements-fees-roi-1lj0c', destination: jfzqj, permanent: true },
-      { source: '/magazine/best-bba-colleges-in-india-2026-a-guide-to-placements-fees-roi-8owt6', destination: jfzqj, permanent: true },
-      { source: '/magazine/free-ipmat-2027-study-material-best-books-pdfs-online-resources-fllix', destination: studymat, permanent: true },
-      { source: '/magazine/iim-bodh-gaya-ipm-admission-2026-cutoffs-fees-placements-1npq8', destination: bodhgaya, permanent: true },
-    ];
+    return redirectList;
   },
 };
 module.exports = nextConfig;
