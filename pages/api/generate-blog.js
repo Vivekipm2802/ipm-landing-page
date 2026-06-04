@@ -196,6 +196,26 @@ Now write the JSON object per the schema in the system prompt.
     const hit  = BANNED_TERMS.find(b => flat.includes(b));
     if (hit) throw new Error(`Brand-safety reject: contains banned term "${hit}".`);
 
+    // 4a-2. Draft-placeholder guard — a blog must NEVER ship with review markers.
+    //   This is what put 93 "[VERIFY]" tags on a live page. Refuse to publish if
+    //   the model left any placeholder in the body, excerpt, or FAQ.
+    const placeholderHaystack = [blog.body_md, blog.excerpt, JSON.stringify(blog.faq || [])].join('\n');
+    const placeholder = placeholderHaystack.match(/\[VERIFY\b[^\]]*\]|\bTODO\b|\bTBD\b|\[?\bFILL IN\b\]?/i);
+    if (placeholder) throw new Error(`Draft-placeholder reject: found "${placeholder[0]}" — refusing to publish unverified content.`);
+
+    // 4a-3. FAQ answers render as plain text on the reader, so any markdown there
+    //   (e.g. "[text](url)", "**bold**") shows literally. Flatten to clean text.
+    const flattenMd = (s = '') => s
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if (Array.isArray(blog.faq)) {
+      blog.faq = blog.faq.map(f => ({ q: flattenMd(f.q || ''), a: flattenMd(f.a || '') }));
+    }
+
     // 4b. Humanize the body — strips em-dashes, AI vocab, templated phrases,
     //     curly quotes, inline-header bullets, title-case headings, etc.
     //     What the upstream prompt rules don't catch, this regex pass does.
