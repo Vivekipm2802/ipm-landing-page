@@ -34,7 +34,7 @@ function getGrade(score, max) {
   if (pct >= 50) return { letter: "A", vibe: "Solid performance. Great effort.", color: "#a855f7" };
   if (pct >= 40) return { letter: "B", vibe: "In the fight. Room to grow.", color: "#ff8c42" };
   if (pct >= 25) return { letter: "C", vibe: "Foundation built. Keep pushing.", color: "#ff5e7e" };
-  return { letter: "D", vibe: "Every journey starts somewhere. Rise up.", color: "#14b8a6" };
+  return { letter: "D", vibe: "Every journey starts somewhere. Rise up.", color: "#833589" };
 }
 
 export default function JipmatReport({ data: rawData, isFound, error: fetchError }) {
@@ -91,7 +91,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
               href="/jipmat"
               style={{
                 marginTop: "1.5rem",
-                color: "#14b8a6",
+                color: "#833589",
                 fontSize: "0.88rem",
                 fontWeight: 700,
               }}
@@ -151,13 +151,13 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
       name: "Quantitative Aptitude (QA)",
       data: qa,
       questions: parsedData.qa || [],
-      color: "#14b8a6",
+      color: "#833589",
     },
     {
       name: "Logical Reasoning & DI (LRDI)",
       data: lrdi,
       questions: parsedData.lrdi || [],
-      color: "#06b6d4",
+      color: "#a855b5",
     },
     {
       name: "Verbal Ability & RC (VARC)",
