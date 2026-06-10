@@ -172,15 +172,41 @@ function JipmatScoreCalculator() {
           uuid: uid,
         };
 
-        const { error: dbError } = await supabase
-          .from("responses")
-          .insert(insertData);
+        // ── Save to Supabase (non-fatal: if the DB is down/paused, the
+        //    student still gets their score and the email still goes out) ──
+        let saved = false;
+        try {
+          const { error: dbError } = await supabase
+            .from("responses")
+            .insert(insertData);
+          if (dbError) {
+            console.error("[JIPMAT] Supabase error:", dbError);
+          } else {
+            saved = true;
+          }
+        } catch (e) {
+          console.error("[JIPMAT] Supabase unreachable:", e);
+        }
 
-        if (dbError) {
-          console.error("[JIPMAT] Supabase error:", dbError);
-          toast.error("Failed to save your response. Please try again.");
-          setLoading(false);
-          return;
+        // ── Email the lead via Gmail (never blocks the student's result) ──
+        try {
+          await axios.post("/api/jipmat-notify", {
+            name: formData.name.trim(),
+            email: formData.email,
+            phone: formData.phone,
+            city: formData.city || "",
+            category: formData.category,
+            scores: {
+              qa: qaStats.score,
+              lrdi: lrdiStats.score,
+              varc: varcStats.score,
+              total: totalScore,
+            },
+            link: url.trim(),
+            student: parsed.StudentData || {},
+          });
+        } catch (e) {
+          console.error("[JIPMAT] Notify failed:", e);
         }
 
         // Store response and scores in state for display
@@ -192,21 +218,26 @@ function JipmatScoreCalculator() {
           totalScore,
         });
 
-        // Also broadcast for live social proof
-        try {
-          await supabase.from("who_submitted").insert({
-            name: formData.name.trim(),
-            total: totalScore !== null ? totalScore : "Pending",
-          });
-        } catch {}
+        if (saved) {
+          // Also broadcast for live social proof
+          try {
+            await supabase.from("who_submitted").insert({
+              name: formData.name.trim(),
+              total: totalScore !== null ? totalScore : "Pending",
+            });
+          } catch {}
+
+          setDownloadLink(`/jipmat-report/${uid}`);
+          toast.success("Response captured! Redirecting to your report...");
+          setTimeout(() => {
+            router.push(`/jipmat-report/${uid}`);
+          }, 1500);
+        } else {
+          // DB unavailable — show the scorecard inline, skip the report redirect
+          toast.success("Score calculated!");
+        }
 
         setLoading(false);
-        setDownloadLink(`/jipmat-report/${uid}`);
-        toast.success("Response captured! Redirecting to your report...");
-
-        setTimeout(() => {
-          router.push(`/jipmat-report/${uid}`);
-        }, 1500);
       } else {
         setError("Could not parse the response sheet. Please check the URL.");
         setLoading(false);
