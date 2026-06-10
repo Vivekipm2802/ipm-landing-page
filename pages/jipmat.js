@@ -5,9 +5,21 @@ import { NextSeo } from "next-seo";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
-import { uuid } from "uuidv4";
 import AppShell from "../components/AppShell";
 import { toast } from "react-hot-toast";
+
+// UUID v4 — uses the browser's crypto API (the old `uuidv4` package's
+// `uuid` export breaks in the production bundle: "(0, c.uuid) is not a function")
+function genUuid() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 function JipmatScoreCalculator() {
   const [url, setUrl] = useState("");
@@ -156,7 +168,7 @@ function JipmatScoreCalculator() {
           : null;
 
         // Prepare data for Supabase
-        const uid = uuid();
+        const uid = genUuid();
         const insertData = {
           email: formData.email,
           phone: formData.phone,
