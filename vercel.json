@@ -50,6 +50,9 @@
     "pages/api/generateReportPDF.js": {
       "maxDuration": 30,
       "memory": 1024
+    },
+    "pages/api/jipmat-parse.js": {
+      "maxDuration": 30
     }
   },
   "redirects": [
