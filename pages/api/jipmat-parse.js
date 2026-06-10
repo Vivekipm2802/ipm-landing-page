@@ -241,8 +241,10 @@ export default async function handler(req, res) {
 
     const participantName =
       $init("#MainContent_lblName").text().trim() || "Unknown";
-    const rollNo = $init("#MainContent_lblRollNo").text().trim() || "";
-    const applicationNo = $init("#MainContent_lblAppNo").text().trim() || "";
+    // NOTE: the NTA page's element IDs are swapped — lblAppNo holds the roll
+    // number and lblRollNo holds the application number. Verified live.
+    const rollNo = $init("#MainContent_lblAppNo").text().trim() || "";
+    const applicationNo = $init("#MainContent_lblRollNo").text().trim() || "";
     const examDate = $init("#MainContent_lblExamDate").text().trim() || "";
     const slot = $init("#MainContent_lblSlot").text().trim() || "";
 
