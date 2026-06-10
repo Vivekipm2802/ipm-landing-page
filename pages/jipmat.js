@@ -55,7 +55,13 @@ function JipmatScoreCalculator() {
   function validateURL(urlStr) {
     try {
       const parsed = new URL(urlStr.trim());
-      return parsed.hostname.endsWith("onlineregistrationform.org");
+      const h = parsed.hostname.toLowerCase();
+      return (
+        h === "cbexams.com" ||
+        h.endsWith(".cbexams.com") ||
+        h === "onlineregistrationform.org" ||
+        h.endsWith(".onlineregistrationform.org")
+      );
     } catch {
       return false;
     }
@@ -75,12 +81,17 @@ function JipmatScoreCalculator() {
   /**
    * JIPMAT Scoring:
    * +4 for correct, -1 for wrong, 0 for unanswered
+   * Dropped questions (isCorrect === "dropped") are excluded from scoring.
    * All 100 questions are MCQ.
    */
   function calculateSectionScore(questions) {
     if (!questions || !Array.isArray(questions)) return { score: 0, correct: 0, wrong: 0, skipped: 0 };
     let score = 0, correct = 0, wrong = 0, skipped = 0;
     for (const q of questions) {
+      if (q.isCorrect === "dropped") {
+        // Dropped by NTA — excluded from scoring
+        continue;
+      }
       if (!q.chosenOption || q.chosenOption === "" || q.status === "Not Answered") {
         skipped++;
         continue;
@@ -119,7 +130,7 @@ function JipmatScoreCalculator() {
     }
     if (!url || !validateURL(url.trim())) {
       setError(
-        "Invalid URL. Please paste your official JIPMAT response sheet link from onlineregistrationform.org."
+        "Invalid URL. Please paste your official JIPMAT response sheet link from nta.cbexams.com."
       );
       return;
     }
@@ -223,14 +234,14 @@ function JipmatScoreCalculator() {
       </Head>
       <NextSeo
         title="JIPMAT Score Calculator 2026 — Check Your Score Instantly | IPM Careers"
-        description="Paste your JIPMAT response sheet URL and get instant sectional scores for QA, LRDI, and VARC. Free JIPMAT 2026 score calculator by IPM Careers."
+        description="Paste your JIPMAT response sheet URL and get instant sectional scores for QA, DILR, and VARC against the official NTA answer key. Free JIPMAT 2026 score calculator by IPM Careers."
         canonical="https://register.ipmcareer.com/jipmat"
         openGraph={{
           url: "https://register.ipmcareer.com/jipmat",
           title:
             "JIPMAT Score Calculator 2026 — Check Your Score Instantly | IPM Careers",
           description:
-            "Paste your JIPMAT response sheet URL and get instant sectional scores. Free tool by IPM Careers.",
+            "Paste your JIPMAT response sheet URL and get instant sectional scores against the official NTA answer key. Free tool by IPM Careers.",
           images: [
             {
               url: "/scorecard_ss.png",
@@ -256,8 +267,9 @@ function JipmatScoreCalculator() {
             </span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Instant sectional breakdown with QA, LRDI & VARC scores. Know
-            exactly where you stand for IIM Jammu & IIM Bodh Gaya.
+            Scored against the official NTA answer key. Instant sectional
+            breakdown with QA, DILR & VARC scores. Know exactly where you
+            stand for IIM Jammu & IIM Bodh Gaya.
           </p>
 
           <div className={styles.socialProof}>
@@ -300,7 +312,7 @@ function JipmatScoreCalculator() {
                       <div className={styles.scoreBoxValue}>{qaScore}</div>
                     </div>
                     <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>LRDI</div>
+                      <div className={styles.scoreBoxLabel}>DILR</div>
                       <div className={styles.scoreBoxValue}>{lrdiScore}</div>
                     </div>
                     <div className={styles.scoreBox}>
@@ -323,7 +335,7 @@ function JipmatScoreCalculator() {
                       </div>
                     </div>
                     <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>LRDI</div>
+                      <div className={styles.scoreBoxLabel}>DILR</div>
                       <div className={styles.scoreBoxValue}>
                         {data.lrdiStats ? `${data.lrdi?.length - data.lrdiStats.skipped}/${data.lrdi?.length}` : "—"}
                       </div>
@@ -509,7 +521,7 @@ function JipmatScoreCalculator() {
                 <input
                   className={styles.urlInput}
                   type="url"
-                  placeholder="https://...onlineregistrationform.org/JIPMAT/..."
+                  placeholder="https://nta.cbexams.com/JIPMAT/Apps/CandResp/Responsesheet.aspx?id=..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                 />
@@ -546,7 +558,7 @@ function JipmatScoreCalculator() {
                   <div className={styles.stepNum}>1</div>
                   <div className={styles.stepText}>
                     Go to the <strong>NTA JIPMAT portal</strong> where you
-                    downloaded your response sheet (onlineregistrationform.org)
+                    viewed your response sheet (<strong>nta.cbexams.com</strong>)
                   </div>
                 </div>
                 <div className={styles.stepItem}>
@@ -560,14 +572,15 @@ function JipmatScoreCalculator() {
                   <div className={styles.stepNum}>3</div>
                   <div className={styles.stepText}>
                     Click on <strong>"View Response Sheet"</strong> — a new tab
-                    will open with your responses
+                    will open with your Candidate Response Sheet
                   </div>
                 </div>
                 <div className={styles.stepItem}>
                   <div className={styles.stepNum}>4</div>
                   <div className={styles.stepText}>
                     <strong>Copy the full URL</strong> from the browser address
-                    bar (it starts with https://...onlineregistrationform.org...)
+                    bar (it looks like
+                    https://nta.cbexams.com/JIPMAT/Apps/CandResp/Responsesheet.aspx?id=...)
                   </div>
                 </div>
                 <div className={styles.stepItem}>
@@ -591,7 +604,7 @@ function JipmatScoreCalculator() {
               is conducted by NTA for admission to the 5-Year Integrated
               Programme in Management at IIM Jammu and IIM Bodh Gaya. JIPMAT
               2026 tests candidates across three sections: Quantitative Aptitude
-              (33 questions), Logical Reasoning & Data Interpretation (33
+              (33 questions), Data Interpretation & Logical Reasoning (33
               questions), and Verbal Ability & Reading Comprehension (34
               questions).
             </p>
@@ -611,11 +624,11 @@ function JipmatScoreCalculator() {
             </h3>
             <p className={styles.blogText}>
               Our JIPMAT Score Calculator reads your official NTA response sheet
-              and compares your chosen answers against the official answer key.
-              It automatically calculates your section-wise scores for QA, LRDI,
-              and VARC, giving you a comprehensive breakdown of your
-              performance. You can use this score to check your eligibility for
-              IIM Jammu and IIM Bodh Gaya.
+              and compares your chosen answers against the official answer key
+              released by NTA. It automatically calculates your section-wise
+              scores for QA, DILR, and VARC, giving you a comprehensive
+              breakdown of your performance. You can use this score to check
+              your eligibility for IIM Jammu and IIM Bodh Gaya.
             </p>
 
             <h3 className={styles.blogSubtitle}>
@@ -640,7 +653,7 @@ function JipmatScoreCalculator() {
               </div>
               <div className={styles.faqAnswer}>
                 JIPMAT 2026 has 100 MCQs across 3 sections: Quantitative
-                Aptitude (33Q), Logical Reasoning & Data Interpretation (33Q),
+                Aptitude (33Q), Data Interpretation & Logical Reasoning (33Q),
                 and Verbal Ability & Reading Comprehension (34Q). Total marks:
                 400. Duration: 150 minutes. Marking: +4 correct, -1 wrong.
               </div>
@@ -672,22 +685,21 @@ function JipmatScoreCalculator() {
                 How accurate is this score calculator?
               </div>
               <div className={styles.faqAnswer}>
-                Our calculator uses the official NTA answer key to evaluate your
+                Our calculator uses the official NTA answer key (matched by
+                Question ID, so it works for every paper set) to evaluate your
                 responses. The score calculated here matches the official
-                scoring methodology (+4/-1/0) exactly. Once the official answer
-                key is released, scores are 100% accurate.
+                scoring methodology (+4/-1/0) exactly.
               </div>
             </div>
 
             <div className={styles.faqItem}>
               <div className={styles.faqQuestion}>
-                What if the answer key is not yet released?
+                What if NTA revises the answer key after challenges?
               </div>
               <div className={styles.faqAnswer}>
-                Your response will be recorded and saved. As soon as the
-                official answer key is released by NTA, your score will be
-                calculated automatically. You can revisit your report page to
-                see updated scores.
+                Your response is saved. If NTA revises any answers in the final
+                key, your report page will automatically reflect the updated
+                scores — just revisit your report link.
               </div>
             </div>
           </div>

@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import styles from "../Jipmat.module.css";
 import { supabase } from "../../utils/supabaseClient";
 import { NextSeo } from "next-seo";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import AppShell from "../../components/AppShell";
+import { applyJipmatAnswerKey } from "../../lib/jipmat-answer-key";
 
 // ═══════ ANIMATED COUNTER HOOK ═══════
 function useCountUp(target, duration = 1600) {
@@ -37,8 +38,37 @@ function getGrade(score, max) {
   return { letter: "D", vibe: "Every journey starts somewhere. Rise up.", color: "#833589" };
 }
 
-export default function JipmatReport({ data: rawData, isFound, error: fetchError }) {
-  const router = useRouter();
+// ═══════ SECTION CALCULATOR ═══════
+// Dropped questions (isCorrect === "dropped") are excluded from scoring & max.
+function calcSection(questions, isAnswerKeyAvailable) {
+  if (!questions || !Array.isArray(questions)) {
+    return { score: 0, correct: 0, wrong: 0, skipped: 0, total: 0, max: 0, attempted: 0 };
+  }
+  let correct = 0, wrong = 0, skipped = 0, dropped = 0;
+  for (const q of questions) {
+    if (q.isCorrect === "dropped") {
+      dropped++;
+      continue;
+    }
+    if (!q.chosenOption || q.chosenOption === "" || q.status === "Not Answered") {
+      skipped++;
+    } else if (isAnswerKeyAvailable) {
+      if (q.isCorrect === true) correct++;
+      else if (q.isCorrect === false) wrong++;
+    }
+  }
+  const total = questions.length;
+  const scorable = total - dropped;
+  const score = isAnswerKeyAvailable ? correct * 4 - wrong * 1 : 0;
+  const max = scorable * 4;
+  return { score, correct, wrong, skipped, total, max, attempted: total - dropped - skipped, dropped };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Main page component — handles loading / not-found states only.
+// All score hooks live in <ReportBody/> so hook order stays stable.
+// ═══════════════════════════════════════════════════════════════
+export default function JipmatReport({ data: rawData, isFound }) {
   const [parsedData, setParsedData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,6 +80,18 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
 
     try {
       const d = typeof rawData.data === "string" ? JSON.parse(rawData.data) : rawData.data;
+
+      // ── Re-score against the current official answer key ──
+      // This means stored responses automatically pick up the key (and any
+      // future revisions to it) every time the report is opened.
+      let keyMatches = 0;
+      for (const sectionKey of ["qa", "lrdi", "varc"]) {
+        if (Array.isArray(d[sectionKey])) {
+          keyMatches += applyJipmatAnswerKey(d[sectionKey]);
+        }
+      }
+      if (keyMatches > 0) d.answerKeyAvailable = true;
+
       setParsedData({
         ...d,
         studentName: rawData.name || d.StudentData?.participantName || d.formName || "Student",
@@ -104,31 +146,20 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
     );
   }
 
-  // ─── Calculate Scores ───
+  return <ReportBody parsedData={parsedData} />;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Report body — rendered only when data exists, hooks are safe here
+// ═══════════════════════════════════════════════════════════════
+function ReportBody({ parsedData }) {
+  const router = useRouter();
+
   const isAnswerKeyAvailable = parsedData.answerKeyAvailable === true;
 
-  function calcSection(questions) {
-    if (!questions || !Array.isArray(questions)) {
-      return { score: 0, correct: 0, wrong: 0, skipped: 0, total: 0, max: 0 };
-    }
-    let correct = 0, wrong = 0, skipped = 0;
-    for (const q of questions) {
-      if (!q.chosenOption || q.chosenOption === "" || q.status === "Not Answered") {
-        skipped++;
-      } else if (isAnswerKeyAvailable) {
-        if (q.isCorrect === true) correct++;
-        else if (q.isCorrect === false) wrong++;
-      }
-    }
-    const total = questions.length;
-    const score = isAnswerKeyAvailable ? correct * 4 - wrong * 1 : 0;
-    const max = total * 4;
-    return { score, correct, wrong, skipped, total, max, attempted: total - skipped };
-  }
-
-  const qa = calcSection(parsedData.qa);
-  const lrdi = calcSection(parsedData.lrdi);
-  const varc = calcSection(parsedData.varc);
+  const qa = calcSection(parsedData.qa, isAnswerKeyAvailable);
+  const lrdi = calcSection(parsedData.lrdi, isAnswerKeyAvailable);
+  const varc = calcSection(parsedData.varc, isAnswerKeyAvailable);
 
   const totalScore = qa.score + lrdi.score + varc.score;
   const totalMax = qa.max + lrdi.max + varc.max;
@@ -136,7 +167,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
   const totalWrong = qa.wrong + lrdi.wrong + varc.wrong;
   const totalSkipped = qa.skipped + lrdi.skipped + varc.skipped;
   const totalQuestions = qa.total + lrdi.total + varc.total;
-  const totalAttempted = totalQuestions - totalSkipped;
+  const totalAttempted = qa.attempted + lrdi.attempted + varc.attempted;
   const accuracy = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
 
   const grade = isAnswerKeyAvailable ? getGrade(totalScore, totalMax) : null;
@@ -154,7 +185,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
       color: "#833589",
     },
     {
-      name: "Logical Reasoning & DI (LRDI)",
+      name: "Data Interpretation & LR (DILR)",
       data: lrdi,
       questions: parsedData.lrdi || [],
       color: "#a855b5",
@@ -174,7 +205,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
       navigator.share({
         title: `My JIPMAT Score: ${isAnswerKeyAvailable ? totalScore : "Pending"}`,
         text: isAnswerKeyAvailable
-          ? `I scored ${totalScore}/400 in JIPMAT 2026! Check yours:`
+          ? `I scored ${totalScore}/${totalMax} in JIPMAT 2026! Check yours:`
           : `I just submitted my JIPMAT response. Check yours:`,
         url: shareUrl,
       });
@@ -189,7 +220,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
   const handleWhatsApp = () => {
     const shareUrl = `https://register.ipmcareer.com${router.asPath}`;
     const text = isAnswerKeyAvailable
-      ? `Hey! I scored ${totalScore}/400 in JIPMAT 2026 (QA: ${qa.score}, LRDI: ${lrdi.score}, VARC: ${varc.score}). Check your score here: ${shareUrl}`
+      ? `Hey! I scored ${totalScore}/${totalMax} in JIPMAT 2026 (QA: ${qa.score}, DILR: ${lrdi.score}, VARC: ${varc.score}). Check your score here: ${shareUrl}`
       : `I just submitted my JIPMAT 2026 response sheet on IPM Careers! Check yours: ${shareUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
@@ -203,7 +234,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
         title={`JIPMAT Score Report — ${parsedData.studentName} | IPM Careers`}
         description={
           isAnswerKeyAvailable
-            ? `${parsedData.studentName} scored ${totalScore}/400 in JIPMAT 2026. QA: ${qa.score}, LRDI: ${lrdi.score}, VARC: ${varc.score}.`
+            ? `${parsedData.studentName} scored ${totalScore}/${totalMax} in JIPMAT 2026. QA: ${qa.score}, DILR: ${lrdi.score}, VARC: ${varc.score}.`
             : `${parsedData.studentName}'s JIPMAT 2026 response recorded. Score pending answer key release.`
         }
         noindex={true}
@@ -234,13 +265,13 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
                   r="60"
                   className={styles.ringFg}
                   style={{
-                    strokeDasharray: `${(pct / 100) * 2 * Math.PI * 60} ${2 * Math.PI * 60}`,
+                    strokeDasharray: `${(Math.max(0, pct) / 100) * 2 * Math.PI * 60} ${2 * Math.PI * 60}`,
                   }}
                 />
               </svg>
               <div className={styles.ringCenter}>
                 <div className={styles.ringScore}>{scoreAnimated}</div>
-                <div className={styles.ringMax}>/400</div>
+                <div className={styles.ringMax}>/{totalMax}</div>
                 {grade && (
                   <div className={styles.ringGrade} style={{ color: grade.color }}>
                     {grade.letter}
@@ -368,6 +399,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
                     </thead>
                     <tbody>
                       {sec.questions.map((q, j) => {
+                        const isDropped = q.isCorrect === "dropped";
                         const isCorrect = q.isCorrect === true;
                         const isWrong = q.isCorrect === false;
                         const isSkipped = !q.chosenOption || q.chosenOption === "";
@@ -380,15 +412,17 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
                           <tr key={j} className={rowClass}>
                             <td>{q.questionNo || j + 1 + (i === 0 ? 0 : i === 1 ? 33 : 66)}</td>
                             <td>{q.chosenOption || "—"}</td>
-                            <td>{q.correctAnswer || "—"}</td>
+                            <td>{isDropped ? "Dropped" : q.correctAnswer || "—"}</td>
                             <td>
-                              {isCorrect
+                              {isDropped
+                                ? "◌ Dropped"
+                                : isCorrect
                                 ? "✓ Correct"
                                 : isWrong
                                 ? "✗ Wrong"
                                 : "— Skipped"}
                             </td>
-                            <td>{isCorrect ? "+4" : isWrong ? "-1" : "0"}</td>
+                            <td>{isDropped ? "0" : isCorrect ? "+4" : isWrong ? "-1" : "0"}</td>
                           </tr>
                         );
                       })}
@@ -450,7 +484,7 @@ export default function JipmatReport({ data: rawData, isFound, error: fetchError
 }
 
 export async function getServerSideProps(context) {
-  const { data, error } = await supabase.rpc("get_response_data", {
+  const { data } = await supabase.rpc("get_response_data", {
     uuid_arg: context.query.uid,
   });
   return {
