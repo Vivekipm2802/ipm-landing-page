@@ -21,6 +21,42 @@ function genUuid() {
   });
 }
 
+// ── Animated count-up ──
+function useCountUp(target, duration = 1600) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target == null) return;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return count;
+}
+
+// ── Grade + vibe ──
+function getVibe(score) {
+  if (score >= 320) return { grade: "S+", vibe: "certified topper energy 🔥", color: "#ffd700" };
+  if (score >= 280) return { grade: "S", vibe: "IIM-bound. no cap 🚀", color: "#22d3ee" };
+  if (score >= 240) return { grade: "A+", vibe: "you ate this, fr ✨", color: "#34d399" };
+  if (score >= 200) return { grade: "A", vibe: "solid W — keep cooking 💪", color: "#a855f7" };
+  if (score >= 140) return { grade: "B", vibe: "respectable run. now lock in 📈", color: "#fb923c" };
+  return { grade: "C", vibe: "character development arc 🎬", color: "#f472b6" };
+}
+
+// ── Benchmark zones (EDIT THESE as real cutoff data emerges — estimates!) ──
+const BENCHMARKS = [
+  { label: "IIM Bodh Gaya zone", score: 220 },
+  { label: "IIM Jammu zone", score: 245 },
+  { label: "Topper league", score: 320 },
+];
+
 function JipmatScoreCalculator() {
   const [url, setUrl] = useState("");
   const [data, setData] = useState(null);
@@ -270,6 +306,43 @@ function JipmatScoreCalculator() {
   const varcScore = data?.varcStats?.score || 0;
   const totalScore = data?.totalScore;
 
+  // ── Score reveal animation state ──
+  const [reveal, setReveal] = useState(false);
+  useEffect(() => {
+    if (data) {
+      const t = setTimeout(() => setReveal(true), 200);
+      return () => clearTimeout(t);
+    }
+    setReveal(false);
+  }, [data]);
+
+  const totalAnimated = useCountUp(
+    reveal && typeof totalScore === "number" ? totalScore : 0
+  );
+
+  // Aggregate stats
+  const totalCorrect =
+    (data?.qaStats?.correct || 0) + (data?.lrdiStats?.correct || 0) + (data?.varcStats?.correct || 0);
+  const totalWrong =
+    (data?.qaStats?.wrong || 0) + (data?.lrdiStats?.wrong || 0) + (data?.varcStats?.wrong || 0);
+  const totalSkipped =
+    (data?.qaStats?.skipped || 0) + (data?.lrdiStats?.skipped || 0) + (data?.varcStats?.skipped || 0);
+  const totalAttempted = (data?.totalQuestions || 100) - totalSkipped;
+  const accuracy = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+  const vibe = getVibe(typeof totalScore === "number" ? totalScore : 0);
+
+  const RING_R = 68;
+  const RING_C = 2 * Math.PI * RING_R;
+  const ringArc = Math.max(0, Math.min(1, (totalScore || 0) / 400)) * RING_C;
+
+  const sectionRows = data
+    ? [
+        { short: "QA", name: "Quant Aptitude", stats: data.qaStats, count: data.qa?.length || 33, color: "#a855b5" },
+        { short: "DILR", name: "DI & Logical Reasoning", stats: data.lrdiStats, count: data.lrdi?.length || 33, color: "#38bdf8" },
+        { short: "VARC", name: "Verbal Ability & RC", stats: data.varcStats, count: data.varc?.length || 34, color: "#34d399" },
+      ]
+    : [];
+
   return (
     <AppShell activePage="/jipmat" pageTitle="JIPMAT Score Calculator">
       <Head>
@@ -339,73 +412,194 @@ function JipmatScoreCalculator() {
           {/* ── Scorecard Result (shown after generation) ── */}
           {data && (
             <>
-              <div className={styles.scorecardResult}>
-                <div className={styles.scorecardBg}></div>
-                <div className={styles.scorecardHeader}>
-                  <div className={styles.scorecardTitle}>Your Scorecard</div>
-                  <div className={styles.scorecardName}>
+              <div className={styles.gCard}>
+                <div className={styles.gBlobA}></div>
+                <div className={styles.gBlobB}></div>
+                <div className={styles.gSparkle1}>✨</div>
+                <div className={styles.gSparkle2}>✦</div>
+
+                <div className={styles.gInner}>
+                  <div className={styles.gEyebrow}>⚡ scorecard unlocked</div>
+                  <div className={styles.gName}>
                     {data.StudentData?.participantName || formData.name}
                   </div>
-                </div>
+                  <div className={styles.gMeta}>
+                    JIPMAT 2026 · {(formData.category || "gen").toUpperCase()}
+                    {data.StudentData?.slot ? ` · Slot ${data.StudentData.slot}` : ""}
+                  </div>
 
-                {data.answerKeyAvailable ? (
-                  <div className={styles.scoreGrid}>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>QA</div>
-                      <div className={styles.scoreBoxValue}>{qaScore}</div>
-                    </div>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>DILR</div>
-                      <div className={styles.scoreBoxValue}>{lrdiScore}</div>
-                    </div>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>VARC</div>
-                      <div className={styles.scoreBoxValue}>{varcScore}</div>
-                    </div>
-                    <div
-                      className={`${styles.scoreBox} ${styles.scoreBoxTotal}`}
-                    >
-                      <div className={styles.scoreBoxLabel}>Total</div>
-                      <div className={styles.scoreBoxValue}>{totalScore}</div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={styles.scoreGrid}>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>QA</div>
-                      <div className={styles.scoreBoxValue}>
-                        {data.qaStats ? `${data.qa?.length - data.qaStats.skipped}/${data.qa?.length}` : "—"}
+                  {data.answerKeyAvailable ? (
+                    <>
+                      {/* ── Score Ring ── */}
+                      <div className={styles.gRingWrap}>
+                        <svg viewBox="0 0 160 160" className={styles.gRingSvg}>
+                          <defs>
+                            <linearGradient id="jipgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#a855b5" />
+                              <stop offset="55%" stopColor="#833589" />
+                              <stop offset="100%" stopColor="#38bdf8" />
+                            </linearGradient>
+                          </defs>
+                          <circle cx="80" cy="80" r={RING_R} className={styles.gRingTrack} />
+                          <circle
+                            cx="80"
+                            cy="80"
+                            r={RING_R}
+                            className={styles.gRingFill}
+                            stroke="url(#jipgrad)"
+                            style={{
+                              strokeDasharray: `${ringArc} ${RING_C}`,
+                              strokeDashoffset: reveal ? 0 : ringArc,
+                            }}
+                          />
+                        </svg>
+                        <div className={styles.gRingCenter}>
+                          <div className={styles.gRingScore}>{totalAnimated}</div>
+                          <div className={styles.gRingMax}>/ 400</div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={styles.gGradeChip}
+                        style={{ color: vibe.color, borderColor: vibe.color }}
+                      >
+                        GRADE {vibe.grade}
+                      </div>
+                      <div className={styles.gVibe}>{vibe.vibe}</div>
+
+                      {/* ── Quick Stats ── */}
+                      <div className={styles.gQuickRow}>
+                        <div className={styles.gQuickStat}>
+                          <div className={styles.gQuickVal}>{totalAttempted}</div>
+                          <div className={styles.gQuickLab}>attempted</div>
+                        </div>
+                        <div className={styles.gQuickStat}>
+                          <div className={styles.gQuickVal} style={{ color: "#34d399" }}>
+                            {totalCorrect}
+                          </div>
+                          <div className={styles.gQuickLab}>correct</div>
+                        </div>
+                        <div className={styles.gQuickStat}>
+                          <div className={styles.gQuickVal} style={{ color: "#f87171" }}>
+                            {totalWrong}
+                          </div>
+                          <div className={styles.gQuickLab}>wrong</div>
+                        </div>
+                        <div className={styles.gQuickStat}>
+                          <div className={styles.gQuickVal} style={{ color: "#38bdf8" }}>
+                            {accuracy}%
+                          </div>
+                          <div className={styles.gQuickLab}>accuracy</div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles.gQuickRow}>
+                      <div className={styles.gQuickStat}>
+                        <div className={styles.gQuickVal}>{totalAttempted}</div>
+                        <div className={styles.gQuickLab}>attempted</div>
+                      </div>
+                      <div className={styles.gQuickStat}>
+                        <div className={styles.gQuickVal}>{totalSkipped}</div>
+                        <div className={styles.gQuickLab}>skipped</div>
+                      </div>
+                      <div className={styles.gQuickStat}>
+                        <div className={styles.gQuickVal}>⏳</div>
+                        <div className={styles.gQuickLab}>key pending</div>
                       </div>
                     </div>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>DILR</div>
-                      <div className={styles.scoreBoxValue}>
-                        {data.lrdiStats ? `${data.lrdi?.length - data.lrdiStats.skipped}/${data.lrdi?.length}` : "—"}
-                      </div>
-                    </div>
-                    <div className={styles.scoreBox}>
-                      <div className={styles.scoreBoxLabel}>VARC</div>
-                      <div className={styles.scoreBoxValue}>
-                        {data.varcStats ? `${data.varc?.length - data.varcStats.skipped}/${data.varc?.length}` : "—"}
-                      </div>
-                    </div>
-                    <div
-                      className={`${styles.scoreBox} ${styles.scoreBoxTotal}`}
-                    >
-                      <div className={styles.scoreBoxLabel}>Attempted</div>
-                      <div className={styles.scoreBoxValue}>
-                        {data.totalQuestions
-                          ? data.totalQuestions -
-                            (data.qaStats?.skipped || 0) -
-                            (data.lrdiStats?.skipped || 0) -
-                            (data.varcStats?.skipped || 0)
-                          : "—"}
-                        /{data.totalQuestions || 100}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
+
+              {/* ── Section Breakdown ── */}
+              {data.answerKeyAvailable && (
+                <div className={styles.gSectionWrap}>
+                  {sectionRows.map((sec) => {
+                    const max = sec.count * 4;
+                    const score = sec.stats?.score || 0;
+                    const att = sec.count - (sec.stats?.skipped || 0);
+                    const acc = att > 0 ? Math.round(((sec.stats?.correct || 0) / att) * 100) : 0;
+                    return (
+                      <div className={styles.gSectionCard} key={sec.short}>
+                        <div className={styles.gSectionTop}>
+                          <span className={styles.gSectionName}>
+                            <span className={styles.gSectionDot} style={{ background: sec.color }}></span>
+                            {sec.name}
+                          </span>
+                          <span className={styles.gSectionScore} style={{ color: sec.color }}>
+                            {score}
+                            <span className={styles.gSectionMax}>/{max}</span>
+                          </span>
+                        </div>
+                        <div className={styles.gBarTrack}>
+                          <div
+                            className={styles.gBarFill}
+                            style={{
+                              width: reveal ? `${Math.max(0, (score / max) * 100)}%` : "0%",
+                              background: `linear-gradient(90deg, ${sec.color}99, ${sec.color})`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className={styles.gChipsRow}>
+                          <span className={`${styles.gChip} ${styles.gChipCorrect}`}>
+                            ✓ {sec.stats?.correct || 0}
+                          </span>
+                          <span className={`${styles.gChip} ${styles.gChipWrong}`}>
+                            ✗ {sec.stats?.wrong || 0}
+                          </span>
+                          <span className={`${styles.gChip} ${styles.gChipSkip}`}>
+                            — {sec.stats?.skipped || 0}
+                          </span>
+                          <span className={styles.gChipAcc}>{acc}% acc</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ── Where You Stand ── */}
+              {data.answerKeyAvailable && typeof totalScore === "number" && (
+                <div className={styles.gMeterCard}>
+                  <div className={styles.gMeterTitle}>📍 where you stand</div>
+                  <div className={styles.gMeterTrack}>
+                    <div
+                      className={styles.gMeterFill}
+                      style={{ width: reveal ? `${Math.max(0, Math.min(100, (totalScore / 400) * 100))}%` : "0%" }}
+                    ></div>
+                    {BENCHMARKS.map((b) => (
+                      <div
+                        className={styles.gMarker}
+                        key={b.label}
+                        style={{ left: `${(b.score / 400) * 100}%` }}
+                      >
+                        <div className={styles.gMarkerTick}></div>
+                        <div className={styles.gMarkerLabel}>
+                          {b.label}
+                          <span className={styles.gMarkerScore}>{b.score}+</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div
+                      className={styles.gUserDot}
+                      style={{ left: reveal ? `${Math.max(0, Math.min(100, (totalScore / 400) * 100))}%` : "0%" }}
+                    >
+                      <span className={styles.gUserDotLabel}>you · {totalScore}</span>
+                    </div>
+                  </div>
+                  <div className={styles.gMeterScale}>
+                    <span>0</span>
+                    <span>100</span>
+                    <span>200</span>
+                    <span>300</span>
+                    <span>400</span>
+                  </div>
+                  <div className={styles.gDisclaimer}>
+                    *zones are estimates from past trends — not official cutoffs
+                  </div>
+                </div>
+              )}
 
               {/* Answer key pending banner */}
               {!data.answerKeyAvailable && (
