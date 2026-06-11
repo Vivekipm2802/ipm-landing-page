@@ -300,6 +300,154 @@ function JipmatScoreCalculator() {
     }
   }
 
+  // ── Share scorecard as image (canvas → native share sheet / download) ──
+  async function shareScorecardImage() {
+    try {
+      const W = 1080, H = 1350;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      const rr = (x, y, w, h, r) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      };
+
+      // Background
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, "#0f172a");
+      bg.addColorStop(1, "#1a1033");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+      const g1 = ctx.createRadialGradient(W - 100, 150, 0, W - 100, 150, 420);
+      g1.addColorStop(0, "rgba(168,85,181,0.35)");
+      g1.addColorStop(1, "rgba(168,85,181,0)");
+      ctx.fillStyle = g1;
+      ctx.fillRect(0, 0, W, H);
+      const g2 = ctx.createRadialGradient(80, H - 150, 0, 80, H - 150, 420);
+      g2.addColorStop(0, "rgba(56,189,248,0.22)");
+      g2.addColorStop(1, "rgba(56,189,248,0)");
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#c084fc";
+      ctx.font = "800 30px Inter, sans-serif";
+      ctx.fillText("⚡ JIPMAT 2026 SCORECARD", W / 2, 110);
+
+      const dispName = (data?.StudentData?.participantName || formData.name || "Student").toUpperCase();
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "900 50px Inter, sans-serif";
+      ctx.fillText(dispName, W / 2, 182);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "700 26px Inter, sans-serif";
+      ctx.fillText(
+        `${(formData.category || "GEN").toUpperCase()}${data?.StudentData?.slot ? "  ·  SLOT " + data.StudentData.slot : ""}`,
+        W / 2,
+        228
+      );
+
+      // Score ring
+      const cx = W / 2, cy = 520, R = 200;
+      ctx.lineWidth = 28;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(148,163,184,0.12)";
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.stroke();
+      const frac = Math.max(0, Math.min(1, (totalScore || 0) / 400));
+      const ringGrad = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+      ringGrad.addColorStop(0, "#a855b5");
+      ringGrad.addColorStop(0.6, "#833589");
+      ringGrad.addColorStop(1, "#38bdf8");
+      ctx.strokeStyle = ringGrad;
+      ctx.shadowColor = "rgba(168,85,181,0.6)";
+      ctx.shadowBlur = 30;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "900 130px Inter, sans-serif";
+      ctx.fillText(String(totalScore ?? "—"), cx, cy + 30);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "700 34px Inter, sans-serif";
+      ctx.fillText("/ 400", cx, cy + 88);
+
+      ctx.font = "900 34px Inter, sans-serif";
+      ctx.fillStyle = vibe.color;
+      ctx.fillText(`GRADE ${vibe.grade}  ·  ${accuracy}% ACCURACY`, cx, 812);
+
+      // Section bars
+      const secs = [
+        { n: "QA", s: data?.qaStats?.score || 0, m: (data?.qa?.length || 33) * 4, c: "#a855b5" },
+        { n: "DILR", s: data?.lrdiStats?.score || 0, m: (data?.lrdi?.length || 33) * 4, c: "#38bdf8" },
+        { n: "VARC", s: data?.varcStats?.score || 0, m: (data?.varc?.length || 34) * 4, c: "#34d399" },
+      ];
+      let y = 890;
+      const bx = 140, bw = W - 280;
+      for (const s of secs) {
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "800 30px Inter, sans-serif";
+        ctx.fillText(s.n, bx, y);
+        ctx.textAlign = "right";
+        ctx.fillStyle = s.c;
+        ctx.fillText(`${s.s} / ${s.m}`, bx + bw, y);
+        ctx.fillStyle = "rgba(148,163,184,0.12)";
+        rr(bx, y + 18, bw, 14, 7);
+        ctx.fill();
+        ctx.fillStyle = s.c;
+        rr(bx, y + 18, Math.max(14, bw * Math.max(0, Math.min(1, s.s / s.m))), 14, 7);
+        ctx.fill();
+        y += 100;
+      }
+
+      // Footer branding
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "700 28px Inter, sans-serif";
+      ctx.fillText("calculate yours →  register.ipmcareer.com/jipmat", W / 2, 1245);
+      ctx.fillStyle = "#c084fc";
+      ctx.font = "900 30px Inter, sans-serif";
+      ctx.fillText("IPM CAREERS · RUN BY IIM ALUMNI", W / 2, 1298);
+
+      const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+      const file = new File([blob], "jipmat-scorecard.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "My JIPMAT Scorecard" });
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "jipmat-scorecard.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast.success("Scorecard saved! Share it anywhere 🔥");
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") {
+        console.error("[JIPMAT] Image share failed:", e);
+        toast.error("Could not generate the image. Please try again.");
+      }
+    }
+  }
+
+  function shareWhatsApp() {
+    const link = downloadLink
+      ? `https://register.ipmcareer.com${downloadLink}`
+      : "https://register.ipmcareer.com/jipmat";
+    const text = `Just calculated my JIPMAT 2026 score 🔥\n\nTotal: ${totalScore}/400\nQA ${qaScore} · DILR ${lrdiScore} · VARC ${varcScore}\n\nCalculate yours 👉 ${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
   // Section scores for display
   const qaScore = data?.qaStats?.score || 0;
   const lrdiScore = data?.lrdiStats?.score || 0;
@@ -598,6 +746,24 @@ function JipmatScoreCalculator() {
                   <div className={styles.gDisclaimer}>
                     *zones are estimates from past trends — not official cutoffs
                   </div>
+                </div>
+              )}
+
+              {/* ── Share Scorecard ── */}
+              {data.answerKeyAvailable && (
+                <div className={styles.gShareRow}>
+                  <button
+                    className={styles.gShareBtnPrimary}
+                    onClick={shareScorecardImage}
+                  >
+                    🖼️ Share My Scorecard
+                  </button>
+                  <button
+                    className={styles.gShareBtnWa}
+                    onClick={shareWhatsApp}
+                  >
+                    💬 WhatsApp
+                  </button>
                 </div>
               )}
 

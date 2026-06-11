@@ -1464,3 +1464,64 @@
   .gRingScore { font-size: 2.2rem; }
   .gMarkerLabel { font-size: 0.5rem; }
 }
+/* ═══════════════════════════════════════════════════════
+   🖼️ SHARE SCORECARD ROW — append to end of Jipmat.module.css
+   ═══════════════════════════════════════════════════════ */
+
+.gShareRow {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 480px) {
+  .gShareRow {
+    flex-direction: column;
+  }
+}
+
+.gShareBtnPrimary {
+  flex: 2;
+  padding: 0.95rem 1rem;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #833589 0%, #a855b5 55%, #38bdf8 130%);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 22px rgba(168, 85, 181, 0.35);
+}
+
+.gShareBtnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(168, 85, 181, 0.55);
+}
+
+.gShareBtnPrimary:active {
+  transform: translateY(0);
+}
+
+.gShareBtnWa {
+  flex: 1;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  background: rgba(37, 211, 102, 0.1);
+  backdrop-filter: blur(8px);
+  color: #4ade80;
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.gShareBtnWa:hover {
+  background: rgba(37, 211, 102, 0.18);
+  border-color: rgba(37, 211, 102, 0.6);
+  transform: translateY(-2px);
+}
