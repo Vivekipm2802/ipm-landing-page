@@ -91,7 +91,7 @@ function RegistrationForm() {
     candidateName: '',
     whatsappNumber: '',
     emailAddress: '',
-    targetYear: 'Target 2026',
+    targetYear: 'Target 2027',
     city: '',
   });
   const [status, setStatus] = useState('idle');
@@ -122,7 +122,7 @@ function RegistrationForm() {
         }),
       }).catch((e) => console.warn('sendDelhi failed:', e));
       setStatus('success');
-      setFormData({ candidateName: '', whatsappNumber: '', emailAddress: '', targetYear: 'Target 2026', city: '' });
+      setFormData({ candidateName: '', whatsappNumber: '', emailAddress: '', targetYear: 'Target 2027', city: '' });
     } catch (err) {
       console.error('Supabase Error (leads insert):', err);
       setStatus('idle');
@@ -184,9 +184,9 @@ function RegistrationForm() {
               onChange={(e) => setFormData({ ...formData, targetYear: e.target.value })}
               className="w-full bg-[#0A0D14] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-[#E89624] transition-colors text-white appearance-none"
             >
-              <option>Target 2026</option>
-              <option>Target 2025</option>
               <option>Target 2027</option>
+              <option>Target 2028</option>
+              <option>Target 2029</option>
             </select>
             <input
               type="text"
