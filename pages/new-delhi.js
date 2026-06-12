@@ -108,6 +108,19 @@ function RegistrationForm() {
         city: formData.city,
       });
       if (error) throw error;
+
+      // Fire-and-forget email to ipmcareersdelhi25@gmail.com
+      fetch('/api/sendDelhi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateName: formData.candidateName,
+          whatsappNumber: formData.whatsappNumber,
+          emailAddress: formData.emailAddress,
+          targetYear: formData.targetYear,
+          city: formData.city,
+        }),
+      }).catch((e) => console.warn('sendDelhi failed:', e));
       setStatus('success');
       setFormData({ candidateName: '', whatsappNumber: '', emailAddress: '', targetYear: 'Target 2026', city: '' });
     } catch (err) {
