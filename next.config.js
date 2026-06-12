@@ -17,7 +17,7 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return { beforeFiles: [ { source: '/', destination: '/home' } ] };
+    return { beforeFiles: [ { source: '/', destination: '/home' }, { source: '/webinar', destination: '/webinar/index.html' } ] };
   },
   async redirects() {
     return redirectList;
