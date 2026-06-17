@@ -243,9 +243,15 @@ export default function NewDelhi() {
             `,
           }}
         />
+              {/* Google Tag Manager */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PS6TC9MN');` } />
+        {/* End Google Tag Manager */}
       </Head>
 
       <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-[#E89624] selection:text-white">
+        {/* Google Tag Manager (noscript) */}
+        <noscript dangerouslySetInnerHTML={{ __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PS6TC9MN" height="0" width="0" style="display:none;visibility:hidden"></iframe>` } />
+        {/* End Google Tag Manager (noscript) */}
         {/* Navbar */}
         <nav className="absolute top-0 w-full z-50 py-6 px-6 lg:px-12 flex justify-between items-center text-white/90">
           <div className="flex items-center gap-2">
