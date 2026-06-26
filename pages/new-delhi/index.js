@@ -41,7 +41,7 @@ const faqs = [
   {
     question: 'Who is eligible to apply for IPMAT?',
     answer:
-      'Students who have completed their Class 12 (or are appearing for it) from a recognized board are eligible. General and NC-OBC category applicants should have a minimum of 60% in standard X/SSC and standard XII/HSC or equivalent examinations.',
+      'Students who have completed their Class 12 (or are appearing for it) from a recognised board are eligible. General and NC-OBC category applicants should have a minimum of 60% in Class X and Class XII marks.',
   },
   {
     question: 'What makes IPM Careers different from regular coaching?',
@@ -51,14 +51,54 @@ const faqs = [
   {
     question: "What is the Director's Special Batch?",
     answer:
-      "It's an exclusive cohort limited to just 50 students, ensuring personalized attention, rigorous audit of each student's progress, and direct mentorship from our founders to maximize your chances of securing a top rank.",
+      "It's an exclusive cohort limited to just 50 students, ensuring personalised attention, rigorous audit of each student's progress, and direct mentorship from our founders to maximise your chances of securing a top rank.",
   },
   {
     question: 'How do I enroll in the program?',
     answer:
       "You can start by registering on this page to schedule a 1-on-1 Strategy Session with Deepak Sir's Team. We will evaluate your profile and guide you through the enrollment process.",
   },
-];
+  {
+    question: 'Which is the best IPMAT coaching in Delhi?',
+    answer:
+      'IPM Careers is widely regarded as the best IPMAT coaching in Delhi, having produced All India Rank 1 in IPMAT 2025 and 33 IIM Indore selections in a single year. Our New Delhi centre runs the same Director-led curriculum behind those results. If you have been looking for the best coaching for IPMAT near you in Delhi NCR, this is it.',
+  },
+  {
+    question: 'What does IPMAT online coaching at IPM Careers include?',
+    answer:
+      'Our IPMAT online coaching covers live classes with IIM alumni faculty, daily Quant Concept Bites, Verbal flashcard modules, full-length mock tests, and weekly 1-on-1 doubt sessions. Whether you prefer online coaching for IPMAT or attending our Delhi centre in person, you follow the same AIR 1 Blueprint curriculum. Online students also get access to our score-tracker dashboard and personalised study plans.',
+  },
+  {
+    question: 'How is the IPMAT entrance exam structured?',
+    answer:
+      'The IPMAT entrance exam by IIM Indore has three separately-timed sections: Quantitative Aptitude Short Answer (15 questions, 40 min), Quantitative Aptitude MCQ (30 questions, 40 min), and Verbal Ability MCQ (45 questions, 40 min) — 90 questions in 120 minutes total. IIM IPMAT is among the most competitive undergraduate management entrance exams in India, with roughly 35,000 students competing for around 150 General category seats.',
+  },
+  {
+    question: 'What are the IPMAT coaching fees at IPM Careers Delhi?',
+    answer:
+      "Our IPMAT online coaching fees and classroom batch fees vary by programme duration and batch type. The Director's Special Batch is priced to reflect the founder-led, boutique model rather than mass-factory coaching. We offer EMI options and periodic early-bird discounts. Register on this page and our counsellor will share a detailed fee structure matched to your target year.",
+  },
+  {
+    question: 'Where is the IPM Careers coaching centre in Delhi?',
+    answer:
+      'Our IPMAT coaching centre is located in South Delhi. Students looking for IPMAT coaching near me, IPMAT coaching centres near me, or coaching for IPMAT near me in the NCR region can reach us easily. The exact address is shared after registration to maintain batch quality and avoid walk-in disruptions.',
+  },
+  {
+    question: 'What is the difference between IPM entrance coaching and regular MBA coaching?',
+    answer:
+      'IPM entrance exam coaching is designed for Class 12 students targeting the 5-year Integrated Programme in Management at IIMs. Regular MBA coaching (for CAT) targets postgraduates. The IPMAT exam tests speed-based Quant and Vocab depth — not the case-study reasoning of CAT prep. IPM coaching must therefore focus on pattern recognition, short-answer accuracy, and rapid vocabulary recall from Day 1.',
+  },
+  {
+    question: 'When should I start IPMAT coaching classes?',
+    answer:
+      'Ideally, start IPMAT coaching classes at the beginning of Class 11 for a 2-year preparation window, or at the start of Class 12 for a focused 1-year sprint. Students who begin early get the full benefit of our structured IPMAT preparation coaching, while Class 12 students and drop-year aspirants join our intensive programme. The right IPMAT coaching institute makes the difference — students who joined us in Class 11 have consistently produced Top 100 AIR results.',
+  },
+  {
+    question: 'Does IPM Careers also cover IPMAT coaching for IIM Rohtak and other IIMs?',
+    answer:
+      'Yes. Our core coaching for IPMAT covers IIM Indore, IPMAT Rohtak (IIM Rohtak), and JIPMAT (IIM Jammu and IIM Bodh Gaya). The same preparation also supports selection at IIM Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong, and IIFT — all 10 IIMs that offer the 5-year IPM programme. You prepare once; you compete across all campuses.',
+  },
+]
 
 function FAQItem({ question, answer }) {
   const [isOpen, setIsOpen] = useState(false);
