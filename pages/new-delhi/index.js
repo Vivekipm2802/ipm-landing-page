@@ -236,16 +236,13 @@ export default function NewDelhi() {
         {/* Navbar */}
         <nav className="absolute top-0 w-full z-50 py-6 px-6 lg:px-12 flex justify-between items-center text-white/90">
           <div className="flex items-center gap-2">
-            <a href="#" className="inline-block">
+            <a href="/new-delhi" className="inline-block">
               <img src="https://register.ipmcareer.com/whitelogoipm.svg" alt="IPM Careers" className="h-10 lg:h-12" />
             </a>
           </div>
           <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-300">
-            <a href="#" className="hover:text-white transition-colors">Home</a>
-            <a href="https://www.ipmcareer.com/about-us/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">About</a>
-            <a href="https://www.ipmcareer.com/courses/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Courses</a>
-            <a href="https://www.ipmcareer.com/ipmat-2025-selection/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Results</a>
-            <a href="https://register.ipmcareer.com/air1commandcenter" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex justify-center items-center gap-1.5">AIR1 Commandcenter</a>
+            <a href="/new-delhi" className="hover:text-white transition-colors">Home</a>
+            <a href="/new-delhi/results" className="hover:text-white transition-colors">Results</a>
           </div>
         </nav>
 
