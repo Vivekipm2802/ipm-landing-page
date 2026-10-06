@@ -78,6 +78,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   const navItems = [
     { icon: '📊', label: 'IPMAT Score Analyzer', path: '/response' },
     { icon: '📝', label: 'JIPMAT Score Calculator', path: '/jipmat' },
+    { icon: '🏛️', label: 'IIM-B UG Score Calculator', path: '/response-v1' },
     { icon: '📋', label: 'My Report', path: '/report', disabled: false },
     { icon: '🤖', label: 'AI Mock Interview', path: '/interview-prep' },
     { icon: '🏆', label: 'Topper List', path: '/topperlist' },
@@ -88,6 +89,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   const topNavItems = [
     { label: 'IPMAT Score', path: '/response' },
     { label: 'JIPMAT Score', path: '/jipmat' },
+    { label: 'IIM-B UG Score', path: '/response-v1' },
     { label: 'AI Interview', path: '/interview-prep' },
     { label: 'College Predictor', path: '/call' },
   ];

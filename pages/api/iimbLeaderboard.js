@@ -5,33 +5,40 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Only GET allowed" });
   }
 
-  // Prevent caching so leaderboard stays fresh
-  res.setHeader("Cache-Control", "no-store, max-age=0");
+  // Short CDN cache keeps the page fast without going stale
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    const { data, error } = await supabase
-      .from("response_sheet_uploads")
-      .select("name, score_total, raw_scores, created_at")
-      .order("score_total", { ascending: false })
-      .order("created_at", { ascending: true })
-      .limit(10);
+    const [top, total] = await Promise.all([
+      supabase
+        .from("response_sheet_uploads")
+        .select("name, score_total, raw_scores, created_at")
+        .not("score_total", "is", null)
+        .order("score_total", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(10),
+      supabase.from("response_sheet_uploads").select("*", { count: "exact", head: true }),
+    ]);
 
-    if (error) {
+    if (top.error) {
       return res.status(500).json({ error: "Failed to fetch leaderboard" });
     }
 
-    const leaderboard = (data ?? []).map((row) => ({
-      name: row?.name ?? "Anonymous",
+    // Only first name + last initial and city are public. Never phone/email.
+    const shortName = (n) => {
+      const parts = String(n || "Anonymous").trim().split(/\s+/);
+      return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1].charAt(0).toUpperCase()}.` : parts[0];
+    };
+
+    const leaderboard = (top.data ?? []).map((row) => ({
+      name: shortName(row?.name),
       total: row?.score_total ?? 0,
       city: row?.raw_scores?.city ?? "",
-      createdAt: row?.created_at ?? null,
     }));
 
-    return res.status(200).json({ leaderboard });
+    return res.status(200).json({ leaderboard, count: total.count ?? 0 });
   } catch (e) {
     return res.status(500).json({ error: "Unexpected error" });
   }
