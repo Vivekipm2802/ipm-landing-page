@@ -63,7 +63,7 @@
         }
       }
     </script>
-    <script type="module" crossorigin src="/air1commandcenter/assets/index-CZwdpQ0N.js"></script>
+    <script type="module" crossorigin src="/air1commandcenter/assets/index-F2027a.js"></script>
   
     <!-- SEO: dynamic meta per tab (injected by script below) -->
     <meta id="seo-title-tag" name="x-page-title" content="" />
@@ -89,8 +89,8 @@
             desc:  'Read authentic student journals from IIM Indore and IIM Rohtak IPM students.'
           },
           'forms': {
-            title: 'IPM Application Forms 2026: Last Dates, Fees & Apply Links | AIR 1',
-            desc:  'All IPM and BBA application forms in one place — IIM Indore, Rohtak, NMIMS, Masters Union, NALSAR and 25+ more. Live deadlines and direct apply links.'
+            title: 'IPM & BBA Application Forms 2027: Last Dates, Fees & Apply Links | AIR 1',
+            desc:  'IPM and BBA application forms 2027 in one place: IIM Bangalore, Christ, Ashoka, Krea, Masters Union open now, plus IIM Indore, Rohtak, JIPMAT and 25+ more. Live deadlines and apply links.'
           },
           'eligibility': {
             title: 'IPMAT Eligibility 2026 | Age, Marks & Category Checker | IPM Careers',
@@ -146,11 +146,11 @@
           canonical: 'https://register.ipmcareer.com/air1commandcenter/eligibility',
           h1: 'IPMAT Eligibility 2026 — Age, Percentage & Category Criteria for All IIMs'
         },'forms': {
-          title: 'IPM & BBA Application Forms 2026 | Live Deadlines & Apply Links | AIR 1 Commandcenter',
-          desc:  'All IPM and BBA application forms 2026 in one place — IIM Indore, Rohtak, NMIMS, Masters Union, NALSAR and 25+ colleges. Live deadlines and direct apply links.',
-          keywords: 'IIM Indore IPM application form 2026, IPMAT registration 2026, IPM application last date, BBA application forms 2026',
+          title: 'IPM & BBA Application Forms 2027 | Live Deadlines & Apply Links | AIR 1 Command Center',
+          desc:  'All IPM and BBA application forms for 2027 admissions in one place: which forms are open now, last dates, exam dates, fees and direct apply links for 30+ colleges.',
+          keywords: 'IPM application form 2027, IPMAT 2027 registration, IPMAT 2027 form date, JIPMAT 2027 application, BBA application forms 2027, IIM Bangalore UG application 2027',
           canonical: 'https://register.ipmcareer.com/air1commandcenter/forms',
-          h1: 'IPM & BBA Application Forms 2026 — All Colleges, Live Deadlines, Direct Links'
+          h1: 'IPM & BBA Application Forms 2027: All Colleges, Live Deadlines, Direct Links'
         },'cheatsheets': {
           title: 'IPMAT Cheat Sheets 2026 | Quick Revision Formulas & Notes | IPM Careers',
           desc:  'Free IPMAT cheat sheets and formula booklets for Quantitative Ability and Verbal Ability. Download, print and revise fast for IPMAT 2026.',
@@ -267,6 +267,137 @@
     })();
     </script>
 
+    <!-- ipm-forms-2027-v1 -->
+    <style>
+      /* ═══ Forms & Deadlines 2027 tracker (mobile first, no Tailwind dependency) ═══ */
+      .ipm-fw, .ipm-fw *, .ipm-art, .ipm-art * { box-sizing: border-box; }
+      .ipm-fw { width: 100%; max-width: 1100px; margin: 0 auto; font-family: "Inter", system-ui, sans-serif; color: #e2e8f0; }
+      .ipm-fw-head { margin: 0 0 14px; }
+      .ipm-fw-title { font-size: 22px; line-height: 1.25; font-weight: 800; color: #f1f5f9; margin: 0 0 6px; letter-spacing: -0.01em; }
+      .ipm-fw-sub { font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.5; }
+      .ipm-fw-sub b { color: #22c55e; font-weight: 700; }
+
+      .ipm-fw-tools { display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px; }
+      .ipm-fw-chips { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+      .ipm-fw-chips::-webkit-scrollbar { display: none; }
+      .ipm-fw-chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 8px 14px; border-radius: 999px;
+        background: #0f1117; border: 1px solid #1e2533; color: #94a3b8; font: 600 13px/1 "Inter", sans-serif; cursor: pointer; white-space: nowrap; }
+      .ipm-fw-chip.is-on { background: rgba(249,160,27,.12); border-color: rgba(249,160,27,.55); color: #f9a01b; }
+      .ipm-fw-chipn { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; background: rgba(148,163,184,.12); color: inherit; }
+      .ipm-fw-search { width: 100%; min-height: 42px; padding: 10px 14px; border-radius: 12px; background: #0f1117; border: 1px solid #1e2533;
+        color: #e2e8f0; font: 500 15px "Inter", sans-serif; outline: none; -webkit-appearance: none; appearance: none; }
+      .ipm-fw-search:focus { border-color: #f9a01b; box-shadow: 0 0 0 3px rgba(249,160,27,.15); }
+      .ipm-fw-search::placeholder { color: #64748b; }
+      .ipm-fw-empty { text-align: center; color: #94a3b8; padding: 32px 0; font-size: 14px; }
+      .ipm-fw-disclaimer { font-size: 12px; color: #64748b; text-align: center; margin: 20px 0 0; line-height: 1.5; }
+
+      .ipm-fw-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+
+      .ipm-fc { position: relative; min-width: 0; background: rgba(15,17,23,.78); border: 1px solid #1e2533; border-radius: 18px;
+        padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+      .ipm-fc--open { border-color: rgba(34,197,94,.35); box-shadow: inset 0 3px 0 0 rgba(34,197,94,.55); }
+      .ipm-fc--soon { box-shadow: inset 0 3px 0 0 rgba(249,160,27,.45); }
+      .ipm-fc--closed { opacity: .72; }
+
+      .ipm-fc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+      .ipm-fc-id { min-width: 0; flex: 1; }
+      .ipm-fc-name { font-size: 18px; line-height: 1.3; font-weight: 800; color: #f1f5f9; margin: 0; overflow-wrap: anywhere; }
+      .ipm-fc-courses { font-size: 12.5px; line-height: 1.45; color: #94a3b8; margin: 4px 0 0; overflow-wrap: anywhere; }
+      .ipm-fc-badge { flex: 0 0 auto; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+      .ipm-fc-badge--open { background: rgba(34,197,94,.14); color: #4ade80; border: 1px solid rgba(34,197,94,.35); }
+      .ipm-fc-badge--soon { background: rgba(249,160,27,.10); color: #f9a01b; border: 1px solid rgba(249,160,27,.35); }
+      .ipm-fc-badge--closed { background: rgba(148,163,184,.10); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+      .ipm-fc-urgent { align-self: flex-start; font-size: 12px; font-weight: 700; color: #fca5a5; background: rgba(239,68,68,.10); border: 1px solid rgba(239,68,68,.3); padding: 4px 10px; border-radius: 8px; }
+
+      .ipm-fc-rows { margin: 0; display: grid; gap: 0; border-top: 1px solid #1e2533; }
+      .ipm-fc-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-bottom: 1px solid #141925; align-items: baseline; }
+      .ipm-fc-row dt { font-size: 12.5px; color: #64748b; font-weight: 600; margin: 0; }
+      .ipm-fc-row dd { font-size: 13.5px; color: #e2e8f0; font-weight: 600; margin: 0; text-align: right; overflow-wrap: anywhere; line-height: 1.4; }
+      .ipm-fc-row dd.ipm-fc-hl { color: #f9a01b; font-weight: 800; }
+
+      .ipm-fc-note { font-size: 12.5px; line-height: 1.5; color: #cbd5e1; margin: 0; padding: 9px 11px; border-radius: 10px; background: rgba(148,163,184,.06); }
+      .ipm-fc-last { font-size: 12px; line-height: 1.5; color: #94a3b8; margin: 0; }
+      .ipm-fc-last b { color: #cbd5e1; font-weight: 700; }
+
+      .ipm-fc-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+      .ipm-fc-fee { font-size: 12px; font-weight: 700; color: #a78bfa; background: rgba(139,92,246,.10); border: 1px solid rgba(139,92,246,.28); padding: 5px 10px; border-radius: 999px; }
+      .ipm-fc-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+      .ipm-fc-bell { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+        background: rgba(249,160,27,.10); border: 1px solid rgba(249,160,27,.3); color: #f9a01b; padding: 0; }
+      .ipm-fc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 9px 14px; border-radius: 12px;
+        font: 700 13px/1.2 "Inter", sans-serif; text-decoration: none; color: #f9a01b; border: 1px solid rgba(249,160,27,.4); background: transparent; text-align: center; }
+      .ipm-fc-btn.is-primary { background: #f9a01b; color: #0a0c14; border-color: #f9a01b; }
+      .ipm-fc-btn:active, .ipm-fc-bell:active, .ipm-fw-chip:active { transform: scale(.97); }
+      .ipm-fc-ico { width: 16px; height: 16px; flex: 0 0 16px; }
+      .ipm-fc-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .ipm-fc-links .ipm-fc-btn { font-size: 12px; padding: 8px 10px; }
+
+      @media (hover: hover) {
+        .ipm-fc-btn:hover { background: rgba(249,160,27,.12); }
+        .ipm-fc-btn.is-primary:hover { background: #e08e15; }
+        .ipm-fw-chip:hover { color: #e2e8f0; }
+      }
+      @media (min-width: 640px) {
+        .ipm-fw-title { font-size: 28px; }
+        .ipm-fw-tools { flex-direction: row; align-items: center; justify-content: space-between; }
+        .ipm-fw-search { max-width: 280px; }
+        .ipm-fc { padding: 20px; }
+        .ipm-fc-name { font-size: 20px; }
+      }
+      @media (min-width: 900px) {
+        .ipm-fw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+      }
+      @media (max-width: 360px) {
+        .ipm-fc { padding: 14px; }
+        .ipm-fc-row { grid-template-columns: 84px minmax(0, 1fr); }
+        .ipm-fc-links { grid-template-columns: 1fr; }
+      }
+
+      /* ═══ SEO article under the tracker ═══ */
+      #ipm-forms-seo-blog { background: #07090f; color: #cbd5e1; font-family: "Inter", sans-serif; padding: 0 0 60px; }
+      .ipm-art { max-width: 900px; margin: 0 auto; padding: 40px 16px 0; font-size: 15px; line-height: 1.75; }
+      .ipm-art h1 { font-size: clamp(22px, 5vw, 36px); line-height: 1.25; font-weight: 800; color: #f1f5f9; margin: 0 0 8px; }
+      .ipm-art h2 { font-size: clamp(19px, 4vw, 22px); line-height: 1.3; font-weight: 800; color: #f1f5f9; margin: 36px 0 12px; }
+      .ipm-art a { color: #f9a01b; }
+      .ipm-art-crumb { font-size: 12px; color: #475569; margin: 0 0 20px; }
+      .ipm-art-crumb a { text-decoration: none; }
+      .ipm-art-crumb span { margin: 0 4px; }
+      .ipm-art-meta, .ipm-art-note { font-size: 13px; color: #64748b; margin: 0 0 16px; }
+      .ipm-art-box { background: #0f1117; border: 1px solid #1e2533; border-left: 4px solid #f9a01b; border-radius: 10px; padding: 16px 18px; margin: 20px 0; }
+      .ipm-art-box ul, .ipm-art-list, .ipm-art-steps { margin: 0; padding-left: 20px; color: #94a3b8; font-size: 14px; }
+      .ipm-art-box li, .ipm-art-list li, .ipm-art-steps li { margin: 6px 0; }
+      .ipm-art-box ul, .ipm-art-list { list-style: disc; }
+      .ipm-art-steps { list-style: decimal; }
+      .ipm-art b { color: #e2e8f0; }
+      .ipm-art-kicker { color: #f9a01b; font-weight: 700; font-size: 12px; letter-spacing: .06em; margin: 0 0 8px; }
+      .ipm-art-table { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 12px; border: 1px solid #1e2533; border-radius: 12px; }
+      .ipm-art-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .ipm-art-table th { text-align: left; padding: 11px 12px; color: #f9a01b; background: #0f1117; font-weight: 700; border-bottom: 1px solid #1e2533; }
+      .ipm-art-table td { padding: 11px 12px; border-bottom: 1px solid #12161f; color: #94a3b8; vertical-align: top; }
+      .ipm-art-table td span { display: block; font-size: 12px; color: #64748b; margin-top: 2px; }
+      .ipm-art-table em { font-style: normal; font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+      .ipm-st-open { color: #4ade80; background: rgba(34,197,94,.12); }
+      .ipm-st-soon { color: #fbbf24; background: rgba(234,179,8,.12); }
+      .ipm-st-closed { color: #94a3b8; background: rgba(148,163,184,.12); }
+      .ipm-art-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; justify-content: space-between; margin: 36px 0 0; padding: 18px; border-radius: 12px;
+        background: linear-gradient(135deg, #1a0f00, #0f1117); border: 1px solid rgba(249,160,27,.27); }
+      .ipm-art-cta-t { margin: 0; color: #f1f5f9; font-weight: 700; }
+      .ipm-art-cta-s { margin: 0; color: #94a3b8; font-size: 13px; }
+      .ipm-art-cta a { background: #f9a01b; color: #0a0c14; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; }
+      @media (max-width: 640px) {
+        /* tables become stacked cards on phones */
+        .ipm-art-table { border: 0; overflow: visible; }
+        .ipm-art-table thead { display: none; }
+        .ipm-art-table tr { display: block; background: #0f1117; border: 1px solid #1e2533; border-radius: 12px; padding: 6px 12px; margin: 0 0 10px; }
+        .ipm-art-table td { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid #141925; text-align: right; }
+        .ipm-art-table td:last-child { border-bottom: 0; }
+        .ipm-art-table td::before { content: attr(data-l); color: #64748b; font-weight: 600; text-align: left; flex: 0 0 auto; }
+        .ipm-art-table td:first-child { display: block; text-align: left; }
+        .ipm-art-table td:first-child::before { content: none; }
+        .ipm-art-cta a { width: 100%; text-align: center; }
+      }
+
+    </style>
   </head>
   <body>
     <div id="root"></div>
@@ -327,11 +458,11 @@
     var slug = getSlug();
     var blog = document.getElementById('ipm-forms-seo-blog');
     if (slug === 'forms' || slug === 'formsanddeadlines') {
-      document.title = 'IPM & IPMAT Forms and Deadlines 2026 | Apply Dates | IPM Careers';
-      setMeta('description', 'Complete IPM & IPMAT application forms and last dates 2026. IIM Indore, Rohtak, JIPMAT, Shillong, Ashoka & more — check deadlines and apply links in one place.');
-      setMeta('keywords', 'IPM forms and deadlines 2026, IPMAT forms and deadlines, IIM IPM application 2026, IPMAT last date 2026, IPM application form, JIPMAT form, IPM college application deadline');
-      setMeta('og:title', 'IPM & IPMAT Forms and Deadlines 2026 | IPM Careers');
-      setMeta('og:description', 'All IPM & IPMAT application forms open for 2026 — deadlines, apply links and eligibility in one place.');
+      document.title = 'IPM & BBA Forms and Deadlines 2027 | Open Forms, Last Dates | IPM Careers';
+      setMeta('description', 'IPM & BBA application forms 2027: see which forms are open now, last dates, exam dates, fees and apply links for IIMs, IIFT, NMIMS, Christ, Ashoka and 25+ colleges.');
+      setMeta('keywords', 'IPM forms and deadlines 2027, IPMAT 2027 application form, IPMAT 2027 last date, JIPMAT 2027 form, IIM IPM application 2027, BBA application form 2027');
+      setMeta('og:title', 'IPM & BBA Forms and Deadlines 2027 | IPM Careers');
+      setMeta('og:description', 'Which IPM & BBA forms are open for 2027 admissions, with last dates and direct apply links.');
       setMeta('og:url', 'https://register.ipmcareer.com/air1commandcenter/forms');
       if (blog) { blog.style.display = 'block'; }
     } else {
@@ -395,382 +526,69 @@
 </script>
 
 <!-- air1commandcenter-forms-seo -->
-<div id="ipm-forms-seo-blog" style="display:none;background:#07090f;color:#cbd5e1;font-family:'Inter',sans-serif;padding:0 0 60px 0;">
+<div id="ipm-forms-seo-blog" style="display:none">
+  <article class="ipm-art">
+    <nav class="ipm-art-crumb"><a href="https://register.ipmcareer.com">Home</a> <span>›</span> <a href="/air1commandcenter">AIR 1 Command Center</a> <span>›</span> <span>Forms &amp; Deadlines 2027</span></nav>
+    <h1>IPM &amp; BBA Application Forms 2027: Open Forms, Last Dates and Apply Links</h1>
+    <p class="ipm-art-meta">Admission cycle 2027-28 · Last checked on official websites: 16 Oct 2026</p>
 
-  <!-- SEO Article Wrapper -->
-  <article style="max-width:900px;margin:0 auto;padding:48px 24px 0;">
-
-    <!-- Breadcrumb -->
-    <nav style="font-size:12px;color:#475569;margin-bottom:28px;">
-      <a href="https://register.ipmcareer.com" style="color:#f9a01b;text-decoration:none;">Home</a>
-      <span style="margin:0 6px;">›</span>
-      <a href="/air1commandcenter" style="color:#f9a01b;text-decoration:none;">AIR 1 Command Center</a>
-      <span style="margin:0 6px;">›</span>
-      <span>Forms &amp; Deadlines 2026</span>
-    </nav>
-
-    <!-- H1 -->
-    <h1 style="font-size:clamp(24px,4vw,38px);font-weight:800;color:#f1f5f9;line-height:1.25;margin:0 0 20px;">
-      IPM &amp; IPMAT Forms and Deadlines 2026 — Complete Application Guide
-    </h1>
-
-    <!-- Key Takeaways -->
-    <div style="background:#0f1117;border:1px solid #1e2533;border-left:4px solid #f9a01b;border-radius:10px;padding:20px 24px;margin-bottom:32px;">
-      <p style="color:#f9a01b;font-weight:700;font-size:13px;margin:0 0 12px;letter-spacing:.05em;">KEY TAKEAWAYS</p>
-      <ul style="margin:0;padding-left:20px;color:#94a3b8;font-size:14px;line-height:1.9;">
-        <li><strong style="color:#e2e8f0;">12+ institutes</strong> offer IPM/BBA programs accepting IPMAT, JIPMAT &amp; direct application in 2026</li>
-        <li><strong style="color:#e2e8f0;">Most deadlines fall between April and May 2026</strong> — missing a date means waiting a full year</li>
-        <li>IIM Indore &amp; IIM Rohtak accept applications only through their <strong style="color:#e2e8f0;">official portals</strong> — no third-party sites</li>
-        <li><strong style="color:#e2e8f0;">Class 12 percentage matters</strong>: minimum 60% (General) required at nearly every institute</li>
-        <li>Apply to <strong style="color:#e2e8f0;">multiple programs simultaneously</strong> — application fees are ₹1,000–₹4,000, a small insurance premium</li>
+    <div class="ipm-art-box">
+      <p class="ipm-art-kicker">KEY TAKEAWAYS</p>
+      <ul>
+        <li><b>7 colleges</b> already have 2027 forms open, led by IIM Bangalore (B.Sc), Christ, Ashoka, Krea and Masters' Union.</li>
+        <li><b>IPMAT Indore 2027, IPMAT Rohtak 2027 and JIPMAT 2027</b> forms are not out yet. Last cycle, IIM Indore's form closed on 17 Mar 2026.</li>
+        <li>Each institute has its <b>own form and fee</b>. Apply only on the official portal linked below.</li>
+        <li>IIM Jammu and IIM Bodhgaya admit through JIPMAT with <b>no WAT-PI round</b>.</li>
       </ul>
     </div>
 
-    <!-- Table of Contents -->
-    <div style="background:#0a0c14;border:1px solid #1e2533;border-radius:10px;padding:20px 24px;margin-bottom:40px;">
-      <p style="color:#f9a01b;font-weight:700;font-size:13px;margin:0 0 12px;letter-spacing:.05em;">TABLE OF CONTENTS</p>
-      <ol style="margin:0;padding-left:20px;color:#94a3b8;font-size:14px;line-height:2;">
-        <li><a href="#all-deadlines" style="color:#94a3b8;text-decoration:none;">All IPM &amp; IPMAT Application Deadlines 2026 — Master Table</a></li>
-        <li><a href="#iim-indore" style="color:#94a3b8;text-decoration:none;">IIM Indore IPMAT 2026 — Application Details</a></li>
-        <li><a href="#iim-rohtak" style="color:#94a3b8;text-decoration:none;">IIM Rohtak IPMAT 2026</a></li>
-        <li><a href="#jipmat" style="color:#94a3b8;text-decoration:none;">JIPMAT 2026 (IIM Jammu &amp; IIM Bodhgaya)</a></li>
-        <li><a href="#other-institutes" style="color:#94a3b8;text-decoration:none;">Other Institutes: Ashoka, Bennett, Shillong, TAPMI &amp; More</a></li>
-        <li><a href="#how-to-apply" style="color:#94a3b8;text-decoration:none;">How to Apply — Step-by-Step</a></li>
-        <li><a href="#documents" style="color:#94a3b8;text-decoration:none;">Documents Required</a></li>
-        <li><a href="#eligibility" style="color:#94a3b8;text-decoration:none;">Eligibility Criteria 2026</a></li>
-        <li><a href="#faq" style="color:#94a3b8;text-decoration:none;">Frequently Asked Questions</a></li>
-      </ol>
+    <h2 id="open-now">Forms open right now for 2027</h2>
+    <ul class="ipm-art-list"><li data-end="2026-10-17T17:00:00+05:30"><b>IIM Bangalore (B.Sc DS &amp; Economics)</b>: last date 17th Oct 2026, 5 PM, exam 15th Nov 2026 (tentative)</li><li data-end="2026-11-25T17:00:00+05:30"><b>Christ University</b>: last date 25th Nov 2026, exam 5th Dec 2026</li><li data-end="2027-05-23T23:59:59+05:30"><b>Ashoka University</b>: last date 23rd Nov 2026 (Round 1), exam 6th Dec 2026 (Round 1)</li><li data-end="2027-06-13T23:59:59+05:30"><b>IFMR (Krea University)</b>: last date 1st Dec 2026 (Early round), exam KAT Early round: 8 to 12 Dec 2026</li><li data-end="2026-12-15T23:59:59+05:30"><b>Masters&#x27; Union</b>: last date 15th Dec 2026 (Round 1), exam Oct / Nov 2026</li><li data-end=""><b>Alliance University</b>: last date not announced yet</li><li data-end=""><b>UPES</b>: last date not announced yet</li></ul>
+
+    <h2 id="all-deadlines">All IPM &amp; BBA application deadlines 2027 (master table)</h2>
+    <p class="ipm-art-note">"Opening soon" means the college has not released its 2027 form yet. Check the live tracker above for the latest status.</p>
+    <div class="ipm-art-table"><table>
+      <thead><tr><th>Institute</th><th>Exam</th><th>Last date</th><th>Status</th><th>Link</th></tr></thead>
+      <tbody><tr data-end="2026-10-17T17:00:00+05:30"><td data-l="Institute"><b>IIM Bangalore (B.Sc DS &amp; Economics)</b><span>B.Sc (Hons) Data Science / B.Sc (Hons) Economics (4 Years)</span></td><td data-l="Exam">IIMB UG Admission Test</td><td data-l="Last date">17th Oct 2026, 5 PM</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://cdn.digialm.com/EForms/configuredHtml/1345/101967/Registration.html" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end="2026-11-25T17:00:00+05:30"><td data-l="Institute"><b>Christ University</b><span>BBA / BBA (Hons) / BBA (Hons with Research)</span></td><td data-l="Exam">Christ University Entrance Test</td><td data-l="Last date">25th Nov 2026</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://espro.christuniversity.in/Application/" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end="2027-05-23T23:59:59+05:30"><td data-l="Institute"><b>Ashoka University</b><span>Undergraduate Programme 2027 (Economics, Political Science, Management combinations)</span></td><td data-l="Exam">Ashoka Aptitude Assessment / Ashoka Maths Challenge</td><td data-l="Last date">23rd Nov 2026 (Round 1)</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://application.ashoka.edu.in/" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end="2027-06-13T23:59:59+05:30"><td data-l="Institute"><b>IFMR (Krea University)</b><span>Integrated BBA + MBA (5 Years) / BBA (Hons)</span></td><td data-l="Exam">IPMAT Indore / KAT (Krea Aptitude Test)</td><td data-l="Last date">1st Dec 2026 (Early round)</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://ifmrgsbadmissions.krea.edu.in/ifmr-bba-programme-applynow?utm_source=IPM%20CAREER&amp;utm_medium=Banner&amp;utm_campaign=Kanpur&amp;utm_content=header&amp;_gl=1*1iztjz5*_ga*MTI0MDgwMDg2MC4xNjcwODU4Mzg4*_ga_K846DTLBHK*czE3Njc5NTQ0MjUkbzMwJGcwJHQxNzY3OTU0NDI1JGo2MCRsMCRoMA" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end="2026-12-15T23:59:59+05:30"><td data-l="Institute"><b>Masters&#x27; Union</b><span>UG Programmes (4 Years): Technology &amp; Business Management, Psychology &amp; Marketing, Finance &amp; Economics, Data Science &amp; AI</span></td><td data-l="Exam">Masters&#x27; Union Online Scholarship Test</td><td data-l="Last date">15th Dec 2026 (Round 1)</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://mastersunion.org/ug-technology-and-business-management?utm_source=IPMOnline&amp;utm_medium=Online&amp;utm_campaign=Invite&amp;utm_content=" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Alliance University</b><span>BBA (Hons.) &amp; BCom (Hons) (2027-31)</span></td><td data-l="Exam">IPMAT Indore / Alliance entrance</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://apply.alliance.edu.in/undergraduate-application-form-for-2027?utm_source=IPMcareer&amp;utm_medium=Kanpur&amp;utm_campaign=BBA2026" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>UPES</b><span>BBA / Integrated BBA-MBA / BA (Hons)</span></td><td data-l="Exam">UPESMET-UG / CUET / Board merit</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-open">Open now</em></td><td data-l="Link"><a href="https://admission.upes.ac.in/Login?BCode=ysApp0gAXIDFHAhVkG75bw%3D%3D" target="_blank" rel="noopener">Apply &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Indore</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iimidr.ac.in/programmes/academic-programmes/five-year-integrated-programme-in-management-ipm/ipm-admissions-details/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Rohtak</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Rohtak 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.iimrohtak.ac.in/ipm-admission.php" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Jammu</b><span>IPM (5 Years)</span></td><td data-l="Exam">JIPMAT 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://exams.nta.nic.in/jipmat/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Bodhgaya</b><span>IPM (5 Years)</span></td><td data-l="Exam">JIPMAT 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://exams.nta.nic.in/jipmat/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Ranchi</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iimranchi.ac.in/admissions/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Shillong</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Indore 2027 / SAT</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.iimshillong.ac.in/ipm/admission-process/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Sambalpur</b><span>B.S. Management &amp; Public Policy / B.S. Data Science &amp; AI (4 Years)</span></td><td data-l="Exam">IPMAT Indore (MPP) / JEE Main (DS &amp; AI)</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://registration.iimsambalpur.ac.in/portal/SignIn/MPPolicy" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Amritsar</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iimamritsar.ac.in/academics/ipm/admission-process" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Sirmaur</b><span>BMS (4 Years)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iimsirmaur.ac.in/bachelors-management-studies-bms" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Kozhikode</b><span>Bachelor of Management Studies (BMS), 4 Years</span></td><td data-l="Exam">IIMK BMS Aptitude Test 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iimk.ac.in/academic-programmes/BMS/bms-key-dates" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Udaipur</b><span>BBA (4 Years)</span></td><td data-l="Exam">Class 12 scores (no entrance test)</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://bba.iimu.ac.in/admissions.html" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIM Bangalore (BBA DBE)</b><span>BBA in Digital Business &amp; Entrepreneurship</span></td><td data-l="Exam">IIMB DBE Entrance Test</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://dbe.iimb.ac.in/admissions" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIFT</b><span>IPM (5 Years)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.iift.ac.in/programme/integrated-program-in-management-ipm" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>NMIMS (NPAT 2027)</b><span>IPM (5 Years), BBA (3 Years), BBA (International Business), Bachelor in Business Management &amp; Marketing</span></td><td data-l="Exam">NPAT 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://npat.nmims.edu/?utm_source=IPM%20Careers&amp;utm_medium=NPATWidget&amp;utm_campaign=NMIMSNPAT" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Symbiosis (SET 2027)</b><span>BBA / BBA (Hons), 4 Years</span></td><td data-l="Exam">SET (Symbiosis Entrance Test) 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.set-test.org/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>NALSAR</b><span>BBA + MBA (5 Years)</span></td><td data-l="Exam">IPMAT Indore / NMET 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://doms.nalsar.ac.in/ipm/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>TAPMI</b><span>IPM (5 Years) / BBA (Hons) (4 Years)</span></td><td data-l="Exam">IPMAT, JIPMAT, JEE, SAT, CLAT, MET</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.tapmi.edu.in/programs/ug-admissions/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>NIRMA University</b><span>Integrated BBA + MBA (5 Years) / BBA (Hons)</span></td><td data-l="Exam">IPMAT Indore 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://management.nirmauni.ac.in/admission-aid/undergraduate/bba-mba-five-year-integrated/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>NFSU</b><span>BBA + MBA</span></td><td data-l="Exam">CUET UG 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.nfsu.ac.in/CSAS" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>IIT Patna</b><span>BBA (3 Years) / BBA-MBA</span></td><td data-l="Exam">CUET UG 2027</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://iitp-cep.in/" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Bennett University</b><span>BBA + MBA (5 Years)</span></td><td data-l="Exam">Bennett Entrance Test</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://applications.bennett.edu.in/bu?utm_source=Consultant&amp;utm_medium=VIVEK+SHUKLA(GURU+MANTRA)/2026-28/407&amp;utm_campaign=Without+Coupon" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Doon Business School</b><span>BA (Economics / Political Science + Management)</span></td><td data-l="Exam">Interview based</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://bit.ly/4bb8z6n" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Uttaranchal University (Doon)</b><span>BBA / UG programmes</span></td><td data-l="Exam">University admission process</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://www.uudoon.in/admissions/index.php?utm_source=UU6LV3535&amp;utm_medium=Consultant&amp;utm_campaign=UU6LV3535" target="_blank" rel="noopener">Official site &rarr;</a></td></tr><tr data-end=""><td data-l="Institute"><b>Stride School</b><span>BBA (3 Years) at partner campuses</span></td><td data-l="Exam">S-BAT (Stride entrance)</td><td data-l="Last date">To be announced</td><td data-l="Status"><em class="ipm-st-soon">Opening soon</em></td><td data-l="Link"><a href="https://apply.strideschool.ai/?utm_source=Consultant+&amp;utm_medium=Offline+&amp;utm_campaign=IPM+Careers+&amp;utm_id=29/05/26&amp;utm_content=navbar_desktop_cta" target="_blank" rel="noopener">Official site &rarr;</a></td></tr></tbody>
+    </table></div>
+
+    <h2 id="exam-map">Which exam do you need for which IIM?</h2>
+    <div class="ipm-art-table"><table>
+      <thead><tr><th>Exam</th><th>Used by</th></tr></thead>
+      <tbody>
+        <tr><td data-l="Exam"><b>IPMAT Indore</b></td><td data-l="Used by">IIM Indore, IIM Ranchi, IIM Sirmaur, IIM Amritsar, IIM Shillong, IIM Sambalpur (MPP), IIFT</td></tr>
+        <tr><td data-l="Exam"><b>JIPMAT</b></td><td data-l="Used by">IIM Jammu, IIM Bodhgaya</td></tr>
+        <tr><td data-l="Exam"><b>IPMAT Rohtak</b></td><td data-l="Used by">IIM Rohtak only</td></tr>
+        <tr><td data-l="Exam"><b>Own test</b></td><td data-l="Used by">IIM Bangalore (UG Admission Test), IIM Kozhikode (BMS Aptitude Test)</td></tr>
+        <tr><td data-l="Exam"><b>Class 12 scores</b></td><td data-l="Used by">IIM Udaipur BBA</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="how-to-apply">How to apply without missing a deadline</h2>
+    <ol class="ipm-art-steps">
+      <li><b>Shortlist your exams first.</b> IPMAT Indore, IPMAT Rohtak and JIPMAT are separate forms with separate fees.</li>
+      <li><b>Keep documents scanned.</b> Class 10 marksheet, Class 12 marksheet or admit card, category or PwD certificate, photo and signature.</li>
+      <li><b>Apply only on official portals.</b> Use the links in the tracker above.</li>
+      <li><b>Save the confirmation page</b> and payment receipt for every form.</li>
+      <li><b>Turn on reminders</b> with the bell icon on each card so you hear when a 2027 form opens or is about to close.</li>
+    </ol>
+
+    <div class="ipm-art-cta">
+      <div><p class="ipm-art-cta-t">Preparing for IPMAT 2027?</p><p class="ipm-art-cta-s">Free PYQs, cutoffs and eligibility checker in the AIR 1 Command Center.</p></div>
+      <a href="https://register.ipmcareer.com/air1commandcenter">Explore free resources →</a>
     </div>
-
-    <!-- Intro -->
-    <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 16px;">
-      Filling the right IPM or IPMAT application form on time is the single most overlooked step in an aspirant's preparation journey. A student who scores 290+ on IPMAT but misses the IIM Rohtak form deadline gets nothing — a student who scores 240 and applies to six programs has six shots at an IIM.
-    </p>
-    <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 40px;">
-      This guide consolidates every IPM and IPMAT application form, last date, and direct apply link for 2026 in one place. Bookmark this page and check it weekly — deadlines shift without warning.
-    </p>
-
-    <!-- CTA 1 -->
-    <div style="background:linear-gradient(135deg,#1a0f00,#0f1117);border:1px solid #f9a01b44;border-radius:12px;padding:20px 24px;margin-bottom:48px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:200px;">
-        <p style="margin:0 0 4px;color:#f1f5f9;font-weight:700;font-size:15px;">Preparing for IPMAT 2026?</p>
-        <p style="margin:0;color:#94a3b8;font-size:13px;">Get IPM Careers' free study plan + deadline tracker</p>
-      </div>
-      <a href="https://register.ipmcareer.com" style="background:#f9a01b;color:#0a0c14;padding:10px 22px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;">Start Free →</a>
-    </div>
-
-    <!-- Section 1: Master Table -->
-    <h2 id="all-deadlines" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 8px;">All IPM &amp; IPMAT Application Deadlines 2026</h2>
-    <p style="font-size:14px;color:#64748b;margin:0 0 20px;">Last updated: May 2026. Always verify on the official institute website before applying.</p>
-
-    <div style="overflow-x:auto;margin-bottom:40px;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:#0f1117;border-bottom:2px solid #f9a01b33;">
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Institute</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Program</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Exam</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Last Date</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Status</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Apply</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Indore</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT Indore</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">4th May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://ipmat.iimindore.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Rohtak</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT Rohtak</td>
-            <td style="padding:12px 14px;color:#94a3b8;">To be announced</td>
-            <td style="padding:12px 14px;"><span style="background:#eab30822;color:#fbbf24;border:1px solid #eab30844;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Check site</span></td>
-            <td style="padding:12px 14px;"><a href="https://www.iimrohtak.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Jammu</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">JIPMAT</td>
-            <td style="padding:12px 14px;color:#94a3b8;">To be announced</td>
-            <td style="padding:12px 14px;"><span style="background:#eab30822;color:#fbbf24;border:1px solid #eab30844;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Check site</span></td>
-            <td style="padding:12px 14px;"><a href="https://jipmat.nta.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Bodhgaya</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">JIPMAT</td>
-            <td style="padding:12px 14px;color:#94a3b8;">To be announced</td>
-            <td style="padding:12px 14px;"><span style="background:#eab30822;color:#fbbf24;border:1px solid #eab30844;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Check site</span></td>
-            <td style="padding:12px 14px;"><a href="https://jipmat.nta.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Shillong</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT Indore</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">30th May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://apps.iimshillong.ac.in/admission/" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Sambalpur</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT Indore</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">31st May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://www.iimsambalpur.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">Ashoka University</td>
-            <td style="padding:12px 14px;color:#94a3b8;">BBA (Hons)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">Own Exam</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">31st May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://www.ashoka.edu.in/admissions" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">TAPMI Manipal</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM / BBA (Hons)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT / JEE / SAT</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">2nd May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://apply.manipal.edu/login" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">Bennett University</td>
-            <td style="padding:12px 14px;color:#94a3b8;">BBA + MBA (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">Bennett Entrance Test</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">15th May 2026 (Tentative)</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://applications.bennett.edu.in/bu?utm_source=Consultant&amp;utm_medium=VIVEK+SHUKLA(GURU+MANTRA)/2026-28/407&amp;utm_campaign=Without+Coupon" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">ITM Navi Mumbai</td>
-            <td style="padding:12px 14px;color:#94a3b8;">BBA (3-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">Not Mandatory</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">9th May 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://sh.itm.edu/GuruMantra" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIFT Delhi/Kolkata</td>
-            <td style="padding:12px 14px;color:#94a3b8;">BBA (International Business)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IIFT Entrance</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">26th Apr 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#16a34a22;color:#4ade80;border:1px solid #16a34a44;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Open</span></td>
-            <td style="padding:12px 14px;"><a href="https://iift.ac.in" style="color:#f9a01b;text-decoration:none;font-weight:600;">Apply →</a></td>
-          </tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;">
-            <td style="padding:12px 14px;color:#e2e8f0;font-weight:600;">IIM Kozhikode</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPM (5-Yr)</td>
-            <td style="padding:12px 14px;color:#94a3b8;">IPMAT Indore</td>
-            <td style="padding:12px 14px;color:#fbbf24;font-weight:600;">20th Apr 2026</td>
-            <td style="padding:12px 14px;"><span style="background:#ef444422;color:#f87171;border:1px solid #ef444444;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;">Closed</span></td>
-            <td style="padding:12px 14px;color:#475569;font-size:12px;">Closed</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Section 2: IIM Indore -->
-    <h2 id="iim-indore" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">IIM Indore IPMAT 2026 — Application Details</h2>
-    <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 16px;">
-      IIM Indore's IPM (Integrated Programme in Management) is the most sought-after 5-year BBA+MBA programme in India. The application is made through NTA, and the admit card / score is then used to apply to IIM Indore directly. The two steps are separate — missing either means disqualification.
-    </p>
-    <div style="background:#0f1117;border:1px solid #1e2533;border-radius:10px;padding:20px 24px;margin-bottom:32px;">
-      <p style="color:#f9a01b;font-weight:700;font-size:13px;margin:0 0 14px;">QUICK FACTS — IIM INDORE IPM 2026</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
-        <div><p style="margin:0;color:#64748b;font-size:12px;font-weight:600;">SEATS (General)</p><p style="margin:4px 0 0;color:#e2e8f0;font-weight:700;font-size:15px;">~120</p></div>
-        <div><p style="margin:0;color:#64748b;font-size:12px;font-weight:600;">MIN. 12TH %</p><p style="margin:4px 0 0;color:#e2e8f0;font-weight:700;font-size:15px;">60% (55% SC/ST)</p></div>
-        <div><p style="margin:0;color:#64748b;font-size:12px;font-weight:600;">AGE LIMIT</p><p style="margin:4px 0 0;color:#e2e8f0;font-weight:700;font-size:15px;">Max 20 years</p></div>
-        <div><p style="margin:0;color:#64748b;font-size:12px;font-weight-600;">EXAM DATE</p><p style="margin:4px 0 0;color:#f9a01b;font-weight:700;font-size:15px;">May 2026</p></div>
-        <div><p style="margin:0;color:#64748b;font-size:12px;font-weight:600;">APPLICATION FEE</p><p style="margin:4px 0 0;color:#e2e8f0;font-weight:700;font-size:15px;">₹4,000 (Gen)</p></div>
-      </div>
-    </div>
-
-    <!-- Section 3: JIPMAT -->
-    <h2 id="jipmat" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">JIPMAT 2026 — IIM Jammu &amp; IIM Bodhgaya</h2>
-    <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 16px;">
-      JIPMAT (Joint Integrated Programme in Management Aptitude Test) is conducted by NTA for admission to IIM Jammu and IIM Bodhgaya's 5-year IPM programmes. A single application and exam score is used for both IIMs. It is a separate exam from IPMAT Indore — aspirants often apply to both.
-    </p>
-    <div style="background:#0a0c14;border:1px solid #1e2533;border-radius:10px;padding:20px 24px;margin-bottom:40px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div>
-          <p style="color:#f9a01b;font-weight:700;font-size:12px;margin:0 0 10px;letter-spacing:.05em;">IIM JAMMU</p>
-          <p style="color:#94a3b8;font-size:13px;margin:0 0 6px;">Seats: ~60 (approx) | Min 12th: 60%</p>
-          <p style="color:#94a3b8;font-size:13px;margin:0;">Age: Max 20 years (General)</p>
-        </div>
-        <div>
-          <p style="color:#f9a01b;font-weight:700;font-size:12px;margin:0 0 10px;letter-spacing:.05em;">IIM BODHGAYA</p>
-          <p style="color:#94a3b8;font-size:13px;margin:0 0 6px;">Seats: ~60 (approx) | Min 12th: 60%</p>
-          <p style="color:#94a3b8;font-size:13px;margin:0;">Age: Max 20 years (General)</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 4: Other Institutes -->
-    <h2 id="other-institutes" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">Other Institutes — Ashoka, TAPMI, Bennett &amp; More</h2>
-    <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 24px;">
-      Beyond the IIM system, several top private universities offer IPM-equivalent or BBA programs that accept IPMAT scores or have their own entrance exams. These are excellent backup or parallel options.
-    </p>
-    <div style="background:#0f1117;border:1px solid #1e2533;border-radius:10px;padding:20px 24px;margin-bottom:40px;">
-      <p style="color:#64748b;font-size:13px;line-height:1.9;margin:0;">
-        <strong style="color:#e2e8f0;">Ashoka University</strong> — One of India's premier liberal arts universities. Accepts IPMAT Indore scores for its BBA programme. Strong research &amp; international exposure focus.<br/>
-        <strong style="color:#e2e8f0;">TAPMI Manipal</strong> — Accepts IPMAT, JIPMAT, JEE Main, SAT &amp; CLAT scores. One of the most flexible acceptance policies in the country.<br/>
-        <strong style="color:#e2e8f0;">Bennett University</strong> — Times Group institution. Has its own entrance test. Strong media &amp; industry connections.<br/>
-        <strong style="color:#e2e8f0;">IIM Shillong</strong> — Newer IIM, uses IPMAT Indore for screening. Growing placement record with IIM brand.<br/>
-        <strong style="color:#e2e8f0;">IIM Sambalpur</strong> — Accepts IPMAT Indore scores. Offers both DSA I and MPP pathways post-IPM.
-      </p>
-    </div>
-
-    <!-- Section 5: How to Apply -->
-    <h2 id="how-to-apply" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">How to Apply — Step-by-Step (IPMAT 2026)</h2>
-    <div style="margin-bottom:40px;">
-      <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;">
-        <div style="min-width:32px;height:32px;border-radius:50%;background:#f9a01b22;border:1px solid #f9a01b55;display:flex;align-items:center;justify-content:center;color:#f9a01b;font-weight:800;font-size:13px;">1</div>
-        <div><p style="margin:0;color:#e2e8f0;font-weight:600;font-size:14px;">Register on the Official NTA Portal</p><p style="margin:4px 0 0;color:#64748b;font-size:13px;">Go to ipmat.iimindore.ac.in or jipmat.nta.ac.in. Create an account with your email and mobile number. Keep these credentials safe — you'll need them until final admission.</p></div>
-      </div>
-      <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;">
-        <div style="min-width:32px;height:32px;border-radius:50%;background:#f9a01b22;border:1px solid #f9a01b55;display:flex;align-items:center;justify-content:center;color:#f9a01b;font-weight:800;font-size:13px;">2</div>
-        <div><p style="margin:0;color:#e2e8f0;font-weight:600;font-size:14px;">Fill in Personal &amp; Academic Details</p><p style="margin:4px 0 0;color:#64748b;font-size:13px;">Enter Class 10 and Class 12 marks accurately. If you are appearing in Class 12 in 2026, enter provisional marks. You must clear 60% at the time of admission.</p></div>
-      </div>
-      <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;">
-        <div style="min-width:32px;height:32px;border-radius:50%;background:#f9a01b22;border:1px solid #f9a01b55;display:flex;align-items:center;justify-content:center;color:#f9a01b;font-weight:800;font-size:13px;">3</div>
-        <div><p style="margin:0;color:#e2e8f0;font-weight:600;font-size:14px;">Upload Documents</p><p style="margin:4px 0 0;color:#64748b;font-size:13px;">Passport-size photograph (white background, recent), signature (black ink on white paper), and Class 10 certificate. All uploads must meet the exact size specifications on the form.</p></div>
-      </div>
-      <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;">
-        <div style="min-width:32px;height:32px;border-radius:50%;background:#f9a01b22;border:1px solid #f9a01b55;display:flex;align-items:center;justify-content:center;color:#f9a01b;font-weight:800;font-size:13px;">4</div>
-        <div><p style="margin:0;color:#e2e8f0;font-weight:600;font-size:14px;">Choose Exam Centre</p><p style="margin:4px 0 0;color:#64748b;font-size:13px;">Select your preferred exam city. Popular centres fill up fast — select your city and a backup city. Centres are allocated on a first-come-first-served basis.</p></div>
-      </div>
-      <div style="display:flex;gap:14px;align-items:flex-start;">
-        <div style="min-width:32px;height:32px;border-radius:50%;background:#f9a01b22;border:1px solid #f9a01b55;display:flex;align-items:center;justify-content:center;color:#f9a01b;font-weight:800;font-size:13px;">5</div>
-        <div><p style="margin:0;color:#e2e8f0;font-weight:600;font-size:14px;">Pay the Application Fee &amp; Submit</p><p style="margin:4px 0 0;color:#64748b;font-size:13px;">Pay via Net Banking / Credit / Debit Card / UPI. Download and save the confirmation page. The fee is non-refundable. Application not complete until fee payment is confirmed.</p></div>
-      </div>
-    </div>
-
-    <!-- CTA 2 -->
-    <div style="background:linear-gradient(135deg,#1a0f00,#0f1117);border:1px solid #f9a01b44;border-radius:12px;padding:20px 24px;margin-bottom:48px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:200px;">
-        <p style="margin:0 0 4px;color:#f1f5f9;font-weight:700;font-size:15px;">Forms filed. Now crack the exam.</p>
-        <p style="margin:0;color:#94a3b8;font-size:13px;">Join IPM Careers — 2026 batch open. Check courses.</p>
-      </div>
-      <a href="https://register.ipmcareer.com/#courses" style="background:#f9a01b;color:#0a0c14;padding:10px 22px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;">View Courses →</a>
-    </div>
-
-    <!-- Section 6: Documents -->
-    <h2 id="documents" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">Documents Required for IPM &amp; IPMAT Application 2026</h2>
-    <div style="overflow-x:auto;margin-bottom:40px;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:#0f1117;border-bottom:2px solid #f9a01b33;">
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Document</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Format</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Max Size</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Passport Photo</td><td style="padding:12px 14px;color:#94a3b8;">JPG</td><td style="padding:12px 14px;color:#94a3b8;">50 KB</td><td style="padding:12px 14px;color:#94a3b8;">White background, taken within 6 months</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;"><td style="padding:12px 14px;color:#e2e8f0;">Signature</td><td style="padding:12px 14px;color:#94a3b8;">JPG</td><td style="padding:12px 14px;color:#94a3b8;">30 KB</td><td style="padding:12px 14px;color:#94a3b8;">Black ink on white paper, no stray marks</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Class 10 Certificate</td><td style="padding:12px 14px;color:#94a3b8;">JPG / PDF</td><td style="padding:12px 14px;color:#94a3b8;">200 KB</td><td style="padding:12px 14px;color:#94a3b8;">For Date of Birth verification</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;"><td style="padding:12px 14px;color:#e2e8f0;">Class 12 Marksheet</td><td style="padding:12px 14px;color:#94a3b8;">JPG / PDF</td><td style="padding:12px 14px;color:#94a3b8;">200 KB</td><td style="padding:12px 14px;color:#94a3b8;">Required at admission; provisional if appearing</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Category Certificate</td><td style="padding:12px 14px;color:#94a3b8;">PDF</td><td style="padding:12px 14px;color:#94a3b8;">300 KB</td><td style="padding:12px 14px;color:#94a3b8;">SC / ST / OBC-NCL / EWS — if applicable</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;"><td style="padding:12px 14px;color:#e2e8f0;">PwD Certificate</td><td style="padding:12px 14px;color:#94a3b8;">PDF</td><td style="padding:12px 14px;color:#94a3b8;">300 KB</td><td style="padding:12px 14px;color:#94a3b8;">If seeking disability reservation</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Section 7: Eligibility -->
-    <h2 id="eligibility" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 16px;">Eligibility Criteria for IPM &amp; IPMAT 2026</h2>
-    <div style="overflow-x:auto;margin-bottom:40px;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:#0f1117;border-bottom:2px solid #f9a01b33;">
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">Criteria</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">General / EWS</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">SC / ST</th>
-            <th style="padding:12px 14px;text-align:left;color:#f9a01b;font-weight:700;">PwD</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Min Class 12 marks</td><td style="padding:12px 14px;color:#94a3b8;">60%</td><td style="padding:12px 14px;color:#94a3b8;">55%</td><td style="padding:12px 14px;color:#94a3b8;">55%</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;"><td style="padding:12px 14px;color:#e2e8f0;">Max Age (IIM Indore)</td><td style="padding:12px 14px;color:#94a3b8;">20 years</td><td style="padding:12px 14px;color:#94a3b8;">22 years</td><td style="padding:12px 14px;color:#94a3b8;">22 years</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Attempts allowed</td><td style="padding:12px 14px;color:#94a3b8;">No limit (within age)</td><td style="padding:12px 14px;color:#94a3b8;">No limit</td><td style="padding:12px 14px;color:#94a3b8;">No limit</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;background:#0a0c1455;"><td style="padding:12px 14px;color:#e2e8f0;">12th year (appearing)</td><td style="padding:12px 14px;color:#94a3b8;" colspan="3">Students appearing in 2026 exams are eligible</td></tr>
-          <tr style="border-bottom:1px solid #1e2533;"><td style="padding:12px 14px;color:#e2e8f0;">Stream restriction</td><td style="padding:12px 14px;color:#94a3b8;" colspan="3">No stream restriction — Science, Commerce, Arts all eligible</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- FAQ -->
-    <h2 id="faq" style="font-size:22px;font-weight:800;color:#f1f5f9;margin:0 0 24px;">Frequently Asked Questions — IPM &amp; IPMAT Forms 2026</h2>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">When do IPM and IPMAT application forms open for 2026?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">IPMAT Indore forms typically open in March and close in early May. JIPMAT opens slightly later, usually in April. Private institutes like Ashoka and TAPMI open forms as early as January. Check the master table above for current status — it is updated regularly.</p></div>
-    </div>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">Can I apply to multiple IPM programs with one application?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">No. Each institute has a separate application portal and fee. However, your IPMAT Indore score is accepted by IIM Indore, IIM Shillong, IIM Sambalpur, Ashoka, and IIM Kozhikode — one exam, multiple applications. Apply to each institute individually using your IPMAT scorecard.</p></div>
-    </div>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">What is the application fee for IPMAT 2026?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">IPMAT Indore charges ₹4,000 for General/EWS/OBC and ₹2,000 for SC/ST/PwD candidates. JIPMAT has a similar fee structure. Private institute fees vary from ₹1,000 to ₹3,000. All fees are non-refundable. Applying to 5–6 programs costs ₹10,000–₹20,000 total — worth it for the optionality.</p></div>
-    </div>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">Can students appearing in Class 12 in 2026 apply?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">Yes. Students currently in Class 12 (2025–26 batch) are fully eligible to apply for IPMAT, JIPMAT, and all IPM programs. You enter your predicted or provisional marks. The actual 60% eligibility is verified at the time of admission — not application.</p></div>
-    </div>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">Is there an age limit for IPM 2026?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">IIM Indore's IPM has a maximum age of 20 years for General/OBC/EWS on July 31 of the admission year. SC/ST/PwD candidates get 22 years. IIM Rohtak and JIPMAT have similar limits. Private institutes like TAPMI and Ashoka have no strict age limit.</p></div>
-    </div>
-
-    <div style="margin-bottom:16px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">What happens if I miss the IPMAT form deadline?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">There is no late submission window. Missing the deadline means you cannot sit the 2026 exam — the next opportunity is IPMAT 2027. This is why applying early (ideally within the first 2 weeks of the form opening) is strongly recommended. There is no advantage to waiting.</p></div>
-    </div>
-
-    <div style="margin-bottom:40px;border:1px solid #1e2533;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1117;padding:16px 20px;"><h3 style="margin:0;color:#f1f5f9;font-size:15px;font-weight:700;">Does stream or subject combination in Class 12 matter for IPM?</h3></div>
-      <div style="background:#07090f;padding:16px 20px;"><p style="margin:0;color:#94a3b8;font-size:14px;line-height:1.75;">No. There is no stream restriction. Science, Commerce, and Arts students are all eligible for IPMAT and IPM programs. The exam tests Quantitative Ability and Verbal Ability — both stream-neutral. Students from non-Math backgrounds can and do crack IPMAT with focused preparation.</p></div>
-    </div>
-
-    <!-- Conclusion -->
-    <div style="background:#0f1117;border:1px solid #1e2533;border-radius:12px;padding:28px 32px;margin-bottom:40px;">
-      <h2 style="font-size:20px;font-weight:800;color:#f1f5f9;margin:0 0 12px;">The Bottom Line</h2>
-      <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 16px;">
-        The IPM and IPMAT application process is straightforward — but unforgiving on deadlines. With most forms closing in April and May 2026, the window is short. The students who crack IIM Indore IPM are rarely more talented than those who miss out; they are simply more organised.
-      </p>
-      <p style="font-size:15px;line-height:1.8;color:#94a3b8;margin:0 0 20px;">
-        Apply early, apply to multiple programs, and then put all your energy into preparation. The form is the ticket — the exam is the real game.
-      </p>
-      <a href="https://register.ipmcareer.com/#courses" style="display:inline-block;background:#f9a01b;color:#0a0c14;padding:12px 28px;border-radius:10px;font-weight:800;font-size:15px;text-decoration:none;">Enrol in IPMAT 2026 Course →</a>
-    </div>
-
-    <!-- Schema markup for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {"@type": "Question", "name": "When do IPM and IPMAT application forms open for 2026?", "acceptedAnswer": {"@type": "Answer", "text": "IPMAT Indore forms typically open in March and close in early May 2026. JIPMAT opens in April. Private institutes open forms as early as January."}},
-        {"@type": "Question", "name": "Can students appearing in Class 12 in 2026 apply for IPMAT?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Students currently in Class 12 (2025-26 batch) are fully eligible to apply for IPMAT, JIPMAT, and all IPM programs in 2026."}},
-        {"@type": "Question", "name": "What is the last date for IPMAT 2026?", "acceptedAnswer": {"@type": "Answer", "text": "The last date for IPMAT Indore 2026 application is 4th May 2026. JIPMAT and other institute deadlines vary — check the official portal."}},
-        {"@type": "Question", "name": "What are the eligibility criteria for IPM 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Minimum 60% in Class 12 for General/OBC/EWS, 55% for SC/ST/PwD. Maximum age 20 years for IIM Indore (General category). No stream restriction."}}
-      ]
-    }
-    </script>
-
   </article>
+  <script>
+  (function(){ var now = new Date();
+    document.querySelectorAll('#ipm-forms-seo-blog [data-end]').forEach(function(el){
+      var v = el.getAttribute('data-end'); if (!v) return; var d = new Date(v);
+      if (isNaN(d.getTime()) || now <= d) return;
+      if (el.tagName === 'LI') { el.style.display = 'none'; return; }
+      var em = el.querySelector('em'); if (em) { em.textContent = 'Closed'; em.className = 'ipm-st-closed'; }
+      var a = el.querySelector('td[data-l="Link"] a'); if (a) a.innerHTML = 'Official site &rarr;';
+    });
+  })();
+  </script>
 </div>
 <!-- /air1commandcenter-forms-seo -->
 
@@ -913,26 +731,30 @@
     </div>
   </section>
   <section class="ipm-seo-faq" data-tab="forms" style="display:none">
-    <h2 class="ipm-faq-heading">Frequently Asked Questions</h2>
+    <h2 class="ipm-faq-heading">Frequently Asked Questions: IPM & BBA Forms 2027</h2>
     <div class="ipm-faq-item">
-      <h3 class="ipm-faq-q">How do I apply for IIM Indore IPM 2026?</h3>
-      <p class="ipm-faq-a">Applications for IIM Indore IPM 2026 are submitted through the official IIM Indore admissions portal (iimidr.ac.in). The process involves: (1) Register and fill the form, (2) Upload documents, (3) Pay the application fee, (4) Appear for IPMAT on the scheduled date. The form and deadline are listed in the tracker above.</p>
+      <h3 class="ipm-faq-q">Are IPM application forms for 2027 out?</h3>
+      <p class="ipm-faq-a">As of 16 Oct 2026, the 2027-cycle forms that are open include IIM Bangalore&#x27;s B.Sc (Hons) programmes, Christ University, Ashoka University, IFMR (Krea), Masters&#x27; Union, Alliance University and UPES. IIM Indore (IPMAT 2027), IIM Rohtak and JIPMAT 2027 (IIM Jammu and IIM Bodhgaya) have not released their 2027 forms yet. The tracker above marks every college as Open now, Opening soon or Closed.</p>
     </div>
     <div class="ipm-faq-item">
-      <h3 class="ipm-faq-q">Can I apply to multiple IPM programs with one registration?</h3>
-      <p class="ipm-faq-a">No — each institution has a separate application process. IPMAT Indore scores are used by IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong and IIFT. JIPMAT is a separate exam for IIM Jammu and Bodh Gaya. IPMAT Rohtak is separate for IIM Rohtak. You need to register for each exam individually.</p>
+      <h3 class="ipm-faq-q">When will the IPMAT Indore 2027 application form be released?</h3>
+      <p class="ipm-faq-a">IIM Indore has not announced IPMAT 2027 dates yet. In the last cycle the form closed on 17 March 2026 (extended from 14 March) and the exam was held on 4 May 2026. Turn on deadline reminders in the tracker so you hear the moment the 2027 form opens.</p>
     </div>
     <div class="ipm-faq-item">
-      <h3 class="ipm-faq-q">What is the application fee for IPMAT 2026?</h3>
-      <p class="ipm-faq-a">The IPMAT Indore 2026 application fee is typically ₹4,130 for General/OBC/EWS candidates and ₹2,065 for SC/ST/PwD. Fees are paid online through the DigiAlm portal. Exact fees are confirmed at the time of registration — check the official IIM Indore notification.</p>
+      <h3 class="ipm-faq-q">Which exams do IIMs use for IPM admission?</h3>
+      <p class="ipm-faq-a">IPMAT Indore is used by IIM Indore, IIM Ranchi, IIM Sirmaur, IIM Amritsar, IIM Shillong, IIM Sambalpur (MPP) and IIFT. JIPMAT is used by IIM Jammu and IIM Bodhgaya. IPMAT Rohtak is used only by IIM Rohtak. IIM Bangalore and IIM Kozhikode run their own tests, and IIM Udaipur admits on Class 12 scores.</p>
     </div>
     <div class="ipm-faq-item">
-      <h3 class="ipm-faq-q">What documents are required for the IPM application form?</h3>
-      <p class="ipm-faq-a">You will need: (1) Class 10 marksheet and certificate, (2) Class 12 marksheet (or admit card if appearing), (3) Category certificate (if applicable), (4) PwD certificate (if applicable), (5) Passport-size photograph, (6) Signature in the prescribed format. Keep scanned copies ready before starting the form.</p>
+      <h3 class="ipm-faq-q">Can I apply to multiple IPM and BBA programmes?</h3>
+      <p class="ipm-faq-a">Yes. Each institute has its own form and fee, so you can apply to as many as you like. Many students apply to IPMAT Indore, IPMAT Rohtak and JIPMAT together, plus a few private colleges as backups.</p>
     </div>
     <div class="ipm-faq-item">
-      <h3 class="ipm-faq-q">Which BBA programs are still open for applications in 2026?</h3>
-      <p class="ipm-faq-a">Check the "Open" section in the tracker above — it shows all institutes with live application windows including NMIMS (NPAT), Masters' Union, IIM Shillong, IIM Sambalpur, Ashoka University, NALSAR and more with exact last dates. New applications open regularly, so bookmark this page.</p>
+      <h3 class="ipm-faq-q">What documents do I need for IPM application forms?</h3>
+      <p class="ipm-faq-a">Keep these ready: Class 10 marksheet and certificate, Class 12 marksheet or admit card if you are appearing, category certificate (if applicable), PwD certificate (if applicable), a recent passport-size photograph and your signature in the prescribed format.</p>
+    </div>
+    <div class="ipm-faq-item">
+      <h3 class="ipm-faq-q">Is there a WAT-PI for IIM Jammu and IIM Bodhgaya?</h3>
+      <p class="ipm-faq-a">No. IIM Jammu and IIM Bodhgaya admit IPM students on the basis of the JIPMAT score and academic record. There is no WAT-PI round.</p>
     </div>
   </section>
   <section class="ipm-seo-faq" data-tab="cheatsheets" style="display:none">
@@ -1095,26 +917,30 @@
     ]
   ],
   "forms": [
-    [
-      "How do I apply for IIM Indore IPM 2026?",
-      "Applications for IIM Indore IPM 2026 are submitted through the official IIM Indore admissions portal (iimidr.ac.in). The process involves: (1) Register and fill the form, (2) Upload documents, (3) Pay the application fee, (4) Appear for IPMAT on the scheduled date. The form and deadline are listed in the tracker above."
-    ],
-    [
-      "Can I apply to multiple IPM programs with one registration?",
-      "No — each institution has a separate application process. IPMAT Indore scores are used by IIM Indore, Ranchi, Sirmaur, Amritsar, Sambalpur, Shillong and IIFT. JIPMAT is a separate exam for IIM Jammu and Bodh Gaya. IPMAT Rohtak is separate for IIM Rohtak. You need to register for each exam individually."
-    ],
-    [
-      "What is the application fee for IPMAT 2026?",
-      "The IPMAT Indore 2026 application fee is typically ₹4,130 for General/OBC/EWS candidates and ₹2,065 for SC/ST/PwD. Fees are paid online through the DigiAlm portal. Exact fees are confirmed at the time of registration — check the official IIM Indore notification."
-    ],
-    [
-      "What documents are required for the IPM application form?",
-      "You will need: (1) Class 10 marksheet and certificate, (2) Class 12 marksheet (or admit card if appearing), (3) Category certificate (if applicable), (4) PwD certificate (if applicable), (5) Passport-size photograph, (6) Signature in the prescribed format. Keep scanned copies ready before starting the form."
-    ],
-    [
-      "Which BBA programs are still open for applications in 2026?",
-      "Check the \"Open\" section in the tracker above — it shows all institutes with live application windows including NMIMS (NPAT), Masters' Union, IIM Shillong, IIM Sambalpur, Ashoka University, NALSAR and more with exact last dates. New applications open regularly, so bookmark this page."
-    ]
+      [
+          "Are IPM application forms for 2027 out?",
+          "As of 16 Oct 2026, the 2027-cycle forms that are open include IIM Bangalore's B.Sc (Hons) programmes, Christ University, Ashoka University, IFMR (Krea), Masters' Union, Alliance University and UPES. IIM Indore (IPMAT 2027), IIM Rohtak and JIPMAT 2027 (IIM Jammu and IIM Bodhgaya) have not released their 2027 forms yet. The tracker above marks every college as Open now, Opening soon or Closed."
+      ],
+      [
+          "When will the IPMAT Indore 2027 application form be released?",
+          "IIM Indore has not announced IPMAT 2027 dates yet. In the last cycle the form closed on 17 March 2026 (extended from 14 March) and the exam was held on 4 May 2026. Turn on deadline reminders in the tracker so you hear the moment the 2027 form opens."
+      ],
+      [
+          "Which exams do IIMs use for IPM admission?",
+          "IPMAT Indore is used by IIM Indore, IIM Ranchi, IIM Sirmaur, IIM Amritsar, IIM Shillong, IIM Sambalpur (MPP) and IIFT. JIPMAT is used by IIM Jammu and IIM Bodhgaya. IPMAT Rohtak is used only by IIM Rohtak. IIM Bangalore and IIM Kozhikode run their own tests, and IIM Udaipur admits on Class 12 scores."
+      ],
+      [
+          "Can I apply to multiple IPM and BBA programmes?",
+          "Yes. Each institute has its own form and fee, so you can apply to as many as you like. Many students apply to IPMAT Indore, IPMAT Rohtak and JIPMAT together, plus a few private colleges as backups."
+      ],
+      [
+          "What documents do I need for IPM application forms?",
+          "Keep these ready: Class 10 marksheet and certificate, Class 12 marksheet or admit card if you are appearing, category certificate (if applicable), PwD certificate (if applicable), a recent passport-size photograph and your signature in the prescribed format."
+      ],
+      [
+          "Is there a WAT-PI for IIM Jammu and IIM Bodhgaya?",
+          "No. IIM Jammu and IIM Bodhgaya admit IPM students on the basis of the JIPMAT score and academic record. There is no WAT-PI round."
+      ]
   ],
   "cheatsheets": [
     [
@@ -1201,119 +1027,7 @@
   <script type="application/ld+json" id="ipm-faq-jsonld"></script>
 
   
-      .ipm-fee-pin {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .ipm-fee-pin.free { background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e; }
-    .ipm-fee-pin.low  { background:rgba(249,160,27,.10);border:1px solid rgba(249,160,27,.3);color:#f9a01b; }
-    .ipm-fee-pin.mid  { background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);color:#94a3b8; }
-    .ipm-fee-pin.exam { background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.28);color:#a78bfa; }
-  <!-- ipm-form-fees-v1: Application fee badges on Forms tab tiles -->
-  <style>
 
-      .ipm-fee-row   { margin-top: 8px; }
-    }
-  </style>
-
-  <script>
-  (function() {
-    // ── Fee data (sourced from official websites, May 2026) ─────────────────
-    var FEE_DATA = {
-      // Open colleges
-      "IIM Shillong":              { label: "Form fee ₹2,000", type: "low",  note: "₹1,000 for reserved" },
-      "Masters' Union":            { label: "Form fee ₹2,900",  type: "low",  note: "Verify on mastersunion.org" },
-      "NMIMS (NPAT 2026)":         { label: "NPAT ₹2,000/school", type: "exam", note: "+ ₹1,000 per extra school" },
-      "IIM Sambalpur":             { label: "via IPMAT ₹4,130", type: "exam", note: "Separate form post-IPMAT" },
-      "Doon Business School":      { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
-      "Alliance University":       { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
-      "UPES":                      { label: "Form fee ₹1,750",  type: "low",  note: "Verify on upes.ac.in" },
-      "Ashoka University":         { label: "Free to apply",    type: "free", note: "No application fee" },
-      "IFMR (Krea University)":    { label: "Form fee ₹1,500",  type: "low",  note: "Accepts IPMAT/SAT/KAT" },
-      "IIM Bangalore (BBA DBE)":   { label: "Form fee ₹3,000",  type: "mid",  note: "₹1,500 for SC/ST/PwD" },
-      "IIM Udaipur":               { label: "Form fee ₹1,000",  type: "low",  note: "4-yr BBA, no entrance exam" },
-      "Bennett University":        { label: "Form fee ₹1,500",  type: "low",  note: "12th merit-based" },
-      "IIT Patna":                 { label: "Form fee ~₹1,000", type: "low",  note: "Verify on website" },
-      "NALSAR":                    { label: "Form fee ₹2,200",  type: "low",  note: "Accepts IPMAT/NMET" },
-
-      // Closed colleges
-      "Stride School":           { label: "Form fee \u20b91,000", type: "low",  note: "apply.strideschool.ai" },
-      "Uttaranchal University (Doon)": { label: "Form fee \u20b91,200", type: "low", note: "uudoon.in" },
-      "IIM Indore":                { label: "IPMAT ₹4,130",     type: "exam", note: "₹2,065 for SC/ST/PwD" },
-      "IIM Rohtak":                { label: "IPMAT ₹4,937",     type: "exam", note: "No category concession" },
-      "IIM Ranchi":                { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
-      "IIM Kozhikode":             { label: "BMSAT ~₹1,000",    type: "exam", note: "Verify on iimk.ac.in" },
-      "IIM Jammu":                 { label: "JIPMAT ₹2,200",    type: "exam", note: "₹1,100 for SC/ST/PwD" },
-      "IIM Bodhgaya":              { label: "JIPMAT ₹2,200",    type: "exam", note: "Same exam as IIM Jammu" },
-      "IIM Amritsar":              { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
-      "IIM Sirmaur":               { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
-      "IIFT":                      { label: "via IPMAT ₹4,130", type: "exam", note: "Separate shortlist form" },
-      "Symbiosis (SET 2026)":      { label: "SET ₹2,250",       type: "exam", note: "+ ₹1,000 per college" },
-      "Christ University Entrance Test": { label: "Form fee ~₹1,500", type: "low", note: "Verify on christuniversity.in" },
-      "TAPMI":                     { label: "Form fee ~₹2,000", type: "low",  note: "Verify on tapmi.edu.in" },
-      "NIRMA University":          { label: "Form fee ~₹1,500", type: "low",  note: "Verify on nirmauni.ac.in" },
-      "NFSU":                      { label: "Form fee ~₹500",   type: "low",  note: "Verify on nfsu.ac.in" },
-      "IIM Bangalore":             { label: "BSc prog closed",  type: "mid",  note: "Applications closed Nov 2025" },
-    };
-
-    // ── Icons per type ─────────────────────────────────────────────────────
-    var ICONS = {
-      free: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-      low:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-      mid:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-      exam: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-    };
-
-    function addFeeToCard(card) {
-      if (card.querySelector('.ipm-fee-pin')) return; // already done
-
-      var h3 = card.querySelector('h3');
-      if (!h3) return;
-      var name = h3.textContent.trim();
-      var data = FEE_DATA[name];
-      if (!data) return;
-
-      // Pin badge top-right — position:absolute, zero layout impact
-      card.style.position = 'relative';
-      var pin = document.createElement('span');
-      pin.className = 'ipm-fee-pin ' + data.type;
-      pin.title = data.note;
-      pin.innerHTML = ICONS[data.type] + ' ' + data.label;
-      card.appendChild(pin);
-    }
-
-    function scanCards() {
-      document.querySelectorAll('.rounded-3xl.p-8').forEach(addFeeToCard);
-    }
-
-    // MutationObserver watches for React rendering the cards
-    var observer = new MutationObserver(scanCards);
-    observer.observe(document.getElementById('root'), {
-      childList: true,
-      subtree: true,
-    });
-
-    // Also run after delays to catch initial render and tab switches
-    setTimeout(scanCards, 800);
-    setTimeout(scanCards, 2000);
-    setTimeout(scanCards, 4000);
-
-    // Re-scan on tab change (hash change)
-    window.addEventListener('hashchange', function() { setTimeout(scanCards, 500); });
-  })();
-  </script>
 
   </body>
 </html>
