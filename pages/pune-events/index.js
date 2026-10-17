@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../../lib/crm";
 import { useEffect, useState } from 'react';
 import FAQ from '../../components/FAQ';
 import Review from '../../components/Review';
@@ -465,6 +466,8 @@ async function SubmitContact(){
     }
   
       setLoader(true)
+      // CRM copy of this lead (fire-and-forget, never blocks the form)
+      sendLeadToCrm({ name: formData?.name || formData?.fullname, phone: formData?.phone, email: formData?.email, city: "Pune", class: formData?.class }, "register-pune-events");
       
       
       triggerInterakt();

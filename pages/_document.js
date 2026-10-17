@@ -4,6 +4,8 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head >
+      {/* Visit attribution shared with ipmcareer.com (utm_*, gclid, fbclid, landing page, referrer). Read by lib/crm.js */}
+      <script src="https://ipmcareer.com/ipm-attrib.js" defer></script>
       {/* Site-wide Organization (EducationalOrganization) structured data — renders on every page */}
       <script
         type="application/ld+json"

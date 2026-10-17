@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -179,6 +180,8 @@ export default function IimbUgScoreCalculator() {
       return;
     }
     setSubmitting(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: form?.name, phone: form?.mobile, email: form?.email, city: form?.city }, "register-iimb-ug-score-calculator");
     setError("");
     setWarning("");
 

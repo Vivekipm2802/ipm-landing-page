@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 // Inline lead-capture form for magazine reader pages.
 // Sends to /api/magazine-inquiry which writes to Supabase.
 // Mobile-first, dark + orange styling, inline validation, success state,
@@ -40,6 +41,8 @@ export default function MagazineInquiryForm({ blog }) {
     if (!target_year) return setStatus({ state: 'error', msg: 'Pick your IPMAT target year.' });
 
     setStatus({ state: 'submitting', msg: '' });
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name, phone: mobile, email, target: target_year, company: form.hp }, 'register-magazine-inquiry');
     try {
       const r = await fetch('/api/magazine-inquiry', {
         method: 'POST',

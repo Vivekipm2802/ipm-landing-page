@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 
 
 
@@ -349,6 +350,8 @@ toast.error('Please upload your Admit Card PDF & wait for scanning')
             return null
         }
         const r= toast.loading('Uploading Data');
+        // CRM copy of this lead (fire-and-forget, never blocks the form)
+        sendLeadToCrm({ name: b?.sData?.name, phone: a?.phone, email: a?.email }, 'register-admit-card');
         const{data,error} = await supabase.from('admit_cards').insert({
             url:a?.pdfurl,
             phone:a?.phone,

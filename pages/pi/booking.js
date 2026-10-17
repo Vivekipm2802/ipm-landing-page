@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../../lib/crm";
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
@@ -120,6 +121,8 @@ export default function ExpertBooking() {
 
   const confirmBooking = () => {
     if (!selectedExpert || !selectedDate || !selectedTime) return;
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    if (studentPhone) sendLeadToCrm({ name: studentName, phone: studentPhone }, 'register-interview-prep-booking');
 
     const booking = {
       id: Date.now().toString(),

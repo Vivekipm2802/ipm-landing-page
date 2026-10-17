@@ -1,4 +1,5 @@
 "use client";
+import { sendLeadToCrm } from "../lib/crm";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
@@ -164,6 +165,8 @@ export default function IPM() {
       return null;
     }
     setLoader(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.fullname, phone: formData?.phone, email: formData?.email, city: formData?.city, target: formData?.year }, "register-iimb-ug");
     TestApi();
     triggerInterakt();
     /* await axios.post('/') */

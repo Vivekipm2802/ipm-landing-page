@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import styles from "./Jipmat.module.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -184,6 +185,8 @@ function JipmatScoreCalculator() {
     }
 
     setLoading(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.name, phone: formData?.phone, email: formData?.email, city: formData?.city }, "register-jipmat-score-calculator");
     setError(null);
 
     try {

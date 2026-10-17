@@ -122,6 +122,8 @@
   .scroll-hint{animation:hintFloat 2.4s ease-in-out infinite;}
   @keyframes hintFloat{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 </style>
+<script src="https://ipmcareer.com/ipm-attrib.js" defer></script>
+<script src="/ipm-crm.js" defer></script>
 </head>
 <body>
 
@@ -562,6 +564,8 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
     _template: 'table',
     _captcha: 'false'
   };
+  // CRM copy of this lead (fire-and-forget, never blocks the form)
+  try{ window.ipmSendLeadToCrm && window.ipmSendLeadToCrm({ name: payload.name, phone: payload.whatsapp_number, email: payload.email, class: payload.current_status }, 'register-webinar-dropper-roadmap'); }catch(_){}
   btn.disabled = true; btn.textContent = 'Reserving...';
   try{
     const r = await fetch('https://formsubmit.co/ajax/ipmcareeronline@gmail.com', {

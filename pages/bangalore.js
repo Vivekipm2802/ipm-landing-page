@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 /**
  * register.ipmcareer.com/bangalore
  * Drop-in Next.js (pages router) page. Place at: pages/bangalore.js
@@ -99,6 +100,8 @@ function RegistrationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('submitting');
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.candidateName, phone: formData?.whatsappNumber, email: formData?.emailAddress, city: formData?.city, target: formData?.targetYear }, 'register-bangalore');
     try {
       const { error } = await supabase.from('leads').insert({
         candidate_name: formData.candidateName,

@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -768,6 +769,8 @@ export default function City() {
       return null;
     }
     setLoader(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.fullname, phone: formData?.phone, email: formData?.email, city: formData?.city, target: formData?.year }, "register-city-" + (router?.query?.city || "page"));
 
     /* TestApi(); */
     triggerInterakt();

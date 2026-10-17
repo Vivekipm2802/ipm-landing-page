@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import React, { useState } from "react";
 import Head from "next/head";
 
@@ -68,6 +69,8 @@ export default function IPMATOnlineCoachingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: form.fullname, phone: form.phone, email: form.email, city: form.city, target: form.year }, "register-ipmat-online-coaching");
     try {
       const res = await fetch("/api/contactEmail", {
         method: "POST",

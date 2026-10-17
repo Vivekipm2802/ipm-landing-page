@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import styles from "./Response.module.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -117,6 +118,8 @@ function Response() {
       return;
     }
     setLoading(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ phone: formData?.phone, email: formData?.email, city: formData?.city }, "register-ipmat-indore-score-calculator");
     await axios
       .post("/api/sheetdata", { url: url.trim() })
       .then((response) => {

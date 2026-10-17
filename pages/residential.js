@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import { useEffect, useState } from "react";
 import FAQ from "../components/FAQ";
 import Navbar from "../components/Navbar";
@@ -497,6 +498,8 @@ function Residential() {
     }
 
     setLoader(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.fullname, phone: formData?.phone, email: formData?.email, city: formData?.city, target: formData?.year }, "register-residential");
 
     /*   TestApi();
       triggerInterakt(); */

@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import { useEffect, useRef, useState } from "react";
 import Timer from "../components/Timer";
 import st from "./TestPredictor.module.css";
@@ -157,6 +158,8 @@ function Call() {
     }
 
     setLoading(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: a?.fullname, phone: a?.phone }, "register-call-predictor");
     submitLead(a);
     try {
       const response = await axios.post("/api/predictor", {

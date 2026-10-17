@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../../lib/crm";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Lock, CheckCircle2, Zap } from 'lucide-react';
@@ -70,6 +71,8 @@ const UnifiedRegistrationForm: React.FC<UnifiedRegistrationFormProps> = ({
     }
 
     setFormStatus('submitting');
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData.fullname, phone: formData.phone, email: formData.email, city: formData.city, target: formData.year }, 'register-home');
 
     try {
       await sendViaFormSubmit(

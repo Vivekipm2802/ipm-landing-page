@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../lib/crm";
 import Head from 'next/head'
 import Image from 'next/image'
 import {useState,useEffect} from 'react'
@@ -445,6 +446,8 @@ async function SubmitContact(){
   if(formData && Object.values(formData).filter((i,d)=> i.length > 2).length > 3 && validateEmail(formData.email ? formData.email :'') && validatePhone(formData.phone ? formData.phone:'')){
 
     setLoader(true)
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    sendLeadToCrm({ name: formData?.fullname, phone: formData?.phone, email: formData?.email, city: formData?.city, target: formData?.year }, "register-crash-course");
     
     /* TestApi();
     triggerInterakt(); */

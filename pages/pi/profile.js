@@ -1,3 +1,4 @@
+import { sendLeadToCrm } from "../../lib/crm";
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import AppShell from '../../components/AppShell';
@@ -83,6 +84,8 @@ export default function PIProfile() {
 
   const handleSave = async () => {
     setSaving(true);
+    // CRM copy of this lead (fire-and-forget, never blocks the form)
+    if (profile?.phone || profile?.email) sendLeadToCrm({ name: profile?.name, phone: profile?.phone, email: profile?.email, city: profile?.city }, 'register-interview-prep');
     // Save to localStorage for now (Supabase tables come in next task)
     try {
       localStorage.setItem('pi_profile', JSON.stringify(profile));
