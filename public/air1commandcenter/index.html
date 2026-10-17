@@ -64,7 +64,7 @@
         }
       }
     </script>
-    <script type="module" crossorigin src="/air1commandcenter/assets/index-G2027c.js"></script>
+    <script type="module" crossorigin src="/air1commandcenter/assets/index-G2027d.js"></script>
   
     <!-- SEO: dynamic meta per tab (injected by script below) -->
     <meta id="seo-title-tag" name="x-page-title" content="" />
@@ -869,6 +869,111 @@
         .ipm-hero-float { display: block; }
       }
       @media (prefers-reduced-motion: reduce) { .ipm-fcard, .ipm-grain, .ipm-grad { animation: none !important; } }
+
+      /* ═══════════ Cut Offs tab, decluttered (one tool, one flow) ═══════════ */
+      .ipm-cut { max-width: 1100px; margin: 0 auto; padding: 8px 0 24px; }
+      .ipm-cut .ipm-cx { margin: 0 0 16px; padding: 22px 18px 18px; border-radius: 22px; }
+      .ipm-cx-head { margin-bottom: 16px; }
+      .ipm-cx-title { margin: 0 0 6px !important; font-size: clamp(26px, 5.6vw, 38px) !important; }
+      .ipm-cx-lede { margin: 0 !important; color: var(--b-mut) !important; }
+      .ipm-cx-bar1 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+      .ipm-cx-seg { display: inline-flex; gap: 2px; padding: 4px; border-radius: 980px; background: rgba(236,232,225,.05); border: 1px solid var(--b-line); max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+      .ipm-cx-seg::-webkit-scrollbar { display: none; }
+      .ipm-cx-seg button { flex: 0 0 auto; border: 0; cursor: pointer; padding: 9px 16px; border-radius: 980px; background: transparent; color: rgba(236,232,225,.72); font: 600 14px/1 "Inter", sans-serif; white-space: nowrap; }
+      .ipm-cx-seg button.is-on { background: var(--b-ink); color: #0b0b0c; }
+      .ipm-cx-cat { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--b-mut); font-weight: 500; }
+      .ipm-cx-cat select { appearance: none; -webkit-appearance: none; cursor: pointer; min-height: 40px; padding: 8px 34px 8px 14px; border-radius: 980px; border: 1px solid var(--b-line2); color: var(--b-ink); font: 600 14px "Inter", sans-serif;
+        background: rgba(236,232,225,.04) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f9a01b' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 13px center; }
+      .ipm-cx-cat select option { background: #0e0f12; color: var(--b-ink); }
+      .ipm-cx-field { font-weight: 500 !important; color: var(--b-mut2) !important; font-size: 12.5px !important; }
+      .ipm-cx-field input { min-height: 46px !important; font-size: 17px !important; background: rgba(236,232,225,.04) !important; border: 1px solid var(--b-line2) !important; }
+      .ipm-cx-total { font-weight: 500 !important; color: var(--b-mut2) !important; }
+      .ipm-cx-total b { min-height: 46px !important; font-family: "Fraunces", Georgia, serif; font-weight: 500 !important; }
+      .ipm-cx-row2 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 16px 0 12px; }
+      .ipm-cx-mode { margin: 0 !important; background: rgba(236,232,225,.05) !important; border-color: var(--b-line) !important; }
+      .ipm-cx-mode button { font-weight: 600 !important; font-size: 13.5px !important; padding: 9px 16px !important; color: rgba(236,232,225,.72) !important; }
+      .ipm-cx-mode button.is-on { background: var(--b-ink) !important; color: #0b0b0c !important; }
+      .ipm-cut .ipm-cx-sum { display: inline-flex; align-items: baseline; gap: 6px; margin: 0; padding: 7px 14px; border-radius: 980px; font-size: 13.5px; color: var(--b-mut2); }
+      .ipm-cut .ipm-cx-sum b { font-size: 18px; letter-spacing: 0; }
+      .ipm-cx-tw { overflow-x: auto; border-radius: 16px; border: 1px solid var(--b-line); }
+      .ipm-cx-tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+      .ipm-cx-tbl caption { caption-side: top; text-align: left; padding: 11px 14px; font-size: 12px; color: var(--b-mut); border-bottom: 1px solid var(--b-line); background: rgba(236,232,225,.02); }
+      .ipm-cx-tbl th, .ipm-cx-tbl td { padding: 11px 14px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--b-line); }
+      .ipm-cx-tbl tr:last-child th, .ipm-cx-tbl tr:last-child td { border-bottom: 0; }
+      .ipm-cx-tbl thead th { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--b-mut); }
+      .ipm-cx-tbl thead th:first-child, .ipm-cx-tbl tbody th { text-align: left; }
+      .ipm-cx-tbl tbody th { font: 500 16px "Fraunces", Georgia, serif; color: var(--b-ink); }
+      .ipm-cx-tbl tbody th sup { color: var(--b-gold); font-family: "Inter", sans-serif; margin-left: 2px; }
+      .ipm-cx-tbl td { color: var(--b-txt); font-weight: 500; }
+      .ipm-cx-tbl td.ok { color: #6ee7a0; }
+      .ipm-cx-tbl td.bad { color: #fca5a5; }
+      .ipm-cx-tbl tr.is-na td { color: rgba(236,232,225,.35); }
+      .ipm-cx-tbl .ipm-cx-rescol { text-align: right; width: 1%; }
+      .ipm-cx-res { display: inline-block; font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 980px; color: var(--b-mut); }
+      .ipm-cx-res.is-ok { color: #6ee7a0; background: rgba(34,197,94,.12); }
+      .ipm-cx-res.is-bad { color: #fca5a5; background: rgba(239,68,68,.1); }
+      .ipm-cx-res.is-na { font-weight: 500; }
+      .ipm-cx-more { margin: 10px 0 0; padding: 6px 2px; border: 0; background: none; cursor: pointer; color: var(--b-gold); font: 600 13.5px "Inter", sans-serif; }
+      .ipm-cx-more:hover { text-decoration: underline; }
+      .ipm-cut .ipm-cx-note { margin: 8px 0 0; font-size: 12px; color: var(--b-mut); }
+      .ipm-cut .ipm-cx-foot { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--b-line); font-size: 11.5px; color: rgba(154,149,140,.85); }
+      .ipm-cut .ipm-cx-tgrow { background: rgba(236,232,225,.03) !important; border-color: var(--b-line) !important; }
+
+      /* full tables expander */
+      .ipm-cutall { border-radius: 22px; border: 1px solid var(--b-line); background: rgba(14,15,18,.7); overflow: hidden; }
+      .ipm-cutall-tog { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; border: 0; background: transparent; cursor: pointer; text-align: left; color: var(--b-ink); }
+      .ipm-cutall-tog span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .ipm-cutall-tog b { font: 500 19px "Fraunces", Georgia, serif; }
+      .ipm-cutall-tog small { font-size: 12.5px; color: var(--b-mut); }
+      .ipm-cutall-tog i { flex: 0 0 auto; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--b-line2); font-style: normal; font-size: 18px; color: var(--b-gold); }
+      .ipm-cutall-tog:hover i { background: rgba(249,160,27,.1); }
+      .ipm-cutall-body { padding: 0 18px 18px; border-top: 1px solid var(--b-line); }
+      .ipm-cutall-chips { display: flex; gap: 6px; padding-top: 14px; overflow-x: auto; scrollbar-width: none; }
+      .ipm-cutall-chips::-webkit-scrollbar { display: none; }
+      .ipm-cutall-chips button { flex: 0 0 auto; cursor: pointer; padding: 8px 14px; border-radius: 980px; border: 1px solid var(--b-line2); background: transparent; color: rgba(236,232,225,.75); font: 600 13.5px/1 "Inter", sans-serif; }
+      .ipm-cutall-chips button.is-on { background: var(--b-ink); border-color: var(--b-ink); color: #0b0b0c; }
+      .ipm-cutall-years { padding-top: 8px; }
+      .ipm-cutall-years button { padding: 6px 11px; font-size: 12.5px; }
+      .ipm-cutall-years button.is-on { background: rgba(249,160,27,.14); border-color: rgba(249,160,27,.55); color: var(--b-gold); }
+      /* reuse the old viewer, minus its stacked page headings and page chrome */
+      .ipm-cutall-view { margin-top: 14px; }
+      .ipm-cutall-view .min-h-screen { min-height: 0 !important; background: transparent !important; padding: 0 !important; }
+      .ipm-cutall-view .max-w-7xl, .ipm-cutall-view .max-w-4xl { max-width: none !important; padding: 0 !important; margin: 0 !important; }
+      .ipm-cutall-view .max-w-7xl > .text-center:first-child, .ipm-cutall-view .max-w-4xl > .text-center:first-child { display: none !important; }
+      .ipm-cutall-view h2 { font-size: 16px !important; margin-bottom: 12px !important; color: var(--b-ink) !important; }
+      .ipm-cutall-view .rounded-xl, .ipm-cutall-view .rounded-2xl { border-radius: 16px !important; }
+      .ipm-cutall-view [class*="border-t-4"] { border-top-width: 1px !important; border: 1px solid var(--b-line) !important; box-shadow: none !important; background: rgba(236,232,225,.02) !important; margin-bottom: 14px !important; }
+      .ipm-cutall-view [class*="border-l-4"] { border-left-width: 2px !important; border-color: rgba(249,160,27,.5) !important; background: transparent !important; margin-top: 0 !important; }
+      .ipm-cutall-view table thead tr { background: rgba(236,232,225,.04) !important; }
+      .ipm-cutall-view table th { color: var(--b-mut) !important; font-weight: 600 !important; font-size: 12px !important; text-transform: uppercase; letter-spacing: .05em; }
+      .ipm-cutall-view table td, .ipm-cutall-view table th { padding-top: 10px !important; padding-bottom: 10px !important; }
+      .ipm-cutall-view tbody tr { background: transparent !important; border-color: var(--b-line) !important; }
+      .ipm-cutall-view .bg-orange-400 { background: transparent !important; color: var(--b-gold) !important; padding: 0 !important; font-size: 14px !important; }
+      .ipm-cutall-view .p-4.md\:p-6.border-b { padding: 12px 16px !important; background: transparent !important; }
+      .ipm-cutall-view .max-w-7xl, .ipm-cutall-view .max-w-4xl { display: flex !important; flex-direction: column; }
+      .ipm-cutall-view .max-w-7xl > .overflow-hidden, .ipm-cutall-view .max-w-4xl > .overflow-hidden { order: -1; }
+      .ipm-cutall-view .overflow-hidden > div:first-child { padding: 12px 16px !important; background: transparent !important; }
+      .ipm-cutall-view .recharts-responsive-container { height: 260px !important; }
+      .ipm-cx-tbl th:not(:first-child), .ipm-cx-tbl td:not(.ipm-cx-rescol) { text-align: center; }
+      @media (min-width: 640px) {
+        .ipm-cut .ipm-cx { padding: 28px 28px 22px; }
+        .ipm-cutall-tog { padding: 18px 24px; }
+        .ipm-cutall-body { padding: 0 24px 22px; }
+      }
+      @media (max-width: 639px) {
+        .ipm-cx-bar1 { flex-direction: column; align-items: stretch; }
+        .ipm-cx-seg { justify-content: space-between; }
+        .ipm-cx-seg button { flex: 1 1 auto; padding: 9px 10px; font-size: 13.5px; }
+        .ipm-cx-cat { justify-content: space-between; }
+        .ipm-cx-cat select { flex: 1; max-width: 220px; }
+        .ipm-cx-tbl th, .ipm-cx-tbl td { padding: 10px 10px; font-size: 13.5px; }
+        .ipm-cx-tbl tbody th { font-size: 15px; }
+        .ipm-cx-tbl th, .ipm-cx-tbl td { padding: 10px 7px; }
+        .ipm-cx-tbl .ipm-cx-rescol { white-space: normal; width: auto; min-width: 84px; }
+        .ipm-cx-res { white-space: normal; line-height: 1.3; font-size: 11.5px; padding: 4px 8px; }
+        .ipm-cx-tbl caption { white-space: normal; }
+        .ipm-cutall-view .recharts-responsive-container { height: 240px !important; }
+      }
     </style>
   </head>
   <body>
