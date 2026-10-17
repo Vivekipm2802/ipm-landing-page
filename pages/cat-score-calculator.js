@@ -45,6 +45,30 @@ const FAQS = [
     a: "No. This tool gives your raw score. The IIMs normalise scores across the three slots and then compute percentiles, so your official scaled score and percentile can differ from the raw total.",
   },
   {
+    q: "When will the CAT 2026 response sheet be released?",
+    a: "The IIMs have not announced the date yet. For CAT 2025, held on 30 November 2025, the response sheet and provisional answer key were released on 4 December 2025, so expect the CAT 2026 response sheet in the first week of December 2026.",
+  },
+  {
+    q: "How do I download the CAT response sheet on my phone?",
+    a: "Log in at iimcat.ac.in, open the response sheet and copy the link from the address bar. If you cannot copy it, open the browser menu, choose Download or Save page, and upload that file in the Upload file tab. Screenshots and PDFs do not work.",
+  },
+  {
+    q: "How many marks are needed for 99 percentile in CAT?",
+    a: "In CAT 2025, published estimates put 99 percentile at roughly 85 to 93 raw marks out of 204, depending on the slot. The figure changes every year with difficulty: about 98 in 2021, 84 in 2022, 76 in 2023 and 96 in 2024. These are coaching-institute estimates, not official IIM data.",
+  },
+  {
+    q: "What is the difference between raw score and scaled score in CAT?",
+    a: "Your raw score is 3 marks per correct answer minus 1 per wrong MCQ. Because the three slots have different papers, the IIMs convert raw scores into scaled scores to make slots comparable, and percentiles are calculated from the scaled scores.",
+  },
+  {
+    q: "How much does it cost to challenge the CAT answer key?",
+    a: "In CAT 2025 the objection fee was Rs 1,500 per question, refunded only if the objection was accepted, and the window ran from 8 to 10 December 2025. The CAT 2026 fee and dates will be announced with the provisional answer key.",
+  },
+  {
+    q: "Does this calculator predict my CAT percentile?",
+    a: "Not yet. It gives your exact raw score, section-wise marks and your rank among students who used the tool. Use the CAT score vs percentile table on this page for a rough idea; official percentiles come only with the result.",
+  },
+  {
     q: "Is the CAT score calculator free and safe?",
     a: "Yes. It is completely free, needs no login, and your phone number and email are never shown publicly. The leaderboard shows only first name, last initial and city.",
   },
@@ -199,8 +223,8 @@ export default function CatScoreCalculator() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="CAT 2026 Score Calculator: Check Score from Response Sheet | IPM Careers"
-        description="Free CAT 2026 score calculator. Paste your CAT response sheet link and get VARC, DILR, QA and total score out of 204 with MCQ and TITA analysis, using +3/-1 marking. No login."
+        title="CAT Score Calculator 2026: Response Sheet Score & Score vs Percentile"
+        description="Free CAT score calculator 2026: paste your CAT response sheet link for VARC, DILR, QA and total out of 204. Plus CAT score vs percentile, answer key dates and TITA marking."
         canonical={PAGE_URL}
         openGraph={{
           url: PAGE_URL,
@@ -213,7 +237,7 @@ export default function CatScoreCalculator() {
           {
             name: "keywords",
             content:
-              "CAT score calculator, CAT 2026 score calculator, CAT 2026 response sheet, CAT response sheet 2026, CAT 2026 answer key, CAT marks calculator, CAT VARC DILR QA score, CAT TITA marking, how to calculate CAT score",
+              "CAT score calculator, CAT score calculator 2026, CAT score calculator response sheet, CAT response sheet calculator, CAT response sheet 2026, CAT response sheet release date, CAT 2026 answer key, CAT score vs percentile, CAT marks vs percentile, CAT marks calculator, CAT raw score vs scaled score, how to calculate CAT score",
           },
           { name: "robots", content: "index, follow, max-image-preview:large" },
         ]}
@@ -587,10 +611,10 @@ export default function CatScoreCalculator() {
           <h2>CAT 2026 Score Calculator: work out your CAT score from the response sheet</h2>
           <p className={ui.lede}>Free CAT response sheet tool with VARC, DILR and QA marks, MCQ vs TITA accuracy and a shareable report</p>
           <p>
-            The <strong>CAT 2026 Score Calculator</strong> by IPM Careers reads your official CAT response sheet and calculates your exact raw
-            score in seconds. It checks all 68 questions, applies the CAT marking scheme separately to MCQ and TITA questions, and shows your{" "}
+            The <strong>CAT Score Calculator 2026</strong> by IPM Careers is a free CAT response sheet calculator: it reads your official CAT
+            response sheet and calculates your exact raw score in seconds, with no manual marks counting. It checks all 68 questions, applies the CAT marking scheme separately to MCQ and TITA questions, and shows your{" "}
             <strong>VARC, DILR and QA</strong> scores, total out of 204, correct, wrong and unattempted counts and accuracy for each section.
-            No manual counting, so no mistakes.
+            Think of it as a CAT marks calculator that already knows the answer key.
           </p>
 
           <h3>CAT 2026 exam pattern</h3>
@@ -640,11 +664,84 @@ export default function CatScoreCalculator() {
             <li>Your rank among students who checked their score on this tool, and a report link you can share</li>
           </ul>
 
-          <h3>Raw score vs CAT percentile</h3>
+          <h2>CAT score calculator from response sheet: step by step</h2>
           <p>
-            This tool gives your <strong>raw score</strong> from the response sheet and answer key. The IIMs normalise scores across the three
-            slots and then calculate percentiles, so your official scaled score and percentile can differ from the raw total. Use the raw score
-            to judge your sectional strengths and plan your next steps while you wait for the result.
+            Your CAT response sheet is a page on the TCS iON server (cdn.digialm.com) that lists every question, the option you chose or the
+            answer you typed for TITA, and the correct answer. Paste that link above and the calculator scores all 68 questions for you. If the
+            link has expired, save the page as HTML and upload it instead: the result is the same.
+          </p>
+          <ol>
+            <li><strong>Laptop:</strong> log in at iimcat.ac.in, open the response sheet, copy the link from the address bar. If you only see the
+              portal address, press Ctrl + U, search for <em>digialm</em> and copy the link ending in .html.</li>
+            <li><strong>Mobile:</strong> open the response sheet, tap the address bar and copy the link. Or use the browser menu (⋮) → Download /
+              Save page and upload the file with the <em>Upload file</em> tab. Screenshots and PDFs will not work.</li>
+            <li>Paste the link, add your details and tap <em>Calculate My CAT Score</em>.</li>
+          </ol>
+
+          <h2>CAT response sheet 2026: release date and answer key</h2>
+          <p>
+            The IIMs have not announced the CAT 2026 response sheet date yet. Going by last year, expect it in the <strong>first week of December
+            2026</strong>, a few days after the exam on 29 November. The provisional answer key is released with it, followed by a short window to
+            challenge answers.
+          </p>
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead>
+                <tr><th>Step</th><th>CAT 2025 (actual)</th><th>CAT 2026 (expected)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Exam</td><td>30 November 2025</td><td>29 November 2026</td></tr>
+                <tr><td>Response sheet + provisional answer key</td><td>4 December 2025</td><td>First week of December 2026</td></tr>
+                <tr><td>Answer key objection window</td><td>8 to 10 December 2025</td><td>A few days after the key</td></tr>
+                <tr><td>Objection fee</td><td>Rs 1,500 per question (refunded if accepted)</td><td>To be announced</td></tr>
+                <tr><td>Final answer key and result</td><td>With the result</td><td>Late December 2026 or early January 2027</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Checked your score before the CAT 2026 answer key is out? Your report link updates automatically once the official key is loaded,
+            so you never need to re-enter anything.
+          </p>
+
+          <h2>CAT score vs percentile 2026 (based on CAT 2025)</h2>
+          <p>
+            CAT percentile depends on how everyone else did, so no tool can give the official figure before the result. The table below shows
+            roughly how many <strong>raw marks out of 204</strong> were needed for each percentile in CAT 2025. These are approximate ranges from
+            published post-result analyses by coaching institutes, not official IIM data, and they vary by slot.
+          </p>
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead>
+                <tr><th>Percentile</th><th>Approx. overall raw marks (CAT 2025)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>99.5</td><td>about 96</td></tr>
+                <tr><td>99</td><td>85 to 93</td></tr>
+                <tr><td>95</td><td>62 to 68</td></tr>
+                <tr><td>90</td><td>51 to 53</td></tr>
+                <tr><td>80</td><td>about 41</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>CAT marks vs percentile: section wise and over the years</h3>
+          <p>
+            For a <strong>99 percentile in each section</strong> in CAT 2025, estimates put VARC at about 39 to 44, DILR at about 30 to 32 and QA at
+            about 27 to 31 raw marks. The overall mark for 99 percentile moves a lot with difficulty: roughly 98 in 2021, 84 in 2022, 76 in 2023,
+            96 in 2024 and 85 to 93 in 2025. So compare your score with the same year's paper, not an old table.
+          </p>
+          <h3>CAT raw score vs scaled score (normalisation)</h3>
+          <p>
+            This calculator gives your <strong>raw score</strong>: 3 marks per correct answer minus 1 per wrong MCQ. Because CAT runs in three
+            slots with different papers, the IIMs first convert raw scores into <strong>scaled scores</strong> so that the slots are comparable,
+            and then compute percentiles from the scaled scores. That is why two students with the same raw score in different slots can get
+            different percentiles.
+          </p>
+
+          <h2>After the CAT 2026 response sheet: result and scorecard</h2>
+          <p>
+            The CAT 2026 result and scorecard will be published on iimcat.ac.in, expected in late December 2026 or early January 2027. Your
+            scorecard shows scaled scores and percentiles for each section and overall, which institutes then use for shortlisting along with
+            their own sectional cut-offs.
           </p>
 
           <h3>More free tools from IPM Careers</h3>
