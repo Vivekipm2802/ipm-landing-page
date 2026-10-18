@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import styles from './AppShell.module.css';
+import Head from 'next/head';
+import lightStyles from './AppShell.module.css';
+import darkStyles from './AppShellDark.module.css';
+
+// Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
+const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms'];
 
 const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => {
   const router = useRouter();
+  const isDark = DARK_ROUTES.some((r) => router.pathname === r || router.pathname.startsWith(r + '/'));
+  const styles = isDark ? darkStyles : lightStyles;
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -117,6 +124,14 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
   return (
     <div className={styles.shell}>
+      {isDark && (
+        <Head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+          <meta name="theme-color" content="#0b0b0c" />
+        </Head>
+      )}
       {/* Top Navigation Bar */}
       <header className={`${styles.topbar} ${isScrolled ? styles.topbarScrolled : ''}`}>
         <div className={styles.topbarContent}>
@@ -148,7 +163,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
             )}
             <Link href="/" className={styles.logo}>
               <img
-                src="/hd-logo.svg"
+                src={isDark ? "/whitelogoipm.svg" : "/hd-logo.svg"}
                 alt="IPM Careers"
                 className={styles.logoImg}
               />

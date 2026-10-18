@@ -542,7 +542,7 @@ export default function IimbUgScoreCalculator() {
                     />
                     <span className={styles.urlHint}>
                       Open your response sheet after login and copy the link from the address bar.{" "}
-                      <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#833589", fontWeight: 600 }}>How?</a>
+                      <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#f9a01b", fontWeight: 600 }}>How?</a>
                     </span>
                   </div>
                 ) : (
@@ -567,7 +567,7 @@ export default function IimbUgScoreCalculator() {
                   </div>
                   <span className={styles.urlHint}>
                     Not sure how to save it?{" "}
-                    <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#833589", fontWeight: 600 }}>See the steps</a>
+                    <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#f9a01b", fontWeight: 600 }}>See the steps</a>
                   </span>
                 </div>
                 )}

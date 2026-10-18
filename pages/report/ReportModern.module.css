@@ -106,11 +106,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(18,19,24,0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(236,232,225,0.12);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   border-radius: 100px;
   padding: 4px;
   font-size: 13px;
@@ -136,9 +136,9 @@
 }
 
 .toggleBtnActive {
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(255,190,92,0.2);
   color: var(--accent-purple);
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 20px rgba(0,0,0,0.33);
 }
 
 /* ── HERO SECTION ── */
@@ -147,7 +147,7 @@
   z-index: 1;
   padding: 48px 32px 40px;
   margin: 0 -1rem;
-  background: linear-gradient(165deg, #12102e 0%, #1a0f3d 40%, #0f1a3d 100%);
+  background: linear-gradient(165deg, #0e0f12 0%, #0e0f12 40%, #0f1a3d 100%);
   border-bottom: 1px solid var(--glass-border);
   overflow: hidden;
 }
@@ -156,8 +156,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(255,190,92,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(6,182,212,0.08) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -186,9 +186,9 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  background: rgba(168, 85, 247, 0.15);
+  background: rgba(255,190,92,0.15);
   color: var(--accent-purple);
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(249,160,27,0.2);
 }
 
 .heroDate {
@@ -201,7 +201,7 @@
   font-weight: 800;
   line-height: 1.05;
   margin: 0 0 4px;
-  background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+  background: linear-gradient(135deg, #0b0b0c 0%, rgba(11,11,12,0.7) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -236,7 +236,7 @@
 
 .ringTrack {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.06);
+  stroke: rgba(244,241,234,0.06);
   stroke-width: 8;
 }
 
@@ -285,7 +285,7 @@
   font-size: clamp(44px, 7vw, 64px);
   font-weight: 900;
   line-height: 1;
-  color: #fff;
+  color: #f4f1ea;
 }
 
 .heroScoreMax {
@@ -303,7 +303,7 @@
   border-radius: 100px;
   font-size: 14px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(18,19,24,0.05);
   border: 1px solid var(--glass-border);
   color: var(--text-secondary);
 }
@@ -324,14 +324,14 @@
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(18,19,24,0.04);
   border: 1px solid var(--glass-border);
   color: var(--text-secondary);
   transition: all 0.2s;
 }
 
 .heroChip:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(18,19,24,0.07);
   border-color: var(--glass-border-hover);
 }
 
@@ -353,7 +353,7 @@
   justify-content: center;
   border-radius: 10px;
   font-size: 18px;
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(255,190,92,0.12);
 }
 
 .sectionTitle {
@@ -478,7 +478,7 @@
 
 .donutTrack {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.04);
+  stroke: rgba(244,241,234,0.04);
   stroke-width: 20;
 }
 
@@ -500,7 +500,7 @@
 
 .donutSkipped {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.1);
+  stroke: rgba(244,241,234,0.1);
   stroke-width: 20;
   stroke-linecap: round;
   transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -541,7 +541,7 @@
 
 .legendCorrect { background: var(--accent-green); }
 .legendWrong { background: var(--accent-red); }
-.legendSkipped { background: rgba(255, 255, 255, 0.2); }
+.legendSkipped { background: rgba(18,19,24,0.2); }
 
 /* ── SUBJECT PERFORMANCE CARDS ── */
 .subjectGrid {
@@ -605,7 +605,7 @@
 .subjectBarTrack {
   height: 6px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(18,19,24,0.06);
   margin: 16px 0 12px;
   overflow: hidden;
 }
@@ -642,7 +642,7 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--accent-pink);
-  background: rgba(236, 72, 153, 0.1);
+  background: rgba(255,190,92,0.1);
   padding: 4px 12px;
   border-radius: 100px;
 }
@@ -689,8 +689,8 @@
 }
 
 .flashBack {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
-  border-color: rgba(168, 85, 247, 0.2);
+  background: linear-gradient(135deg, rgba(255,190,92,0.15) 0%, rgba(6,182,212,0.1) 100%);
+  border-color: rgba(249,160,27,0.2);
   transform: rotateY(180deg);
   align-items: center;
   justify-content: center;
@@ -799,7 +799,7 @@
 .cutoffTrack {
   height: 10px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(18,19,24,0.06);
   position: relative;
   overflow: visible;
 }
@@ -809,7 +809,7 @@
   border-radius: 5px;
   background: linear-gradient(90deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
   transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 16px rgba(0,0,0,0.55);
 }
 
 .cutoffMarker {
@@ -886,7 +886,7 @@
   flex: 1;
   height: 8px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(18,19,24,0.06);
 }
 
 .probBarFill {
@@ -895,9 +895,9 @@
   transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.probHigh { background: var(--accent-green); box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
-.probMedium { background: var(--accent-amber); box-shadow: 0 0 12px rgba(245, 158, 11, 0.3); }
-.probLow { background: var(--accent-red); box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+.probHigh { background: var(--accent-green); box-shadow: 0 0 12px rgba(16,185,129,0.3); }
+.probMedium { background: var(--accent-amber); box-shadow: 0 0 12px rgba(245,158,11,0.3); }
+.probLow { background: var(--accent-red); box-shadow: 0 0 12px rgba(0,0,0,0.55); }
 
 .probValue {
   font-size: 22px;
@@ -960,7 +960,7 @@
 }
 
 .recActionCard {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(18,19,24,0.03);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 20px;
@@ -969,8 +969,8 @@
 }
 
 .recActionCard:hover {
-  background: rgba(168, 85, 247, 0.06);
-  border-color: rgba(168, 85, 247, 0.2);
+  background: rgba(255,190,92,0.06);
+  border-color: rgba(249,160,27,0.2);
   transform: translateY(-2px);
 }
 
@@ -1003,8 +1003,8 @@
   margin-top: 20px;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
-  background: rgba(168, 85, 247, 0.06);
-  border: 1px solid rgba(168, 85, 247, 0.1);
+  background: rgba(255,190,92,0.06);
+  border: 1px solid rgba(249,160,27,0.1);
   font-size: 13px;
   color: var(--text-secondary);
   display: flex;
@@ -1021,7 +1021,7 @@
 }
 
 .recPathCard {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(18,19,24,0.02);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 24px;
@@ -1096,7 +1096,7 @@
 }
 
 .shareCard {
-  background: linear-gradient(135deg, #12102e 0%, #1a0f3d 50%, #0f1a3d 100%);
+  background: linear-gradient(135deg, #0e0f12 0%, #0e0f12 50%, #0f1a3d 100%);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 32px;
@@ -1114,7 +1114,7 @@
 .shareCardScore {
   font-size: 48px;
   font-weight: 900;
-  color: #fff;
+  color: #f4f1ea;
   line-height: 1;
 }
 
@@ -1169,7 +1169,7 @@
 
 .shareBtnWhatsApp {
   background: #25d366;
-  color: #fff;
+  color: #f4f1ea;
 }
 
 .shareBtnWhatsApp:hover {
@@ -1178,13 +1178,13 @@
 }
 
 .shareBtnCopy {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(18,19,24,0.08);
   color: var(--text-primary);
   border: 1px solid var(--glass-border);
 }
 
 .shareBtnCopy:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(18,19,24,0.12);
 }
 
 /* ── DETAILED TABLE ── */
@@ -1207,7 +1207,7 @@
 }
 
 .dataTable thead {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(18,19,24,0.04);
 }
 
 .dataTable th {
@@ -1223,12 +1223,12 @@
 
 .dataTable td {
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(236,232,225,0.12);
   color: var(--text-secondary);
 }
 
 .dataTable tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(18,19,24,0.02);
 }
 
 .statusBadge {
@@ -1240,22 +1240,22 @@
 }
 
 .badgeCorrect {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(16,185,129,0.12);
   color: var(--accent-green);
 }
 
 .badgeIncorrect {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(255,190,92,0.12);
   color: var(--accent-red);
 }
 
 .badgeUnattempted {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(18,19,24,0.06);
   color: var(--text-muted);
 }
 
 .badgeReview {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(245,158,11,0.12);
   color: var(--accent-amber);
 }
 
@@ -1300,7 +1300,7 @@
   padding: 12px 32px;
   border-radius: 100px;
   border: 1px solid var(--glass-border);
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(255,190,92,0.12);
   color: var(--accent-purple);
   font-size: 14px;
   font-weight: 600;
@@ -1310,7 +1310,7 @@
 }
 
 .downloadBtn:hover {
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(255,190,92,0.2);
   transform: translateY(-1px);
 }
 
@@ -1506,8 +1506,8 @@
   }
 
   .modernReport {
-    background: #f8f9fc !important;
-    color: #1a1a2e !important;
+    background: #121318 !important;
+    color: #f4f1ea !important;
     padding: 0 1rem 2rem !important;
   }
 
@@ -1523,8 +1523,8 @@
 
   /* ── Hero: branded dark header ── */
   .hero {
-    background: linear-gradient(165deg, #12102e 0%, #1a0f3d 40%, #0f1a3d 100%) !important;
-    color: #fff !important;
+    background: linear-gradient(165deg, #0e0f12 0%, #0e0f12 40%, #0f1a3d 100%) !important;
+    color: #f4f1ea !important;
     border-radius: 20px !important;
     margin: 0 !important;
     padding: 32px 28px !important;
@@ -1534,59 +1534,59 @@
   .heroGreeting {
     background: none !important;
     -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: #ffffff !important;
+    -webkit-text-fill-color: #f4f1ea !important;
     background-clip: unset !important;
-    color: #ffffff !important;
+    color: #f4f1ea !important;
     font-size: 36px !important;
   }
 
   .heroSub {
-    color: rgba(255,255,255,0.7) !important;
+    color: rgba(244,241,234,0.7) !important;
   }
 
   .heroPill {
-    background: rgba(168, 85, 247, 0.25) !important;
-    color: #c084fc !important;
-    border-color: rgba(168, 85, 247, 0.4) !important;
+    background: rgba(255,190,92,0.25) !important;
+    color: #ffbe5c !important;
+    border-color: rgba(249,160,27,0.4) !important;
   }
 
   .heroDate {
-    color: rgba(255,255,255,0.5) !important;
+    color: rgba(244,241,234,0.5) !important;
   }
 
   .heroScoreNum {
-    color: #ffffff !important;
+    color: #f4f1ea !important;
     font-size: 48px !important;
   }
 
   .heroScoreMax {
-    color: rgba(255,255,255,0.4) !important;
+    color: rgba(244,241,234,0.4) !important;
   }
 
   .heroVibe {
-    background: rgba(255,255,255,0.1) !important;
-    color: rgba(255,255,255,0.8) !important;
-    border-color: rgba(255,255,255,0.15) !important;
+    background: rgba(18,19,24,0.1) !important;
+    color: rgba(244,241,234,0.8) !important;
+    border-color: rgba(236,232,225,0.12) !important;
   }
 
   .heroChip {
-    background: rgba(255,255,255,0.08) !important;
-    color: rgba(255,255,255,0.8) !important;
-    border-color: rgba(255,255,255,0.12) !important;
+    background: rgba(18,19,24,0.08) !important;
+    color: rgba(244,241,234,0.8) !important;
+    border-color: rgba(236,232,225,0.12) !important;
   }
 
   /* Grade ring */
   .gradeLetter {
-    color: var(--grade-color, #a855f7) !important;
+    color: var(--grade-color, #ffbe5c) !important;
     text-shadow: none !important;
   }
 
   .gradeLabel {
-    color: rgba(255,255,255,0.5) !important;
+    color: rgba(244,241,234,0.5) !important;
   }
 
   .ringTrack {
-    stroke: rgba(255,255,255,0.1) !important;
+    stroke: rgba(244,241,234,0.1) !important;
   }
 
   .ringProgress {
@@ -1599,15 +1599,15 @@
   }
 
   .sectionTitle {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .sectionSub {
-    color: #64748b !important;
+    color: #cfc9bf !important;
   }
 
   .sectionIcon {
-    background: rgba(168, 85, 247, 0.1) !important;
+    background: rgba(255,190,92,0.1) !important;
   }
 
   /* ── Bento stat cards ── */
@@ -1616,71 +1616,71 @@
   }
 
   .bentoCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
     border-radius: 16px !important;
     page-break-inside: avoid;
   }
 
   .bentoCard::before {
     opacity: 1 !important;
-    background: var(--card-accent, #a855f7) !important;
+    background: var(--card-accent, #ffbe5c) !important;
   }
 
   .bentoValue {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .bentoLabel {
-    color: #64748b !important;
+    color: #cfc9bf !important;
   }
 
   .bentoSub {
-    color: #94a3b8 !important;
+    color: #9a958c !important;
   }
 
   /* ── Donut chart card ── */
   .donutCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
     border-radius: 16px !important;
     page-break-inside: avoid;
   }
 
   .donutLegend span {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   /* ── Subject cards ── */
   .subjectCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
     border-radius: 16px !important;
     page-break-inside: avoid;
   }
 
   .subjectName {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .subjectType {
-    color: #94a3b8 !important;
+    color: #9a958c !important;
   }
 
   .subjectScore {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .subjectMax {
-    color: #94a3b8 !important;
+    color: #9a958c !important;
   }
 
   .subjectStat {
-    color: #64748b !important;
+    color: #cfc9bf !important;
   }
 
   .subjectBarTrack {
-    background: #e2e8f0 !important;
+    background: rgba(59,130,246,0.15) !important;
   }
 
   /* ── Flash / Review Cards: show FRONT only ── */
@@ -1703,8 +1703,8 @@
 
   .flashFront {
     position: relative !important;
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
   }
 
   .flashBack {
@@ -1712,16 +1712,16 @@
   }
 
   .flashTag {
-    background: var(--card-color, #a855f7) !important;
-    color: #ffffff !important;
+    background: var(--card-color, #ffbe5c) !important;
+    color: #0b0b0c !important;
   }
 
   .flashQNum {
-    color: var(--card-color, #a855f7) !important;
+    color: var(--card-color, #ffbe5c) !important;
   }
 
   .flashYourAns {
-    color: #ef4444 !important;
+    color: #ffbe5c !important;
   }
 
   .flashHint {
@@ -1729,32 +1729,32 @@
   }
 
   .flashCount {
-    color: #a855f7 !important;
+    color: #ffbe5c !important;
   }
 
   /* ── Cutoff / Recommendation card ── */
   .cutoffCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
     border-radius: 16px !important;
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
     page-break-inside: avoid;
   }
 
   .recCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
     border-radius: 16px !important;
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
     page-break-inside: avoid;
   }
 
   .recTitle {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .recDesc {
-    color: #475569 !important;
+    color: #cfc9bf !important;
   }
 
   /* ── Question table ── */
@@ -1763,61 +1763,61 @@
   }
 
   .questionTable th {
-    color: #64748b !important;
-    border-bottom-color: #e2e8f0 !important;
+    color: #cfc9bf !important;
+    border-bottom-color: rgba(59,130,246,0.4) !important;
   }
 
   .questionTable td {
-    color: #1a1a2e !important;
-    border-bottom-color: #f1f5f9 !important;
+    color: #f4f1ea !important;
+    border-bottom-color: rgba(59,130,246,0.4) !important;
   }
 
   /* ── Footer ── */
   .footer {
-    background: #f1f5f9 !important;
-    border-color: #e2e8f0 !important;
-    color: #64748b !important;
+    background: rgba(59,130,246,0.14) !important;
+    border-color: rgba(59,130,246,0.4) !important;
+    color: #cfc9bf !important;
     page-break-inside: avoid;
   }
 
   .footerBrand {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .footerTagline {
-    color: #64748b !important;
+    color: #cfc9bf !important;
   }
 
   .footerMeta {
-    color: #94a3b8 !important;
+    color: #9a958c !important;
   }
 
   /* ── Compare grid ── */
   .compareCard {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    color: #1a1a2e !important;
+    background: #121318 !important;
+    border: 1px solid rgba(59,130,246,0.4) !important;
+    color: #f4f1ea !important;
   }
 
   .compareLabel {
-    color: #64748b !important;
+    color: #cfc9bf !important;
   }
 
   .compareValue {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   /* ── Probability bar ── */
   .probBarTrack {
-    background: #e2e8f0 !important;
+    background: rgba(59,130,246,0.15) !important;
   }
 
   .probLabel {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 
   .probValue {
-    color: #1a1a2e !important;
+    color: #f4f1ea !important;
   }
 }
 

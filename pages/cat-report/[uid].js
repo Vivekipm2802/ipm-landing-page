@@ -164,7 +164,7 @@ export default function CatReport({ report }) {
               <span><i className={ui.legendDot} style={{ background: "#86efac" }}></i>Correct (+3)</span>
               <span><i className={ui.legendDot} style={{ background: "#fca5a5" }}></i>Wrong (MCQ -1, TITA 0)</span>
               <span><i className={ui.legendDot} style={{ background: "#fde68a" }}></i>Waiting for key</span>
-              <span><i className={ui.legendDot} style={{ background: "#E5C9EA" }}></i>Not attempted</span>
+              <span><i className={ui.legendDot} style={{ background: "rgba(236,232,225,0.25)" }}></i>Not attempted</span>
             </div>
           </div>
 

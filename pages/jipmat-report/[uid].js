@@ -35,7 +35,7 @@ function getGrade(score, max) {
   if (pct >= 50) return { letter: "A", vibe: "Solid performance. Great effort.", color: "#a855f7" };
   if (pct >= 40) return { letter: "B", vibe: "In the fight. Room to grow.", color: "#ff8c42" };
   if (pct >= 25) return { letter: "C", vibe: "Foundation built. Keep pushing.", color: "#ff5e7e" };
-  return { letter: "D", vibe: "Every journey starts somewhere. Rise up.", color: "#833589" };
+  return { letter: "D", vibe: "Every journey starts somewhere. Rise up.", color: "#f9a01b" };
 }
 
 // ═══════ SECTION CALCULATOR ═══════
@@ -133,7 +133,7 @@ export default function JipmatReport({ data: rawData, isFound }) {
               href="/jipmat"
               style={{
                 marginTop: "1.5rem",
-                color: "#833589",
+                color: "#f9a01b",
                 fontSize: "0.88rem",
                 fontWeight: 700,
               }}
@@ -182,13 +182,13 @@ function ReportBody({ parsedData }) {
       name: "Quantitative Aptitude (QA)",
       data: qa,
       questions: parsedData.qa || [],
-      color: "#833589",
+      color: "#f9a01b",
     },
     {
       name: "Data Interpretation & LR (DILR)",
       data: lrdi,
       questions: parsedData.lrdi || [],
-      color: "#a855b5",
+      color: "#ffbe5c",
     },
     {
       name: "Verbal Ability & RC (VARC)",

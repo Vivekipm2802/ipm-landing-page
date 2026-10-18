@@ -340,7 +340,7 @@ function JipmatScoreCalculator() {
       ctx.fillRect(0, 0, W, H);
 
       ctx.textAlign = "center";
-      ctx.fillStyle = "#c084fc";
+      ctx.fillStyle = "#f9a01b";
       ctx.font = "800 30px Inter, sans-serif";
       ctx.fillText("⚡ JIPMAT 2026 SCORECARD", W / 2, 110);
 
@@ -366,9 +366,9 @@ function JipmatScoreCalculator() {
       ctx.stroke();
       const frac = Math.max(0, Math.min(1, (totalScore || 0) / 400));
       const ringGrad = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
-      ringGrad.addColorStop(0, "#a855b5");
-      ringGrad.addColorStop(0.6, "#833589");
-      ringGrad.addColorStop(1, "#38bdf8");
+      ringGrad.addColorStop(0, "#f9a01b");
+      ringGrad.addColorStop(0.6, "#ffbe5c");
+      ringGrad.addColorStop(1, "#ffe9c4");
       ctx.strokeStyle = ringGrad;
       ctx.shadowColor = "rgba(168,85,181,0.6)";
       ctx.shadowBlur = 30;
@@ -390,8 +390,8 @@ function JipmatScoreCalculator() {
 
       // Section bars
       const secs = [
-        { n: "QA", s: data?.qaStats?.score || 0, m: (data?.qa?.length || 33) * 4, c: "#a855b5" },
-        { n: "DILR", s: data?.lrdiStats?.score || 0, m: (data?.lrdi?.length || 33) * 4, c: "#38bdf8" },
+        { n: "QA", s: data?.qaStats?.score || 0, m: (data?.qa?.length || 33) * 4, c: "#f9a01b" },
+        { n: "DILR", s: data?.lrdiStats?.score || 0, m: (data?.lrdi?.length || 33) * 4, c: "#ffe9c4" },
         { n: "VARC", s: data?.varcStats?.score || 0, m: (data?.varc?.length || 34) * 4, c: "#34d399" },
       ];
       let y = 890;
@@ -418,7 +418,7 @@ function JipmatScoreCalculator() {
       ctx.fillStyle = "#94a3b8";
       ctx.font = "700 28px Inter, sans-serif";
       ctx.fillText("calculate yours →  register.ipmcareer.com/jipmat", W / 2, 1245);
-      ctx.fillStyle = "#c084fc";
+      ctx.fillStyle = "#f9a01b";
       ctx.font = "900 30px Inter, sans-serif";
       ctx.fillText("IPM CAREERS · RUN BY IIM ALUMNI", W / 2, 1298);
 
@@ -488,8 +488,8 @@ function JipmatScoreCalculator() {
 
   const sectionRows = data
     ? [
-        { short: "QA", name: "Quant Aptitude", stats: data.qaStats, count: data.qa?.length || 33, color: "#a855b5" },
-        { short: "DILR", name: "DI & Logical Reasoning", stats: data.lrdiStats, count: data.lrdi?.length || 33, color: "#38bdf8" },
+        { short: "QA", name: "Quant Aptitude", stats: data.qaStats, count: data.qa?.length || 33, color: "#f9a01b" },
+        { short: "DILR", name: "DI & Logical Reasoning", stats: data.lrdiStats, count: data.lrdi?.length || 33, color: "#ffe9c4" },
         { short: "VARC", name: "Verbal Ability & RC", stats: data.varcStats, count: data.varc?.length || 34, color: "#34d399" },
       ]
     : [];
@@ -586,9 +586,9 @@ function JipmatScoreCalculator() {
                         <svg viewBox="0 0 160 160" className={styles.gRingSvg}>
                           <defs>
                             <linearGradient id="jipgrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#a855b5" />
-                              <stop offset="55%" stopColor="#833589" />
-                              <stop offset="100%" stopColor="#38bdf8" />
+                              <stop offset="0%" stopColor="#f9a01b" />
+                              <stop offset="55%" stopColor="#ffbe5c" />
+                              <stop offset="100%" stopColor="#ffe9c4" />
                             </linearGradient>
                           </defs>
                           <circle cx="80" cy="80" r={RING_R} className={styles.gRingTrack} />
@@ -637,7 +637,7 @@ function JipmatScoreCalculator() {
                           <div className={styles.gQuickLab}>wrong</div>
                         </div>
                         <div className={styles.gQuickStat}>
-                          <div className={styles.gQuickVal} style={{ color: "#38bdf8" }}>
+                          <div className={styles.gQuickVal} style={{ color: "#ffe9c4" }}>
                             {accuracy}%
                           </div>
                           <div className={styles.gQuickLab}>accuracy</div>

@@ -183,7 +183,7 @@ export default function IimbReport({ report }) {
                 <div className={ui.legend}>
                   <span><i className={ui.legendDot} style={{ background: "#86efac" }}></i>Correct (+3)</span>
                   <span><i className={ui.legendDot} style={{ background: "#fca5a5" }}></i>Wrong (-1)</span>
-                  <span><i className={ui.legendDot} style={{ background: "#E5C9EA" }}></i>Not attempted (0)</span>
+                  <span><i className={ui.legendDot} style={{ background: "rgba(236,232,225,0.25)" }}></i>Not attempted (0)</span>
                 </div>
               </div>
 

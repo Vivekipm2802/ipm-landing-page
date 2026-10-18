@@ -138,12 +138,12 @@ function useCountUp(target, duration = 1600) {
 function getGrade(score, max) {
   const pct = (score / max) * 100;
   if (pct >= 80) return { letter: 'S+', vibe: 'Absolute legend. IIM is calling! 🔥', emoji: '👑', color: '#ffd700' };
-  if (pct >= 70) return { letter: 'S',  vibe: 'You nailed it. IIM bound.', emoji: '🚀', color: '#00d4ff' };
+  if (pct >= 70) return { letter: 'S',  vibe: 'You nailed it. IIM bound.', emoji: '🚀', color: '#ffe9c4' };
   if (pct >= 60) return { letter: 'A+', vibe: 'Strong performance. PI prep time!', emoji: '💪', color: '#00ff88' };
-  if (pct >= 50) return { letter: 'A',  vibe: 'Well played. Great effort.', emoji: '⚡', color: '#a855f7' };
+  if (pct >= 50) return { letter: 'A',  vibe: 'Well played. Great effort.', emoji: '⚡', color: '#f9a01b' };
   if (pct >= 40) return { letter: 'B',  vibe: 'Decent show. Explore your options.', emoji: '🎯', color: '#ff8c42' };
   if (pct >= 25) return { letter: 'C',  vibe: 'Tough paper. Keep your head up.', emoji: '📈', color: '#ff5e7e' };
-  return { letter: 'D', vibe: 'This is just one exam. Your journey continues.', emoji: '🌱', color: '#6c63ff' };
+  return { letter: 'D', vibe: 'This is just one exam. Your journey continues.', emoji: '🌱', color: '#ffbe5c' };
 }
 
 // Hero Reveal (Classic)
@@ -281,15 +281,15 @@ const Flashcards = ({ jsonData }) => {
   const wrong = [];
   if (jsonData?.sa) jsonData.sa.forEach((q, i) => {
     if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
-      wrong.push({ ...q, type: 'SA', subject: 'Quant (SA)', num: i + 1, color: '#6c63ff' });
+      wrong.push({ ...q, type: 'SA', subject: 'Quant (SA)', num: i + 1, color: '#f9a01b' });
   });
   if (jsonData?.mcq) jsonData.mcq.forEach((q, i) => {
     if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
-      wrong.push({ ...q, type: 'MCQ', subject: 'Quant (MCQ)', num: i + 1, color: '#00d4ff' });
+      wrong.push({ ...q, type: 'MCQ', subject: 'Quant (MCQ)', num: i + 1, color: '#ffbe5c' });
   });
   if (jsonData?.va) jsonData.va.forEach((q, i) => {
     if (q.status !== 'Not Answered' && q.givenAnswer !== q.rightAnswer)
-      wrong.push({ ...q, type: 'VA', subject: 'Verbal Ability', num: i + 1, color: '#ff5e7e' });
+      wrong.push({ ...q, type: 'VA', subject: 'Verbal Ability', num: i + 1, color: '#ffe9c4' });
   });
   const top = wrong.slice(0, 8);
   const [flipped, setFlipped] = useState({});
@@ -792,9 +792,9 @@ function Report({ data, error, isFound }) {
             <div className={styles.performanceSection}>
               <h2 className={styles.sectionTitle}>Subject Deep-Dive 🔬</h2>
               <div className={styles.subjectGrid}>
-                <SubjectBar title="Short Answer" subtitle="Quantitative Ability (no negative)" score={scores.sa.score} max={scores.sa.max} correct={stats.sa.correct} total={stats.sa.total} color="#6c63ff" />
-                <SubjectBar title="Multiple Choice" subtitle="Quantitative Ability" score={scores.mcq.score} max={scores.mcq.max} correct={stats.mcq.correct} total={stats.mcq.total} color="#00d4ff" />
-                <SubjectBar title="Verbal Ability" subtitle="Reading Comprehension" score={scores.va.score} max={scores.va.max} correct={stats.va.correct} total={stats.va.total} color="#ff5e7e" />
+                <SubjectBar title="Short Answer" subtitle="Quantitative Ability (no negative)" score={scores.sa.score} max={scores.sa.max} correct={stats.sa.correct} total={stats.sa.total} color="#f9a01b" />
+                <SubjectBar title="Multiple Choice" subtitle="Quantitative Ability" score={scores.mcq.score} max={scores.mcq.max} correct={stats.mcq.correct} total={stats.mcq.total} color="#ffbe5c" />
+                <SubjectBar title="Verbal Ability" subtitle="Reading Comprehension" score={scores.va.score} max={scores.va.max} correct={stats.va.correct} total={stats.va.total} color="#ffe9c4" />
               </div>
             </div>
           )}

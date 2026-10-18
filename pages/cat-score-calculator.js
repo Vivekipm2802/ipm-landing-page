@@ -466,7 +466,7 @@ export default function CatScoreCalculator() {
                     />
                     <span className={styles.urlHint}>
                       Open your response sheet after logging in at iimcat.ac.in and copy the link.{" "}
-                      <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#833589", fontWeight: 600 }}>How?</a>
+                      <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#f9a01b", fontWeight: 600 }}>How?</a>
                     </span>
                   </div>
                 ) : (
