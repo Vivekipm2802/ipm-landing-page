@@ -1,4 +1,5 @@
-// GET /api/cat-leaderboard → top 10 fully-scored CAT 2026 sheets + total count.
+// GET /api/cat-leaderboard → top 10 CAT 2026 scores + total count.
+// Sheets still waiting for part of the answer key are included and flagged provisional.
 // Public data only: first name + last initial, city, score. Never phone/email.
 import { catDb, shortName } from "../../lib/catServer";
 import { EXAM_YEAR } from "../../lib/catScoring";
@@ -10,9 +11,8 @@ export default async function handler(req, res) {
     const db = catDb();
     const [top, total] = await Promise.all([
       db.from("cat_responses")
-        .select("name, city, score_total")
+        .select("name, city, score_total, pending_key")
         .eq("exam_year", EXAM_YEAR)
-        .eq("pending_key", 0)
         .not("score_total", "is", null)
         .order("score_total", { ascending: false })
         .order("created_at", { ascending: true })
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     ]);
     if (top.error) return res.status(500).json({ error: "Failed to fetch leaderboard" });
     return res.status(200).json({
-      leaderboard: (top.data || []).map((r) => ({ name: shortName(r.name), city: r.city || "", total: Number(r.score_total) || 0 })),
+      leaderboard: (top.data || []).map((r) => ({ name: shortName(r.name), city: r.city || "", total: Number(r.score_total) || 0, provisional: (r.pending_key || 0) > 0 })),
       count: total.count || 0,
     });
   } catch {

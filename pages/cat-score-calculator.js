@@ -1,7 +1,6 @@
 import { sendLeadToCrm } from "../lib/crm";
 import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import { NextSeo } from "next-seo";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -263,7 +262,7 @@ export default function CatScoreCalculator() {
           <div className={styles.socialProof}>
             {count > 0 && (
               <>
-                <div className={styles.proofStat}><span className={styles.proofStatNum}>{count.toLocaleString("en-IN")}+</span> scorecards</div>
+                <div className={styles.proofStat}><span className={styles.proofStatNum}>{count.toLocaleString("en-IN")}{count >= 10 ? "+" : ""}</span> {count === 1 ? "scorecard" : "scorecards"}</div>
                 <div className={styles.proofDot}></div>
               </>
             )}
@@ -302,7 +301,7 @@ export default function CatScoreCalculator() {
                   <div className={styles.scorecardBg}></div>
                   <div className={styles.scorecardBg2}></div>
                   <div className={styles.scorecardHeader}>
-                    <div className={styles.scorecardTitle}>Your CAT 2026 Scorecard</div>
+                    <div className={styles.scorecardTitle}>Your CAT {result.examYear || 2026} Scorecard</div>
                     <div className={styles.scorecardName}>👤 {result.candidate?.name || result.name}</div>
                   </div>
                   <div className={styles.scoreGrid}>
@@ -551,24 +550,6 @@ export default function CatScoreCalculator() {
               )}
             </div>
 
-            {/* ── Other tools ── */}
-            <div className={styles.featureGrid}>
-              <Link href="/response" className={styles.featureCard}>
-                <span className={styles.featureIcon}>📊</span>
-                <span className={styles.featureName}>IPMAT Score Analyzer</span>
-                <span className={styles.featureDesc}>IPMAT Indore response sheet tool</span>
-              </Link>
-              <Link href="/jipmat" className={styles.featureCard}>
-                <span className={styles.featureIcon}>📝</span>
-                <span className={styles.featureName}>JIPMAT Score Calculator</span>
-                <span className={styles.featureDesc}>NTA JIPMAT response sheet tool</span>
-              </Link>
-              <Link href="/interview-prep" className={styles.featureCard}>
-                <span className={styles.featureIcon}>🤖</span>
-                <span className={styles.featureName}>AI Mock Interview</span>
-                <span className={styles.featureDesc}>Practise for the PI round</span>
-              </Link>
-            </div>
           </div>
 
           {/* ── Side column ── */}
@@ -582,7 +563,7 @@ export default function CatScoreCalculator() {
                   <div className={ui.skeleton}></div>
                 </>
               ) : leaderboard.length === 0 ? (
-                <div className={ui.boardEmpty}>No fully scored sheets yet. Be the first!</div>
+                <div className={ui.boardEmpty}>No scores yet. Be the first!</div>
               ) : (
                 leaderboard.map((s, i) => (
                   <div key={i} className={ui.boardRow}>
@@ -591,11 +572,11 @@ export default function CatScoreCalculator() {
                       {s.name}
                       {s.city && <span className={ui.boardCity}>{s.city}</span>}
                     </span>
-                    <span className={ui.boardScore}>{s.total}</span>
+                    <span className={ui.boardScore} title={s.provisional ? "Provisional: part of the answer key is awaited" : undefined}>{s.total}{s.provisional ? "*" : ""}</span>
                   </div>
                 ))
               )}
-              <div className={ui.boardNote}>*Raw score out of {MAX_SCORE}, from response sheets checked on this tool</div>
+              <div className={ui.boardNote}>Raw score out of {MAX_SCORE}, from response sheets checked on this tool. * Provisional: some answers are waiting for the official key.</div>
             </div>
 
             <div className={ui.ctaCard}>
@@ -744,12 +725,6 @@ export default function CatScoreCalculator() {
             their own sectional cut-offs.
           </p>
 
-          <h3>More free tools from IPM Careers</h3>
-          <p>
-            Preparing a younger sibling for IIM's five-year programme? Try the <Link href="/response">IPMAT Score Analyzer</Link>, the{" "}
-            <Link href="/jipmat">JIPMAT Score Calculator</Link> and the <Link href="/response-v1">IIM Bangalore UG Score Calculator</Link>.
-          </p>
-
           <h2 style={{ fontSize: "1.35rem" }}>Frequently asked questions: CAT 2026 Score Calculator</h2>
           {FAQS.map((f, i) => (
             <details key={i} className={ui.faqItem}>
@@ -794,8 +769,7 @@ export default function CatScoreCalculator() {
                 "@type": "BreadcrumbList",
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "IPM Careers", item: "https://register.ipmcareer.com/" },
-                  { "@type": "ListItem", position: 2, name: "Score Calculators", item: "https://register.ipmcareer.com/response" },
-                  { "@type": "ListItem", position: 3, name: "CAT 2026 Score Calculator", item: PAGE_URL },
+                  { "@type": "ListItem", position: 2, name: "CAT 2026 Score Calculator", item: PAGE_URL },
                 ],
               },
             ],

@@ -18,11 +18,14 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     }
   }, [router.asPath]);
 
+  // CAT pages get their own, separate menu (CAT calculator + Contact Us only)
+  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report');
+
   const handleBack = () => {
     if (canGoBack) {
       router.back();
     } else {
-      router.push('/response');
+      router.push(isCatPage ? '/cat-score-calculator' : '/response');
     }
   };
 
@@ -80,11 +83,10 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     return router.pathname.startsWith(path);
   };
 
-  const navItems = [
+  const ipmNavItems = [
     { icon: '📊', label: 'IPMAT Score Analyzer', path: '/response' },
     { icon: '📝', label: 'JIPMAT Score Calculator', path: '/jipmat' },
     { icon: '🏛️', label: 'IIM-B UG Score Calculator', path: '/response-v1' },
-    { icon: '🎓', label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
     { icon: '📋', label: 'My Report', path: '/report', disabled: false },
     { icon: '🤖', label: 'AI Mock Interview', path: '/interview-prep' },
     { icon: '🏆', label: 'Topper List', path: '/topperlist' },
@@ -92,14 +94,23 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     { icon: '📚', label: 'PI Batch', path: '/pi-batch' },
   ];
 
-  const topNavItems = [
+  const ipmTopNavItems = [
     { label: 'IPMAT Score', path: '/response' },
     { label: 'JIPMAT Score', path: '/jipmat' },
     { label: 'IIM-B UG Score', path: '/response-v1' },
-    { label: 'CAT 2026 Score', path: '/cat-score-calculator' },
     { label: 'AI Interview', path: '/interview-prep' },
     { label: 'College Predictor', path: '/call' },
   ];
+
+  const catNavItems = [
+    { icon: '🎓', label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+  ];
+  const catTopNavItems = [
+    { label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+  ];
+
+  const navItems = isCatPage ? catNavItems : ipmNavItems;
+  const topNavItems = isCatPage ? catTopNavItems : ipmTopNavItems;
 
   return (
     <div className={styles.shell}>
@@ -119,7 +130,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
                 <span className={styles.hamburgerLine}></span>
               </button>
             )}
-            {(showBack !== false && router.pathname !== '/response' && router.pathname !== '/') && (
+            {(showBack !== false && router.pathname !== '/response' && router.pathname !== '/cat-score-calculator' && router.pathname !== '/') && (
               <button
                 className={styles.backBtn}
                 onClick={handleBack}
@@ -165,10 +176,16 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
             </nav>
           )}
 
-          {/* Right: CTA Button */}
-          <Link href="/pi-batch" className={styles.ctaButton}>
-            Enroll in PI Batch
-          </Link>
+          {/* Right: CTA Button (IPM pages only) */}
+          {!isCatPage ? (
+            <Link href="/pi-batch" className={styles.ctaButton}>
+              Enroll in PI Batch
+            </Link>
+          ) : (
+            <a href="tel:8299470392" className={styles.ctaButton}>
+              Contact Us
+            </a>
+          )}
         </div>
       </header>
 

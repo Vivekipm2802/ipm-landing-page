@@ -90,8 +90,9 @@ export default async function handler(req, res) {
   }
 
   const result = scoreCat(parsed.answers, keys);
+  const examYear = parsed.candidate.year && parsed.candidate.year >= 2015 && parsed.candidate.year <= EXAM_YEAR + 1 ? parsed.candidate.year : EXAM_YEAR;
   const row = {
-    exam_year: EXAM_YEAR,
+    exam_year: examYear,
     name, email, phone, category, city,
     candidate_name: clip(parsed.candidate.name, 120),
     test_date: clip(parsed.candidate.testDate, 60),
@@ -105,7 +106,7 @@ export default async function handler(req, res) {
   // Same student, same sheet → update the earlier scorecard instead of adding a duplicate
   let uid = null;
   try {
-    let q = db.from("cat_responses").select("id, uid").eq("exam_year", EXAM_YEAR).eq("phone", phone).limit(1);
+    let q = db.from("cat_responses").select("id, uid").eq("exam_year", examYear).eq("phone", phone).limit(1);
     q = responseUrl ? q.eq("response_url", responseUrl) : q.eq("candidate_name", row.candidate_name).eq("test_date", row.test_date);
     const { data: existing } = await q;
     if (existing && existing.length) {
@@ -124,7 +125,7 @@ export default async function handler(req, res) {
 
   let rank = null, count = null;
   try {
-    const { data } = await db.rpc("cat_score_stats", { p_year: EXAM_YEAR, p_score: result.total });
+    const { data } = await db.rpc("cat_score_stats", { p_year: examYear, p_score: result.total });
     if (data && data[0]) {
       count = Number(data[0].total_students) || null;
       rank = data[0].better_than_you != null ? Number(data[0].better_than_you) + 1 : null;
@@ -133,6 +134,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     uid,
+    examYear,
     candidate: parsed.candidate,
     warnings: parsed.warnings,
     result: {
