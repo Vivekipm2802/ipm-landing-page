@@ -19,7 +19,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   }, [router.asPath]);
 
   // CAT pages get their own, separate menu (CAT calculator + Contact Us only)
-  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report');
+  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms';
 
   const handleBack = () => {
     if (canGoBack) {
@@ -35,6 +35,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
     '/jipmat': 'JIPMAT Score Calculator',
     '/cat-score-calculator': 'CAT 2026 Score Calculator',
     '/cat-report': 'CAT 2026 Report',
+    '/mba-application-forms': 'MBA Forms & Deadlines',
     '/jipmat-report': 'JIPMAT Report',
     '/report': 'My Report',
     '/interview-prep': 'AI Mock Interview',
@@ -104,9 +105,11 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
   const catNavItems = [
     { icon: '🎓', label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+    { icon: '🗓️', label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
   ];
   const catTopNavItems = [
     { label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+    { label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
   ];
 
   const navItems = isCatPage ? catNavItems : ipmNavItems;

@@ -38,6 +38,7 @@ export async function getServerSideProps({ res }) {
     urlNode({ loc: `${SITE}/best-online-ipmat-coaching-india`, lastmod: today, changefreq: 'monthly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/response`,             lastmod: today, changefreq: 'weekly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/cat-score-calculator`, lastmod: today, changefreq: 'weekly', priority: '0.8' }),
+    urlNode({ loc: `${SITE}/mba-application-forms`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
     ...(blogs || []).map(b => urlNode({
       loc: `${SITE}/magazine/${b.slug}`,
       lastmod: (b.updated_at || b.published_at || today),
