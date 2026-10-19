@@ -160,3 +160,26 @@
 .stripRow::-webkit-scrollbar { height: 6px; }
 .stripRow::-webkit-scrollbar-thumb { background: rgba(249,160,27,0.35); border-radius: 6px; }
 .stripRow::-webkit-scrollbar-track { background: transparent; }
+
+/* ═══════════ cleaner cards ═══════════ */
+.grid { gap: 16px !important; }
+.card { gap: 12px !important; padding: 18px !important; border-radius: 20px !important; }
+.name { font-size: 1.12rem !important; }
+.prog { margin-top: -8px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .82rem !important; color: #9a958c !important; }
+.dl { padding: 12px 14px !important; }
+.dlDate { font-size: 1.05rem !important; }
+.nextRound { background: transparent !important; border: 0 !important; padding: 0 !important; color: #fcd34d !important; font-size: .78rem !important; }
+.nextRound::before { content: "⏱ "; }
+.examLine { font-size: .78rem; font-weight: 600; color: #cfc9bf; letter-spacing: .02em; }
+.actions { margin-top: auto; display: flex; gap: 8px; }
+.apply { flex: 1 1 auto; padding: 10px 14px !important; font-size: .88rem !important; }
+.cal { flex: 0 0 auto; width: 42px; display: inline-flex !important; align-items: center; justify-content: center; padding: 0 !important; font-size: 1rem !important; }
+.more { border-top: 1px solid rgba(236,232,225,0.08); padding-top: 10px; margin-top: -2px; }
+.more summary { list-style: none; cursor: pointer; font-size: .78rem; font-weight: 600; color: #9a958c; display: flex; justify-content: space-between; align-items: center; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary::after { content: "+"; color: #f9a01b; font-size: 1rem; line-height: 1; }
+.more[open] summary::after { content: "−"; }
+.more summary:hover { color: #f4f1ea; }
+.moreBody { display: grid; gap: 8px; margin-top: 10px; }
+.chips { display: none !important; }
+.grid { align-items: start; }

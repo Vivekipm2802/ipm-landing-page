@@ -214,32 +214,39 @@ export default function MbaApplicationForms({ builtAt }) {
                       )}
                     </div>
 
-                    {st.next && st.next.date !== r.deadline && (
-                      <div className={s.nextRound}>Next: {st.next.label} · <b>{fmtDate(st.next.date)}</b></div>
+                    {st.next && st.next.date !== r.deadline && r.type !== "symbiosis" && (
+                      <div className={s.nextRound}>{st.next.label} · <b>{fmtDate(st.next.date)}</b></div>
                     )}
 
-                    {r.rounds && r.rounds.length > 1 && (
-                      <ul className={s.rounds}>
-                        {r.rounds.map((x) => (
-                          <li key={x.label} className={new Date(`${x.date}T23:59:59+05:30`).getTime() < now ? s.past : ""}>
-                            <span>{x.label}</span><span>{fmtDate(x.date)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-
-                    <div className={s.chips}>{(r.exams || []).map((e) => <span key={e} className={s.chip}>{e}</span>)}</div>
-                    <div className={s.meta}><b>Fee:</b> {r.fee}</div>
-                    {r.note && <div className={s.meta}>{r.note}</div>}
-                    {r.lastCycle && <div className={s.last}>{r.lastCycle} (for reference only)</div>}
-                    <div className={`${s.src} ${r.source === "official" ? s.srcOk : s.srcWait}`}>
-                      {r.source === "official" ? "✔ Checked on the official website" : "⏳ Official 2027 notice awaited"}
+                    <div className={s.examLine}>
+                      {(r.exams || []).slice(0, 3).join(" · ")}{(r.exams || []).length > 3 ? ` +${r.exams.length - 3}` : ""}
                     </div>
 
                     <div className={s.actions}>
-                      <a className={s.apply} href={r.link} target="_blank" rel="noopener noreferrer nofollow">{st.key === "soon" || st.key === "closed" ? "Official website ↗" : "Apply on official site ↗"}</a>
-                      {cal && <a className={s.cal} href={cal} target="_blank" rel="noopener noreferrer nofollow">📅 Remind me</a>}
+                      <a className={s.apply} href={r.link} target="_blank" rel="noopener noreferrer nofollow">{st.key === "soon" || st.key === "closed" ? "Official site ↗" : "Apply ↗"}</a>
+                      {cal && <a className={s.cal} href={cal} target="_blank" rel="noopener noreferrer nofollow" title="Add the last date to Google Calendar" aria-label="Add the last date to Google Calendar">📅</a>}
                     </div>
+
+                    <details className={s.more}>
+                      <summary>Fee, dates & details</summary>
+                      <div className={s.moreBody}>
+                        <div className={s.meta}><b>Fee:</b> {r.fee}</div>
+                        {r.rounds && r.rounds.length > 1 && (
+                          <ul className={s.rounds}>
+                            {r.rounds.map((x) => (
+                              <li key={x.label} className={new Date(`${x.date}T23:59:59+05:30`).getTime() < now ? s.past : ""}>
+                                <span>{x.label}</span><span>{fmtDate(x.date)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {r.note && <div className={s.meta}>{r.note}</div>}
+                        {r.lastCycle && <div className={s.last}>{r.lastCycle} (for reference only)</div>}
+                        <div className={`${s.src} ${r.source === "official" ? s.srcOk : s.srcWait}`}>
+                          {r.source === "official" ? "✔ Checked on the official website" : "⏳ Official 2027 notice awaited"}
+                        </div>
+                      </div>
+                    </details>
                   </article>
                 );
               })}
