@@ -20,11 +20,7 @@ const DOT = { open: s.dotOpen, closing: s.dotClosing, soon: s.dotSoon, viacat: s
 const BADGE = { open: s.bOpen, closing: s.bClosing, soon: s.bSoon, viacat: s.bViacat, closed: s.bClosed };
 const TYPE_LABEL = { exam: "Entrance exam", iim: "IIM", iit: "IIT", bschool: "B-school", symbiosis: "Symbiosis · SNAP" };
 
-const FAQS = [
-  {
-    q: "Which MBA application forms for 2027-29 are open right now?",
-    a: "As of 18 October 2026, XAT 2027, SNAP 2026, NMAT 2026, MAT December 2026 and IBSAT 2026 registrations are open, along with B-school forms such as SPJIMR, MDI Gurgaon, IIFT, IMT Ghaziabad, XIM, MICA, BITSoM, IMI Delhi, FORE, TAPMI, GIM Goa and K J Somaiya. Use the 'Open now' filter above for the live list.",
-  },
+const FAQS_STATIC = [
   {
     q: "Do I need a separate application for IIMs after CAT?",
     a: "Not for most IIMs: IIM Ahmedabad, Bangalore, Calcutta and most others are selected inside the CAT 2026 form, which closed on 22 September 2026. A few ask for an extra step after the CAT result, such as IIM Mumbai (separate application), IIM Rohtak (paid registration) and IIM Udaipur (registration by email invite).",
@@ -40,6 +36,30 @@ const FAQS = [
   {
     q: "When do the IIT MBA application forms open?",
     a: "The IIT MBA programmes (SJMSOM IIT Bombay, DMS IIT Delhi, DoMS IIT Madras, IIT Kanpur, VGSoM IIT Kharagpur and IIT Roorkee) usually open their forms after the CAT result, between late December and early January, and close in late January or early February.",
+  },
+  {
+    q: "When do MBA admissions 2027 start?",
+    a: "MBA admissions for the 2027-29 batch run through the 2026-27 season: CAT 2026 is on 29 November 2026, XAT 2027 on 3 January 2027 and SNAP on 13, 19 and 26 December 2026. Most B-school application forms open between August 2026 and January 2027, and the IIT MBA forms open after the CAT result.",
+  },
+  {
+    q: "What is the FMS Delhi application form 2027 last date?",
+    a: "FMS Delhi has not released its MBA 2027-29 notice yet. It needs a separate FMS form in addition to CAT, so keep an eye on fms.edu; this tracker updates the card as soon as the official dates are out.",
+  },
+  {
+    q: "What is the IIFT MBA application form 2027 last date?",
+    a: "The IIFT MBA (IB) 2027-29 form opened on 12 October 2026 and closes on 25 November 2026. The fee is ₹3,000 (₹1,500 for reserved categories); shortlisting uses CAT 2026.",
+  },
+  {
+    q: "When will the IIM Mumbai MBA application form 2027 open?",
+    a: "IIM Mumbai needs a separate application in addition to CAT. Last year the form opened after the CAT result, so expect the 2027-29 form around December 2026 or January 2027.",
+  },
+  {
+    q: "Which MBA forms should I fill before CAT?",
+    a: "Several forms close before the CAT exam on 29 November 2026: NMIMS (25 Oct), BITSoM Round 1 (15 Nov), MICAT-I (21 Nov), IIFT and SNAP (25 Nov), SPJIMR and IMT (27 Nov) and MDI Gurgaon (28 Nov). See the 'before CAT vs after CAT' table on this page.",
+  },
+  {
+    q: "How much is the MBA application form fee?",
+    a: "Most B-school forms cost between ₹1,500 and ₹3,500: for example SPJIMR ₹2,500, MDI ₹3,000, IIFT ₹3,000, IMT ₹3,500 and TAPMI ₹2,500 for two programmes. Entrance exams are separate: XAT ₹2,300, SNAP ₹2,550 per attempt and NMAT ₹3,000 plus taxes.",
   },
   {
     q: "Is this list official?",
@@ -108,6 +128,24 @@ export default function MbaApplicationForms({ builtAt }) {
   };
 
   const exams = MBA_FORMS.filter((f) => f.type === "exam" && f.mode !== "year-round");
+  const todayIST = new Date(now + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+  const CAT_DAY = "2026-11-29";
+  const openDated = rows.filter((r) => (r.st.key === "open" || r.st.key === "closing") && r.deadline).sort((a, b) => a.deadline.localeCompare(b.deadline));
+  const openNames = rows.filter((r) => r.st.key === "open" || r.st.key === "closing");
+  const thisWeek = openDated.filter((r) => r.st.days <= 7);
+  const soonList = rows.filter((r) => r.st.key === "soon");
+  const beforeCat = openDated.filter((r) => r.deadline <= CAT_DAY && r.type !== "exam");
+  const afterCat = openDated.filter((r) => r.deadline > CAT_DAY && r.type !== "exam");
+  const iits = rows.filter((r) => r.type === "iit");
+  const feeRows = rows.filter((r) => (r.type === "bschool" || r.type === "iit") && r.fee && !/^(see official|to be announced)/i.test(r.fee));
+  const nonIim = rows.filter((r) => r.type !== "exam" && r.type !== "iim").length;
+  const FAQS = [
+    {
+      q: "Which MBA forms are out right now?",
+      a: `As of ${fmtDate(todayIST)}, ${openNames.length} MBA forms and entrance exam registrations on this page are open, including ${openDated.slice(0, 8).map((r) => `${r.name} (last date ${fmtDate(r.deadline)})`).join(", ")}. Use the 'Open now' filter for the full live list.`,
+    },
+    ...FAQS_STATIC,
+  ];
 
   return (
     <AppShell activePage="/mba-application-forms" pageTitle="MBA Forms & Deadlines">
@@ -115,26 +153,26 @@ export default function MbaApplicationForms({ builtAt }) {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="MBA Application Forms 2027-29: Last Dates & Deadlines Tracker"
-        description="All MBA application forms 2027-29 in one place: XAT, SNAP, NMAT, MAT, IBSAT and last dates for IIMs, IITs, FMS, SPJIMR, MDI, IIFT, XLRI, MICA, Symbiosis and more. Live status and days left."
+        title="MBA Application Forms 2026: Last Dates for 2027-29 Batch (Live)"
+        description="Which MBA forms are open now? Live MBA application form 2026 last dates for the 2027-29 batch: XAT, SNAP, NMAT, SPJIMR, MDI, IIFT, IITs and more, updated hourly."
         canonical={PAGE_URL}
         openGraph={{
           url: PAGE_URL,
-          title: "MBA Application Forms 2027-29: Every Last Date in One Place",
+          title: "MBA Application Forms 2026: Which Forms Are Open Now (Live)",
           description: "Live tracker of MBA entrance exam and B-school application deadlines for the 2027-29 batch.",
           siteName: "IPM Careers",
         }}
         additionalMetaTags={[
-          { name: "keywords", content: "MBA application form 2027, MBA application forms 2027-29, MBA form last date 2026, MBA deadlines 2027, XAT 2027 last date, SNAP 2026 last date, NMAT 2026 last date, SPJIMR application 2027, MDI application 2027, IIFT application 2027, IIT MBA application 2027, B-school application deadlines" },
+          { name: "keywords", content: "MBA application form 2026, MBA application form 2026 last date, MBA form last date 2026, MBA application form 2027, MBA forms open now, which MBA forms are out, upcoming MBA forms, MBA admission 2027, MBA application deadlines 2026, MBA application form fees, non IIM MBA form 2027, IIT MBA application form 2027, IIFT MBA application form 2027, FMS application form 2027, SPJIMR application deadline, MDI application last date, XAT registration last date, SNAP registration last date, NMAT registration last date" },
           { name: "robots", content: "index, follow, max-image-preview:large" },
         ]}
       />
 
       <div className={s.page}>
         <section className={s.hero}>
-          <span className={s.eyebrow}><span className={`${s.dot} ${s.dotOpen}`}></span>MBA 2027-29 · last checked {fmtDate(CHECKED_ON)}</span>
+          <span className={s.eyebrow}><span className={`${s.dot} ${s.dotOpen}`}></span>Live · status as of {fmtDate(todayIST)} · dates verified {fmtDate(CHECKED_ON)}</span>
           <h1 className={s.title}>
-            MBA Application Forms 2027-29. <span className={s.accent}>Every last date in one place.</span>
+            MBA Application Forms 2026. <span className={s.accent}>Every last date for the 2027-29 batch.</span>
           </h1>
           <p className={s.sub}>
             Entrance exams, IIMs, IITs and top B-schools: what is open, what closes this week and which forms you still need to fill
@@ -255,15 +293,83 @@ export default function MbaApplicationForms({ builtAt }) {
         </div>
 
         <article className={s.article}>
-          <h2>MBA application forms 2027-29: how to use this tracker</h2>
+          <h2>MBA application forms 2026 for the 2027-29 batch: how to use this tracker</h2>
           <p>
             This page lists the <strong>MBA application forms for the 2027-29 batch</strong>: national entrance exams like XAT, SNAP, NMAT,
             MAT and IBSAT, the IIMs, the IIT management schools and top B-schools such as FMS, SPJIMR, MDI, IIFT, XLRI, MICA, IMT and the
-            Symbiosis institutes. Each card shows the status today, the last date, days left, accepted exams, the application fee and a link
-            to the official form. Tap <em>Remind me</em> to add the deadline to your Google Calendar.
+            Symbiosis institutes. Each card shows the status today, the last date, days left, accepted exams and a link to the official form; the fee and
+            round-by-round dates are under <em>Fee, dates &amp; details</em>. Tap the 📅 button to add a deadline to your Google Calendar. Statuses and days left refresh every hour.
           </p>
 
-          <h2>MBA entrance exam registration last dates 2026-27</h2>
+          <h2>MBA forms open now ({openNames.length} as of {fmtDate(todayIST)})</h2>
+          <p>
+            These MBA application forms are open today, earliest last date first:{" "}
+            {openDated.map((r, i) => (
+              <span key={r.id}>{i ? ", " : ""}<a href={`#f-${r.id}`}>{r.name}</a> ({fmtDate(r.deadline)})</span>
+            ))}
+            . A few more are open with no fixed last date yet, such as {rows.filter((r) => r.st.rolling).map((r) => r.name).join(", ")}.
+          </p>
+
+          <h2>MBA forms closing this week</h2>
+          {thisWeek.length ? (
+            <ul>
+              {thisWeek.map((r) => (
+                <li key={r.id}><a href={`#f-${r.id}`}>{r.name}</a>: last date {fmtDate(r.deadline)} ({r.st.days === 0 ? "today" : `${r.st.days} day${r.st.days === 1 ? "" : "s"} left`})</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No form on this page closes in the next 7 days. The next last date is {openDated[0] ? `${openDated[0].name} on ${fmtDate(openDated[0].deadline)}` : "not announced yet"}.</p>
+          )}
+
+          <h2>Upcoming MBA forms (opening soon)</h2>
+          <p>
+            These forms are not open yet. Most of them open around or after the CAT result:{" "}
+            {soonList.map((r, i) => (
+              <span key={r.id}>{i ? ", " : ""}<a href={`#f-${r.id}`}>{r.name}</a></span>
+            ))}
+            . Each card shows last year's dates for reference until the official 2027 notice is out.
+          </p>
+
+          <h2>MBA forms to fill before CAT vs after CAT 2026</h2>
+          <p>CAT 2026 is on 29 November 2026. These B-school forms close before the exam, so do not wait for your score:</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Close before CAT (by 29 Nov 2026)</th><th>Last date</th></tr></thead>
+              <tbody>{beforeCat.map((r) => <tr key={r.id}><td><a href={`#f-${r.id}`}>{r.name}</a></td><td>{fmtDate(r.deadline)}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Close after CAT</th><th>Last date</th></tr></thead>
+              <tbody>{afterCat.map((r) => <tr key={r.id}><td><a href={`#f-${r.id}`}>{r.name}</a></td><td>{fmtDate(r.deadline)}</td></tr>)}</tbody>
+            </table>
+          </div>
+
+          <h2>IIT MBA application forms 2027</h2>
+          <p>
+            The IIT management schools need their own form in addition to CAT and usually open it after the CAT result. This page tracks{" "}
+            {iits.length} of them:{" "}
+            {iits.map((r, i) => (
+              <span key={r.id}>{i ? ", " : ""}<a href={`#f-${r.id}`}>{r.name}</a></span>
+            ))}
+            .
+          </p>
+
+          <h2>Non-IIM MBA forms 2027</h2>
+          <p>
+            Apart from the IIMs, {nonIim} non-IIM B-schools and programmes are tracked here, from FMS, SPJIMR, MDI, IIFT and XLRI to the
+            Symbiosis institutes and newer schools like BITSoM. Unlike the IIMs, almost all of them need a separate application form.
+          </p>
+
+          <h2>MBA application form fees 2026</h2>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>College</th><th>Application fee</th></tr></thead>
+              <tbody>{feeRows.map((r) => <tr key={r.id}><td>{r.name}</td><td>{r.fee}</td></tr>)}</tbody>
+            </table>
+          </div>
+
+          <h2>MBA entrance exam form last dates 2026 (XAT, SNAP, NMAT, MAT, IBSAT)</h2>
           <div className={s.tableWrap}>
             <table className={s.table}>
               <thead><tr><th>Exam</th><th>Last date to register</th><th>Exam date(s)</th><th>Fee</th></tr></thead>
@@ -332,7 +438,7 @@ export default function MbaApplicationForms({ builtAt }) {
                 "@type": "WebPage",
                 name: "MBA Application Forms 2027-29: Last Dates & Deadlines Tracker",
                 url: PAGE_URL,
-                dateModified: CHECKED_ON,
+                dateModified: todayIST,
                 publisher: { "@type": "Organization", name: "IPM Careers", url: "https://ipmcareer.com" },
               },
               {
@@ -342,7 +448,7 @@ export default function MbaApplicationForms({ builtAt }) {
                   "@type": "ListItem",
                   position: i + 1,
                   name: `${f.name}: last date ${fmtDate(f.deadline)}`,
-                  url: f.link,
+                  url: `${PAGE_URL}#f-${f.id}`,
                 })),
               },
               {
