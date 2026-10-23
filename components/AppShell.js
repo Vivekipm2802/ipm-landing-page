@@ -6,7 +6,7 @@ import lightStyles from './AppShell.module.css';
 import darkStyles from './AppShellDark.module.css';
 
 // Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
-const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres'];
+const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres', '/cat-percentile-predictor', '/iim-call-predictor'];
 
 const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => {
   const router = useRouter();
@@ -26,7 +26,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   }, [router.asPath]);
 
   // CAT pages get their own, separate menu (CAT calculator + Contact Us only)
-  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms' || router.pathname.startsWith('/cat-exam-day-planner') || router.pathname.startsWith('/cat-exam-centres');
+  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms' || router.pathname.startsWith('/cat-exam-day-planner') || router.pathname.startsWith('/cat-exam-centres') || router.pathname === '/cat-percentile-predictor' || router.pathname === '/iim-call-predictor';
 
   const handleBack = () => {
     if (canGoBack) {
@@ -112,14 +112,18 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
   const catNavItems = [
     { icon: '🎓', label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+    { icon: '📈', label: 'CAT Percentile Predictor', path: '/cat-percentile-predictor' },
+    { icon: '🎯', label: 'IIM Call Predictor', path: '/iim-call-predictor' },
     { icon: '🧭', label: 'CAT Exam Day Planner', path: '/cat-exam-day-planner' },
     { icon: '📍', label: 'CAT Exam Centres', path: '/cat-exam-centres' },
     { icon: '🗓️', label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
   ];
   const catTopNavItems = [
-    { label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
-    { label: 'Exam Day Planner', path: '/cat-exam-day-planner' },
-    { label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
+    { label: 'Score Calculator', path: '/cat-score-calculator' },
+    { label: 'Percentile', path: '/cat-percentile-predictor' },
+    { label: 'IIM Calls', path: '/iim-call-predictor' },
+    { label: 'Exam Day', path: '/cat-exam-day-planner' },
+    { label: 'MBA Forms', path: '/mba-application-forms' },
   ];
 
   const navItems = isCatPage ? catNavItems : ipmNavItems;

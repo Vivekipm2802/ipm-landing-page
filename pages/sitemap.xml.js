@@ -51,6 +51,8 @@ export async function getServerSideProps({ res }) {
     urlNode({ loc: `${SITE}/cat-score-calculator`, lastmod: today, changefreq: 'weekly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/mba-application-forms`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
     urlNode({ loc: `${SITE}/cat-exam-day-planner`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
+    urlNode({ loc: `${SITE}/cat-percentile-predictor`, lastmod: today, changefreq: 'weekly', priority: '0.9' }),
+    urlNode({ loc: `${SITE}/iim-call-predictor`, lastmod: today, changefreq: 'weekly', priority: '0.9' }),
     urlNode({ loc: `${SITE}/cat-exam-centres`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
     ...CAT_CITIES.map((c) => urlNode({ loc: `${SITE}/cat-exam-centres/${c.slug}`, lastmod: today, changefreq: 'daily', priority: '0.6' })),
     ...catCentres.map((c) => urlNode({ loc: `${SITE}/cat-exam-centres/${c.city_slug}/${c.slug}`, lastmod: c.updated_at || today, changefreq: 'daily', priority: '0.6' })),

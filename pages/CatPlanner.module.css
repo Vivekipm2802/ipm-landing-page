@@ -199,3 +199,52 @@
   .cityLink { padding: 9px 10px; font-size: .84rem; }
 }
 @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+
+/* ═══ predictors (percentile + IIM call) ═══ */
+.inputs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.secBox { padding: 12px; border-radius: 14px; background: rgba(236,232,225,0.03); border: 1px solid rgba(236,232,225,0.10); display: grid; gap: 6px; }
+.secName { font-weight: 800; color: #f4f1ea; font-size: .9rem; }
+.secMax { font-size: .72rem; color: #9a958c; }
+.totalLine { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; font-size: .86rem; color: #cfc9bf; }
+.totalLine b { font-family: 'Fraunces', Georgia, serif; font-size: 1.4rem; color: #f9a01b; font-weight: 500; }
+.result { margin-top: 16px; padding: 20px; border-radius: 22px; border: 1px solid rgba(249,160,27,0.45); background: radial-gradient(500px 220px at 50% -40px, rgba(249,160,27,0.16), transparent 70%), rgba(15,17,23,0.7); text-align: center; scroll-margin-top: 90px; }
+.resLabel { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #9a958c; }
+.pctBig { font-family: 'Fraunces', Georgia, serif; font-size: clamp(2.6rem, 9vw, 3.6rem); line-height: 1.05; color: #f9a01b; margin: 6px 0 2px; }
+.pctRange { font-size: .88rem; color: #cfc9bf; }
+.secGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; text-align: center; }
+.secCard { padding: 12px 8px; border-radius: 14px; background: rgba(236,232,225,0.04); border: 1px solid rgba(236,232,225,0.10); }
+.secPct { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; color: #f4f1ea; }
+.secSub { font-size: .72rem; color: #9a958c; margin-top: 2px; }
+.gate { margin-top: 14px; padding: 14px; border-radius: 16px; border: 1px dashed rgba(249,160,27,0.45); background: rgba(249,160,27,0.05); }
+.tone { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: .74rem; font-weight: 800; white-space: nowrap; }
+.toneGood { background: rgba(34,197,94,0.14); color: #86efac; }
+.toneWarn { background: rgba(245,158,11,0.16); color: #fcd34d; }
+.toneBad { background: rgba(239,68,68,0.14); color: #fca5a5; }
+.toneInfo { background: rgba(249,160,27,0.12); color: #ffbe5c; }
+.iimList { display: grid; gap: 10px; margin-top: 12px; }
+.iim { padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(236,232,225,0.10); background: rgba(15,17,23,0.55); text-align: left; }
+.iimTop { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.iimName { font-weight: 800; color: #f4f1ea; font-size: 1rem; }
+.iimMeta { font-size: .72rem; color: #9a958c; margin-top: 2px; }
+.minRow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.minChip { padding: 4px 9px; border-radius: 10px; background: rgba(236,232,225,0.05); font-size: .76rem; color: #cfc9bf; }
+.minChip b { color: #f4f1ea; }
+.minMiss { background: rgba(239,68,68,0.12); color: #fca5a5; }
+.minMiss b { color: #fecaca; }
+.iimMore { margin-top: 10px; border-top: 1px solid rgba(236,232,225,0.08); padding-top: 8px; }
+.iimMore summary { cursor: pointer; font-size: .78rem; font-weight: 700; color: #9a958c; list-style: none; }
+.iimMore summary::-webkit-details-marker { display: none; }
+.iimMore summary::after { content: " +"; color: #f9a01b; }
+.iimMore[open] summary::after { content: " −"; }
+.weights { display: grid; gap: 4px; margin-top: 8px; font-size: .8rem; color: #cfc9bf; }
+.wRow { display: grid; grid-template-columns: 1fr 120px 34px; gap: 8px; align-items: center; }
+.wBar { height: 6px; border-radius: 6px; background: rgba(236,232,225,0.08); overflow: hidden; }
+.wFill { height: 100%; background: linear-gradient(90deg, #ffbe5c, #f9a01b); }
+.filterRow { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.summaryGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+@media (max-width: 720px) {
+  .inputs3, .secGrid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .secBox { padding: 10px 8px; }
+  .wRow { grid-template-columns: 1fr 70px 30px; }
+  .summaryGrid { gap: 6px; }
+}
