@@ -48,6 +48,8 @@ async function fetchSheet(raw) {
   }
 }
 
+import { notifyLead } from "../../lib/leadNotify";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
   res.setHeader("Cache-Control", "no-store");
@@ -63,20 +65,22 @@ export default async function handler(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: "Please enter a valid email address." });
   if (!/^[6-9]\d{9}$/.test(phone)) return res.status(400).json({ error: "Please enter a valid 10-digit mobile number." });
 
+  const ping = (extra = {}) => notifyLead("CAT Score Calculator", { name, phone, email, Category: category, City: city, ...extra }, "https://register.ipmcareer.com/cat-score-calculator");
+
   let html = "", responseUrl = null, mode = "link";
   if (typeof b.html === "string" && b.html.length > 0) {
-    if (b.html.length > MAX_BYTES) return res.status(413).json({ error: "File is too large." });
+    if (b.html.length > MAX_BYTES) { await ping({ Note: "Sheet upload too large" }); return res.status(413).json({ error: "File is too large." }); }
     html = b.html;
     mode = "upload";
   } else {
     const got = await fetchSheet(b.url);
-    if (got.error) return res.status(400).json({ error: got.error });
+    if (got.error) { await ping({ Note: `Sheet not read: ${got.error}` }); return res.status(400).json({ error: got.error }); }
     html = got.html;
     responseUrl = got.url;
   }
 
   const parsed = parseCatSheet(html);
-  if (parsed.error) return res.status(400).json({ error: parsed.error });
+  if (parsed.error) { await ping({ Note: `Sheet not read: ${parsed.error}` }); return res.status(400).json({ error: parsed.error }); }
 
   let db;
   try { db = catDb(); } catch { return res.status(500).json({ error: "Server is not configured. Please try again later." }); }
@@ -122,6 +126,8 @@ export default async function handler(req, res) {
     console.error("cat-score: save failed", e?.message);
     // still return the score so the student is not left with nothing
   }
+
+  await ping({ Score: `${result.total} / 204 (VARC ${result.sections?.VARC?.score}, DILR ${result.sections?.DILR?.score}, QA ${result.sections?.QA?.score})`, Slot: parsed.candidate.slot, Report: uid ? `https://register.ipmcareer.com/cat-report/${uid}` : "" });
 
   let rank = null, count = null;
   try {

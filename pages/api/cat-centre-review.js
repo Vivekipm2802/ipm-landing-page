@@ -1,6 +1,7 @@
 // POST /api/cat-centre-review → a candidate's review of a CAT test centre
 import { catDb, cleanText, validPhone, normPhone } from "../../lib/catPlannerServer";
 import { shortName } from "../../lib/catPlanner";
+import { notifyLead } from "../../lib/leadNotify";
 
 const pick = (v, allowed) => (allowed.includes(v) ? v : null);
 const EXAMS = ["CAT 2026", "CAT 2025", "CAT 2024", "Another exam at this centre"];
@@ -42,6 +43,7 @@ export default async function handler(req, res) {
     };
     const { error } = await db.from("cat_centre_reviews").upsert(row, { onConflict: "centre_id,phone,exam" });
     if (error) throw error;
+    await notifyLead("CAT Centre Review", { name, phone, Centre: `${c.slug} (${c.city_slug})`, Exam: exam, Rating: `${overall}/5` }, `https://register.ipmcareer.com/cat-exam-centres/${c.city_slug}/${c.slug}`);
     try { await res.revalidate(`/cat-exam-centres/${c.city_slug}/${c.slug}`); } catch {}
     return res.status(200).json({ ok: true });
   } catch {

@@ -2,6 +2,7 @@
 // Returns { token, follows, all } which the page keeps on the device so later bells are one tap.
 import { catDb, cleanText, validPhone, normPhone } from "../../lib/catPlannerServer";
 import { formById, isSoon } from "../../lib/mbaAlerts";
+import { notifyLead } from "../../lib/leadNotify";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
@@ -33,6 +34,7 @@ export default async function handler(req, res) {
       await db.from("mba_alert_follows").upsert({ subscriber_id: sub.id, form_id: form.id, wait_open: isSoon(form) }, { onConflict: "subscriber_id,form_id" });
     }
     const { data: f } = await db.from("mba_alert_follows").select("form_id").eq("subscriber_id", sub.id);
+    await notifyLead("MBA Deadline Alerts", { name, phone, email, "Alert for": form ? form.name : "", "All MBA deadlines": sub.all_forms ? "Yes" : "No", Following: (f || []).map((x) => formById(x.form_id)?.name || x.form_id).join(", "), Status: ex ? "Returning subscriber" : "New" }, "https://register.ipmcareer.com/mba-application-forms");
     return res.status(200).json({ ok: true, token: sub.token, all: sub.all_forms, follows: (f || []).map((x) => x.form_id) });
   } catch {
     return res.status(500).json({ error: "Could not turn on alerts. Please try again." });

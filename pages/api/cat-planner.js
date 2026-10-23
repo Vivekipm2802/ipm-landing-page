@@ -2,6 +2,7 @@
 // The admit card is read in the browser; only test-day fields arrive here.
 import { catDb, newUid, cleanText, validPhone, normPhone, resolveCity, findOrCreateCentre } from "../../lib/catPlannerServer";
 import { EXAM_YEAR, EXAM_DATE, SLOTS } from "../../lib/catPlanner";
+import { notifyLead } from "../../lib/leadNotify";
 
 const hhmm = (v) => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || "")) ? v : null);
 
@@ -79,6 +80,16 @@ export default async function handler(req, res) {
       });
       if (error) throw error;
     }
+    await notifyLead("CAT Exam Day Planner", {
+      name, phone, email,
+      City: city.name,
+      Type: mode === "early" ? "Signed up before admit card" : mode === "pdf" ? "Uploaded admit card" : "Typed centre details",
+      Centre: centre?.name || "",
+      Slot: row.slot || "",
+      "WhatsApp updates": row.wa_opt_in ? "Yes" : "No",
+      Status: existing ? "Returning student (plan updated)" : "New",
+      Plan: `https://register.ipmcareer.com/cat-exam-day-planner/${uid}`,
+    }, "https://register.ipmcareer.com/cat-exam-day-planner");
     if (centre?._new) {
       try { await res.revalidate(`/cat-exam-centres/${centre.city_slug}`); } catch {}
     }
