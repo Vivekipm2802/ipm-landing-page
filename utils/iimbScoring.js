@@ -92,7 +92,23 @@ export function parseResponseSheet(html) {
   } else if (answers.every((a) => !a.k)) {
     return { answers: [], error: "This file has your responses but no answer key ticks. Open the Answer Key / Response Sheet page after login and save that page." };
   }
-  return { answers, warning };
+  return { answers, warning, candidate: readCandidate(doc) };
+}
+
+// Name (and test details) from the header table of the response sheet: "Candidate Name | <name>"
+function readCandidate(doc) {
+  const out = { name: "", testDate: "", testTime: "" };
+  const cells = Array.from(doc.querySelectorAll(".main-info-pnl td, table td"));
+  const val = (label) => {
+    const td = cells.find((t) => clean(t.textContent).toLowerCase() === label);
+    return td && td.nextElementSibling ? clean(td.nextElementSibling.textContent) : "";
+  };
+  const titleCase = (s) => s.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase());
+  const raw = val("candidate name") || val("name of the candidate") || val("name");
+  out.name = raw ? titleCase(raw).slice(0, 80) : "";
+  out.testDate = val("test date");
+  out.testTime = val("test time");
+  return out;
 }
 
 /**

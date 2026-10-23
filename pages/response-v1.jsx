@@ -60,7 +60,7 @@ const FAQS = [
 ];
 
 export default function IimbUgScoreCalculator() {
-  const [form, setForm] = useState({ name: "", mobile: "", email: "", category: "", city: "" });
+  const [form, setForm] = useState({ mobile: "", email: "", category: "", city: "" });
   const [mode, setMode] = useState("link"); // "link" | "file"
   const [sheetUrl, setSheetUrl] = useState("");
   const [file, setFile] = useState(null);
@@ -140,7 +140,6 @@ export default function IimbUgScoreCalculator() {
   };
 
   const validate = () => {
-    if (!form.name.trim()) return "Please enter your name.";
     if (!/^[6-9]\d{9}$/.test(form.mobile)) return "Please enter a valid 10-digit mobile number (without +91 or 0).";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) return "Please enter a valid email address.";
     if (!form.category) return "Please select your category.";
@@ -180,8 +179,13 @@ export default function IimbUgScoreCalculator() {
       return;
     }
     setSubmitting(true);
-    // CRM copy of this lead (fire-and-forget, never blocks the form)
-    sendLeadToCrm({ name: form?.name, phone: form?.mobile, email: form?.email, city: form?.city }, "register-iimb-ug-score-calculator");
+    // CRM copy of this lead (fire-and-forget, never blocks the form). The name comes from the response sheet.
+    let crmSent = false;
+    const sendCrm = (name) => {
+      if (crmSent) return;
+      crmSent = true;
+      sendLeadToCrm({ name: name || "", phone: form?.mobile, email: form?.email, city: form?.city }, "register-iimb-ug-score-calculator");
+    };
     setError("");
     setWarning("");
 
@@ -192,6 +196,7 @@ export default function IimbUgScoreCalculator() {
           const res = await axios.post("/api/iimb-fetch-sheet", { url: sheetUrl.trim() });
           html = res?.data?.html || "";
         } catch (e) {
+          sendCrm("");
           setError(e?.response?.data?.error || "We could not open that link. Check it, or switch to 'Upload file' and upload the saved page.");
           setSubmitting(false);
           return;
@@ -200,6 +205,8 @@ export default function IimbUgScoreCalculator() {
         html = await file.text();
       }
       const parsed = parseResponseSheet(html);
+      const studentName = (parsed.candidate && parsed.candidate.name) || "";
+      sendCrm(studentName);
       if (parsed.error) {
         setError(parsed.error);
         setSubmitting(false);
@@ -213,7 +220,7 @@ export default function IimbUgScoreCalculator() {
       let uid = null;
       try {
         const res = await axios.post("/api/sendScorecardIIMB", {
-          name: form.name.trim(),
+          name: studentName || "IIM-B UG candidate",
           mobile: form.mobile,
           email: form.email.trim(),
           category: form.category,
@@ -228,7 +235,7 @@ export default function IimbUgScoreCalculator() {
       }
 
       setResult({
-        name: form.name.trim(),
+        name: studentName,
         category: form.category,
         city: form.city.trim(),
         answers: parsed.answers,
@@ -241,6 +248,7 @@ export default function IimbUgScoreCalculator() {
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch (e) {
       console.error(e);
+      sendCrm("");
       setError("Something went wrong while reading your file. Please re-save the response sheet as HTML and try again.");
     } finally {
       setSubmitting(false);
@@ -252,7 +260,7 @@ export default function IimbUgScoreCalculator() {
     setFile(null);
     setSheetUrl("");
     setWarning("");
-    setForm({ name: "", mobile: "", email: "", category: "", city: "" });
+    setForm({ mobile: "", email: "", category: "", city: "" });
     if (fileInputRef.current) fileInputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -367,7 +375,7 @@ export default function IimbUgScoreCalculator() {
                   <div className={styles.scorecardBg2}></div>
                   <div className={styles.scorecardHeader}>
                     <div className={styles.scorecardTitle}>Your IIM-B UG Scorecard</div>
-                    <div className={styles.scorecardName}>👤 {result.name}</div>
+                    {result.name && <div className={styles.scorecardName}>👤 {result.name}</div>}
                   </div>
                   <div className={styles.scoreGrid}>
                     {SECTIONS.map((s) => (
@@ -487,24 +495,20 @@ export default function IimbUgScoreCalculator() {
             {!result && (
               <div className={styles.formCard}>
                 <h2 className={styles.formTitle}>Calculate your IIM-B UG score</h2>
-                <div className={styles.formSubtitle}>Fill your details, then paste your response sheet link or upload the saved page</div>
+                <div className={styles.formSubtitle}>Fill your details, then paste your response sheet link or upload the saved page. We read your name from the response sheet.</div>
 
                 <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="iimb-name">Full Name</label>
-                    <input id="iimb-name" className={styles.formInput} type="text" placeholder="Your full name" value={form.name} onChange={update("name")} autoComplete="name" />
-                  </div>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="iimb-mobile">Mobile</label>
                     <input id="iimb-mobile" className={styles.formInput} type="tel" inputMode="numeric" placeholder="10-digit number" value={form.mobile} onChange={update("mobile")} autoComplete="tel-national" />
                   </div>
-                </div>
-
-                <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="iimb-email">Email</label>
                     <input id="iimb-email" className={styles.formInput} type="email" placeholder="you@email.com" value={form.email} onChange={update("email")} autoComplete="email" />
                   </div>
+                </div>
+
+                <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="iimb-category">Category</label>
                     <select id="iimb-category" className={styles.formSelect} value={form.category} onChange={update("category")}>
@@ -514,10 +518,7 @@ export default function IimbUgScoreCalculator() {
                       ))}
                     </select>
                   </div>
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={`${styles.formGroup} ${styles.formGroupFull}`}>
+                  <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="iimb-city">City</label>
                     <input id="iimb-city" className={styles.formInput} type="text" placeholder="e.g. Bengaluru" value={form.city} onChange={update("city")} autoComplete="address-level2" />
                   </div>
