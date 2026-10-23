@@ -1,5 +1,5 @@
 // CAT scorecard + detailed report. Used on /cat-score-calculator (right after scoring) and /cat-report/[uid].
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import s from "./IimbScorecard.module.css";
 import { SECTIONS, MAX_SCORE } from "../lib/catScoring";
@@ -91,38 +91,43 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
   const callLink = `/iim-call-predictor?o=${pred.overall.main ?? ""}&v=${pred.VARC.main ?? ""}&d=${pred.DILR.main ?? ""}&q=${pred.QA.main ?? ""}`;
   const shareText = `I scored ${result.total}/${MAX_SCORE} in CAT ${examYear || ""} (VARC ${secs[0].score}, DILR ${secs[1].score}, QA ${secs[2].score}).${pred.overall.main != null && !pred.overall.below ? ` Estimated percentile ~${fmtPct(pred.overall.main)}.` : ""} Check yours free: ${reportUrl}`;
 
-  const shareCard = async () => {
-    setBusy(true);
-    try {
-      const blob = await makeStoryCard({ name, result, pred, rank, count, year: examYear });
-      const file = new File([blob], "cat-scorecard.png", { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], text: shareText });
-      else {
-        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "cat-scorecard.png"; a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-        flash("Card downloaded. Post it on your story!");
-      }
-    } catch (e) { if (e?.name !== "AbortError") flash("Could not create the card. Try the WhatsApp share instead."); }
-    finally { setBusy(false); }
+  // The card is drawn as soon as the scorecard appears, so a tap can open the share sheet instantly
+  // (phone browsers block share sheets / new windows that open after a delay).
+  const [cardFile, setCardFile] = useState(null);
+  useEffect(() => {
+    let off = false;
+    makeStoryCard({ name, result, pred, rank, count, year: examYear }).then((blob) => { if (!off && blob) setCardFile(new File([blob], "cat-scorecard.png", { type: "image/png" })); }).catch(() => {});
+    return () => { off = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.total, uid, rank, count]);
+  const isPhone = () => typeof navigator !== "undefined" && (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform || "")));
+  const canShareFile = () => Boolean(cardFile && navigator.canShare && navigator.canShare({ files: [cardFile] }));
+  const waUrl = () => `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const download = () => {
+    if (!cardFile) return false;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(cardFile); a.download = "cat-scorecard.png"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    return true;
   };
-  // WhatsApp: on phones, share the PNG + caption through the share sheet (pick WhatsApp).
-  // On laptops, wa.me links cannot carry files, so download the card and open WhatsApp with the text + report link.
-  const shareWhatsApp = async () => {
-    setBusy(true);
-    try {
-      const blob = await makeStoryCard({ name, result, pred, rank, count, year: examYear });
-      const file = new File([blob], "cat-scorecard.png", { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text: shareText });
-      } else {
-        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "cat-scorecard.png"; a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
-        flash("Scorecard image downloaded: attach it in WhatsApp");
-      }
-    } catch (e) {
-      if (e?.name !== "AbortError") window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
-    } finally { setBusy(false); }
+
+  // Story card: share sheet on phones, download on laptops
+  const shareCard = () => {
+    if (!cardFile) { flash("Preparing your card, tap again in a second"); return; }
+    if (isPhone() && canShareFile()) {
+      navigator.share({ files: [cardFile], text: shareText }).catch((e) => { if (e?.name !== "AbortError") { download(); flash("Card downloaded. Post it on your story!"); } });
+    } else { download(); flash("Card downloaded. Post it on your story!"); }
+  };
+
+  // WhatsApp: phones send the image + caption through the share sheet (choose WhatsApp);
+  // laptops open WhatsApp right away with the text + report link, and download the image to attach.
+  const shareWhatsApp = () => {
+    if (isPhone() && canShareFile()) {
+      navigator.share({ files: [cardFile], text: shareText }).catch((e) => { if (e?.name !== "AbortError") window.location.href = waUrl(); });
+      return;
+    }
+    if (isPhone()) { window.location.href = waUrl(); return; }
+    window.open(waUrl(), "_blank", "noopener");
+    if (download()) flash("Image downloaded: attach it in the WhatsApp chat");
   };
   const copy = async () => { try { await navigator.clipboard.writeText(reportUrl); flash("Link copied"); } catch { flash("Long-press the link to copy"); } };
   const tileCls = (r) => (r === "C" || r === "B" ? s.qC : r === "W" ? s.qW : s.qU);
