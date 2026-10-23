@@ -151,6 +151,7 @@ export default async function handler(req, res) {
       unattempted: result.unattempted,
       pendingKey: result.pendingKey,
       keySource: result.keySource,
+      answers: result.answers.map(({ n, s, t, c, g, k, r, m }) => ({ n, s, t, c, g, k: r === "N" ? "" : k, r, m })),
     },
     rank,
     count,

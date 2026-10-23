@@ -5,6 +5,7 @@ import { NextSeo } from "next-seo";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
+import CatScorecard from "../components/CatScorecard";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
 import { SECTIONS, MAX_SCORE, TOTAL_QUESTIONS, buildCatInsights } from "../lib/catScoring";
@@ -297,115 +298,19 @@ export default function CatScoreCalculator() {
             {/* ── Result ── */}
             {r && (
               <div ref={resultRef} style={{ scrollMarginTop: 90 }}>
-                <div className={styles.scorecardResult}>
-                  <div className={styles.scorecardBg}></div>
-                  <div className={styles.scorecardBg2}></div>
-                  <div className={styles.scorecardHeader}>
-                    <div className={styles.scorecardTitle}>Your CAT {result.examYear || 2026} Scorecard</div>
-                    <div className={styles.scorecardName}>👤 {result.candidate?.name || result.name}</div>
-                  </div>
-                  <div className={styles.scoreGrid}>
-                    {SECTIONS.map((s) => (
-                      <div key={s.key} className={styles.scoreBox}>
-                        <div className={styles.scoreBoxLabel}>{s.short}</div>
-                        <div className={styles.scoreBoxValue}>
-                          {r.sections[s.key].score}
-                          <span className={ui.scoreBoxMax}>/{s.max}</span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className={`${styles.scoreBox} ${styles.scoreBoxTotal}`}>
-                      <div className={styles.scoreBoxLabel}>Total</div>
-                      <div className={styles.scoreBoxValue}>
-                        {r.total}
-                        <span className={ui.scoreBoxMax}>/{MAX_SCORE}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={ui.scorecardMeta}>
-                    <span className={ui.metaChip}>✅ {r.correct} correct</span>
-                    <span className={ui.metaChip}>❌ {r.wrong} wrong</span>
-                    <span className={ui.metaChip}>⏭ {r.unattempted} skipped</span>
-                    {r.pendingKey > 0 && <span className={ui.metaChip}>⏳ {r.pendingKey} waiting for key</span>}
-                    {result.candidate?.slot && <span className={ui.metaChip}>Slot {result.candidate.slot}</span>}
-                    {result.rank && result.count && <span className={ui.metaChip}>🏅 #{result.rank} of {result.count.toLocaleString("en-IN")} on this tool</span>}
-                  </div>
-                </div>
-
-                {(result.warnings || []).map((w, i) => (
-                  <div key={i} className={ui.warnMsg} style={{ marginTop: -8, marginBottom: 16 }}>
-                    <span>⚠️</span>{w}
-                  </div>
-                ))}
-
-                <div className={styles.actionRow}>
-                  {result.uid ? (
-                    <a href={`/cat-report/${result.uid}`} target="_blank" rel="noopener noreferrer" className={styles.actionCard}>
-                      <span className={styles.actionIcon}>📊</span>
-                      <span className={styles.actionLabel}>View Full Report</span>
-                      <span className={styles.actionDesc}>Question-wise analysis</span>
-                    </a>
-                  ) : (
-                    <div className={styles.actionCard} onClick={() => window.print()}>
-                      <span className={styles.actionIcon}>🖨️</span>
-                      <span className={styles.actionLabel}>Save as PDF</span>
-                      <span className={styles.actionDesc}>Print this scorecard</span>
-                    </div>
-                  )}
-                  <div className={styles.actionCard} onClick={shareWhatsApp}>
-                    <span className={styles.actionIcon}>📲</span>
-                    <span className={styles.actionLabel}>Share on WhatsApp</span>
-                    <span className={styles.actionDesc}>Send to friends</span>
-                  </div>
-                  {result.uid && (
-                    <div className={styles.actionCard} onClick={copyLink}>
-                      <span className={styles.actionIcon}>🔗</span>
-                      <span className={styles.actionLabel}>Copy Report Link</span>
-                      <span className={styles.actionDesc}>Updates when the key is out</span>
-                    </div>
-                  )}
-                  <div className={styles.actionCard} onClick={reset}>
-                    <span className={styles.actionIcon}>🔄</span>
-                    <span className={styles.actionLabel}>Check Another</span>
-                    <span className={styles.actionDesc}>Check a friend's score</span>
-                  </div>
-                </div>
-
-                <div className={ui.sectionList}>
-                  {SECTIONS.map((s) => {
-                    const sec = r.sections[s.key];
-                    const pct = sec.max > 0 ? Math.max(0, (sec.score / sec.max) * 100) : 0;
-                    return (
-                      <div key={s.key} className={ui.sectionCard}>
-                        <div className={ui.sectionHead}>
-                          <div className={ui.sectionName}><span>{s.icon}</span> {s.name}</div>
-                          <span className={`${ui.badge} ${sec.score > 0 ? ui.badgeGood : ui.badgeBad}`}>{sec.score}/{sec.max}</span>
-                        </div>
-                        <div className={ui.bar}><div className={ui.barFill} style={{ width: `${pct}%` }}></div></div>
-                        <div className={ui.statRow}>
-                          <span>Correct <b className={ui.good}>{sec.correct}</b></span>
-                          <span>Wrong <b className={ui.bad}>{sec.wrong}</b></span>
-                          <span>Skipped <b>{sec.unattempted}</b></span>
-                          <span>MCQ <b>{sec.mcq.correct}/{sec.mcq.attempted}</b></span>
-                          <span>TITA <b>{sec.tita.correct}/{sec.tita.attempted}</b></span>
-                          <span>Accuracy <b>{sec.accuracy}%</b></span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className={ui.card}>
-                  <h2 className={ui.cardTitle}>💡 What your score tells you</h2>
-                  <ul className={ui.insightList}>
-                    {result.insights.map((ins, i) => (
-                      <li key={i} className={`${ui.insight} ${ins.tone === "good" ? ui.insightGood : ins.tone === "warn" ? ui.insightWarn : ""}`}>
-                        <span>{ins.tone === "good" ? "✅" : ins.tone === "warn" ? "⚠️" : "📌"}</span>
-                        <span>{ins.text}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <CatScorecard
+                  name={result.candidate?.name || result.name}
+                  category={result.category}
+                  city={form.city}
+                  slot={result.candidate?.slot}
+                  examYear={result.examYear}
+                  result={{ ...r, insights: result.insights }}
+                  uid={result.uid}
+                  rank={result.rank}
+                  count={result.count}
+                  warnings={result.warnings}
+                  onReset={reset}
+                />
               </div>
             )}
 
