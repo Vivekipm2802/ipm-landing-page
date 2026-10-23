@@ -6,6 +6,7 @@ import { NextSeo } from "next-seo";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
+import IimbScorecard from "../components/IimbScorecard";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
 import {
@@ -218,9 +219,12 @@ export default function IimbUgScoreCalculator() {
       const fileUrl = mode === "link" ? sheetUrl.trim() : await uploadToCloudinary(file);
 
       let uid = null;
+      let stats = null;
       try {
         const res = await axios.post("/api/sendScorecardIIMB", {
           name: studentName || "IIM-B UG candidate",
+          testDate: parsed.candidate?.testDate || "",
+          testTime: parsed.candidate?.testTime || "",
           mobile: form.mobile,
           email: form.email.trim(),
           category: form.category,
@@ -229,6 +233,7 @@ export default function IimbUgScoreCalculator() {
           answers: parsed.answers,
         });
         uid = res?.data?.uid || null;
+        stats = res?.data?.stats || null;
       } catch (e) {
         console.error("Save failed", e);
         toast.error("Score calculated, but we could not save your report link. Try again in a minute.");
@@ -242,6 +247,8 @@ export default function IimbUgScoreCalculator() {
         scores,
         insights: buildInsights(scores),
         uid,
+        stats,
+        testDate: parsed.candidate?.testDate || "",
       });
       if (uid) toast.success("Scorecard ready!");
       fetchLeaderboard();
@@ -370,124 +377,19 @@ export default function IimbUgScoreCalculator() {
             {/* ── Result ── */}
             {result && (
               <div ref={resultRef} style={{ scrollMarginTop: 90 }}>
-                <div className={styles.scorecardResult}>
-                  <div className={styles.scorecardBg}></div>
-                  <div className={styles.scorecardBg2}></div>
-                  <div className={styles.scorecardHeader}>
-                    <div className={styles.scorecardTitle}>Your IIM-B UG Scorecard</div>
-                    {result.name && <div className={styles.scorecardName}>👤 {result.name}</div>}
-                  </div>
-                  <div className={styles.scoreGrid}>
-                    {SECTIONS.map((s) => (
-                      <div key={s.key} className={styles.scoreBox}>
-                        <div className={styles.scoreBoxLabel}>{s.short}</div>
-                        <div className={styles.scoreBoxValue}>
-                          {result.scores.sections[s.key].score}
-                          <span className={ui.scoreBoxMax}>/{result.scores.sections[s.key].max}</span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className={`${styles.scoreBox} ${styles.scoreBoxTotal}`}>
-                      <div className={styles.scoreBoxLabel}>Total</div>
-                      <div className={styles.scoreBoxValue}>
-                        {result.scores.total}
-                        <span className={ui.scoreBoxMax}>/{MAX_SCORE}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={ui.scorecardMeta}>
-                    <span className={ui.metaChip}>✅ {result.scores.correct} correct</span>
-                    <span className={ui.metaChip}>❌ {result.scores.wrong} wrong</span>
-                    <span className={ui.metaChip}>⏭ {result.scores.unattempted} skipped</span>
-                    <span className={ui.metaChip}>🎯 {result.scores.accuracy}% accuracy</span>
-                    {result.category && <span className={ui.metaChip}>{result.category}</span>}
-                  </div>
-                </div>
-
-                {warning && (
-                  <div className={ui.warnMsg} style={{ marginTop: -8, marginBottom: 16 }}>
-                    <span>⚠️</span>
-                    {warning}
-                  </div>
-                )}
-
-                <div className={`${styles.actionRow} ${ui.noPrint}`}>
-                  {result.uid ? (
-                    <a href={`/iimb-report/${result.uid}`} target="_blank" rel="noopener noreferrer" className={styles.actionCard}>
-                      <span className={styles.actionIcon}>📊</span>
-                      <span className={styles.actionLabel}>View Full Report</span>
-                      <span className={styles.actionDesc}>Question-wise analysis</span>
-                    </a>
-                  ) : (
-                    <div className={styles.actionCard} onClick={() => window.print()}>
-                      <span className={styles.actionIcon}>🖨️</span>
-                      <span className={styles.actionLabel}>Save as PDF</span>
-                      <span className={styles.actionDesc}>Print this scorecard</span>
-                    </div>
-                  )}
-                  <div className={styles.actionCard} onClick={shareWhatsApp}>
-                    <span className={styles.actionIcon}>📲</span>
-                    <span className={styles.actionLabel}>Share on WhatsApp</span>
-                    <span className={styles.actionDesc}>Send to friends & family</span>
-                  </div>
-                  {result.uid && (
-                    <div className={styles.actionCard} onClick={copyLink}>
-                      <span className={styles.actionIcon}>🔗</span>
-                      <span className={styles.actionLabel}>Copy Report Link</span>
-                      <span className={styles.actionDesc}>Your link stays live</span>
-                    </div>
-                  )}
-                  <div className={styles.actionCard} onClick={reset}>
-                    <span className={styles.actionIcon}>🔄</span>
-                    <span className={styles.actionLabel}>Analyse Another</span>
-                    <span className={styles.actionDesc}>Check a friend's score</span>
-                  </div>
-                </div>
-
-                {/* Section breakdown */}
-                <div className={ui.sectionList}>
-                  {SECTIONS.map((s) => {
-                    const sec = result.scores.sections[s.key];
-                    const pct = sec.max > 0 ? Math.max(0, (sec.score / sec.max) * 100) : 0;
-                    return (
-                      <div key={s.key} className={ui.sectionCard}>
-                        <div className={ui.sectionHead}>
-                          <div className={ui.sectionName}>
-                            <span>{s.icon}</span> {s.name}
-                          </div>
-                          <span className={`${ui.badge} ${sec.positive ? ui.badgeGood : ui.badgeBad}`}>
-                            {sec.positive ? "Positive ✓" : "Not positive"}
-                          </span>
-                        </div>
-                        <div className={ui.bar}>
-                          <div className={ui.barFill} style={{ width: `${pct}%` }}></div>
-                        </div>
-                        <div className={ui.statRow}>
-                          <span>Score <b>{sec.score}/{sec.max}</b></span>
-                          <span>Correct <b className={ui.good}>{sec.correct}</b></span>
-                          <span>Wrong <b className={ui.bad}>{sec.wrong}</b></span>
-                          <span>Skipped <b>{sec.unattempted}</b></span>
-                          <span>Accuracy <b>{sec.accuracy}%</b></span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Insights */}
-                <div className={ui.card}>
-                  <h2 className={ui.cardTitle}>💡 What your score tells you</h2>
-                  <ul className={ui.insightList}>
-                    {result.insights.map((ins, i) => (
-                      <li key={i} className={`${ui.insight} ${ins.tone === "good" ? ui.insightGood : ins.tone === "warn" ? ui.insightWarn : ""}`}>
-                        <span>{ins.tone === "good" ? "✅" : ins.tone === "warn" ? "⚠️" : "📌"}</span>
-                        <span>{ins.text}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <WeightageCard />
+                <IimbScorecard
+                  name={result.name}
+                  category={result.category}
+                  city={result.city}
+                  testDate={result.testDate}
+                  scores={result.scores}
+                  answers={result.answers}
+                  insights={result.insights}
+                  uid={result.uid}
+                  stats={result.stats}
+                  warning={warning}
+                  onReset={reset}
+                />
               </div>
             )}
 

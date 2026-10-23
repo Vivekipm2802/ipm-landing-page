@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
-import { randomUUID } from "crypto";
-import { createClient } from "@supabase/supabase-js";
+import { iimbDb, iimbStats } from "../../lib/iimbServer";
 import { SECTIONS, MAX_SCORE, scoreAnswers } from "../../utils/iimbScoring";
 
 const SECTION_KEYS = SECTIONS.map((s) => s.key);
@@ -51,47 +50,59 @@ export default async function handler(req, res) {
   const scores = scoreAnswers(answers);
   if (scores.total > MAX_SCORE) return res.status(400).json({ error: "Invalid response data" });
 
-  const uid = randomUUID();
+  const testDate = str(body.testDate, 40);
+  const testTime = str(body.testTime, 40);
+  const yearMatch = testDate.match(/(20\d{2})/);
+  const examYear = yearMatch ? Number(yearMatch[1]) : new Date().getFullYear();
+
   const sections = {};
   SECTION_KEYS.forEach((k) => {
     const s = scores.sections[k];
-    sections[k] = { score: s.score, correct: s.correct, wrong: s.wrong, unattempted: s.unattempted, accuracy: s.accuracy, max: s.max };
+    sections[k] = { score: s.score, correct: s.correct, wrong: s.wrong, unattempted: s.unattempted, accuracy: s.accuracy, max: s.max, positive: s.positive };
   });
 
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  let db;
+  try { db = iimbDb(); } catch { return res.status(500).json({ error: "Server is not configured" }); }
 
-  const { error: dbError } = await supabase.from("response_sheet_uploads").insert([
-    {
-      name,
-      mobile,
-      email,
-      category,
-      file_url: fileUrl,
-      // Existing columns: VA -> VARC, MCQ -> LR, SA -> QADI (kept for old reports)
-      score_va: scores.s1,
-      score_mcq: scores.s2,
-      score_sa: scores.s3,
-      score_total: scores.total,
-      raw_scores: {
-        v: 2,
-        uuid: uid,
-        s1: scores.s1,
-        s2: scores.s2,
-        s3: scores.s3,
-        total: scores.total,
-        city,
-        category,
-        accuracy: scores.accuracy,
-        sections,
-        answers,
-      },
-    },
-  ]);
+  const row = {
+    exam_year: examYear,
+    name, mobile, email, category, city,
+    file_url: fileUrl,
+    test_date: testDate || null,
+    test_time: testTime || null,
+    score_varc: scores.s1,
+    score_lr: scores.s2,
+    score_qadi: scores.s3,
+    score_total: scores.total,
+    correct: scores.correct,
+    wrong: scores.wrong,
+    unattempted: scores.unattempted,
+    accuracy: scores.accuracy,
+    sections,
+    answers,
+    updated_at: new Date().toISOString(),
+  };
 
-  if (dbError) {
-    console.error("Supabase insert error:", dbError);
+  // Same student + same sheet → update their earlier scorecard (keeps one leaderboard entry and the same link)
+  let uid = null;
+  try {
+    let q = db.from("iimb_ug_scorecards").select("id, uid").eq("mobile", mobile).eq("exam_year", examYear).limit(1);
+    q = fileUrl ? q.eq("file_url", fileUrl) : q.eq("name", name);
+    const { data: existing } = await q;
+    if (existing && existing.length) {
+      const { error } = await db.from("iimb_ug_scorecards").update(row).eq("id", existing[0].id);
+      if (error) throw error;
+      uid = existing[0].uid;
+    } else {
+      const { data, error } = await db.from("iimb_ug_scorecards").insert(row).select("uid").single();
+      if (error) throw error;
+      uid = data.uid;
+    }
+  } catch (dbError) {
+    console.error("IIMB save error:", dbError?.message || dbError);
     return res.status(500).json({ error: "Could not save scorecard" });
   }
+  const stats = await iimbStats(db, examYear, scores.total);
 
   // Internal notification. Never blocks the student's result.
   try {
@@ -126,5 +137,5 @@ export default async function handler(req, res) {
     console.error("IIMB email failed (non-blocking):", err?.message);
   }
 
-  return res.status(200).json({ uid });
+  return res.status(200).json({ uid, stats });
 }
