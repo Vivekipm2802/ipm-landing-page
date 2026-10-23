@@ -105,6 +105,25 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
     } catch (e) { if (e?.name !== "AbortError") flash("Could not create the card. Try the WhatsApp share instead."); }
     finally { setBusy(false); }
   };
+  // WhatsApp: on phones, share the PNG + caption through the share sheet (pick WhatsApp).
+  // On laptops, wa.me links cannot carry files, so download the card and open WhatsApp with the text + report link.
+  const shareWhatsApp = async () => {
+    setBusy(true);
+    try {
+      const blob = await makeStoryCard({ name, result, pred, rank, count, year: examYear });
+      const file = new File([blob], "cat-scorecard.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: shareText });
+      } else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "cat-scorecard.png"; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
+        flash("Scorecard image downloaded: attach it in WhatsApp");
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
+    } finally { setBusy(false); }
+  };
   const copy = async () => { try { await navigator.clipboard.writeText(reportUrl); flash("Link copied"); } catch { flash("Long-press the link to copy"); } };
   const tileCls = (r) => (r === "C" || r === "B" ? s.qC : r === "W" ? s.qW : s.qU);
 
@@ -149,7 +168,7 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
 
       <div className={s.shareRow}>
         <button type="button" className={s.btnGold} onClick={shareCard} disabled={busy}>{busy ? "Making your card…" : "📸 Share story card"}</button>
-        <a className={s.btn} href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
+        <button type="button" className={s.btn} onClick={shareWhatsApp} disabled={busy}>💬 WhatsApp + image</button>
         {uid && <button type="button" className={s.btn} onClick={copy}>🔗 Copy link</button>}
         {!isReportPage && uid && <a className={s.btn} href={`/cat-report/${uid}`} target="_blank" rel="noopener noreferrer">📄 Report page</a>}
         <Link className={s.btn} href={callLink}>🎯 IIM calls</Link>
