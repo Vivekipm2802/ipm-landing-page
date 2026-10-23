@@ -12,6 +12,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { AIR1_FORMS } from '../../lib/air1FormsData';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -161,6 +162,33 @@ async function sendReminderEmail({ to, examName, lastDate, daysLeft }) {
   });
 }
 
+// ── "Dates are out" email: sent once when a 'To be announced' form gets its last date ──
+async function sendDatesOutEmail({ to, examName, lastDate, link }) {
+  const transporter = createTransporter();
+  const url = 'https://register.ipmcareer.com/air1commandcenter/forms';
+  const esc = (x) => String(x || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#05070a;font-family:'Inter',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
+<table width="480" cellpadding="0" cellspacing="0" style="background:#0f1117;border:1px solid #1e2533;border-radius:20px;overflow:hidden;max-width:480px;">
+<tr><td style="padding:28px 32px;text-align:center;">
+  <img src="https://register.ipmcareer.com/whitelogoipm.svg" alt="IPM Careers" height="36" style="margin-bottom:16px;"/>
+  <div style="font-size:13px;font-weight:700;color:#22c55e;letter-spacing:.06em;text-transform:uppercase;">Dates announced</div>
+  <div style="font-family:Georgia,serif;font-size:22px;color:#f4f1ea;margin-top:8px;">${esc(examName)}</div>
+  <div style="font-size:15px;color:#cfc9bf;margin-top:10px;">Last date to apply: <b style="color:#f9a01b;">${esc(lastDate)}</b></div>
+  <div style="font-size:13px;color:#9a958c;margin-top:10px;line-height:1.5;">You asked us to tell you when this form's dates were out. We will also remind you 7 days, 3 days and 1 day before the last date.</div>
+  ${link ? `<a href="${esc(link)}" style="display:inline-block;margin-top:18px;padding:11px 20px;border-radius:999px;background:#f9a01b;color:#0b0b0c;font-weight:700;font-size:14px;text-decoration:none;">Go to the official form →</a>` : ''}
+  <div style="margin-top:16px;"><a href="${url}" style="color:#f9a01b;font-size:13px;font-weight:700;text-decoration:none;">All IPM &amp; BBA forms and deadlines →</a></div>
+  <div style="font-size:11px;color:#6b665e;margin-top:14px;">Always confirm the date on the official website before you pay.</div>
+</td></tr></table></td></tr></table></body></html>`;
+  await transporter.sendMail({
+    from: { name: 'IPM Careers', address: 'info@ipmcareer.com' },
+    to,
+    subject: `✅ ${examName} dates are out: apply by ${lastDate}`,
+    html,
+  });
+}
+
 // ── Main handler ─────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
@@ -183,17 +211,41 @@ export default async function handler(req, res) {
 
   const results = { sent: [], errors: [], skipped: 0 };
 
-  // Fetch all active subscriptions that have a parsed deadline
-  const { data: subs, error: fetchError } = await supabase
+  // Fetch all active subscriptions (including 'To be announced' ones)
+  const { data: allSubs, error: fetchError } = await supabase
     .from('exam_notifications')
     .select('*')
-    .eq('is_active', true)
-    .not('last_date_parsed', 'is', null);
+    .eq('is_active', true);
 
   if (fetchError) {
     console.error('Fetch error:', fetchError);
     return res.status(500).json({ error: 'Database fetch failed' });
   }
+
+  // Refresh each subscription's date from the current forms data. A form that was 'To be announced'
+  // when the student tapped the bell starts getting reminders once its date is published, and a
+  // changed (extended) date gets fresh reminders.
+  const byName = new Map(AIR1_FORMS.map((r) => [String(r.name).toLowerCase(), r]));
+  results.announced = [];
+  for (const sub of allSubs || []) {
+    const row = byName.get(String(sub.exam_name || '').toLowerCase());
+    const iso = row && row.deadlineISO ? String(row.deadlineISO).slice(0, 10) : null;
+    if (!iso || iso === sub.last_date_parsed) continue;
+    const wasTBA = !sub.last_date_parsed;
+    const patch = { last_date: row.endDate, last_date_parsed: iso, notified_7d: false, notified_3d: false, notified_1d: false, notified_0d: false };
+    const { error: upErr } = await supabase.from('exam_notifications').update(patch).eq('id', sub.id);
+    if (upErr) continue;
+    Object.assign(sub, patch);
+    if (wasTBA && row.status !== 'Closed') {
+      try {
+        await sendDatesOutEmail({ to: sub.email, examName: sub.exam_name, lastDate: row.endDate, link: row.link });
+        results.announced.push({ email: sub.email, exam: sub.exam_name });
+      } catch (err) {
+        results.errors.push({ email: sub.email, exam: sub.exam_name, error: 'dates-out: ' + err.message });
+      }
+    }
+  }
+  const subs = (allSubs || []).filter((x) => x.last_date_parsed);
 
   for (const sub of subs || []) {
     const deadline = new Date(sub.last_date_parsed);
