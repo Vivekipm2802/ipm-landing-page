@@ -3,6 +3,10 @@
     {
       "path": "/api/send-exam-alerts",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/mba-alerts-send",
+      "schedule": "0 7 * * *"
     }
   ],
   "headers": [

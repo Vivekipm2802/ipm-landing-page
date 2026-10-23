@@ -183,3 +183,28 @@
 .moreBody { display: grid; gap: 8px; margin-top: 10px; }
 .chips { display: none !important; }
 .grid { align-items: start; }
+
+/* ═══════════ deadline alert bell ═══════════ */
+.bell { cursor: pointer; font: inherit; filter: grayscale(1) opacity(.6); transition: filter .15s, background .15s, border-color .15s; }
+.bell:hover { filter: none; border-color: rgba(249,160,27,0.6) !important; }
+.bellOn { filter: none; background: rgba(249,160,27,0.16) !important; border-color: rgba(249,160,27,0.6) !important; }
+.alertCta { position: relative; display: inline-flex; align-items: center; gap: 8px; margin-top: 1.2rem; height: 46px; padding: 0 22px; border-radius: 980px; border: 0; cursor: pointer; font: inherit; font-weight: 800; font-size: .95rem; background: linear-gradient(150deg, #ffbe5c, #f9a01b); color: #0b0b0c; box-shadow: 0 10px 30px -12px rgba(249,160,27,0.6); }
+.alertCtaOn { background: rgba(249,160,27,0.12); color: #ffbe5c; border: 1px solid rgba(249,160,27,0.5); box-shadow: none; }
+.alertHint { position: relative; margin: .55rem 0 0; font-size: .78rem; color: #9a958c; }
+.modalBack { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal { position: relative; width: 100%; max-width: 420px; background: #121318; border: 1px solid rgba(249,160,27,0.4); border-radius: 22px; padding: 22px 20px 18px; color: #ece8e1; box-shadow: 0 30px 80px -20px rgba(0,0,0,0.8); }
+.modalX { position: absolute; top: 10px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(236,232,225,0.06); color: #cfc9bf; font-size: 1.3rem; cursor: pointer; line-height: 1; }
+.modalIcon { font-size: 1.8rem; }
+.modalTitle { margin: 6px 0 4px; font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.3rem; color: #f4f1ea; line-height: 1.25; padding-right: 24px; }
+.modalSub { margin: 0 0 14px; font-size: .86rem; color: #cfc9bf; line-height: 1.5; }
+.modalForm { display: grid; gap: 10px; }
+.mField { display: grid; gap: 5px; font-size: .78rem; font-weight: 700; color: #cfc9bf; }
+.mInput { height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(236,232,225,0.18); background: rgba(236,232,225,0.04); color: #ece8e1; font: inherit; font-size: .95rem; font-weight: 400; outline: none; }
+.mInput:focus { border-color: #f9a01b; box-shadow: 0 0 0 3px rgba(249,160,27,0.18); }
+.mCheck { display: flex; gap: 8px; align-items: flex-start; font-size: .84rem; color: #cfc9bf; cursor: pointer; }
+.mCheck input { margin-top: 3px; accent-color: #f9a01b; }
+.mErr { padding: 9px 12px; border-radius: 10px; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; font-size: .84rem; }
+.mBtn { height: 48px; border-radius: 980px; border: 0; cursor: pointer; font: inherit; font-weight: 800; font-size: .96rem; background: linear-gradient(150deg, #ffbe5c, #f9a01b); color: #0b0b0c; }
+.mBtn:disabled { opacity: .6; cursor: wait; }
+.mNote { margin: 0; font-size: .72rem; color: #9a958c; text-align: center; line-height: 1.45; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 70; max-width: 92vw; padding: 11px 18px; border-radius: 999px; background: #f4f1ea; color: #0b0b0c; font-weight: 700; font-size: .86rem; text-align: center; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6); }

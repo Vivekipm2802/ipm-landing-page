@@ -4,6 +4,9 @@ import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
 import s from "./MbaForms.module.css";
 import { MBA_FORMS, TYPES, CHECKED_ON, computeStatus, fmtDate } from "../lib/mbaForms";
+import { sendLeadToCrm } from "../lib/crm";
+
+const ALERT_KEY = "mba-alerts-v1";
 
 const PAGE_URL = "https://register.ipmcareer.com/mba-application-forms";
 
@@ -67,22 +70,76 @@ const FAQS_STATIC = [
   },
 ];
 
-function calendarLink(f) {
-  if (!f.deadline) return null;
-  const d = f.deadline.replace(/-/g, "");
-  const next = new Date(`${f.deadline}T12:00:00Z`);
-  next.setUTCDate(next.getUTCDate() + 1);
-  const end = next.toISOString().slice(0, 10).replace(/-/g, "");
-  const text = encodeURIComponent(`Last date: ${f.name} application`);
-  const details = encodeURIComponent(`${f.programme}\nApply: ${f.link}\nCross-check the date on the official website.\nvia IPM Careers MBA Forms tracker`);
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${d}/${end}&details=${details}`;
-}
 
 export default function MbaApplicationForms({ builtAt }) {
   const [now, setNow] = useState(builtAt);
   const [status, setStatus] = useState("all");
   const [type, setType] = useState("all");
   const [q, setQ] = useState("");
+  const [alerts, setAlerts] = useState(null); // { token, name, email, phone, follows: [], all }
+  const [modal, setModal] = useState(null); // { formId, all }
+  const [af, setAf] = useState({ name: "", phone: "", email: "", all: false });
+  const [aBusy, setABusy] = useState(false);
+  const [aErr, setAErr] = useState("");
+  const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    try { const a = JSON.parse(localStorage.getItem(ALERT_KEY) || "null"); if (a && a.token) setAlerts(a); } catch {}
+  }, []);
+  const saveAlerts = (a) => { setAlerts(a); try { a ? localStorage.setItem(ALERT_KEY, JSON.stringify(a)) : localStorage.removeItem(ALERT_KEY); } catch {} };
+  const flash = (m) => { setToast(m); setTimeout(() => setToast(""), 3200); };
+  const formName = (id) => MBA_FORMS.find((x) => x.id === id)?.name || "this form";
+
+  const openModal = (formId, all = false) => {
+    setAErr("");
+    setAf((x) => ({ ...x, all: all || x.all, name: x.name || alerts?.name || "", phone: x.phone || alerts?.phone || "", email: x.email || alerts?.email || "" }));
+    setModal({ formId, all });
+  };
+
+  const bell = async (r, isSoon) => {
+    if (!alerts) return openModal(r.id);
+    const on = !(alerts.follows || []).includes(r.id);
+    try {
+      const res = await fetch("/api/mba-alerts-follow", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: alerts.token, formId: r.id, on }) });
+      const d = await res.json();
+      if (res.status === 404) { saveAlerts(null); return openModal(r.id); }
+      if (!res.ok) throw new Error(d.error);
+      saveAlerts({ ...alerts, follows: d.follows, all: d.all });
+      flash(on ? (isSoon ? `We'll email you when ${r.name} opens, then 7 days and 1 day before it closes.` : `Done. We'll email you 7 days and 1 day before ${r.name} closes.`) : `Alerts off for ${r.name}.`);
+    } catch (e) { flash(e.message || "Could not update. Try again."); }
+  };
+
+  const submitAlerts = async () => {
+    setAErr("");
+    if (af.name.trim().length < 2) return setAErr("Please enter your name.");
+    if (!/^[6-9]\d{9}$/.test(af.phone)) return setAErr("Please enter a valid 10-digit WhatsApp number.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(af.email.trim())) return setAErr("Please enter a valid email: reminders go there.");
+    setABusy(true);
+    sendLeadToCrm({ name: af.name.trim(), phone: af.phone, email: af.email.trim() }, "register-mba-deadline-alerts");
+    try {
+      const utm = {};
+      try { const u = new URLSearchParams(window.location.search); ["utm_source", "utm_medium", "utm_campaign", "gclid", "fbclid"].forEach((k) => { if (u.get(k)) utm[k] = u.get(k).slice(0, 120); }); } catch {}
+      const res = await fetch("/api/mba-alerts-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: af.name.trim(), phone: af.phone, email: af.email.trim(), formId: modal?.formId || undefined, all: af.all || modal?.all, utm: Object.keys(utm).length ? utm : null }) });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "Could not turn on alerts.");
+      saveAlerts({ token: d.token, name: af.name.trim(), email: af.email.trim(), phone: af.phone, follows: d.follows, all: d.all });
+      const fid = modal?.formId;
+      setModal(null);
+      flash(d.all ? "You'll get an email 7 days and 1 day before every MBA deadline." : fid ? `Done. We'll email you 7 days and 1 day before ${formName(fid)} closes.` : "Alerts are on.");
+    } catch (e) { setAErr(e.message); } finally { setABusy(false); }
+  };
+
+  const toggleAll = async () => {
+    if (!alerts) return openModal(null, true);
+    try {
+      const res = await fetch("/api/mba-alerts-follow", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: alerts.token, all: !alerts.all }) });
+      const d = await res.json();
+      if (res.status === 404) { saveAlerts(null); return openModal(null, true); }
+      if (!res.ok) throw new Error(d.error);
+      saveAlerts({ ...alerts, follows: d.follows, all: d.all });
+      flash(d.all ? "Alerts on for every MBA deadline." : "Alerts for all forms are off. Colleges you belled stay on.");
+    } catch (e) { flash(e.message || "Could not update. Try again."); }
+  };
 
   useEffect(() => {
     setNow(Date.now());
@@ -183,6 +240,10 @@ export default function MbaApplicationForms({ builtAt }) {
             <div className={s.stat}><div className={`${s.statNum} ${s.numClosing}`}>{counts.closing}</div><div className={s.statLabel}>Closing in 14 days</div></div>
             <div className={s.stat}><div className={`${s.statNum} ${s.numSoon}`}>{counts.soon}</div><div className={s.statLabel}>Opening soon</div></div>
           </div>
+          <button type="button" className={`${s.alertCta} ${alerts?.all ? s.alertCtaOn : ""}`} onClick={toggleAll}>
+            {alerts?.all ? "🔔 Alerts on for every deadline · turn off" : "🔔 Email me before every MBA deadline"}
+          </button>
+          <p className={s.alertHint}>Or tap the 🔔 on any college. Reminders 7 days and 1 day before the last date.</p>
         </section>
 
         <div className={s.wrap}>
@@ -221,7 +282,7 @@ export default function MbaApplicationForms({ builtAt }) {
             <div className={s.grid}>
               {list.map((r) => {
                 const st = r.st;
-                const cal = st.key !== "closed" ? calendarLink(r) : null;
+                const followed = Boolean(alerts && ((alerts.follows || []).includes(r.id)));
                 return (
                   <article key={r.id} id={`f-${r.id}`} className={`${s.card} ${st.key === "closing" ? s.cardClosing : ""} ${st.key === "closed" ? s.cardClosed : ""}`}>
                     <div className={s.cardTop}>
@@ -262,7 +323,13 @@ export default function MbaApplicationForms({ builtAt }) {
 
                     <div className={s.actions}>
                       <a className={s.apply} href={r.link} target="_blank" rel="noopener noreferrer nofollow">{st.key === "soon" || st.key === "closed" ? "Official site ↗" : "Apply ↗"}</a>
-                      {cal && <a className={s.cal} href={cal} target="_blank" rel="noopener noreferrer nofollow" title="Add the last date to Google Calendar" aria-label="Add the last date to Google Calendar">📅</a>}
+                      {st.key !== "closed" && (
+                        <button type="button" className={`${s.cal} ${s.bell} ${followed || alerts?.all ? s.bellOn : ""}`} onClick={() => bell(r, st.key === "soon")}
+                          title={followed ? "Alerts on: tap to turn off" : st.key === "soon" ? "Email me when this form opens" : "Email me 7 days and 1 day before the last date"}
+                          aria-label={followed ? `Turn off alerts for ${r.name}` : `Get deadline alerts for ${r.name}`} aria-pressed={followed}>
+                          🔔
+                        </button>
+                      )}
                     </div>
 
                     <details className={s.more}>
@@ -466,6 +533,28 @@ export default function MbaApplicationForms({ builtAt }) {
           }),
         }}
       />
+      {modal && (
+        <div className={s.modalBack} role="dialog" aria-modal="true" aria-label="Turn on deadline alerts" onClick={(e) => { if (e.target === e.currentTarget) setModal(null); }}>
+          <div className={s.modal}>
+            <button type="button" className={s.modalX} onClick={() => setModal(null)} aria-label="Close">×</button>
+            <div className={s.modalIcon}>🔔</div>
+            <h2 className={s.modalTitle}>{modal.formId ? `Get alerts for ${formName(modal.formId)}` : "Get alerts for every MBA deadline"}</h2>
+            <p className={s.modalSub}>We email you 7 days and 1 day before the last date{modal.formId && MBA_FORMS.find((x) => x.id === modal.formId) && computeStatus(MBA_FORMS.find((x) => x.id === modal.formId), now).key === "soon" ? ", and the day the form opens" : ""}. Free.</p>
+            <div className={s.modalForm}>
+              <label className={s.mField}><span>Your name</span><input className={s.mInput} value={af.name} onChange={(e) => setAf((x) => ({ ...x, name: e.target.value }))} autoComplete="name" /></label>
+              <label className={s.mField}><span>WhatsApp number</span><input className={s.mInput} value={af.phone} onChange={(e) => setAf((x) => ({ ...x, phone: e.target.value.replace(/\D/g, "").slice(-10) }))} inputMode="numeric" placeholder="10-digit mobile" autoComplete="tel-national" /></label>
+              <label className={s.mField}><span>Email (reminders go here)</span><input className={s.mInput} value={af.email} onChange={(e) => setAf((x) => ({ ...x, email: e.target.value }))} type="email" autoComplete="email" /></label>
+              {modal.formId && (
+                <label className={s.mCheck}><input type="checkbox" checked={af.all} onChange={(e) => setAf((x) => ({ ...x, all: e.target.checked }))} /><span>Also remind me before every other MBA deadline</span></label>
+              )}
+              {aErr && <div className={s.mErr}>{aErr}</div>}
+              <button type="button" className={s.mBtn} onClick={submitAlerts} disabled={aBusy}>{aBusy ? "Turning on…" : "Turn on alerts"}</button>
+              <p className={s.mNote}>One email a day at most. Unsubscribe from any email. By continuing you agree to be contacted by IPM Careers about MBA admissions.</p>
+            </div>
+          </div>
+        </div>
+      )}
+      {toast && <div className={s.toast} role="status">{toast}</div>}
     </AppShell>
   );
 }
