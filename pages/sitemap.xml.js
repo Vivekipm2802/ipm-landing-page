@@ -5,6 +5,7 @@
 // Cache for 6 hours at the edge.
 
 import { createClient } from '@supabase/supabase-js';
+import { CAT_CITIES } from '../lib/catCities';
 
 const SITE = 'https://register.ipmcareer.com';
 
@@ -29,6 +30,16 @@ export async function getServerSideProps({ res }) {
     .order('published_at', { ascending: false })
     .limit(1000);
 
+  // CAT test centres (service key, server only; table is not public)
+  let catCentres = [];
+  try {
+    if (process.env.SUPABASE_SERVICE_KEY) {
+      const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, { auth: { persistSession: false } });
+      const { data } = await admin.from('cat_centres').select('city_slug, slug, updated_at').limit(2000);
+      catCentres = data || [];
+    }
+  } catch {}
+
   const today = new Date().toISOString();
   const urls = [
     urlNode({ loc: `${SITE}/`,                  lastmod: today, changefreq: 'daily',  priority: '1.0' }),
@@ -39,6 +50,10 @@ export async function getServerSideProps({ res }) {
     urlNode({ loc: `${SITE}/response`,             lastmod: today, changefreq: 'weekly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/cat-score-calculator`, lastmod: today, changefreq: 'weekly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/mba-application-forms`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
+    urlNode({ loc: `${SITE}/cat-exam-day-planner`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
+    urlNode({ loc: `${SITE}/cat-exam-centres`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
+    ...CAT_CITIES.map((c) => urlNode({ loc: `${SITE}/cat-exam-centres/${c.slug}`, lastmod: today, changefreq: 'daily', priority: '0.6' })),
+    ...catCentres.map((c) => urlNode({ loc: `${SITE}/cat-exam-centres/${c.city_slug}/${c.slug}`, lastmod: c.updated_at || today, changefreq: 'daily', priority: '0.6' })),
     ...(blogs || []).map(b => urlNode({
       loc: `${SITE}/magazine/${b.slug}`,
       lastmod: (b.updated_at || b.published_at || today),

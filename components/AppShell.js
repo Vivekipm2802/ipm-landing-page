@@ -6,7 +6,7 @@ import lightStyles from './AppShell.module.css';
 import darkStyles from './AppShellDark.module.css';
 
 // Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
-const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms'];
+const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres'];
 
 const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => {
   const router = useRouter();
@@ -26,7 +26,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
   }, [router.asPath]);
 
   // CAT pages get their own, separate menu (CAT calculator + Contact Us only)
-  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms';
+  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms' || router.pathname.startsWith('/cat-exam-day-planner') || router.pathname.startsWith('/cat-exam-centres');
 
   const handleBack = () => {
     if (canGoBack) {
@@ -112,10 +112,13 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
   const catNavItems = [
     { icon: '🎓', label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+    { icon: '🧭', label: 'CAT Exam Day Planner', path: '/cat-exam-day-planner' },
+    { icon: '📍', label: 'CAT Exam Centres', path: '/cat-exam-centres' },
     { icon: '🗓️', label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
   ];
   const catTopNavItems = [
     { label: 'CAT 2026 Score Calculator', path: '/cat-score-calculator' },
+    { label: 'Exam Day Planner', path: '/cat-exam-day-planner' },
     { label: 'MBA Forms & Deadlines', path: '/mba-application-forms' },
   ];
 
