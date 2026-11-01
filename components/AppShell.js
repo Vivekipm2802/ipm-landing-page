@@ -4,6 +4,10 @@ import Link from 'next/link';
 import Head from 'next/head';
 import lightStyles from './AppShell.module.css';
 import darkStyles from './AppShellDark.module.css';
+import dynamic from 'next/dynamic';
+
+// CAT 2026 "notify me" bell (client only, CAT pages only)
+const CatAlertsBell = dynamic(() => import('./CatAlerts'), { ssr: false });
 
 // Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
 const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres', '/cat-percentile-predictor', '/iim-call-predictor'];
@@ -316,6 +320,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
         <main className={`${styles.main} ${!sidebarOpen && !isMobile ? styles.mainExpanded : ''}`}>
           {children}
         </main>
+        {isCatPage && router.pathname !== '/mba-application-forms' && <CatAlertsBell />}
       </div>
     </div>
   );

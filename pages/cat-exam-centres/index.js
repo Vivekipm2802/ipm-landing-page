@@ -6,6 +6,7 @@ import AppShell from "../../components/AppShell";
 import s from "../CatPlanner.module.css";
 import { CAT_CITIES } from "../../lib/catCities";
 import { STATES, CENTRES_PATH, PLANNER_PATH, SITE } from "../../lib/catPlanner";
+import { CatAlertsInline } from "../../components/CatAlerts";
 
 const PAGE_URL = `${SITE}${CENTRES_PATH}`;
 
@@ -79,6 +80,7 @@ export default function CatExamCentres({ counts }) {
               <Link href={PLANNER_PATH} className={s.btn}>Open the Exam Day Planner →</Link>
             </div>
           </div>
+          <CatAlertsInline />
           <div style={{ marginTop: 16 }}>
             <input className={s.search} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search your city or state (e.g. Kanpur, Kerala)" aria-label="Search CAT test cities" />
           </div>

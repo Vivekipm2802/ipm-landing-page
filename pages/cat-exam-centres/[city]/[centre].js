@@ -5,6 +5,7 @@ import { NextSeo } from "next-seo";
 import AppShell from "../../../components/AppShell";
 import s from "../../CatPlanner.module.css";
 import { sendLeadToCrm } from "../../../lib/crm";
+import { CatAlertsInline } from "../../../components/CatAlerts";
 import { SLOTS, CENTRES_PATH, PLANNER_PATH, SITE, cityBySlug, fmtHHMM, directionsUrl, mapsEmbedUrl, mapsSearchUrl, centreQuery } from "../../../lib/catPlanner";
 
 const REVIEWS_OPEN_AT = new Date("2026-11-29T08:30:00+05:30").getTime();
@@ -104,6 +105,8 @@ export default function CentrePage({ centre, counts, reviews, others }) {
             </div>
             <iframe className={s.map} title={`Map of ${centre.name}`} src={mapsEmbedUrl(centre)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           </div>
+
+          <CatAlertsInline city={city} title={`Taking CAT at ${centre.name}?`} text="Get an email the minute the CAT 2026 response sheet and answer key are out, with a 1-minute score check, then the result and your IIM call check." />
 
           {(nb.rail?.length || nb.metro?.length || nb.bus?.length || nb.parking?.length) ? (
             <div className={s.card}>

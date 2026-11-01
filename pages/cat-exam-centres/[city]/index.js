@@ -5,6 +5,8 @@ import AppShell from "../../../components/AppShell";
 import s from "../../CatPlanner.module.css";
 import { CAT_CITIES } from "../../../lib/catCities";
 import { SLOTS, CENTRES_PATH, PLANNER_PATH, SITE, cityBySlug, fmtHHMM } from "../../../lib/catPlanner";
+import { CatAlertsInline } from "../../../components/CatAlerts";
+import { ADMIT_DATE } from "../../../lib/catAlerts";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -34,10 +36,11 @@ export async function getStaticProps({ params }) {
   } catch {
     if (!city) return { notFound: true, revalidate: 600 };
   }
-  return { props: { city, centres, plans, weather }, revalidate: 3600 };
+  const admitOut = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10) >= ADMIT_DATE;
+  return { props: { city, centres, plans, weather, admitOut }, revalidate: 3600 };
 }
 
-export default function CityPage({ city, centres, plans, weather }) {
+export default function CityPage({ city, centres, plans, weather, admitOut = false }) {
   const url = `${SITE}${CENTRES_PATH}/${city.slug}`;
   const sameState = CAT_CITIES.filter((c) => c.state === city.state && c.slug !== city.slug);
   const twin = city.aliases && city.aliases.length > 2 ? city.aliases.filter((a) => a !== city.name && !/\(/.test(a)) : [];
@@ -86,12 +89,27 @@ export default function CityPage({ city, centres, plans, weather }) {
         </section>
 
         <div className={s.wrap}>
+          {admitOut ? (
+            <>
           <div className={`${s.card} ${s.cardGold}`}>
             <div className={s.cta}>
               <div><div className={s.tlTitle}>Taking CAT in {city.name}?</div><div className={s.note}>Upload your admit card for your leave-by time, route, cab links and reminders. It also adds your centre here.</div></div>
               <Link href={PLANNER_PATH} className={s.btn}>Plan my exam day →</Link>
             </div>
           </div>
+          <CatAlertsInline city={city.unofficial ? null : city} />
+            </>
+          ) : (
+            <>
+          <CatAlertsInline city={city.unofficial ? null : city} />
+          <div className={`${s.card} ${s.cardGold}`}>
+            <div className={s.cta}>
+              <div><div className={s.tlTitle}>Taking CAT in {city.name}?</div><div className={s.note}>Upload your admit card for your leave-by time, route, cab links and reminders. It also adds your centre here.</div></div>
+              <Link href={PLANNER_PATH} className={s.btn}>Plan my exam day →</Link>
+            </div>
+          </div>
+            </>
+          )}
 
           <div className={s.card}>
             <h2 className={s.cardTitle}>CAT 2026 centres in {city.name}</h2>
