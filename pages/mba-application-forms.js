@@ -46,7 +46,7 @@ const FAQS_STATIC = [
   },
   {
     q: "What is the FMS Delhi application form 2027 last date?",
-    a: "FMS Delhi has not released its MBA 2027-29 notice yet. It needs a separate FMS form in addition to CAT, so keep an eye on fms.edu; this tracker updates the card as soon as the official dates are out.",
+    a: "The FMS Delhi MBA 2027-29 form is open from 26 October to 25 November 2026 on the official FMS admissions portal (fmsadmissions.co.in). It is a separate form in addition to CAT and needs your CAT 2026 registration number. The fee is ₹1,000, or ₹350 for SC, ST and PwD candidates.",
   },
   {
     q: "What is the IIFT MBA application form 2027 last date?",
@@ -58,7 +58,7 @@ const FAQS_STATIC = [
   },
   {
     q: "Which MBA forms should I fill before CAT?",
-    a: "Several forms close before the CAT exam on 29 November 2026: NMIMS (25 Oct), BITSoM Round 1 (15 Nov), MICAT-I (21 Nov), IIFT and SNAP (25 Nov), SPJIMR and IMT (27 Nov) and MDI Gurgaon (28 Nov). See the 'before CAT vs after CAT' table on this page.",
+    a: "Several forms close before the CAT exam on 29 November 2026: NMIMS (31 Oct), BITSoM Round 1 (15 Nov), MICAT-I (21 Nov), IIFT, SNAP and FMS Delhi (25 Nov), Great Lakes Cycle 1 (26 Nov), SPJIMR and IMT (27 Nov) and MDI Gurgaon (28 Nov). See the 'before CAT vs after CAT' table on this page.",
   },
   {
     q: "How much is the MBA application form fee?",
@@ -456,7 +456,7 @@ export default function MbaApplicationForms({ builtAt }) {
           <h2>Forms you must fill separately after CAT</h2>
           <p>
             CAT only covers the IIMs. Most other CAT-accepting institutes need their own form, often with an earlier deadline than you expect:
-            SPJIMR and MDI close in the last week of November, IIFT on 25 November, and IMT on 27 November 2026. FMS Delhi, the IIT MBA
+            SPJIMR and MDI close in the last week of November, IIFT on 25 November, and IMT on 27 November 2026. FMS Delhi is open now and closes on 25 November 2026. The IIT MBA
             programmes, DFBE (DU) and IIM Mumbai usually open their forms around or after the CAT result. Filter by <em>Opening soon</em> to
             see them.
           </p>
