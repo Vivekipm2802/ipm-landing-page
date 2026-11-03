@@ -223,7 +223,7 @@ export default function CatScoreCalculator() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="CAT Score Calculator 2026: Response Sheet Score & Score vs Percentile"
+        title="CAT Score Calculator 2026: Response Sheet to Score"
         description="Free CAT score calculator 2026: paste your CAT response sheet link for VARC, DILR, QA and total out of 204. Plus CAT score vs percentile, answer key dates and TITA marking."
         canonical={PAGE_URL}
         openGraph={{

@@ -55,7 +55,7 @@ export default function CatExamCentres({ counts }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title="CAT 2026 Exam Centres: All 162 Test Cities, Centre Address & Reviews"
+        title="CAT 2026 Exam Centres: 162 Cities & Centre List"
         description="CAT 2026 exam centre list for all 162 test cities, state-wise. Find your centre's address, map, nearest railway and metro station, parking and student reviews. Admit cards out 4 Nov."
         canonical={PAGE_URL}
         openGraph={{ url: PAGE_URL, title: "CAT 2026 Exam Centres: 162 test cities, addresses and reviews", description: "State-wise CAT 2026 test cities with centre addresses, maps and reviews from students.", siteName: "IPM Careers" }}

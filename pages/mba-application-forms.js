@@ -210,7 +210,7 @@ export default function MbaApplicationForms({ builtAt }) {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="MBA Application Forms 2026: Last Dates for 2027-29 Batch (Live)"
+        title="MBA Application Forms 2026: Last Dates (Live List)"
         description="Which MBA forms are open now? Live MBA application form 2026 last dates for the 2027-29 batch: XAT, SNAP, NMAT, SPJIMR, MDI, IIFT, IITs and more, updated hourly."
         canonical={PAGE_URL}
         openGraph={{

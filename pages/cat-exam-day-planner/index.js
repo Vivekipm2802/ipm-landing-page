@@ -142,7 +142,7 @@ export default function CatExamDayPlanner() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title="CAT 2026 Exam Day Planner: Admit Card, Reporting Time & Route to Your Centre"
+        title="CAT Admit Card 2026: Exam Day Planner & Reporting Time"
         description="Upload your CAT 2026 admit card (out 4 Nov) and get your leave-by time, Google Maps and cab links to your test centre, calendar alarms and a what-to-carry checklist. Free."
         canonical={PAGE_URL}
         openGraph={{ url: PAGE_URL, title: "CAT 2026 Exam Day Planner | Free tool by IPM Careers", description: "Your whole CAT exam day, sorted from your admit card: leave-by time, route, cab, alarms, checklist and reminders.", siteName: "IPM Careers" }}

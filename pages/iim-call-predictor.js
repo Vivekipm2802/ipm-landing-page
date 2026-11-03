@@ -12,9 +12,18 @@ const SITE = "https://register.ipmcareer.com";
 const PAGE_URL = `${SITE}/iim-call-predictor`;
 const TONE = { good: s.toneGood, warn: s.toneWarn, bad: s.toneBad, info: s.toneInfo };
 const num = (v) => (v === "" || v == null || Number.isNaN(Number(v)) ? null : Number(v));
+const byId = (id) => IIMS.find((i) => i.id === id);
+const minText = (id) => { const g = byId(id)?.min?.GEN; return g ? `${g.o} percentile overall${g.v != null ? ` with ${g.v} VARC, ${g.d} DILR and ${g.q} QA` : ""}` : ""; };
+const WITH_OVERALL = IIMS.filter((i) => i.min.GEN.o != null);
+const LOWEST = WITH_OVERALL.reduce((x, y) => (y.min.GEN.o < x.min.GEN.o ? y : x), WITH_OVERALL[0]);
+const JAP = IIMS.find((i) => i.callCutoff);
+const shortText = (i) => i.shortlist.map(([l, w]) => (w != null && w !== 100 ? `${l} ${w}%` : l)).join(", ");
 
 const FAQS = [
   { q: "What is the minimum CAT percentile for IIM Ahmedabad?", a: "For the 2027-29 batch, IIM Ahmedabad's admission policy sets a minimum of 95 percentile overall and 85 in each section for General and EWS candidates, 90 and 80 for NC-OBC, 85 and 75 for SC, and 75 and 65 for ST. Clearing these makes you eligible to be considered; calls are then decided by a composite score that adds your 10th, 12th, graduation marks, work experience and gender diversity." },
+  { q: "What is the minimum CAT percentile for IIM Bangalore?", a: `IIM Bangalore's 2027-29 policy refers to a pre-set minimum without new numbers; the last table it published (for CAT 2025) asks General candidates for ${minText("bangalore")}. IIM B then ranks eligible candidates with CAT at 55% of the shortlist score, plus 10th, 12th, graduation, work experience and gender diversity.` },
+  { q: "What is the minimum CAT percentile for IIM Calcutta?", a: `IIM Calcutta's 2027-29 policy asks General candidates for ${minText("calcutta")}, plus a non-negative raw score in every section. Graduation marks and work experience are not used at the shortlist stage.` },
+  { q: "Which IIM has the lowest minimum CAT percentile?", a: `Among the IIMs that set an overall minimum, ${LOWEST.name} has the lowest for General candidates: ${LOWEST.min.GEN.o} percentile (${LOWEST.policy} policy). A minimum only makes you eligible; the real call cutoff is usually higher.` },
   { q: "Does clearing the minimum cutoff mean I will get an IIM call?", a: "No. The minimum percentile only makes you eligible. Most IIMs then rank eligible candidates on a composite score of CAT plus academics, work experience and diversity, and call only the top few thousand. For example, IIM Indore shortlisted 1,817 of 147,066 General-category applicants last year." },
   { q: "Which IIMs give the most weight to academics?", a: "IIM Indore gives 25% to 12th marks and 10% to 10th at the shortlist stage, IIM Kozhikode 20% to 12th and 15% to 10th, and IIM Calcutta 15% to 12th and 10% to 10th. IIM Mumbai and the JAP and CAP IIMs shortlist on CAT alone." },
   { q: "Which IIMs shortlist only on CAT percentile?", a: "IIM Mumbai shortlists on CAT score and sectional cutoffs only. IIM Trichy, Ranchi, Raipur and Kashipur shortlist through the Joint Admission Process (JAP) by CAT percentile within category, and IIM Bodh Gaya, Jammu and Sirmaur through the Common Admission Process (CAP) by CAT percentile and intake." },
@@ -100,7 +109,7 @@ export default function IimCallPredictor() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title="IIM Call Predictor 2026: CAT Cutoffs & Shortlisting Criteria for 22 IIMs"
+        title="IIM Call Predictor 2026: CAT Cutoffs for 22 IIMs"
         description="Free IIM call predictor: enter your CAT percentile, 10th, 12th, graduation and work-ex to see which of 22 IIMs' official minimum cutoffs you clear, last year's JAP call cutoffs and how each IIM scores your profile."
         canonical={PAGE_URL}
         openGraph={{ url: PAGE_URL, title: "IIM Call Predictor 2026 | IPM Careers", description: "Official CAT cutoffs and shortlisting criteria for 22 IIMs, checked against your profile.", siteName: "IPM Careers" }}
@@ -215,6 +224,48 @@ export default function IimCallPredictor() {
             </table>
           </div>
           <p className={s.note}>* IIM Rohtak: as reported by Careers360; the official policy PDF could not be read. CAP IIMs (Bodh Gaya, Jammu, Sirmaur) have lower overall minimums for women and transgender candidates. Shillong has sectional minimums only, Sambalpur and Rohtak overall only.</p>
+
+          <h2>Minimum overall CAT percentile by category</h2>
+          <p>Every category has its own minimum. Values are from each IIM’s official admission policy; a dash means the IIM sets only sectional minimums or did not publish one for that category.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>IIM</th>{CATEGORIES.map((c) => <th key={c.key}>{c.label}</th>)}</tr></thead>
+              <tbody>
+                {IIMS.map((i) => (
+                  <tr key={i.id}><td>{i.name}{i.status === "reported" ? " *" : ""}</td>{CATEGORIES.map((c) => <td key={c.key}>{i.min[c.key]?.o ?? "–"}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={s.note}>CAP IIMs (Bodh Gaya, Jammu, Sirmaur) set lower overall minimums for women and transgender candidates. The PwD column shows the General-PwD minimum where an IIM splits it.</p>
+
+          {JAP && (
+            <>
+              <h2>Last year’s actual call cutoffs (JAP IIMs)</h2>
+              <p>IIM Trichy, Ranchi, Raipur and Kashipur shortlist together through the Joint Admission Process. For the 2026-28 batch they published the real interview-call cutoffs, which show how far above the minimum calls went.</p>
+              <div className={s.tableWrap}>
+                <table className={s.table}>
+                  <thead><tr><th>Category</th><th>Minimum overall</th><th>Actual call cutoff (overall)</th><th>Each section</th></tr></thead>
+                  <tbody>
+                    {CATEGORIES.map((c) => (
+                      <tr key={c.key}><td>{c.label}</td><td>{JAP.min[c.key]?.o ?? "–"}</td><td><b>{JAP.callCutoff[c.key]?.o ?? "–"}</b></td><td>{JAP.callCutoff[c.key]?.v ?? "–"}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          <h2>What each IIM looks at for the shortlist</h2>
+          <p>After the minimum percentile, most IIMs rank candidates on a composite score. The weights below are from the official policies; where an IIM does not publish weights, the components are listed without them.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>IIM</th><th>Process</th><th>Shortlist based on</th></tr></thead>
+              <tbody>
+                {IIMS.map((i) => <tr key={i.id}><td>{i.name}</td><td>{i.process || "Own"}</td><td>{shortText(i)}</td></tr>)}
+              </tbody>
+            </table>
+          </div>
 
           <h2>How IIMs shortlist after CAT</h2>
           <p>Every IIM first applies a minimum overall and sectional percentile for your category. Then most of them rank the eligible candidates on a composite score. IIM Ahmedabad uses 65% CAT and 35% academic rating, IIM Bangalore 55% CAT with the rest for 10th, 12th, graduation, work-ex and gender, IIM Calcutta 56 points of CAT, 15 for 12th, 10 for 10th and 4 for gender, and IIM Indore puts 25% on 12th marks. IIM Mumbai, the JAP IIMs (Trichy, Ranchi, Raipur, Kashipur) and the CAP IIMs (Bodh Gaya, Jammu, Sirmaur) shortlist on CAT alone.</p>

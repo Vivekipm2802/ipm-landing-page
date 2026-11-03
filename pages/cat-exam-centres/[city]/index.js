@@ -68,7 +68,7 @@ export default function CityPage({ city, centres, plans, weather, admitOut = fal
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title={`CAT Exam Centre in ${city.name} 2026: Centre List, Address & Reporting Time`}
+        title={`CAT Exam Centre in ${city.name} 2026: List & Address`}
         description={`CAT 2026 exam centres in ${city.name}${city.state ? `, ${city.state}` : ""}: ${n ? `${n} centre${n > 1 ? "s" : ""} with address, map, nearest station, parking and reviews` : "centre list from admit cards (out 4 Nov), reporting times, how to reach and what to carry"}. Exam on 29 Nov 2026.`}
         canonical={url}
         noindex={Boolean(city.unofficial)}

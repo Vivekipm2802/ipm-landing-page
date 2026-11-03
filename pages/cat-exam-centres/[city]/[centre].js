@@ -75,7 +75,7 @@ export default function CentrePage({ centre, counts, reviews, others }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title={`${centre.name}, ${centre.city}: CAT 2026 Exam Centre Address, How to Reach & Reviews`}
+        title={`${centre.name}, ${centre.city} | CAT 2026 Centre`}
         description={`${centre.name}, ${centre.city} CAT exam centre: full address, map, ${nearestRail ? `nearest station ${nearestRail.name}, ` : ""}parking, reporting time and student reviews${reviews.count ? ` (${reviews.count})` : ""}. CAT 2026 on 29 Nov.`}
         canonical={url}
         openGraph={{ url, title: `${centre.name}: CAT exam centre in ${centre.city}`, siteName: "IPM Careers" }}

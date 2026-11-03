@@ -7,16 +7,28 @@ import AppShell from "../components/AppShell";
 import s from "./CatPlanner.module.css";
 import { sendLeadToCrm } from "../lib/crm";
 import { PATTERN, MAX_TOTAL, APPEARED, CURVES, TARGETS, predictAll, marksNeeded } from "../lib/catPercentile";
-import { CATEGORIES } from "../lib/iimCallData";
+import { CATEGORIES, IIMS } from "../lib/iimCallData";
 
 const SITE = "https://register.ipmcareer.com";
 const PAGE_URL = `${SITE}/cat-percentile-predictor`;
 const SECS = ["VARC", "DILR", "QA"];
+const desc = (arr) => [...new Set(arr)].sort((x, y) => y - x);
+const OVERALL_PCTS = desc([...CURVES[2025].overall, ...CURVES[2024].overall].map(([, q]) => q));
+const SECT_PCTS = desc(SECS.flatMap((k) => CURVES[2025][k].map(([, q]) => q)));
+const RANK_PCTS = [99.99, 99.9, 99.5, 99, 98, 97, 95, 90, 85, 80];
+const approxRank = (q) => Math.max(1, Math.round(((100 - q) / 100) * APPEARED[2025]));
+const IIM_MINS = IIMS.filter((i) => i.min.GEN.o != null).map((i) => ({ name: i.name, o: i.min.GEN.o }));
+const iimsAtOrBelow = (q) => IIM_MINS.filter((i) => i.o <= q);
+const fmtN = (n) => n.toLocaleString("en-IN");
 const fmtPct = (x) => (x == null ? "–" : x >= 99.99 ? "99.99+" : x.toFixed(2));
 
 const FAQS = [
   { q: "How many marks are needed for 99 percentile in CAT?", a: `In CAT 2025, about ${marksNeeded(2025, "overall", 99)} marks (scaled score, out of 204) were needed for the 99th percentile, going by scores students reported from their scorecards. In CAT 2024 it was about ${marksNeeded(2024, "overall", 99)}. The number moves every year with paper difficulty.` },
   { q: "How many marks are needed for 95 percentile in CAT?", a: `About ${marksNeeded(2025, "overall", 95)} marks in CAT 2025 and about ${marksNeeded(2024, "overall", 95)} in CAT 2024.` },
+  { q: "How many marks are needed for 90 percentile in CAT?", a: `About ${marksNeeded(2025, "overall", 90)} marks (scaled score, out of 204) in CAT 2025 and about ${marksNeeded(2024, "overall", 90)} in CAT 2024, going by scores students reported from their scorecards.` },
+  { q: "How many marks are needed for 80 percentile in CAT?", a: `About ${marksNeeded(2025, "overall", 80)} marks in CAT 2025 and about ${marksNeeded(2024, "overall", 80)} in CAT 2024.` },
+  { q: "What rank is 99 percentile in CAT?", a: `With about ${(APPEARED[2025] / 100000).toFixed(2)} lakh candidates in CAT 2025, the 99th percentile means roughly ${fmtN(approxRank(99))} candidates scored higher, so a rank of about ${fmtN(approxRank(99))}. At 95 percentile it is about ${fmtN(approxRank(95))} and at 90 percentile about ${fmtN(approxRank(90))}. These are estimates; the IIMs do not publish ranks.` },
+  { q: "What CAT percentile do I need for the IIMs?", a: `Going by the IIMs' own admission policies, ${iimsAtOrBelow(90).length} of the ${IIM_MINS.length} IIMs that set an overall minimum ask for 90 percentile or less (General category), and ${iimsAtOrBelow(85).length} ask for 85 or less. These are minimums to be considered; actual interview calls usually need more. The IIM Call Predictor checks your percentiles and profile against each IIM.` },
   { q: "How accurate is this CAT percentile predictor?", a: "It is an estimate. It maps your marks onto the score-to-percentile curves students reported after the CAT 2025 and CAT 2024 results, and shows both, so you see a range. Your real percentile depends on your slot's normalisation and how everyone else did this year. The IIMs do not publish a score-to-percentile table." },
   { q: "What is the difference between raw score and scaled score in CAT?", a: "Your raw score is 3 marks per correct answer minus 1 per wrong MCQ (wrong TITA answers cost nothing). Because CAT runs in three slots with different papers, the IIMs normalise raw scores into scaled scores, and percentiles are calculated on scaled scores. The scorecard shows scaled scores, which is what the curves here use." },
   { q: "What is the CAT 2026 exam pattern and marking scheme?", a: "CAT 2025 had 68 questions in 120 minutes: VARC 24 questions (72 marks), DILR 22 (66 marks) and QA 22 (66 marks), with 40 minutes per section. Each correct answer is +3, a wrong MCQ is -1 and a wrong TITA answer has no penalty. Check the CAT 2026 notification for any change." },
@@ -102,7 +114,7 @@ export default function CatPercentilePredictor() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title="CAT Percentile Predictor 2026: Score vs Percentile (CAT 2025 Data)"
+        title="CAT Percentile Predictor 2026: Marks vs Percentile"
         description={`Free CAT percentile predictor: enter your VARC, DILR and QA marks and get your expected overall and sectional percentile, from real CAT 2025 and 2024 results. 99 percentile needed about ${marksNeeded(2025, "overall", 99)} marks in CAT 2025.`}
         canonical={PAGE_URL}
         openGraph={{ url: PAGE_URL, title: "CAT Percentile Predictor 2026 | IPM Careers", description: "Your marks to CAT percentile, from real CAT 2025 and 2024 scorecards.", siteName: "IPM Careers" }}
@@ -211,6 +223,59 @@ export default function CatPercentilePredictor() {
             </table>
           </div>
           <p className={s.note}>Sources: cracku.in CAT score vs percentile (2025 overall and VARC, DILR, QA pages; 2024 page), cross-checked with iquanta.in. Scores are scaled scores out of 204.</p>
+
+          <h2>CAT score vs percentile: every data point (2025 and 2024)</h2>
+          <p>All the overall score and percentile pairs in our data, from 99.99 down. Scores are scaled scores out of 204; a dash means no reported data point for that year.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Percentile</th><th>CAT 2025 score</th><th>CAT 2024 score</th></tr></thead>
+              <tbody>
+                {OVERALL_PCTS.map((q) => (
+                  <tr key={q}><td><b>{q}</b></td><td>{marksNeeded(2025, "overall", q) ?? "–"}</td><td>{marksNeeded(2024, "overall", q) ?? "–"}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h2>CAT 2025 sectional score vs percentile (VARC, DILR, QA)</h2>
+          <p>Sectional percentiles are calculated separately, and IIMs set sectional minimums, so a weak section can cost you a call even with a high overall percentile. Negative scores at the bottom are real: wrong MCQs cost a mark each.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Percentile</th><th>VARC (out of 72)</th><th>DILR (out of 66)</th><th>QA (out of 66)</th></tr></thead>
+              <tbody>
+                {SECT_PCTS.map((q) => (
+                  <tr key={q}><td><b>{q}</b></td>{SECS.map((k) => <td key={k}>{marksNeeded(2025, k, q) ?? "–"}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h2>CAT percentile vs rank (estimate)</h2>
+          <p>Rank here means roughly how many candidates scored above you, worked out from about {(APPEARED[2025] / 100000).toFixed(2)} lakh CAT 2025 test-takers. The IIMs do not publish ranks, so treat these as approximate.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Percentile</th><th>Approximate rank</th><th>CAT 2025 score needed</th></tr></thead>
+              <tbody>
+                {RANK_PCTS.map((q) => (
+                  <tr key={q}><td><b>{q}</b></td><td>{fmtN(approxRank(q))}</td><td>{marksNeeded(2025, "overall", q) ?? "–"}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Which IIMs your percentile makes you eligible for</h2>
+          <p>Minimum overall CAT percentile for the General category, from each IIM’s official admission policy. Clearing the minimum makes you eligible to be considered; real interview calls usually need more, and sectional minimums apply too. Check yours with the <Link href="/iim-call-predictor" className={s.link}>IIM Call Predictor</Link>.</p>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Your overall percentile</th><th>IIMs whose minimum you clear</th></tr></thead>
+              <tbody>
+                {[99, 95, 90, 85].map((q) => (
+                  <tr key={q}><td><b>{q}</b></td><td>{iimsAtOrBelow(q).length} of {IIM_MINS.length}{q <= 90 ? `: ${iimsAtOrBelow(q).map((i) => i.name.replace("IIM ", "")).join(", ")}` : ""}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={s.note}>IIM Shillong sets only sectional minimums, so it is not counted. Policies: 2027-29 where released, otherwise 2026-28.</p>
 
           <h2>How CAT percentile is calculated</h2>
           <p>Each correct answer earns 3 marks, a wrong MCQ costs 1 mark and a wrong TITA answer costs nothing. Because the three slots have different papers, the IIMs convert raw marks into scaled scores. Your percentile tells you what share of all candidates scored below you: at the 99th percentile, 99% of test-takers scored lower. With about {(APPEARED[2025] / 100000).toFixed(2)} lakh candidates in CAT 2025, every 0.1 percentile near the top is roughly {Math.round(APPEARED[2025] / 1000)} candidates.</p>
