@@ -1608,5 +1608,75 @@
   
 
 
+  <!-- air1-ipmat-countdown (Nov 2026): live countdown to IPMAT Indore 2027 in the hero + the floating "IPMAT 2027" card.
+     To change the date, edit EXAM and LABEL below. Hides itself the day after the exam. -->
+<style>
+  .ipm-cd { margin-top: 22px; max-width: 470px; padding: 16px 18px; border-radius: 16px; background: rgba(15,17,23,.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(249,160,27,.28); animation: ipmUp .7s .25s ease both; }
+  .ipm-cd-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; font-size: 13px; color: #94a3b8; }
+  .ipm-cd-lab { display: inline-flex; align-items: center; gap: 8px; color: #f1f5f9; font-weight: 600; font-size: 14px; }
+  .ipm-cd-dot { width: 8px; height: 8px; border-radius: 50%; background: #f9a01b; animation: ipmCdPing 1.6s infinite; }
+  .ipm-cd-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .ipm-cd-u { background: #0f1117; border: 1px solid #1e2533; border-radius: 12px; padding: 10px 4px 9px; text-align: center; }
+  .ipm-cd-n { display: block; font-size: 28px; font-weight: 700; line-height: 1.1; color: #f9a01b; font-variant-numeric: tabular-nums; }
+  .ipm-cd-note { margin-top: 10px; font-size: 12px; color: #64748b; }
+  .ipm-cd-note a { color: #94a3b8; text-decoration: underline; text-underline-offset: 2px; }
+  .ipm-cd-l { display: block; margin-top: 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #64748b; }
+  @keyframes ipmCdPing { 0% { box-shadow: 0 0 0 0 rgba(249,160,27,.55); } 70% { box-shadow: 0 0 0 8px rgba(249,160,27,0); } 100% { box-shadow: 0 0 0 0 rgba(249,160,27,0); } }
+  @media (max-width: 639px) { .ipm-cd { max-width: none; padding: 14px; } .ipm-cd-n { font-size: 24px; } }
+  @media (prefers-reduced-motion: reduce) { .ipm-cd, .ipm-cd-dot { animation: none !important; } }
+</style>
+<script>
+(function () {
+  var EXAM = '2027-04-24T00:00:00+05:30'; // IPMAT Indore 2027 exam day, IST
+  var LABEL = 'Saturday, 24 April 2027';
+  var NOTE = 'Afternoon shift. Official date announced by <a href="https://iimidr.ac.in/programmes/academic-programmes/five-year-integrated-programme-in-management-ipm/ipm-admissions-details/" target="_blank" rel="noopener">IIM Indore</a> on 9 Nov 2026.';
+  var T = new Date(EXAM).getTime();
+  var DAY = 86400000;
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function build() {
+    var el = document.createElement('div');
+    el.className = 'ipm-cd';
+    el.id = 'ipm-cd';
+    el.setAttribute('role', 'timer');
+    el.setAttribute('aria-label', 'Countdown to IPMAT Indore 2027 on ' + LABEL);
+    el.innerHTML =
+      '<div class="ipm-cd-top"><span class="ipm-cd-lab"><span class="ipm-cd-dot"></span>IPMAT Indore 2027 countdown</span>' +
+      '<span class="ipm-cd-date">' + LABEL + '</span></div>' +
+      '<div class="ipm-cd-grid">' +
+      [['d', 'Days'], ['h', 'Hours'], ['m', 'Min'], ['s', 'Sec']].map(function (u) {
+        return '<div class="ipm-cd-u"><span class="ipm-cd-n" data-k="' + u[0] + '">00</span><span class="ipm-cd-l">' + u[1] + '</span></div>';
+      }).join('') +
+      '</div>' +
+      '<div class="ipm-cd-note">' + NOTE + '</div>';
+    return el;
+  }
+  function set(el, k, v) { var n = el.querySelector('[data-k="' + k + '"]'); if (n && n.textContent !== v) n.textContent = v; }
+  function tick() {
+    var ms = T - Date.now();
+    var card = document.getElementById('ipm-cd');
+    if (ms <= -DAY) { if (card) card.parentNode.removeChild(card); return false; } // exam is over
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    if (!card) {
+      var copy = document.querySelector('#root .ipm-hero-copy'); // React renders the hero after load
+      if (copy) { card = build(); copy.appendChild(card); }
+    }
+    if (card) {
+      set(card, 'd', String(d)); set(card, 'h', pad(h)); set(card, 'm', pad(m)); set(card, 's', pad(sec));
+      if (ms <= 0) { var dt = card.querySelector('.ipm-cd-date'); if (dt) dt.textContent = 'Exam day. All the best!'; }
+    }
+    // floating hero card ("IPMAT 2027 dates soon") → live days left
+    var f = document.querySelector('#root .ipm-fcard--3');
+    if (f) {
+      var sp = f.querySelector('span:not(.ipm-fcard-ico)'), b = f.querySelector('b');
+      var txt = ms > 0 ? d + (d === 1 ? ' day' : ' days') : 'today';
+      if (sp && sp.textContent !== 'IPMAT Indore in') sp.textContent = 'IPMAT Indore in';
+      if (b && b.textContent !== txt) b.textContent = txt;
+    }
+    return true;
+  }
+  if (tick() !== false) { var iv = setInterval(function () { if (tick() === false) clearInterval(iv); }, 1000); }
+})();
+</script>
   </body>
 </html>
