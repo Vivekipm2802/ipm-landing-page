@@ -45,7 +45,7 @@ const FAQS = [
   },
   {
     q: "What is the IIMB UG marking scheme used by this calculator?",
-    a: "IIMB confirms there is negative marking but has not published the exact marks. The calculator uses +3 for a correct answer, -1 for a wrong answer and 0 for unattempted questions. Section maximums are QADI 90, LR 45 and VARC 45.",
+    a: "+3 for each correct answer, -1 for each wrong answer and 0 for an unattempted question. Section maximums are QADI 90, LR 45 and VARC 45, for a total of 180.",
   },
   {
     q: "How do I get my IIM Bangalore UG response sheet file?",
@@ -683,8 +683,8 @@ export default function IimbUgScoreCalculator() {
 
           <h3>How the IIMB UG score is calculated</h3>
           <p>
-            IIMB confirms negative marking but does not publish the exact marks, so the calculator uses <strong>+3</strong> for a correct
-            answer, <strong>-1</strong> for a wrong answer and <strong>0</strong> for an unattempted question. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
+            Each correct answer gets <strong>+3</strong>, each wrong answer gets <strong>-1</strong> and an unattempted question gets{" "}
+            <strong>0</strong>. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
             accuracy matters as much as attempts, which is why the calculator shows both for every section.
           </p>
 

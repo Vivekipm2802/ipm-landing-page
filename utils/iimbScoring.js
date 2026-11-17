@@ -7,7 +7,7 @@
 //   60 MCQs, 135 minutes, sections in this order with their own timers:
 //   QADI 30 questions (60 min) | LR 15 questions (45 min) | VARC 15 questions (30 min)
 //   Pre-interview weights of the 70 test points: QADI 30, LR 20, VARC 20
-// Marking: IIMB only says "negative marking: yes". We use +3 correct, -1 wrong, 0 unattempted (our assumption).
+// Marking: +3 correct, -1 wrong, 0 unattempted.
 // ═══════════════════════════════════════════════════════════════════
 
 export const MARK_CORRECT = 3;

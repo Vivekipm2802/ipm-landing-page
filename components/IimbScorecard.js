@@ -304,7 +304,7 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
           <a className={s.btn} href={WHATSAPP_PI} target="_blank" rel="noopener noreferrer">📲 WhatsApp &quot;IIMB&quot;</a>
         </div>
       </div>
-      <p className={s.note}>Raw score using +3 / −1 / 0 (IIMB says only that there is negative marking). IIMB standardises scores and uses percentiles for shortlisting, so official results can differ.{city ? ` · 📍 ${city}` : ""}</p>
+      <p className={s.note}>Raw score using +3 / −1 / 0. IIMB standardises scores and uses percentiles for shortlisting, so official results can differ.{city ? ` · 📍 ${city}` : ""}</p>
     </div>
   );
 }
