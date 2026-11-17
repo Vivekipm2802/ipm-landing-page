@@ -81,6 +81,7 @@ export default async function handler(req, res) {
   const now = new Date().toISOString();
   const changes = [];
   const baseline = [];
+  const pending = []; // state is saved after the email, so a failed email is retried on the next run
 
   for (const p of PAGES) {
     const html = await get(p.url);
@@ -94,7 +95,7 @@ export default async function handler(req, res) {
         const items = added.map(([h, t]) => ({ href: h, text: t, hot: HOT.test(t) || HOT.test(h) })).filter((i) => p.all || i.hot);
         if (items.length) changes.push({ p, items });
       }
-      await db.from("iimb_watch_state").upsert({ key: p.id, value: { links: { ...(prev?.links || {}), ...cur } }, updated_at: now });
+      pending.push({ id: p.id, changed: Boolean(prev && prev.links && changes.some((c) => c.p.id === p.id)), row: { key: p.id, value: { links: { ...(prev?.links || {}), ...cur } }, updated_at: now } });
     } else {
       const text = strip(html).slice(0, 20000);
       if (!prev || prev.text == null) baseline.push({ p, count: text.length });
@@ -103,7 +104,7 @@ export default async function handler(req, res) {
         const fresh = text.split(" ").filter((w) => !words.has(w)).join(" ").slice(0, 600);
         if (HOT.test(fresh)) changes.push({ p, items: [{ href: p.url, text: fresh, hot: true }] }); // ignore cosmetic changes
       }
-      await db.from("iimb_watch_state").upsert({ key: p.id, value: { text }, updated_at: now });
+      pending.push({ id: p.id, changed: changes.some((c) => c.p.id === p.id), row: { key: p.id, value: { text }, updated_at: now } });
     }
   }
 
@@ -121,6 +122,10 @@ export default async function handler(req, res) {
       await mailer().sendMail({ from: { name: "IPM Careers Watcher", address: "info@ipmcareer.com" }, to: TO, subject, html: `<div style="font-family:Arial,sans-serif;max-width:620px;">${body}<p style="color:#888;font-size:12px;">Checked ${esc(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }))} IST.</p></div>` });
       emailed = true;
     } catch (e) { console.error("iimb-watch email failed:", e?.message); emailError = String(e?.message || e).slice(0, 200); }
+  }
+  for (const x of pending) {
+    if (x.changed && !emailed) continue; // keep the old state: this change will be emailed next time
+    await db.from("iimb_watch_state").upsert(x.row);
   }
   return res.status(200).json({ checked: PAGES.length, baseline: baseline.map((b) => b.p.id), changes: changes.map((c) => ({ page: c.p.id, items: c.items.length })), emailed, emailError, mail: mailConfigured() });
 }
