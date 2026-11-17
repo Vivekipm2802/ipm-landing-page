@@ -1,6 +1,7 @@
 // POST /api/cat-alerts-subscribe { name, phone, email, city?, page?, utm? } → CAT 2026 "notify me" alerts.
 // Saves the lead, emails the team instantly, sends the student a short confirmation.
 import { catDb, cleanText, validPhone, normPhone } from "../../lib/catPlannerServer";
+import { mailConfigured } from "../../lib/mail";
 import { notifyLead } from "../../lib/leadNotify";
 import { welcomeEmail } from "../../lib/catAlerts";
 import { mailer } from "../../lib/mbaAlerts";
@@ -38,7 +39,7 @@ export default async function handler(req, res) {
     const jobs = [
       notifyLead("CAT 2026 Alerts", { name, phone, email, City: cityName, "Signed up on": page, Status: ex ? "Returning" : "New", ...(utm || {}) }, `https://register.ipmcareer.com${page || "/cat-score-calculator"}`),
     ];
-    if (!ex && process.env.SMTP_PASS) {
+    if (!ex && mailConfigured()) {
       const w = welcomeEmail({ ...sub, name }, cityName);
       jobs.push(Promise.race([
         mailer().sendMail({ from: { name: "IPM Careers", address: "info@ipmcareer.com" }, to: email, subject: w.subject, html: w.html, text: w.text }),

@@ -11,6 +11,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { sharedMailer } from "../../lib/mail";
 import nodemailer from 'nodemailer';
 import { AIR1_FORMS } from '../../lib/air1FormsData';
 
@@ -21,15 +22,7 @@ const supabase = createClient(
 
 // ── Email config (ZeptoMail) ─────────────────────────────────────────────────
 function createTransporter() {
-  return nodemailer.createTransport({
-    host: 'smtp.zeptomail.in',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'emailapikey',
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  return sharedMailer(); // ZeptoMail with credential fallback (lib/mail.js)
 }
 
 // ── Email template ───────────────────────────────────────────────────────────

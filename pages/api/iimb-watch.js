@@ -4,6 +4,7 @@
 // Safe to call by anyone: it only reads public pages, and each change is emailed a single time.
 import { catDb } from "../../lib/catPlannerServer";
 import { mailer } from "../../lib/mbaAlerts";
+import { mailConfigured } from "../../lib/mail";
 
 export const config = { maxDuration: 30 };
 
@@ -107,7 +108,7 @@ export default async function handler(req, res) {
   }
 
   let emailed = false, emailError = null;
-  if (process.env.SMTP_PASS && (changes.length || baseline.length)) {
+  if (mailConfigured() && (changes.length || baseline.length)) {
     const hot = changes.some((c) => c.items.some((i) => i.hot));
     const subject = changes.length
       ? `${hot ? "🚨 " : ""}IIMB UG update: ${hot ? "response sheet / answer key / result link posted" : "new link on IIMB's UG pages"}`
@@ -121,5 +122,5 @@ export default async function handler(req, res) {
       emailed = true;
     } catch (e) { console.error("iimb-watch email failed:", e?.message); emailError = String(e?.message || e).slice(0, 200); }
   }
-  return res.status(200).json({ checked: PAGES.length, baseline: baseline.map((b) => b.p.id), changes: changes.map((c) => ({ page: c.p.id, items: c.items.length })), emailed, emailError, smtp: Boolean(process.env.SMTP_PASS) });
+  return res.status(200).json({ checked: PAGES.length, baseline: baseline.map((b) => b.p.id), changes: changes.map((c) => ({ page: c.p.id, items: c.items.length })), emailed, emailError, mail: mailConfigured() });
 }

@@ -1,6 +1,7 @@
 // POST /api/iimb-alerts-subscribe { name, phone, email, page?, utm? } → IIMB UG 2026 alerts (response sheet, answer key, result).
 // Saves the lead, emails the team instantly, sends the student a short confirmation.
 import { catDb, cleanText, validPhone, normPhone } from "../../lib/catPlannerServer";
+import { mailConfigured } from "../../lib/mail";
 import { notifyLead } from "../../lib/leadNotify";
 import { iimbWelcome } from "../../lib/iimbAlerts";
 import { mailer } from "../../lib/mbaAlerts";
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
       sub = data;
     }
     const jobs = [notifyLead("IIMB UG Alerts", { name, phone, email, "Signed up on": page, Status: ex ? "Returning" : "New", ...(utm || {}) }, `https://register.ipmcareer.com${page || "/response-v1"}`, TEAM)];
-    if (!ex && process.env.SMTP_PASS) {
+    if (!ex && mailConfigured()) {
       const w = iimbWelcome({ ...sub, name });
       jobs.push(Promise.race([
         mailer().sendMail({ from: { name: "IPM Careers", address: "info@ipmcareer.com" }, to: email, subject: w.subject, html: w.html, text: w.text }),
