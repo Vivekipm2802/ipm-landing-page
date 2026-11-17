@@ -31,14 +31,43 @@ function links(html, base) {
   return out;
 }
 
-async function get(url) {
+// ug.iimb.ac.in sits behind Sucuri, which first returns a tiny page that sets a cookie with JavaScript.
+// We read that cookie value without running any of their code: the script only joins string literals
+// and String.fromCharCode(n) calls. Anything else and we give up for this run.
+let sucuriCookie = "";
+function solveSucuri(html) {
+  const m = /S='([A-Za-z0-9+/=]+)'/.exec(html);
+  if (!m) return "";
+  const code = Buffer.from(m[1], "base64").toString("utf8");
+  const st = /^\s*([A-Za-z_$][\w$]*)\s*=([\s\S]*?);\s*document\.cookie\s*=([\s\S]*?);\s*location\.reload/.exec(code);
+  if (!st) return "";
+  const [, v, e1, e2] = st;
+  const ev = (expr, val = "") => {
+    let out = "";
+    const re = new RegExp(`'([^']*)'|"([^"]*)"|String\\.fromCharCode\\((\\d+)\\)|\\b${v.replace(/\$/g, "\\$")}\\b|(\\.[a-zA-Z]+\\()`, "g");
+    let t;
+    while ((t = re.exec(expr))) {
+      if (t[4]) throw new Error("unsupported");
+      if (t[1] != null) out += t[1]; else if (t[2] != null) out += t[2]; else if (t[3]) out += String.fromCharCode(Number(t[3])); else out += val;
+    }
+    return out;
+  };
+  try { return ev(e2, ev(e1)).split(";")[0]; } catch { return ""; }
+}
+
+async function get(url, tries = 2) {
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 12000);
+  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
-    const r = await fetch(url, { signal: ctrl.signal, headers: { "User-Agent": "Mozilla/5.0 (IPM Careers IIMB UG watcher)", "Cache-Control": "no-cache" } });
-    if (!r.ok) return null;
-    return await r.text();
-  } catch { return null; } finally { clearTimeout(t); }
+    const r = await fetch(url, { redirect: "manual", signal: ctrl.signal, headers: { "User-Agent": "Mozilla/5.0 (IPM Careers IIMB UG watcher)", "Cache-Control": "no-cache", ...(sucuriCookie ? { Cookie: sucuriCookie } : {}) } });
+    const text = await r.text();
+    if (r.status === 200 && !/sucuri_cloudproxy_js/.test(text)) return text;
+    if (tries > 1 && /sucuri_cloudproxy_js/.test(text)) {
+      const c = solveSucuri(text);
+      if (c) { sucuriCookie = c; return get(url, tries - 1); }
+    }
+    return null;
+  } catch { return null; } finally { clearTimeout(timer); }
 }
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -77,7 +106,7 @@ export default async function handler(req, res) {
     }
   }
 
-  let emailed = false;
+  let emailed = false, emailError = null;
   if (process.env.SMTP_PASS && (changes.length || baseline.length)) {
     const hot = changes.some((c) => c.items.some((i) => i.hot));
     const subject = changes.length
@@ -90,7 +119,7 @@ export default async function handler(req, res) {
     try {
       await mailer().sendMail({ from: { name: "IPM Careers Watcher", address: "info@ipmcareer.com" }, to: TO, subject, html: `<div style="font-family:Arial,sans-serif;max-width:620px;">${body}<p style="color:#888;font-size:12px;">Checked ${esc(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }))} IST.</p></div>` });
       emailed = true;
-    } catch (e) { console.error("iimb-watch email failed:", e?.message); }
+    } catch (e) { console.error("iimb-watch email failed:", e?.message); emailError = String(e?.message || e).slice(0, 200); }
   }
-  return res.status(200).json({ checked: PAGES.length, baseline: baseline.map((b) => b.p.id), changes: changes.map((c) => ({ page: c.p.id, items: c.items.length })), emailed });
+  return res.status(200).json({ checked: PAGES.length, baseline: baseline.map((b) => b.p.id), changes: changes.map((c) => ({ page: c.p.id, items: c.items.length })), emailed, emailError, smtp: Boolean(process.env.SMTP_PASS) });
 }
