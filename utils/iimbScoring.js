@@ -3,19 +3,38 @@
 // Used by: pages/response-v1.jsx, pages/iimb-report/[uid].js,
 //          pages/api/sendScorecardIIMB.js
 //
-// Official pattern (IIMB UG Admissions Process, batch 2027-31):
-//   60 MCQs, 135 minutes
-//   Section 1 VARC (15) | Section 2 LR (15) | Section 3 QADI (30)
-// Marking used: +3 correct, -1 wrong, 0 unattempted
+// Official pattern (IIMB UG Admissions Process for batch 2027-31, test on 15 Nov 2026):
+//   60 MCQs, 135 minutes, sections in this order with their own timers:
+//   QADI 30 questions (60 min) | LR 15 questions (45 min) | VARC 15 questions (30 min)
+//   Pre-interview weights of the 70 test points: QADI 30, LR 20, VARC 20
+// Marking: IIMB only says "negative marking: yes". We use +3 correct, -1 wrong, 0 unattempted (our assumption).
 // ═══════════════════════════════════════════════════════════════════
 
 export const MARK_CORRECT = 3;
 export const MARK_WRONG = -1;
 
 export const SECTIONS = [
-  { key: "VARC", name: "Verbal Ability & Reading Comprehension", short: "VARC", questions: 15, icon: "📝", testWeight: 20 },
-  { key: "LR", name: "Logical Reasoning", short: "LR", questions: 15, icon: "🧩", testWeight: 30 },
-  { key: "QADI", name: "Quantitative Ability & Data Interpretation", short: "QADI", questions: 30, icon: "🔢", testWeight: 20 },
+  { key: "QADI", name: "Quantitative Ability & Data Interpretation", short: "QADI", questions: 30, minutes: 60, icon: "🔢", testWeight: 30 },
+  { key: "LR", name: "Logical Reasoning", short: "LR", questions: 15, minutes: 45, icon: "🧩", testWeight: 20 },
+  { key: "VARC", name: "Verbal Ability & Reading Comprehension", short: "VARC", questions: 15, minutes: 30, icon: "📝", testWeight: 20 },
+];
+export const EXAM_YEAR = 2026;            // the test on 15 Nov 2026 (batch 2027-31)
+export const TEST_DATE = "2026-11-15";
+export const RESULT_DATE = "2026-12-15";  // tentative, per IIMB FAQ
+export const KEY_DATES = [
+  { label: "UG Admission Test", when: "15 Nov 2026", done: true },
+  { label: "Results", when: "15 Dec 2026 (tentative)" },
+  { label: "Interviews", when: "2nd and 3rd week of Jan 2027 (tentative)" },
+  { label: "Offers & waitlist", when: "3rd week of Feb 2027 (tentative)" },
+];
+// First-shortlist minimum percentiles (IIMB UG Admissions Process 2026, Annexure I, Table 1)
+export const CUTOFFS = [
+  { cat: "General", VARC: 50, LR: 50, QADI: 75, total: 80 },
+  { cat: "NC-OBC", VARC: 40, LR: 40, QADI: 50, total: 50 },
+  { cat: "EWS", VARC: 40, LR: 40, QADI: 50, total: 50 },
+  { cat: "SC", VARC: 25, LR: 25, QADI: 40, total: 40 },
+  { cat: "ST", VARC: 20, LR: 20, QADI: 30, total: 30 },
+  { cat: "PwD", VARC: 20, LR: 20, QADI: 30, total: 30 },
 ];
 
 export const TOTAL_QUESTIONS = 60;
@@ -36,11 +55,11 @@ function labelToKey(label) {
   return null;
 }
 
-// Fallback: section by position (VARC 1-15, LR 16-30, QADI 31-60)
+// Fallback: section by position, 2026 order (QADI 1-30, LR 31-45, VARC 46-60)
 function indexToKey(i) {
-  if (i < 15) return "VARC";
-  if (i < 30) return "LR";
-  return "QADI";
+  if (i < 30) return "QADI";
+  if (i < 45) return "LR";
+  return "VARC";
 }
 
 const clean = (s) => (s || "").replace(/\s+/g, " ").trim();
@@ -68,12 +87,22 @@ export function parseResponseSheet(html) {
   const useLabels = labelled.every(Boolean);
 
   const answers = panels.map((p, i) => {
-    let chosen = "";
+    let chosen = "", qid = "";
+    const optIds = [];
     const menu = p.querySelector(".menu-tbl");
     if (menu) {
       const tds = Array.from(menu.querySelectorAll("td"));
-      const row = tds.find((t) => clean(t.textContent).includes("Chosen Option"));
-      chosen = clean(row && row.nextElementSibling ? row.nextElementSibling.textContent : "");
+      const cell = (label) => {
+        const row = tds.find((t) => clean(t.textContent).startsWith(label));
+        return clean(row && row.nextElementSibling ? row.nextElementSibling.textContent : "");
+      };
+      chosen = cell("Chosen Option");
+      qid = cell("Question ID").replace(/\D/g, "");
+      for (let o = 1; o <= 6; o++) {
+        const v = cell(`Option ${o} ID`).replace(/\D/g, "");
+        if (!v) break;
+        optIds.push(v);
+      }
     }
     if (chosen === "--") chosen = "";
 
@@ -83,16 +112,16 @@ export function parseResponseSheet(html) {
     let r = "U";
     if (chosen) r = key ? (chosen === key ? "C" : "W") : "N";
 
-    return { n: i + 1, s: useLabels ? labelled[i] : indexToKey(i), c: chosen, k: key, r };
+    return { n: i + 1, s: useLabels ? labelled[i] : indexToKey(i), c: chosen, k: key, kt: key, q: qid, o: optIds, r };
   });
 
   let warning = null;
   if (answers.length !== TOTAL_QUESTIONS) {
     warning = `We found ${answers.length} questions instead of ${TOTAL_QUESTIONS}. Your score is calculated on what we found. If this looks wrong, save the full page again and re-upload.`;
-  } else if (answers.every((a) => !a.k)) {
-    return { answers: [], error: "This file has your responses but no answer key ticks. Open the Answer Key / Response Sheet page after login and save that page." };
   }
-  return { answers, warning, candidate: readCandidate(doc) };
+  // No ticks: the sheet has responses only. The page then scores with IIMB's official key (if loaded) or stops.
+  const noTicks = answers.every((a) => !a.k);
+  return { answers, warning, noTicks, candidate: readCandidate(doc) };
 }
 
 // Name (and test details) from the header table of the response sheet: "Candidate Name | <name>"
@@ -112,6 +141,33 @@ function readCandidate(doc) {
 }
 
 /**
+ * Apply IIMB's official answer key (rows of iimb_ug_answer_keys) on top of the sheet's ticks.
+ * keys: { [questionId]: { id: correctOptionId, n: correctOptionNumber, dropped: bool } }
+ * Matches by option ID first (option order can differ between candidates), then by option number.
+ * Dropped questions score 0 for everyone (r = "X") until IIMB says otherwise.
+ */
+export function applyOfficialKey(answers, keys) {
+  if (!keys || !Object.keys(keys).length) return { answers: (answers || []).map((a) => ({ ...a, ks: "sheet" })), official: 0 };
+  let official = 0;
+  const out = (answers || []).map((a) => {
+    const k = a.q ? keys[a.q] : null;
+    const tick = a.kt != null ? a.kt : a.k;
+    if (!k) return { ...a, k: tick, ks: "sheet", r: !a.c ? "U" : tick ? (a.c === tick ? "C" : "W") : "N" };
+    official += 1;
+    if (k.dropped) return { ...a, k: "", ks: "official", r: "X" };
+    let num = "";
+    if (k.id && Array.isArray(a.o) && a.o.length) {
+      const i = a.o.indexOf(String(k.id));
+      if (i >= 0) num = String(i + 1);
+    }
+    if (!num && k.n) num = String(k.n);
+    const r = !a.c ? "U" : num ? (a.c === num ? "C" : "W") : "N";
+    return { ...a, k: num, ks: "official", r };
+  });
+  return { answers: out, official };
+}
+
+/**
  * Score a parsed answer list. Pure function, safe on server and client.
  */
 export function scoreAnswers(answers) {
@@ -127,6 +183,7 @@ export function scoreAnswers(answers) {
     if (a.r === "C") { sec.correct += 1; sec.score += MARK_CORRECT; }
     else if (a.r === "W") { sec.wrong += 1; sec.score += MARK_WRONG; }
     else if (a.r === "N") { sec.noKey += 1; }
+    else if (a.r === "X") { sec.dropped = (sec.dropped || 0) + 1; }
     else { sec.unattempted += 1; }
   });
 
@@ -179,8 +236,8 @@ export function buildInsights(result) {
     out.push({ tone: "info", text: `Negative marking cost you ${result.wrong} mark${result.wrong > 1 ? "s" : ""} across ${result.wrong} wrong answer${result.wrong > 1 ? "s" : ""}. Overall accuracy: ${result.accuracy}%.` });
   }
 
-  const lr = result.sections.LR;
-  out.push({ tone: "info", text: `LR has only 15 questions but carries 30 of the 70 test points at IIMB's pre-interview stage. Your LR: ${lr.score}/${lr.max}.` });
+  const qa = result.sections.QADI;
+  out.push({ tone: "info", text: `QADI carries 30 of the 70 test points at IIMB's pre-interview stage (LR and VARC carry 20 each), so it moves your shortlist chances the most. Your QADI: ${qa.score}/${qa.max}.` });
 
   return out;
 }

@@ -6,7 +6,9 @@ import { NextSeo } from "next-seo";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
+import dynamic from "next/dynamic";
 import IimbScorecard from "../components/IimbScorecard";
+import { IimbAlertsInline } from "../components/IimbAlerts";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
 import {
@@ -16,10 +18,17 @@ import {
   parseResponseSheet,
   scoreAnswers,
   buildInsights,
+  applyOfficialKey,
+  EXAM_YEAR,
+  RESULT_DATE,
+  KEY_DATES,
+  CUTOFFS,
 } from "../utils/iimbScoring";
 
+const IimbAlertsBell = dynamic(() => import("../components/IimbAlerts"), { ssr: false });
+
 // Update this each cycle when IIMB shares the new response sheet login link
-const RESPONSE_LOGIN_URL = "https://cdn.digialm.com/EForms/configuredHtml/1345/96226/login.html";
+const RESPONSE_LOGIN_URL = "https://cdn.digialm.com/EForms/configuredHtml/1345/101967/login.html"; // 2026 candidate login (IIMB UG Admissions 2027 page)
 const PAGE_URL = "https://register.ipmcareer.com/response-v1";
 const WHATSAPP_URL = "https://wa.me/918299470392?text=" + encodeURIComponent("IIMB - I just checked my IIM Bangalore UG score. Help me plan PI prep.");
 
@@ -28,15 +37,15 @@ const CATEGORIES = ["General", "EWS", "NC-OBC", "SC", "ST", "PwD"];
 const FAQS = [
   {
     q: "What is the IIM Bangalore UG Score Calculator?",
-    a: "It is a free tool by IPM Careers that reads your saved IIM Bangalore UG Test response sheet (HTML file) and calculates your VARC, LR, QADI and total score using +3 for a correct answer and -1 for a wrong answer. You also get accuracy, attempts and a shareable report.",
+    a: "It is a free tool by IPM Careers that reads your IIM Bangalore UG Test 2026 response sheet and calculates your QADI, LR, VARC and total score using +3 for a correct answer and -1 for a wrong answer. You also get accuracy, attempts, your rank among students who used the tool and a shareable report.",
   },
   {
     q: "How many questions and marks are there in the IIM Bangalore UG Test?",
-    a: "As per IIMB's admissions document, the UG Test is a 135-minute computer-based test with 60 multiple-choice questions: VARC 15, LR 15 and QADI 30. With +3 per correct answer, the maximum score is 180.",
+    a: "As per IIMB's admissions document for the 2027-31 batch, the UG Test is a 135-minute computer-based test with 60 multiple-choice questions in three timed sections: QADI 30 questions (60 minutes), LR 15 questions (45 minutes) and VARC 15 questions (30 minutes). With +3 per correct answer, the maximum is 180.",
   },
   {
     q: "What is the IIMB UG marking scheme used by this calculator?",
-    a: "+3 for each correct answer, -1 for each wrong answer and 0 for unattempted questions. Section maximums are VARC 45, LR 45 and QADI 90.",
+    a: "IIMB confirms there is negative marking but has not published the exact marks. The calculator uses +3 for a correct answer, -1 for a wrong answer and 0 for unattempted questions. Section maximums are QADI 90, LR 45 and VARC 45.",
   },
   {
     q: "How do I get my IIM Bangalore UG response sheet file?",
@@ -48,11 +57,27 @@ const FAQS = [
   },
   {
     q: "How does IIMB use the UG Test score for selection?",
-    a: "At the pre-interview stage the UG Test carries 70 points (QADI 20, LR 30, VARC 20), along with Class 10 overall score (15), Class 10 maths score (10) and gender diversity (5). After the interview, the UG Test carries 40, the personal interview 40, Class 10 overall 10 and Class 10 maths 10.",
+    a: "At the pre-interview stage the UG Test carries 70 points (QADI 30, LR 20, VARC 20), along with Class 10 overall score (15), Class 10 maths score (10) and gender diversity (5). After the interview, the UG Test carries 40, the personal interview 40, Class 10 overall 10 and Class 10 maths 10.",
   },
   {
     q: "Is my calculated score the same as my official IIMB score?",
     a: "It matches the raw marks from your response sheet. IIMB standardises scores and computes percentiles for shortlisting, so your official percentile and composite score can differ from the raw total.",
+  },
+  {
+    q: "When will the IIMB UG answer key 2026 be released?",
+    a: "IIM Bangalore has not announced a date for the official answer key of the UG Test held on 15 November 2026. Your response sheet may already show the correct answers. When IIMB releases its official key, we load it the same day and every saved report link re-scores automatically. Turn on alerts on this page to get an email.",
+  },
+  {
+    q: "What is the IIM Bangalore UG cutoff 2026?",
+    a: "For the first shortlist, IIMB's admissions document sets minimum percentiles in the UG Test 2026. General: VARC 50, LR 50, QADI 75 and aggregate 80. NC-OBC and EWS: 40, 40, 50 and 50. SC: 25, 25, 40 and 40. ST and PwD: 20, 20, 30 and 30. Your raw score must also be positive in every section. IIMB says the scores of candidates finally called for interviews are likely to be higher.",
+  },
+  {
+    q: "When is the IIMB UG result 2026?",
+    a: "IIMB's FAQ gives 15 December 2026 (tentative) for the UG Admissions Test results. Interviews are planned for the 2nd and 3rd week of January 2027 and offers for the 3rd week of February 2027, both tentative.",
+  },
+  {
+    q: "How many seats are there in IIM Bangalore's UG programme?",
+    a: "80 seats in total: 40 in the BSc (Hons) Data Sciences and 40 in the BSc (Hons) Economics. IIMB received a record 12,000 applications for its first batch, which started on 31 August 2026.",
   },
   {
     q: "Is the IIM Bangalore UG Score Calculator free?",
@@ -80,7 +105,7 @@ export default function IimbUgScoreCalculator() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await axios.get("/api/iimbLeaderboard");
+      const res = await axios.get(`/api/iimbLeaderboard?year=${EXAM_YEAR}`);
       setLeaderboard(res?.data?.leaderboard ?? []);
       if (typeof res?.data?.count === "number") setCount(res.data.count);
     } catch (e) {
@@ -151,7 +176,7 @@ export default function IimbUgScoreCalculator() {
       } catch {
         return "Please paste the full response sheet link (it starts with https://cdn.digialm.com/...).";
       }
-      if (u.hostname !== "cdn.digialm.com") return "That link is not an IIMB response sheet link. It should start with https://cdn.digialm.com/";
+      if (!/(^|\.)digialm\.com$/.test(u.hostname)) return "That link is not an IIMB response sheet link. It should start with https://cdn.digialm.com/";
     } else if (!file) {
       return "Please upload your response sheet HTML file.";
     }
@@ -215,7 +240,22 @@ export default function IimbUgScoreCalculator() {
       }
       if (parsed.warning) setWarning(parsed.warning);
 
-      const scores = scoreAnswers(parsed.answers);
+      // IIMB's official answer key, once loaded on our side, overrides the sheet's ticks
+      let keyStatus = null;
+      let answers = parsed.answers;
+      try {
+        const kr = await axios.get(`/api/iimb-answer-key?year=${EXAM_YEAR}`);
+        if (kr?.data?.count) {
+          answers = applyOfficialKey(parsed.answers, kr.data.keys).answers;
+          keyStatus = kr.data.status;
+        }
+      } catch {}
+      if (!keyStatus && parsed.noTicks) {
+        setError("Your response sheet shows your answers but not the answer key, and IIMB has not released its official key yet. Turn on alerts below and we will email you the moment it is out.");
+        setSubmitting(false);
+        return;
+      }
+      let scores = scoreAnswers(answers);
       const fileUrl = mode === "link" ? sheetUrl.trim() : await uploadToCloudinary(file);
 
       let uid = null;
@@ -230,10 +270,12 @@ export default function IimbUgScoreCalculator() {
           category: form.category,
           city: form.city.trim(),
           fileUrl,
-          answers: parsed.answers,
+          answers,
         });
         uid = res?.data?.uid || null;
         stats = res?.data?.stats || null;
+        if (Array.isArray(res?.data?.answers)) { answers = res.data.answers; scores = scoreAnswers(answers); }
+        if (res?.data?.keyStatus) keyStatus = res.data.keyStatus;
       } catch (e) {
         console.error("Save failed", e);
         toast.error("Score calculated, but we could not save your report link. Try again in a minute.");
@@ -243,8 +285,9 @@ export default function IimbUgScoreCalculator() {
         name: studentName,
         category: form.category,
         city: form.city.trim(),
-        answers: parsed.answers,
+        answers,
         scores,
+        keyStatus,
         insights: buildInsights(scores),
         uid,
         stats,
@@ -274,7 +317,7 @@ export default function IimbUgScoreCalculator() {
 
   const reportUrl = result?.uid ? `https://register.ipmcareer.com/iimb-report/${result.uid}` : PAGE_URL;
   const shareText = result
-    ? `I scored ${result.scores.total}/${MAX_SCORE} in the IIM Bangalore UG Test (VARC ${result.scores.sections.VARC.score}, LR ${result.scores.sections.LR.score}, QADI ${result.scores.sections.QADI.score}). Check yours free: ${reportUrl}`
+    ? `I scored ${result.scores.total}/${MAX_SCORE} in the IIM Bangalore UG Test (QADI ${result.scores.sections.QADI.score}, LR ${result.scores.sections.LR.score}, VARC ${result.scores.sections.VARC.score}). Check yours free: ${reportUrl}`
     : "";
 
   const shareWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
@@ -295,13 +338,13 @@ export default function IimbUgScoreCalculator() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="IIM Bangalore UG Score Calculator 2026 | IIMB UG Response Sheet & Answer Key Tool"
-        description="Free IIM Bangalore UG Score Calculator. Upload your IIMB UG response sheet and get VARC, LR, QADI and total score out of 180 instantly, with accuracy, sectional check and a shareable report."
+        title="IIMB UG Score Calculator 2026: Answer Key, Cutoff & Result Date"
+        description="Free IIM Bangalore UG score calculator for the 15 Nov 2026 test: paste your response sheet link for QADI, LR, VARC and total out of 180. Official cutoffs, answer key status and result date (15 Dec, tentative)."
         canonical={PAGE_URL}
         openGraph={{
           url: PAGE_URL,
-          title: "IIM Bangalore UG Score Calculator 2026 | Free IIMB UG Response Sheet Tool",
-          description: "Upload your IIMB UG response sheet and get your section-wise score out of 180 in seconds. Free tool by IPM Careers.",
+          title: "IIMB UG Score Calculator 2026 | Answer Key, Cutoff & Result Date",
+          description: "Paste your IIMB UG 2026 response sheet link and get QADI, LR, VARC and total out of 180 in seconds. Free tool by IPM Careers.",
           images: [{ url: "https://register.ipmcareer.com/iimbug.png", width: 1200, height: 630, alt: "IIM Bangalore UG Score Calculator" }],
           siteName: "IPM Careers",
         }}
@@ -310,7 +353,7 @@ export default function IimbUgScoreCalculator() {
           {
             name: "keywords",
             content:
-              "IIM Bangalore UG score calculator, IIMB UG score calculator, IIM Bangalore UG response sheet, IIMB UG answer key, IIM Bangalore UG answer key 2026, IIM B UG response key tool, IIMB UG Test marks calculator, IIM Bangalore BSc score calculator",
+              "IIMB UG answer key 2026, IIM Bangalore UG cutoff 2026, IIMB UG result date, IIM Bangalore UG score calculator, IIMB UG score calculator, IIM Bangalore UG response sheet 2026, IIMB UG response sheet, IIM Bangalore UG answer key 2026, IIMB UG Test 2026 analysis, IIM Bangalore BSc score calculator, IIMB UG expected cutoff",
           },
           { name: "robots", content: "index, follow, max-image-preview:large" },
         ]}
@@ -332,7 +375,7 @@ export default function IimbUgScoreCalculator() {
             <span className={styles.heroTitleAccent}>Paste your response sheet link, get your score in seconds.</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            VARC, LR and QADI scores out of 180, accuracy, sectional cut check and a report you can share.
+            QADI, LR and VARC scores out of 180 for the 15 Nov 2026 test, accuracy, your rank among students and a report you can share.
           </p>
           <div className={styles.socialProof}>
             {count > 0 && (
@@ -359,9 +402,12 @@ export default function IimbUgScoreCalculator() {
           <div className={ui.fact}><div className={ui.factNum}>+3 / -1</div><div className={ui.factLabel}>Marking</div></div>
         </div>
 
+        <KeyDates />
+
         <div className={ui.layout}>
           {/* ════════ MAIN COLUMN ════════ */}
           <div className={ui.mainCol}>
+            {!result && <div className={ui.noPrint}><IimbAlertsInline /></div>}
             {top3.length > 0 && (
               <div className={styles.topperRow}>
                 {top3.map((t, i) => (
@@ -387,6 +433,7 @@ export default function IimbUgScoreCalculator() {
                   insights={result.insights}
                   uid={result.uid}
                   stats={result.stats}
+                  keyStatus={result.keyStatus || null}
                   warning={warning}
                   onReset={reset}
                 />
@@ -593,9 +640,10 @@ export default function IimbUgScoreCalculator() {
             </div>
 
             <div className={ui.ctaCard}>
-              <h3 className={ui.ctaTitle}>Cleared the test? Plan your PI.</h3>
-              <p className={ui.ctaText}>The interview carries 40 of 100 in IIMB's final score. Get a free PI plan from our mentors.</p>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ui.ctaBtn}>📲 WhatsApp "IIMB"</a>
+              <h3 className={ui.ctaTitle}>Interviews in January. Start PI prep now.</h3>
+              <p className={ui.ctaText}>IIMB interviews are planned for the 2nd and 3rd week of January 2027 and carry 40 of 100 in the final score, as much as the test.</p>
+              <Link href="/pi-batch" className={ui.ctaBtn}>🎤 Join the PI batch</Link>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ui.ctaBtn} style={{ marginTop: 8, background: "transparent", border: "1px solid rgba(249,160,27,0.5)", color: "#f4f1ea" }}>📲 WhatsApp &quot;IIMB&quot;</a>
             </div>
           </aside>
         </div>
@@ -606,35 +654,37 @@ export default function IimbUgScoreCalculator() {
           <p className={ui.lede}>Free IIMB UG response sheet tool with section-wise marks, accuracy and a shareable report</p>
           <p>
             The <strong>IIM Bangalore UG Score Calculator</strong> by IPM Careers reads your saved IIMB UG Test response sheet and works out your
-            exact raw score in seconds. It checks every one of the 60 questions against the answer key marked on your sheet, applies the marking
-            scheme and shows your <strong>VARC, LR and QADI</strong> scores, total out of 180, accuracy, attempts and whether each section is positive.
-            No manual entry, so no counting mistakes.
+            exact raw score in seconds. It checks every one of the 60 questions against the answer key (the one marked on your sheet, or IIMB&apos;s
+            official key once it is out), applies the marking scheme and shows your <strong>QADI, LR and VARC</strong> scores, total out of 180,
+            accuracy, attempts and whether each section is positive. No manual entry, so no counting mistakes.
           </p>
 
           <h3>IIM Bangalore UG Test pattern 2026</h3>
           <p>
             IIMB admits students to its four-year, full-time residential <strong>B.Sc. (Hons) in Data Science</strong> and{" "}
             <strong>B.Sc. (Hons) in Economics</strong> programmes through the IIMB UG Test followed by a personal interview. The test is a
-            135-minute computer-based test with 60 multiple-choice questions.
+            135-minute computer-based test with 60 multiple-choice questions. In 2026 the sections came in a fixed order, each with its own timer:
+            QADI first, then LR, then VARC. IIMB admits <strong>80 students</strong> in total, 40 in each programme, and received a record{" "}
+            <strong>12,000 applications</strong> for its first batch, which started on 31 August 2026.
           </p>
           <div className={ui.tableWrap}>
             <table className={ui.table}>
               <thead>
-                <tr><th>Section</th><th>Questions</th><th>Max marks (+3 each)</th></tr>
+                <tr><th>Section (in test order)</th><th>Questions</th><th>Time</th><th>Max marks (+3 each)</th></tr>
               </thead>
               <tbody>
-                <tr><td>Section 1: Verbal Ability & Reading Comprehension (VARC)</td><td>15</td><td>45</td></tr>
-                <tr><td>Section 2: Logical Reasoning (LR)</td><td>15</td><td>45</td></tr>
-                <tr><td>Section 3: Quantitative & Data Interpretation (QADI)</td><td>30</td><td>90</td></tr>
-                <tr><td><strong>Total</strong></td><td><strong>60</strong></td><td><strong>180</strong></td></tr>
+                <tr><td>1. Quantitative Ability & Data Interpretation (QADI)</td><td>30</td><td>60 min</td><td>90</td></tr>
+                <tr><td>2. Logical Reasoning (LR)</td><td>15</td><td>45 min</td><td>45</td></tr>
+                <tr><td>3. Verbal Ability & Reading Comprehension (VARC)</td><td>15</td><td>30 min</td><td>45</td></tr>
+                <tr><td><strong>Total</strong></td><td><strong>60</strong></td><td><strong>135 min</strong></td><td><strong>180</strong></td></tr>
               </tbody>
             </table>
           </div>
 
           <h3>How the IIMB UG score is calculated</h3>
           <p>
-            Each correct answer gets <strong>+3</strong>, each wrong answer gets <strong>-1</strong> and an unattempted question gets{" "}
-            <strong>0</strong>. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
+            IIMB confirms negative marking but does not publish the exact marks, so the calculator uses <strong>+3</strong> for a correct
+            answer, <strong>-1</strong> for a wrong answer and <strong>0</strong> for an unattempted question. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
             accuracy matters as much as attempts, which is why the calculator shows both for every section.
           </p>
 
@@ -646,12 +696,34 @@ export default function IimbUgScoreCalculator() {
           </p>
           <WeightageCard compact />
 
+          <h3>IIM Bangalore UG cutoff 2026 (first shortlist)</h3>
+          <p>
+            IIMB&apos;s admissions document lists the minimum percentiles in the UG Test 2026 for the first shortlist. These apply only if your raw
+            score is also positive in every section. IIMB can lower these percentiles but not raise them, and says the scores of candidates finally
+            called for interviews are likely to be higher.
+          </p>
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead><tr><th>Category</th><th>QADI</th><th>LR</th><th>VARC</th><th>Aggregate</th></tr></thead>
+              <tbody>{CUTOFFS.map((c) => <tr key={c.cat}><td>{c.cat}</td><td>{c.QADI}</td><td>{c.LR}</td><td>{c.VARC}</td><td><strong>{c.total}</strong></td></tr>)}</tbody>
+            </table>
+          </div>
+          <p className={ui.sourceNote}>Percentiles, not marks. Source: IIMB UG Admissions Process 2026, Annexure I, Table 1 (batch 2027-31).</p>
+
+          <h3>IIMB UG answer key 2026 and result date</h3>
+          <p>
+            IIMB has not announced a date for the official answer key of the 15 November 2026 test. Until it does, the calculator uses the answer
+            key marked on your response sheet. The day IIMB releases its official key, we load it and every saved report link re-scores on its own.
+            The result is expected on <strong>15 December 2026</strong> (tentative), with interviews in the 2nd and 3rd week of January 2027 and
+            offers in the 3rd week of February 2027.
+          </p>
+
           <h3>Eligibility snapshot (batch 2027-31)</h3>
           <ul>
             <li>Age not more than 20 years as on 1 August 2027</li>
             <li>Pass in Class XII or equivalent from a recognised board</li>
             <li>Mathematics as a subject in both Class XI and Class XII</li>
-            <li>At least 60% marks in Class X</li>
+            <li>At least 60% marks in Class X (IIMB&apos;s FAQ words this as 60% in Class X mathematics, so check both)</li>
           </ul>
           <p>Always confirm the latest rules on IIMB's official UG admissions website before you apply.</p>
 
@@ -681,7 +753,7 @@ export default function IimbUgScoreCalculator() {
             "@graph": [
               {
                 "@type": "WebApplication",
-                name: "IIM Bangalore UG Score Calculator 2026",
+                name: "IIMB UG Score Calculator 2026",
                 url: PAGE_URL,
                 applicationCategory: "EducationalApplication",
                 operatingSystem: "All",
@@ -709,7 +781,39 @@ export default function IimbUgScoreCalculator() {
           }),
         }}
       />
+      <IimbAlertsBell />
     </AppShell>
+  );
+}
+
+// Key dates + countdown to the (tentative) result day. Client-only clock avoids hydration mismatch.
+function KeyDates() {
+  const [now, setNow] = useState(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+  const target = new Date(`${RESULT_DATE}T00:00:00+05:30`).getTime();
+  const left = now == null ? null : Math.max(0, target - now);
+  const cd = left == null ? null : { d: Math.floor(left / 86400000), h: Math.floor((left % 86400000) / 3600000), m: Math.floor((left % 3600000) / 60000), s: Math.floor((left % 60000) / 1000) };
+  return (
+    <div className={ui.datesCard}>
+      <div className={ui.datesHead}>
+        <span className={ui.datesTitle}>⏳ IIMB UG result (15 Dec 2026, tentative) in</span>
+        <div className={ui.cdRow}>
+          {[["d", "days"], ["h", "hrs"], ["m", "min"], ["s", "sec"]].map(([k, l]) => (
+            <div key={k} className={ui.cdBox}><b>{cd ? String(cd[k]).padStart(2, "0") : "--"}</b><span>{l}</span></div>
+          ))}
+        </div>
+      </div>
+      <div className={ui.datesList}>
+        {KEY_DATES.map((d) => (
+          <div key={d.label} className={`${ui.dateItem} ${d.done ? ui.dateDone : ""}`}><span>{d.done ? "✓ " : ""}{d.label}</span><b>{d.when}</b></div>
+        ))}
+      </div>
+      <div className={ui.sourceNote}>Source: IIMB UG Admissions 2027 page and FAQ (ug.iimb.ac.in). Dates after the test are tentative.</div>
+    </div>
   );
 }
 
@@ -721,7 +825,7 @@ function WeightageCard({ compact = false }) {
         <div className={ui.weightCol}>
           <div className={ui.weightHead}>Pre-interview score</div>
           <div className={ui.weightRow}><span>UG Test</span><b>70</b></div>
-          <div className={ui.weightRow}><span>· QADI / LR / VARC</span><b>20 / 30 / 20</b></div>
+          <div className={ui.weightRow}><span>· QADI / LR / VARC</span><b>30 / 20 / 20</b></div>
           <div className={ui.weightRow}><span>Class 10 overall</span><b>15</b></div>
           <div className={ui.weightRow}><span>Class 10 maths</span><b>10</b></div>
           <div className={ui.weightRow}><span>Gender diversity</span><b>5</b></div>
@@ -734,7 +838,7 @@ function WeightageCard({ compact = false }) {
           <div className={ui.weightRow}><span>Class 10 maths</span><b>10</b></div>
         </div>
       </div>
-      <div className={ui.sourceNote}>Source: IIMB UG Admissions Process document for batch 2027-31. Board scores are standardised by IIMB.</div>
+      <div className={ui.sourceNote}>Source: IIMB UG Admissions Process 2026 (batch 2027-31). Board scores are standardised by IIMB.</div>
     </div>
   );
 }

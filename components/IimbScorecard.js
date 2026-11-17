@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import s from "./IimbScorecard.module.css";
-import { SECTIONS, MAX_SCORE } from "../utils/iimbScoring";
+import { SECTIONS, MAX_SCORE, KEY_DATES } from "../utils/iimbScoring";
 
 const SITE = "https://register.ipmcareer.com";
 const WHATSAPP_PI = "https://wa.me/918299470392?text=" + encodeURIComponent("IIMB - I just checked my IIM Bangalore UG score. Help me plan PI prep.");
@@ -76,7 +76,7 @@ async function makeStoryCard({ name, scores, stats, year }) {
   return new Promise((res) => cv.toBlob((b) => res(b), "image/png"));
 }
 
-export default function IimbScorecard({ name, category, city, testDate, scores, answers, insights, uid, stats, warning, onReset, isReportPage = false }) {
+export default function IimbScorecard({ name, category, city, testDate, scores, answers, insights, uid, stats, warning, onReset, keyStatus = null, isReportPage = false }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [openQ, setOpenQ] = useState(null);
@@ -89,7 +89,7 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
   const best = [...secs].sort((a, b) => b.score / b.max - a.score / a.max)[0];
   const lost = scores.wrong; // −1 each
   const skippedPotential = scores.unattempted * 3;
-  const shareText = `I scored ${scores.total}/${MAX_SCORE} in the IIM Bangalore UG Test (VARC ${secs[0].score}, LR ${secs[1].score}, QADI ${secs[2].score}, ${scores.accuracy}% accuracy). Check yours free: ${reportUrl}`;
+  const shareText = `I scored ${scores.total}/${MAX_SCORE} in the IIM Bangalore UG Test (QADI ${scores.sections.QADI.score}, LR ${scores.sections.LR.score}, VARC ${scores.sections.VARC.score}, ${scores.accuracy}% accuracy). Check yours free: ${reportUrl}`;
 
   const maxBucket = useMemo(() => (stats?.buckets?.length ? Math.max(...stats.buckets.map((b) => b.n)) : 0), [stats]);
   const myBucket = Math.floor(Math.max(0, scores.total) / 10) * 10;
@@ -170,6 +170,12 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
           <span className={`${s.gate} ${scores.allPositive ? s.gateOk : s.gateNo}`}>{scores.allPositive ? "✓ Positive in all 3 sections" : "✕ Not positive in every section"}</span>
         </div>
       </section>
+
+      <div className={keyStatus ? s.keyOk : s.keyWait}>
+        {keyStatus
+          ? <>🔑 Scored with IIMB&apos;s <b>{keyStatus === "final" ? "final" : "provisional"} official answer key</b>.{keyStatus !== "final" ? " Your report link re-scores automatically when the final key is out." : ""}</>
+          : <>🔑 Scored with the answer key marked on your response sheet. When IIMB releases its official answer key, your report link re-scores automatically.</>}
+      </div>
 
       {warning && <div className={s.warn}>⚠️ {warning}</div>}
 
@@ -265,14 +271,14 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
                   <div className={s.qGrid}>
                     {list.map((a) => (
                       <button type="button" key={a.n} onClick={() => setOpenQ(openQ === a.n ? null : a.n)}
-                        className={`${s.q} ${a.r === "C" ? s.qC : a.r === "W" ? s.qW : a.r === "N" ? s.qN : s.qU} ${openQ === a.n ? s.qOpen : ""}`}
-                        aria-label={`Question ${a.n}: ${a.r === "C" ? "correct" : a.r === "W" ? "wrong" : "not attempted"}`}>{a.n}</button>
+                        className={`${s.q} ${a.r === "C" ? s.qC : a.r === "W" ? s.qW : a.r === "N" || a.r === "X" ? s.qN : s.qU} ${openQ === a.n ? s.qOpen : ""}`}
+                        aria-label={`Question ${a.n}: ${a.r === "C" ? "correct" : a.r === "W" ? "wrong" : a.r === "X" ? "dropped by IIMB" : "not attempted"}`}>{a.n}</button>
                     ))}
                   </div>
                 </div>
               );
             })}
-            {openQ != null && (() => { const a = answers.find((x) => x.n === openQ); return a ? <div className={s.qDetail}>Q{a.n} · your answer <b>{a.c || "–"}</b> · key <b>{a.k || "–"}</b> · {a.r === "C" ? "+3" : a.r === "W" ? "−1" : "0"}</div> : null; })()}
+            {openQ != null && (() => { const a = answers.find((x) => x.n === openQ); return a ? <div className={s.qDetail}>Q{a.n} · your answer <b>{a.c || "–"}</b> · key <b>{a.r === "X" ? "dropped" : a.k || "–"}</b> · {a.r === "C" ? "+3" : a.r === "W" ? "−1" : "0"}</div> : null; })()}
             <div className={s.legend}><span><i style={{ background: "#4ade80" }} />Correct +3</span><span><i style={{ background: "#f87171" }} />Wrong −1</span><span><i style={{ background: "rgba(236,232,225,0.25)" }} />Skipped 0</span></div>
           </div>
           <details className={s.tableBox}>
@@ -280,7 +286,7 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
             <div className={s.tableWrap}>
               <table className={s.table}>
                 <thead><tr><th>Q</th><th>Section</th><th>Yours</th><th>Key</th><th>Marks</th></tr></thead>
-                <tbody>{answers.map((a) => <tr key={a.n}><td>{a.n}</td><td>{a.s}</td><td>{a.c || "–"}</td><td>{a.k || "–"}</td><td className={a.r === "C" ? s.ok : a.r === "W" ? s.no : ""}>{a.r === "C" ? "+3" : a.r === "W" ? "−1" : "0"}</td></tr>)}</tbody>
+                <tbody>{answers.map((a) => <tr key={a.n}><td>{a.n}</td><td>{a.s}</td><td>{a.c || "–"}</td><td>{a.r === "X" ? "dropped" : a.k || "–"}</td><td className={a.r === "C" ? s.ok : a.r === "W" ? s.no : ""}>{a.r === "C" ? "+3" : a.r === "W" ? "−1" : "0"}</td></tr>)}</tbody>
               </table>
             </div>
           </details>
@@ -291,11 +297,14 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
       <div className={s.cta}>
         <div>
           <div className={s.ctaTitle}>Next up{first ? `, ${first}` : ""}: the IIMB interview</div>
-          <div className={s.ctaText}>The interview carries 40 of 100 in IIMB's final score, as much as the test. Get a free PI plan from our mentors.</div>
+          <div className={s.ctaText}>Interviews are in the {KEY_DATES[2].when.replace(" (tentative)", "")} and carry 40 of 100 in IIMB&apos;s final score, as much as the test. Results are expected {KEY_DATES[1].when}, so start PI prep now.</div>
         </div>
-        <a className={s.btnGold} href={WHATSAPP_PI} target="_blank" rel="noopener noreferrer">📲 WhatsApp "IIMB"</a>
+        <div className={s.ctaBtns}>
+          <a className={s.btnGold} href="/pi-batch">🎤 Join the PI batch</a>
+          <a className={s.btn} href={WHATSAPP_PI} target="_blank" rel="noopener noreferrer">📲 WhatsApp &quot;IIMB&quot;</a>
+        </div>
       </div>
-      <p className={s.note}>Raw score from your response sheet using +3 / −1 / 0. IIMB standardises scores for shortlisting, so official results can differ.{city ? ` · 📍 ${city}` : ""}</p>
+      <p className={s.note}>Raw score using +3 / −1 / 0 (IIMB says only that there is negative marking). IIMB standardises scores and uses percentiles for shortlisting, so official results can differ.{city ? ` · 📍 ${city}` : ""}</p>
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function IimbReport({ report }) {
     );
   }
 
-  const { name, category, city, answers, uid, stats, testDate } = report;
+  const { name, category, city, answers, uid, stats, testDate, keyStatus } = report;
   const scores = scoreAnswers(answers);
   const insights = buildInsights(scores);
   const first = (name || "Student").split(" ")[0];
@@ -52,7 +52,7 @@ export default function IimbReport({ report }) {
       />
       <div className={styles.page}>
         <div className={ui.reportWrap} style={{ paddingTop: "1.2rem" }}>
-          <IimbScorecard name={name} category={category} city={city} testDate={testDate} scores={scores} answers={answers} insights={insights} uid={uid} stats={stats} isReportPage />
+          <IimbScorecard name={name} category={category} city={city} testDate={testDate} scores={scores} answers={answers} insights={insights} uid={uid} stats={stats} keyStatus={keyStatus || null} isReportPage />
         </div>
       </div>
     </AppShell>
@@ -66,19 +66,24 @@ export async function getServerSideProps({ params, res }) {
     return { props: { report: null } };
   }
   try {
-    const { iimbDb, iimbStats } = await import("../../lib/iimbServer");
+    const { iimbDb, iimbStats, loadIimbKeys } = await import("../../lib/iimbServer");
+    const { applyOfficialKey, scoreAnswers: score } = await import("../../utils/iimbScoring");
     const db = iimbDb();
     const { data } = await db.from("iimb_ug_scorecards").select("uid, exam_year, name, category, city, test_date, score_total, answers").eq("uid", uid).maybeSingle();
     if (!data || !Array.isArray(data.answers) || !data.answers.length) {
       res.statusCode = 404;
       return { props: { report: null } };
     }
-    const stats = await iimbStats(db, data.exam_year, data.score_total);
+    // Re-score with the latest official key so old report links update when IIMB releases/revises it
+    const key = await loadIimbKeys(db, data.exam_year);
+    const scored = applyOfficialKey(data.answers, key.keys).answers;
+    const total = score(scored).total;
+    const stats = await iimbStats(db, data.exam_year, total);
     res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=600");
     // Only public-safe fields leave the server. Never phone or email.
     return {
       props: {
-        report: { uid, name: data.name || "Student", category: data.category || "", city: data.city || "", testDate: data.test_date || "", answers: data.answers, stats },
+        report: { uid, name: data.name || "Student", category: data.category || "", city: data.city || "", testDate: data.test_date || "", answers: scored.map(({ n, s, c, k, r, ks }) => ({ n, s, c, k, r, ks: ks || "sheet" })), stats, keyStatus: key.status || null },
       },
     };
   } catch {

@@ -127,3 +127,8 @@
 }
 @media print { .shareRow, .cta, .toast { display: none !important; } .hero::after { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hero, .hero::after, .ringArc { animation: none; transition: none; } }
+
+.keyOk, .keyWait { font-size: .82rem; line-height: 1.5; padding: 10px 14px; border-radius: 14px; }
+.keyOk { background: rgba(34,197,94,0.10); border: 1px solid rgba(34,197,94,0.35); color: #bbf7d0; }
+.keyWait { background: rgba(249,160,27,0.08); border: 1px solid rgba(249,160,27,0.30); color: #f5deb3; }
+.ctaBtns { display: flex; gap: 10px; flex-wrap: wrap; }

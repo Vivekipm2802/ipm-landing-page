@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
-import { iimbDb, iimbStats } from "../../lib/iimbServer";
-import { SECTIONS, MAX_SCORE, scoreAnswers } from "../../utils/iimbScoring";
+import { iimbDb, iimbStats, loadIimbKeys } from "../../lib/iimbServer";
+import { SECTIONS, MAX_SCORE, scoreAnswers, applyOfficialKey } from "../../utils/iimbScoring";
 
 const SECTION_KEYS = SECTIONS.map((s) => s.key);
-const RESULT_CODES = ["C", "W", "U", "N"];
+const RESULT_CODES = ["C", "W", "U", "N", "X"];
 
 const esc = (v) =>
   String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -21,6 +21,9 @@ function sanitizeAnswers(list) {
       s: a.s,
       c: str(a.c, 3),
       k: str(a.k, 3),
+      kt: str(a.kt ?? a.k, 3),
+      q: /^\d{1,20}$/.test(String(a.q || "")) ? String(a.q) : "",
+      o: Array.isArray(a.o) ? a.o.slice(0, 6).map((x) => String(x)).filter((x) => /^\d{1,20}$/.test(x)) : [],
       r: a.r,
     });
   }
@@ -44,25 +47,29 @@ export default async function handler(req, res) {
   if (!/^[6-9]\d{9}$/.test(mobile)) return res.status(400).json({ error: "Invalid mobile number" });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: "Invalid email" });
 
-  const answers = sanitizeAnswers(body.answers);
-  if (!answers) return res.status(400).json({ error: "Invalid response data" });
-
-  const scores = scoreAnswers(answers);
-  if (scores.total > MAX_SCORE) return res.status(400).json({ error: "Invalid response data" });
+  const clean = sanitizeAnswers(body.answers);
+  if (!clean) return res.status(400).json({ error: "Invalid response data" });
 
   const testDate = str(body.testDate, 40);
   const testTime = str(body.testTime, 40);
   const yearMatch = testDate.match(/(20\d{2})/);
   const examYear = yearMatch ? Number(yearMatch[1]) : new Date().getFullYear();
 
+  let db;
+  try { db = iimbDb(); } catch { return res.status(500).json({ error: "Server is not configured" }); }
+
+  // Official key (when loaded) wins over the sheet's ticks; scores are always recomputed here
+  const key = await loadIimbKeys(db, examYear);
+  const { answers } = applyOfficialKey(clean, key.keys);
+  const scores = scoreAnswers(answers);
+  if (scores.total > MAX_SCORE) return res.status(400).json({ error: "Invalid response data" });
+  if (answers.every((a) => !a.k && a.r !== "X")) return res.status(400).json({ error: "This response sheet has no answer key yet. IIMB's official key is not loaded on our side either; please try again once it is out." });
+
   const sections = {};
   SECTION_KEYS.forEach((k) => {
     const s = scores.sections[k];
     sections[k] = { score: s.score, correct: s.correct, wrong: s.wrong, unattempted: s.unattempted, accuracy: s.accuracy, max: s.max, positive: s.positive };
   });
-
-  let db;
-  try { db = iimbDb(); } catch { return res.status(500).json({ error: "Server is not configured" }); }
 
   const row = {
     exam_year: examYear,
@@ -137,5 +144,5 @@ export default async function handler(req, res) {
     console.error("IIMB email failed (non-blocking):", err?.message);
   }
 
-  return res.status(200).json({ uid, stats });
+  return res.status(200).json({ uid, stats, answers, scores, keyStatus: key.status });
 }

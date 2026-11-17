@@ -2,7 +2,7 @@
 // parse it (the CDN does not allow cross-origin reads from our domain).
 // Locked to cdn.digialm.com over HTTPS to prevent this being used as an open proxy.
 
-const ALLOWED_HOST = "cdn.digialm.com";
+const ALLOWED_HOST = /^cdn\d*\.digialm\.com$/; // cdn., cdn3. ... over HTTPS only (not an open proxy)
 const MAX_BYTES = 8 * 1024 * 1024;
 
 export default async function handler(req, res) {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Please paste the full response sheet link." });
   }
 
-  if (target.protocol !== "https:" || target.hostname !== ALLOWED_HOST || target.port) {
+  if (target.protocol !== "https:" || !ALLOWED_HOST.test(target.hostname) || target.port) {
     return res.status(400).json({ error: "Only IIMB response sheet links from https://cdn.digialm.com are supported." });
   }
   if (!/\.html?$/i.test(target.pathname)) {
