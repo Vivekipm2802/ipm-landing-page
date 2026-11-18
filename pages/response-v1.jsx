@@ -8,7 +8,6 @@ import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
 import dynamic from "next/dynamic";
 import IimbScorecard from "../components/IimbScorecard";
-import { IimbAlertsInline } from "../components/IimbAlerts";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
 import {
@@ -20,8 +19,6 @@ import {
   buildInsights,
   applyOfficialKey,
   EXAM_YEAR,
-  RESULT_DATE,
-  KEY_DATES,
   CUTOFFS,
 } from "../utils/iimbScoring";
 
@@ -402,12 +399,9 @@ export default function IimbUgScoreCalculator() {
           <div className={ui.fact}><div className={ui.factNum}>+3 / -1</div><div className={ui.factLabel}>Marking</div></div>
         </div>
 
-        <KeyDates />
-
         <div className={ui.layout}>
           {/* ════════ MAIN COLUMN ════════ */}
           <div className={ui.mainCol}>
-            {!result && <div className={ui.noPrint}><IimbAlertsInline /></div>}
             {top3.length > 0 && (
               <div className={styles.topperRow}>
                 {top3.map((t, i) => (
@@ -783,37 +777,6 @@ export default function IimbUgScoreCalculator() {
       />
       <IimbAlertsBell />
     </AppShell>
-  );
-}
-
-// Key dates + countdown to the (tentative) result day. Client-only clock avoids hydration mismatch.
-function KeyDates() {
-  const [now, setNow] = useState(null);
-  useEffect(() => {
-    setNow(Date.now());
-    const iv = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(iv);
-  }, []);
-  const target = new Date(`${RESULT_DATE}T00:00:00+05:30`).getTime();
-  const left = now == null ? null : Math.max(0, target - now);
-  const cd = left == null ? null : { d: Math.floor(left / 86400000), h: Math.floor((left % 86400000) / 3600000), m: Math.floor((left % 3600000) / 60000), s: Math.floor((left % 60000) / 1000) };
-  return (
-    <div className={ui.datesCard}>
-      <div className={ui.datesHead}>
-        <span className={ui.datesTitle}>⏳ IIMB UG result (15 Dec 2026, tentative) in</span>
-        <div className={ui.cdRow}>
-          {[["d", "days"], ["h", "hrs"], ["m", "min"], ["s", "sec"]].map(([k, l]) => (
-            <div key={k} className={ui.cdBox}><b>{cd ? String(cd[k]).padStart(2, "0") : "--"}</b><span>{l}</span></div>
-          ))}
-        </div>
-      </div>
-      <div className={ui.datesList}>
-        {KEY_DATES.map((d) => (
-          <div key={d.label} className={`${ui.dateItem} ${d.done ? ui.dateDone : ""}`}><span>{d.done ? "✓ " : ""}{d.label}</span><b>{d.when}</b></div>
-        ))}
-      </div>
-      <div className={ui.sourceNote}>Source: IIMB UG Admissions 2027 page and FAQ (ug.iimb.ac.in). Dates after the test are tentative.</div>
-    </div>
   );
 }
 
