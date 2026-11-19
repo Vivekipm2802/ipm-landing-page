@@ -6,7 +6,6 @@ import { NextSeo } from "next-seo";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
-import dynamic from "next/dynamic";
 import IimbScorecard from "../components/IimbScorecard";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
@@ -22,7 +21,6 @@ import {
   CUTOFFS,
 } from "../utils/iimbScoring";
 
-const IimbAlertsBell = dynamic(() => import("../components/IimbAlerts"), { ssr: false });
 
 // Update this each cycle when IIMB shares the new response sheet login link
 const RESPONSE_LOGIN_URL = "https://cdn.digialm.com/EForms/configuredHtml/1345/101967/login.html"; // 2026 candidate login (IIMB UG Admissions 2027 page)
@@ -97,6 +95,8 @@ export default function IimbUgScoreCalculator() {
   const [count, setCount] = useState(0);
   const [stepsOpen, setStepsOpen] = useState(false);
   const [device, setDevice] = useState("laptop");
+  const [alertsOn, setAlertsOn] = useState(true); // inline alert opt-in (replaces the floating bell + pop-up)
+  const [showBoard, setShowBoard] = useState(false); // phones: full top 10 only on request
   const fileInputRef = useRef(null);
   const resultRef = useRef(null);
 
@@ -211,6 +211,13 @@ export default function IimbUgScoreCalculator() {
     };
     setError("");
     setWarning("");
+    // Answer-key / result alerts, ticked by default in the form (fire-and-forget)
+    let alertsSent = false;
+    const subscribeAlerts = (name) => {
+      if (!alertsOn || alertsSent) return;
+      alertsSent = true;
+      axios.post("/api/iimb-alerts-subscribe", { name: name && name.length > 1 ? name : "IIMB UG candidate", phone: form.mobile, email: form.email.trim(), page: "/response-v1" }).catch(() => {});
+    };
 
     try {
       let html = "";
@@ -230,6 +237,7 @@ export default function IimbUgScoreCalculator() {
       const parsed = parseResponseSheet(html);
       const studentName = (parsed.candidate && parsed.candidate.name) || "";
       sendCrm(studentName);
+      subscribeAlerts(studentName);
       if (parsed.error) {
         setError(parsed.error);
         setSubmitting(false);
@@ -248,7 +256,7 @@ export default function IimbUgScoreCalculator() {
         }
       } catch {}
       if (!keyStatus && parsed.noTicks) {
-        setError("Your response sheet shows your answers but not the answer key, and IIMB has not released its official key yet. Turn on alerts below and we will email you the moment it is out.");
+        setError(alertsOn ? "Your response sheet shows your answers but not the answer key, and IIMB has not released its official key yet. Your alerts are on: we will message you the moment it is out." : "Your response sheet shows your answers but not the answer key, and IIMB has not released its official key yet. Tick the alert box and try again, and we will message you the moment it is out.");
         setSubmitting(false);
         return;
       }
@@ -330,7 +338,7 @@ export default function IimbUgScoreCalculator() {
   const top3 = leaderboard.slice(0, 3);
 
   return (
-    <AppShell activePage="/response-v1" pageTitle="IIM-B UG Score Calculator">
+    <AppShell activePage="/response-v1" pageTitle="IIM-B UG Score Calculator" minimal showBack={false}>
       <Head>
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
@@ -368,11 +376,10 @@ export default function IimbUgScoreCalculator() {
             IIM Bangalore UG Test 2026
           </div>
           <h1 className={styles.heroTitle}>
-            IIM Bangalore UG Score Calculator.{" "}
-            <span className={styles.heroTitleAccent}>Paste your response sheet link, get your score in seconds.</span>
+            IIM Bangalore UG <span className={styles.heroTitleAccent}>Score Calculator 2026</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            QADI, LR and VARC scores out of 180 for the 15 Nov 2026 test, accuracy, your rank among students and a report you can share.
+            Paste your response sheet link. Get your QADI, LR, VARC and total out of 180 in seconds.
           </p>
           <div className={styles.socialProof}>
             {count > 0 && (
@@ -391,26 +398,16 @@ export default function IimbUgScoreCalculator() {
           </div>
         </div>
 
-        {/* ── Quick facts ── */}
-        <div className={ui.factStrip}>
-          <div className={ui.fact}><div className={ui.factNum}>{TOTAL_QUESTIONS}</div><div className={ui.factLabel}>MCQs</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>135</div><div className={ui.factLabel}>Minutes</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>{MAX_SCORE}</div><div className={ui.factLabel}>Max marks</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>+3 / -1</div><div className={ui.factLabel}>Marking</div></div>
-        </div>
-
         <div className={ui.layout}>
           {/* ════════ MAIN COLUMN ════════ */}
           <div className={ui.mainCol}>
-            {top3.length > 0 && (
-              <div className={styles.topperRow}>
+            {!result && top3.length > 0 && (
+              <div className={ui.top3}>
+                Top so far:{" "}
                 {top3.map((t, i) => (
-                  <div key={i} className={styles.topperBadge}>
-                    <span className={`${styles.topperRank} ${i === 0 ? styles.topperRank1 : i === 1 ? styles.topperRank2 : styles.topperRank3}`}>{i + 1}</span>
-                    {t.name}
-                    <span className={styles.topperScore}>{t.total}</span>
-                  </div>
-                ))}
+                  <span key={i}>{i > 0 && " · "}<b>{t.name}</b> <span className={ui.top3Score}>{t.total}</span></span>
+                ))}{" "}
+                <button type="button" className={`${ui.linkBtn} ${ui.mobileOnly}`} onClick={() => setShowBoard((v) => !v)}>{showBoard ? "Hide top 10" : "See top 10"}</button>
               </div>
             )}
 
@@ -437,35 +434,8 @@ export default function IimbUgScoreCalculator() {
             {/* ── Form ── */}
             {!result && (
               <div className={styles.formCard}>
-                <h2 className={styles.formTitle}>Calculate your IIM-B UG score</h2>
-                <div className={styles.formSubtitle}>Fill your details, then paste your response sheet link or upload the saved page. We read your name from the response sheet.</div>
-
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="iimb-mobile">Mobile</label>
-                    <input id="iimb-mobile" className={styles.formInput} type="tel" inputMode="numeric" placeholder="10-digit number" value={form.mobile} onChange={update("mobile")} autoComplete="tel-national" />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="iimb-email">Email</label>
-                    <input id="iimb-email" className={styles.formInput} type="email" placeholder="you@email.com" value={form.email} onChange={update("email")} autoComplete="email" />
-                  </div>
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="iimb-category">Category</label>
-                    <select id="iimb-category" className={styles.formSelect} value={form.category} onChange={update("category")}>
-                      <option value="">Select category</option>
-                      {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="iimb-city">City</label>
-                    <input id="iimb-city" className={styles.formInput} type="text" placeholder="e.g. Bengaluru" value={form.city} onChange={update("city")} autoComplete="address-level2" />
-                  </div>
-                </div>
+                <h2 className={styles.formTitle}>Calculate your score</h2>
+                <div className={styles.formSubtitle}>We read your name from your response sheet.</div>
 
                 <div className={ui.tabs} style={{ marginTop: 4, marginBottom: 12 }}>
                   <button type="button" className={`${ui.tab} ${mode === "link" ? ui.tabActive : ""}`} onClick={() => { setMode("link"); setError(""); }}>🔗 Paste link</button>
@@ -516,8 +486,40 @@ export default function IimbUgScoreCalculator() {
                 </div>
                 )}
 
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel} htmlFor="iimb-mobile">Mobile</label>
+                    <input id="iimb-mobile" className={styles.formInput} type="tel" inputMode="numeric" placeholder="10-digit number" value={form.mobile} onChange={update("mobile")} autoComplete="tel-national" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel} htmlFor="iimb-email">Email</label>
+                    <input id="iimb-email" className={styles.formInput} type="email" placeholder="you@email.com" value={form.email} onChange={update("email")} autoComplete="email" />
+                  </div>
+                </div>
+
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel} htmlFor="iimb-category">Category</label>
+                    <select id="iimb-category" className={styles.formSelect} value={form.category} onChange={update("category")}>
+                      <option value="">Select category</option>
+                      {CATEGORIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel} htmlFor="iimb-city">City <span className={ui.optional}>(optional)</span></label>
+                    <input id="iimb-city" className={styles.formInput} type="text" placeholder="e.g. Bengaluru" value={form.city} onChange={update("city")} autoComplete="address-level2" />
+                  </div>
+                </div>
+
+                <label className={ui.alertChk}>
+                  <input type="checkbox" checked={alertsOn} onChange={(e) => setAlertsOn(e.target.checked)} />
+                  <span>Alert me when IIMB releases the official answer key and the result</span>
+                </label>
+
                 <button className={`${styles.generateBtn} ${submitting ? styles.generateBtnLoading : ""}`} onClick={analyse} disabled={submitting}>
-                  {submitting ? "Analysing..." : "🎯 Analyse My Score"}
+                  {submitting ? "Analysing..." : "Get my score"}
                 </button>
 
                 {error && (
@@ -526,11 +528,12 @@ export default function IimbUgScoreCalculator() {
                     {error}
                   </div>
                 )}
-                <div className={ui.privacyNote}>🔒 Your phone and email are never shown publicly.</div>
+                <div className={ui.privacyNote}>🔒 Your number and email are never shown publicly.</div>
               </div>
             )}
 
             {/* ── How-to ── */}
+            {!result && (
             <div className={`${styles.stepsCard} ${ui.noPrint}`} id="how-to" style={{ scrollMarginTop: 90 }}>
               <div className={styles.stepsToggle} onClick={() => setStepsOpen(!stepsOpen)}>
                 <h2 className={styles.stepsTitle} style={{ margin: 0 }}>📖 How to save your IIMB UG response sheet</h2>
@@ -579,37 +582,48 @@ export default function IimbUgScoreCalculator() {
                     </div>
                     <div className={styles.step}>
                       <div className={styles.stepNum}>5</div>
-                      <div className={styles.stepText}>Tap <span className={styles.stepBold}>Analyse My Score</span>. Your VARC, LR, QADI and total appear instantly.</div>
+                      <div className={styles.stepText}>Tap <span className={styles.stepBold}>Get my score</span>. Your VARC, LR, QADI and total appear instantly.</div>
                     </div>
                   </div>
                 </>
               )}
             </div>
+            )}
 
-            {/* ── Other tools ── */}
-            <div className={`${styles.featureGrid} ${ui.noPrint}`}>
-              <Link href="/interview-prep" className={styles.featureCard}>
-                <span className={styles.featureIcon}>🤖</span>
-                <span className={styles.featureName}>AI Mock Interview</span>
-                <span className={styles.featureDesc}>PI is 40% of IIMB's final score</span>
-              </Link>
-              <Link href="/response" className={styles.featureCard}>
-                <span className={styles.featureIcon}>📊</span>
-                <span className={styles.featureName}>IPMAT Score Calculator</span>
-                <span className={styles.featureDesc}>Check your IPMAT Indore score</span>
-              </Link>
-              <Link href="/pi-batch" className={styles.featureCard}>
-                <span className={styles.featureIcon}>🎯</span>
-                <span className={styles.featureName}>PI Batch</span>
-                <span className={styles.featureDesc}>Interview prep with mentors</span>
-              </Link>
-            </div>
+            {/* ── Next steps: only AFTER the score (they distracted from the form before) ── */}
+            {result && (
+              <div className={`${ui.afterResult} ${ui.noPrint}`}>
+                <div className={ui.ctaCard}>
+                  <h3 className={ui.ctaTitle}>Interviews in January. Start PI prep now.</h3>
+                  <p className={ui.ctaText}>IIMB interviews are planned for the 2nd and 3rd week of January 2027 and carry 40 of 100 in the final score, as much as the test.</p>
+                  <Link href="/pi-batch" className={ui.ctaBtn}>🎤 Join the PI batch</Link>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ui.ctaBtn} style={{ marginTop: 8, background: "transparent", border: "1px solid rgba(249,160,27,0.5)", color: "#f4f1ea" }}>📲 WhatsApp &quot;IIMB&quot;</a>
+                </div>
+                <div className={`${styles.featureGrid} ${ui.noPrint}`}>
+                  <Link href="/interview-prep" className={styles.featureCard}>
+                    <span className={styles.featureIcon}>🤖</span>
+                    <span className={styles.featureName}>AI Mock Interview</span>
+                    <span className={styles.featureDesc}>PI is 40% of IIMB's final score</span>
+                  </Link>
+                  <Link href="/response" className={styles.featureCard}>
+                    <span className={styles.featureIcon}>📊</span>
+                    <span className={styles.featureName}>IPMAT Score Calculator</span>
+                    <span className={styles.featureDesc}>Check your IPMAT Indore score</span>
+                  </Link>
+                  <Link href="/pi-batch" className={styles.featureCard}>
+                    <span className={styles.featureIcon}>🎯</span>
+                    <span className={styles.featureName}>PI Batch</span>
+                    <span className={styles.featureDesc}>Interview prep with mentors</span>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ════════ SIDE COLUMN ════════ */}
-          <aside className={`${ui.sideCol} ${ui.noPrint}`}>
+          <aside className={`${ui.sideCol} ${ui.noPrint} ${showBoard || result ? "" : ui.sideMobileHide}`}>
             <div className={ui.board}>
-              <h2 className={ui.boardTitle}>🏆 Leaderboard (Top 10)</h2>
+              <h2 className={ui.boardTitle}>🏆 Top scores so far</h2>
               {boardLoading ? (
                 <>
                   <div className={ui.skeleton}></div>
@@ -633,12 +647,6 @@ export default function IimbUgScoreCalculator() {
               <div className={ui.boardNote}>*Raw total out of {MAX_SCORE}, self-reported via this tool</div>
             </div>
 
-            <div className={ui.ctaCard}>
-              <h3 className={ui.ctaTitle}>Interviews in January. Start PI prep now.</h3>
-              <p className={ui.ctaText}>IIMB interviews are planned for the 2nd and 3rd week of January 2027 and carry 40 of 100 in the final score, as much as the test.</p>
-              <Link href="/pi-batch" className={ui.ctaBtn}>🎤 Join the PI batch</Link>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ui.ctaBtn} style={{ marginTop: 8, background: "transparent", border: "1px solid rgba(249,160,27,0.5)", color: "#f4f1ea" }}>📲 WhatsApp &quot;IIMB&quot;</a>
-            </div>
           </aside>
         </div>
 
@@ -652,81 +660,102 @@ export default function IimbUgScoreCalculator() {
             official key once it is out), applies the marking scheme and shows your <strong>QADI, LR and VARC</strong> scores, total out of 180,
             accuracy, attempts and whether each section is positive. No manual entry, so no counting mistakes.
           </p>
-
-          <h3>IIM Bangalore UG Test pattern 2026</h3>
-          <p>
-            IIMB admits students to its four-year, full-time residential <strong>B.Sc. (Hons) in Data Science</strong> and{" "}
-            <strong>B.Sc. (Hons) in Economics</strong> programmes through the IIMB UG Test followed by a personal interview. The test is a
-            135-minute computer-based test with 60 multiple-choice questions. In 2026 the sections came in a fixed order, each with its own timer:
-            QADI first, then LR, then VARC. IIMB admits <strong>80 students</strong> in total, 40 in each programme, and received a record{" "}
-            <strong>12,000 applications</strong> for its first batch, which started on 31 August 2026.
-          </p>
-          <div className={ui.tableWrap}>
-            <table className={ui.table}>
-              <thead>
-                <tr><th>Section (in test order)</th><th>Questions</th><th>Time</th><th>Max marks (+3 each)</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>1. Quantitative Ability & Data Interpretation (QADI)</td><td>30</td><td>60 min</td><td>90</td></tr>
-                <tr><td>2. Logical Reasoning (LR)</td><td>15</td><td>45 min</td><td>45</td></tr>
-                <tr><td>3. Verbal Ability & Reading Comprehension (VARC)</td><td>15</td><td>30 min</td><td>45</td></tr>
-                <tr><td><strong>Total</strong></td><td><strong>60</strong></td><td><strong>135 min</strong></td><td><strong>180</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3>How the IIMB UG score is calculated</h3>
-          <p>
-            Each correct answer gets <strong>+3</strong>, each wrong answer gets <strong>-1</strong> and an unattempted question gets{" "}
-            <strong>0</strong>. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
-            accuracy matters as much as attempts, which is why the calculator shows both for every section.
-          </p>
-
-          <h3>How IIMB uses your UG Test score</h3>
-          <p>
-            According to IIMB's admissions document, only candidates with a <strong>positive raw score in all three sections</strong> are
-            considered for the first shortlist. Shortlisted candidates then get a pre-interview score, and selected candidates are called for the
-            personal interview. The calculator flags any section that is not positive so you know exactly where you stand on that first gate.
-          </p>
-          <WeightageCard compact />
-
-          <h3>IIM Bangalore UG cutoff 2026 (first shortlist)</h3>
-          <p>
-            IIMB&apos;s admissions document lists the minimum percentiles in the UG Test 2026 for the first shortlist. These apply only if your raw
-            score is also positive in every section. IIMB can lower these percentiles but not raise them, and says the scores of candidates finally
-            called for interviews are likely to be higher.
-          </p>
-          <div className={ui.tableWrap}>
-            <table className={ui.table}>
-              <thead><tr><th>Category</th><th>QADI</th><th>LR</th><th>VARC</th><th>Aggregate</th></tr></thead>
-              <tbody>{CUTOFFS.map((c) => <tr key={c.cat}><td>{c.cat}</td><td>{c.QADI}</td><td>{c.LR}</td><td>{c.VARC}</td><td><strong>{c.total}</strong></td></tr>)}</tbody>
-            </table>
-          </div>
-          <p className={ui.sourceNote}>Percentiles, not marks. Source: IIMB UG Admissions Process 2026, Annexure I, Table 1 (batch 2027-31).</p>
-
-          <h3>IIMB UG answer key 2026 and result date</h3>
-          <p>
-            IIMB has not announced a date for the official answer key of the 15 November 2026 test. Until it does, the calculator uses the answer
-            key marked on your response sheet. The day IIMB releases its official key, we load it and every saved report link re-scores on its own.
-            The result is expected on <strong>15 December 2026</strong> (tentative), with interviews in the 2nd and 3rd week of January 2027 and
-            offers in the 3rd week of February 2027.
-          </p>
-
-          <h3>Eligibility snapshot (batch 2027-31)</h3>
-          <ul>
-            <li>Age not more than 20 years as on 1 August 2027</li>
-            <li>Pass in Class XII or equivalent from a recognised board</li>
-            <li>Mathematics as a subject in both Class XI and Class XII</li>
-            <li>At least 60% marks in Class X (IIMB&apos;s FAQ words this as 60% in Class X mathematics, so check both)</li>
-          </ul>
-          <p>Always confirm the latest rules on IIMB's official UG admissions website before you apply.</p>
-
-          <h3>Got your score? Here is what to do next</h3>
-          <p>
-            The personal interview carries 40 of the 100 points in IIMB's post-interview score, the same as the UG Test itself. Start practising
-            with our <Link href="/interview-prep">AI Mock Interview</Link>, and if you also wrote IPMAT Indore, check that score with the{" "}
-            <Link href="/response">IPMAT Score Calculator</Link>.
-          </p>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>IIM Bangalore UG Test pattern 2026</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              IIMB admits students to its four-year, full-time residential <strong>B.Sc. (Hons) in Data Science</strong> and{" "}
+              <strong>B.Sc. (Hons) in Economics</strong> programmes through the IIMB UG Test followed by a personal interview. The test is a
+              135-minute computer-based test with 60 multiple-choice questions. In 2026 the sections came in a fixed order, each with its own timer:
+              QADI first, then LR, then VARC. IIMB admits <strong>80 students</strong> in total, 40 in each programme, and received a record{" "}
+              <strong>12,000 applications</strong> for its first batch, which started on 31 August 2026.
+            </p>
+            <div className={ui.tableWrap}>
+              <table className={ui.table}>
+                <thead>
+                  <tr><th>Section (in test order)</th><th>Questions</th><th>Time</th><th>Max marks (+3 each)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>1. Quantitative Ability & Data Interpretation (QADI)</td><td>30</td><td>60 min</td><td>90</td></tr>
+                  <tr><td>2. Logical Reasoning (LR)</td><td>15</td><td>45 min</td><td>45</td></tr>
+                  <tr><td>3. Verbal Ability & Reading Comprehension (VARC)</td><td>15</td><td>30 min</td><td>45</td></tr>
+                  <tr><td><strong>Total</strong></td><td><strong>60</strong></td><td><strong>135 min</strong></td><td><strong>180</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>How the IIMB UG score is calculated</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              Each correct answer gets <strong>+3</strong>, each wrong answer gets <strong>-1</strong> and an unattempted question gets{" "}
+              <strong>0</strong>. So if you got 30 right and 10 wrong, your score is (30 × 3) - (10 × 1) = 80. Because of the negative marking,
+              accuracy matters as much as attempts, which is why the calculator shows both for every section.
+            </p>
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>How IIMB uses your UG Test score</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              According to IIMB's admissions document, only candidates with a <strong>positive raw score in all three sections</strong> are
+              considered for the first shortlist. Shortlisted candidates then get a pre-interview score, and selected candidates are called for the
+              personal interview. The calculator flags any section that is not positive so you know exactly where you stand on that first gate.
+            </p>
+            <WeightageCard compact />
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>IIM Bangalore UG cutoff 2026 (first shortlist)</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              IIMB&apos;s admissions document lists the minimum percentiles in the UG Test 2026 for the first shortlist. These apply only if your raw
+              score is also positive in every section. IIMB can lower these percentiles but not raise them, and says the scores of candidates finally
+              called for interviews are likely to be higher.
+            </p>
+            <div className={ui.tableWrap}>
+              <table className={ui.table}>
+                <thead><tr><th>Category</th><th>QADI</th><th>LR</th><th>VARC</th><th>Aggregate</th></tr></thead>
+                <tbody>{CUTOFFS.map((c) => <tr key={c.cat}><td>{c.cat}</td><td>{c.QADI}</td><td>{c.LR}</td><td>{c.VARC}</td><td><strong>{c.total}</strong></td></tr>)}</tbody>
+              </table>
+            </div>
+            <p className={ui.sourceNote}>Percentiles, not marks. Source: IIMB UG Admissions Process 2026, Annexure I, Table 1 (batch 2027-31).</p>
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>IIMB UG answer key 2026 and result date</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              IIMB has not announced a date for the official answer key of the 15 November 2026 test. Until it does, the calculator uses the answer
+              key marked on your response sheet. The day IIMB releases its official key, we load it and every saved report link re-scores on its own.
+              The result is expected on <strong>15 December 2026</strong> (tentative), with interviews in the 2nd and 3rd week of January 2027 and
+              offers in the 3rd week of February 2027.
+            </p>
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>Eligibility snapshot (batch 2027-31)</h3></summary>
+            <div className={ui.accBody}>
+            <ul>
+              <li>Age not more than 20 years as on 1 August 2027</li>
+              <li>Pass in Class XII or equivalent from a recognised board</li>
+              <li>Mathematics as a subject in both Class XI and Class XII</li>
+              <li>At least 60% marks in Class X (IIMB&apos;s FAQ words this as 60% in Class X mathematics, so check both)</li>
+            </ul>
+            <p>Always confirm the latest rules on IIMB's official UG admissions website before you apply.</p>
+            </div>
+          </details>
+          <details className={`${ui.faqItem} ${ui.accItem}`}>
+            <summary><h3 className={ui.accH3}>Got your score? Here is what to do next</h3></summary>
+            <div className={ui.accBody}>
+            <p>
+              The personal interview carries 40 of the 100 points in IIMB's post-interview score, the same as the UG Test itself. Start practising
+              with our <Link href="/interview-prep">AI Mock Interview</Link>, and if you also wrote IPMAT Indore, check that score with the{" "}
+              <Link href="/response">IPMAT Score Calculator</Link>.
+            </p>
+            </div>
+          </details>
 
           <h2 style={{ fontSize: "1.35rem" }}>Frequently asked questions: IIM Bangalore UG Score Calculator</h2>
           {FAQS.map((f, i) => (
@@ -736,6 +765,14 @@ export default function IimbUgScoreCalculator() {
             </details>
           ))}
         </article>
+
+        <nav className={`${ui.moreTools} ${ui.noPrint}`} aria-label="More free tools">
+          More free tools:
+          <Link href="/response">IPMAT score</Link>
+          <Link href="/jipmat">JIPMAT score</Link>
+          <Link href="/interview-prep">AI mock interview</Link>
+          <Link href="/call">College predictor</Link>
+        </nav>
       </div>
 
       {/* ── Structured data ── */}
@@ -775,7 +812,6 @@ export default function IimbUgScoreCalculator() {
           }),
         }}
       />
-      <IimbAlertsBell />
     </AppShell>
   );
 }

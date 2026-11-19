@@ -12,7 +12,9 @@ const CatAlertsBell = dynamic(() => import('./CatAlerts'), { ssr: false });
 // Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
 const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres', '/cat-percentile-predictor', '/iim-call-predictor'];
 
-const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => {
+// minimal: focused landing pages (Nov 2026, IIMB UG calculator bounce-rate fix) hide the
+// sidebar, the tool links in the top bar and the mobile menu; logo + one CTA only.
+const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack, minimal = false }) => {
   const router = useRouter();
   const isDark = DARK_ROUTES.some((r) => router.pathname === r || router.pathname.startsWith(r + '/'));
   const styles = isDark ? darkStyles : lightStyles;
@@ -148,7 +150,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
         <div className={styles.topbarContent}>
           {/* Left: Back + Logo + Mobile Menu Toggle */}
           <div className={styles.topbarLeft}>
-            {isMobile && (
+            {isMobile && !minimal && (
               <button
                 className={styles.hamburger}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -189,7 +191,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
           </div>
 
           {/* Center: Navigation (Desktop Only) */}
-          {!isMobile && (
+          {!isMobile && !minimal && (
             <nav className={styles.topbarNav}>
               {topNavItems.map((item) => (
                 <Link
@@ -219,7 +221,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
       </header>
 
       {/* Mobile Menu Overlay */}
-      {isMobile && mobileMenuOpen && (
+      {isMobile && mobileMenuOpen && !minimal && (
         <div className={styles.mobileMenuOverlay} onClick={() => setMobileMenuOpen(false)}>
           <div className={styles.mobileMenuContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.mobileMenuHeader}>
@@ -261,7 +263,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack }) => 
 
       <div className={styles.container}>
         {/* Left Sidebar (Desktop Only) */}
-        {!isMobile && (
+        {!isMobile && !minimal && (
           <aside
             className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarCollapsed}`}
           >
