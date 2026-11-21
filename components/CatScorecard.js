@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import s from "./IimbScorecard.module.css";
+import k from "./CatScorecard.module.css";
 import { SECTIONS, MAX_SCORE } from "../lib/catScoring";
 import { predictAll } from "../lib/catPercentile";
 
@@ -65,7 +66,7 @@ async function makeStoryCard({ name, result, pred, rank, count, year }) {
   });
   x.fillStyle = "#ffbe5c"; x.font = `700 32px ${sans}`;
   const acc = result.correct + result.wrong > 0 ? Math.round((result.correct / (result.correct + result.wrong)) * 100) : 0;
-  x.fillText([`${acc}% accuracy`, `${result.correct} correct`, count >= 10 && rank ? `#${rank} of ${count}` : `${result.wrong} wrong`].join("   ·   "), 80, 1235);
+  x.fillText([`${acc}% accuracy`, `${result.correct} correct`, count >= 50 && rank ? `#${rank} of ${count}` : `${result.wrong} wrong`].join("   ·   "), 80, 1235);
   x.fillStyle = "#9a958c"; x.font = `500 24px ${sans}`; x.fillText("*estimate from CAT 2025 data · register.ipmcareer.com/cat-score-calculator", 80, 1290);
   return new Promise((res) => cv.toBlob((b) => res(b), "image/png"));
 }
@@ -75,6 +76,15 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [openQ, setOpenQ] = useState(null);
+  const [moreOpen, setMoreOpen] = useState(false);
+  useEffect(() => {
+    if (!moreOpen) return undefined;
+    const close = (e) => { if (e.type === "keydown" ? e.key === "Escape" : !e.target.closest?.("[data-more]")) setMoreOpen(false); };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close);
+    document.addEventListener("keydown", close);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("touchstart", close); document.removeEventListener("keydown", close); };
+  }, [moreOpen]);
   const answers = result.answers || [];
   const secs = SECTIONS.map((x) => ({ ...x, ...result.sections[x.key] }));
   const pred = predictAll({ VARC: secs[0].score, DILR: secs[1].score, QA: secs[2].score });
@@ -130,14 +140,22 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
     if (download()) flash("Image downloaded: attach it in the WhatsApp chat");
   };
   const copy = async () => { try { await navigator.clipboard.writeText(reportUrl); flash("Link copied"); } catch { flash("Long-press the link to copy"); } };
+  const SHOW_RANK_FROM = 50;
+  const judgedSecs = secs.filter((x) => x.correct + x.wrong > 0);
+  const weak = judgedSecs.length ? [...judgedSecs].sort((a, b) => a.score / a.max - b.score / b.max)[0] : null;
+  const takeaways = [];
+  if (weak && weak.key !== best.key) takeaways.push({ tone: "warn", head: `${weak.short} pulled you down`, text: `${weak.score}/${weak.max}. IIM shortlists need a sectional cut-off in every section, so this is where marks matter most.` });
+  if (mcqWrong > 0) takeaways.push({ tone: "warn", head: `Negatives cost you ${mcqWrong} mark${mcqWrong === 1 ? "" : "s"}`, text: `${mcqWrong} wrong MCQ${mcqWrong === 1 ? "" : "s"}. Wrong TITA answers cost nothing.` });
+  if (best && best.score > 0) takeaways.push({ tone: "good", head: `${best.short} is your strength`, text: `${best.score}/${best.max} with ${best.accuracy}% accuracy.` });
+  const pctOk = pred.overall.main != null && !pred.overall.below;
   const tileCls = (r) => (r === "C" || r === "B" ? s.qC : r === "W" ? s.qW : s.qU);
 
   return (
     <div className={s.wrap}>
       <section className={s.hero}>
         <div className={s.heroTop}>
-          <span className={s.kicker}><span className={s.dot} /> CAT {examYear || ""} · Scorecard{slot ? ` · Slot ${slot}` : ""}</span>
-          {name && <span className={s.namePill}>👤 {name}</span>}
+          <span className={s.kicker}><span className={s.dot} /> CAT {examYear || ""} Scorecard{slot ? ` · Slot ${slot}` : ""}</span>
+          {name && <span className={s.namePill}>{name}</span>}
         </div>
         <div className={s.heroBody}>
           <div className={s.ringWrap}>
@@ -147,125 +165,109 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
           <div className={s.secBars}>
             {secs.map((x) => (
               <div key={x.key} className={s.secRow}>
-                <div className={s.secHead}><span>{x.icon} {x.short}</span><b>{x.score}<i>/{x.max}</i></b></div>
+                <div className={s.secHead}><span>{x.short}</span><b>{x.score}<i>/{x.max}</i></b></div>
                 <div className={s.track}><div className={`${s.fill} ${x.score > 0 ? "" : s.fillBad}`} style={{ width: `${Math.max(2, Math.max(0, x.score / x.max) * 100)}%` }} /></div>
               </div>
             ))}
-            <div className={s.chips}>
-              <span className={s.chip}>✅ {result.correct}</span>
-              <span className={s.chip}>❌ {result.wrong}</span>
-              <span className={s.chip}>⏭ {result.unattempted}</span>
-              <span className={`${s.chip} ${s.chipGold}`}>🎯 {accuracy}%</span>
-              {result.pendingKey > 0 && <span className={s.chip}>⏳ {result.pendingKey} awaiting key</span>}
-              {category && <span className={s.chip}>{category}</span>}
+            <div className={k.counts}>
+              {result.correct} correct · {result.wrong} wrong · {result.unattempted} skipped{result.pendingKey > 0 ? ` · ${result.pendingKey} awaiting key` : ""}
             </div>
           </div>
         </div>
-        <div className={s.heroFoot}>
-          {pred.overall.main != null && !pred.overall.below ? (
-            <span className={s.rankPill}>📈 Estimated percentile ~{fmtPct(pred.overall.main)}{pred.overall.low !== pred.overall.high ? ` (range ${fmtPct(pred.overall.low)}–${fmtPct(pred.overall.high)})` : ""}</span>
-          ) : <span className={s.rankPill}>📈 Estimated percentile: below 55 on CAT 2025 data</span>}
-          {rank && count ? <span className={`${s.gate} ${s.gateOk}`}>🏆 #{rank} of {count.toLocaleString("en-IN")}{count >= 10 ? ` · top ${topPct}%` : ""}</span> : null}
+        <div className={k.pctLine}>
+          <div>{pctOk ? (
+            <>Estimated percentile <b>~{fmtPct(pred.overall.main)}</b>{pred.overall.low !== pred.overall.high ? <span> (range {fmtPct(pred.overall.low)} to {fmtPct(pred.overall.high)})</span> : null}</>
+          ) : <>Estimated percentile: below 55 on CAT 2025 data</>}</div>
+          {rank && count >= SHOW_RANK_FROM ? <span className={k.rank}>#{rank} of {count.toLocaleString("en-IN")}</span> : null}
         </div>
       </section>
 
-      {(warnings || []).length > 0 && <div className={s.warn}>⚠️ {warnings.join(" ")}</div>}
+      {(warnings || []).length > 0 && <div className={s.warn}>{warnings.join(" ")}</div>}
 
-      <div className={s.shareRow}>
-        <button type="button" className={s.btnGold} onClick={shareCard} disabled={busy}>{busy ? "Making your card…" : "📸 Share story card"}</button>
-        <button type="button" className={s.btn} onClick={shareWhatsApp} disabled={busy}>💬 WhatsApp + image</button>
-        {uid && <button type="button" className={s.btn} onClick={copy}>🔗 Copy link</button>}
-        {!isReportPage && uid && <a className={s.btn} href={`/cat-report/${uid}`} target="_blank" rel="noopener noreferrer">📄 Report page</a>}
-        <Link className={s.btn} href={callLink}>🎯 IIM calls</Link>
-        <button type="button" className={s.btn} onClick={() => window.print()}>🖨️ PDF</button>
-        {onReset ? <button type="button" className={s.btn} onClick={onReset}>🔄 Check another</button> : <Link className={s.btn} href="/cat-score-calculator">🎓 Check yours</Link>}
+      <div className={k.actions}>
+        <button type="button" className={s.btnGold} onClick={shareWhatsApp} disabled={busy}>Share on WhatsApp</button>
+        <div className={k.moreWrap} data-more>
+          <button type="button" className={s.btn} onClick={() => setMoreOpen(!moreOpen)} aria-expanded={moreOpen}>More <span className={moreOpen ? k.chevOpen : k.chev}>▾</span></button>
+          {moreOpen && (
+            <div className={k.menu} role="menu" onClick={() => setMoreOpen(false)}>
+              {uid && <button type="button" role="menuitem" onClick={copy}>Copy link</button>}
+              <button type="button" role="menuitem" onClick={shareCard}>Download image</button>
+              <button type="button" role="menuitem" onClick={() => window.print()}>Save as PDF</button>
+              {onReset ? <button type="button" role="menuitem" onClick={onReset}>Check another sheet</button> : <Link role="menuitem" href="/cat-score-calculator">Check your own score</Link>}
+            </div>
+          )}
+        </div>
       </div>
       {msg && <div className={s.toast} role="status">{msg}</div>}
 
-      <div className={s.tiles}>
-        <div className={s.tile}><div className={s.tileK}>Best section</div><div className={s.tileV}>{best.icon} {best.short}</div><div className={s.tileS}>{best.score}/{best.max} · {best.accuracy}% accuracy</div></div>
-        <div className={s.tile}><div className={s.tileK}>Lost to negatives</div><div className={s.tileV}>−{mcqWrong}</div><div className={s.tileS}>{mcqWrong} wrong MCQ{mcqWrong === 1 ? "" : "s"} (TITA has no minus)</div></div>
-        <div className={s.tile}><div className={s.tileK}>TITA</div><div className={s.tileV}>{tita.c}<i>/{tita.a}</i></div><div className={s.tileS}>correct of attempted</div></div>
-        <div className={s.tile}><div className={s.tileK}>Attempted</div><div className={s.tileV}>{attempted}<i>/68</i></div><div className={s.tileS}>{Math.round((attempted / 68) * 100)}% of the paper</div></div>
-      </div>
-
-      <h2 className={s.h2}>Estimated percentile 📈</h2>
-      <div className={s.tiles} style={{ gridTemplateColumns: "repeat(4, minmax(0,1fr))" }}>
-        <div className={s.tile} style={{ borderColor: "rgba(249,160,27,0.45)" }}><div className={s.tileK}>Overall</div><div className={s.tileV} style={{ color: "#f9a01b" }}>{pred.overall.below ? "<55" : fmtPct(pred.overall.main)}</div><div className={s.tileS}>{pred.rank ? `≈ rank ${pred.rank.toLocaleString("en-IN")}` : "percentile"}</div></div>
-        {SECTIONS.map((k) => <div key={k.key} className={s.tile}><div className={s.tileK}>{k.short}</div><div className={s.tileV}>{pred[k.key].below ? "<1" : fmtPct(pred[k.key].main)}</div><div className={s.tileS}>sectional</div></div>)}
-      </div>
-      <p className={s.note} style={{ textAlign: "left" }}>Estimated from score-to-percentile data students reported after CAT 2025 (and 2024 for the range). The IIMs normalise each slot, so your official percentile can differ. <Link href={callLink} style={{ color: "#f9a01b", fontWeight: 700 }}>See which IIMs this clears →</Link></p>
-
-      <h2 className={s.h2}>Section deep-dive 🔬</h2>
-      <div className={s.secGrid}>
-        {secs.map((x) => (
-          <div key={x.key} className={s.secCard}>
-            <div className={s.secCardTop}>
-              <div><div className={s.secTitle}>{x.icon} {x.short}</div><div className={s.secName}>{x.name}</div></div>
-              <span className={`${s.badge} ${x.score > 0 ? s.badgeOk : s.badgeNo}`}>{x.score > 0 ? "Positive" : "Not positive"}</span>
+      {takeaways.length > 0 && (
+        <div className={k.takeaways}>
+          {takeaways.slice(0, 3).map((t, i) => (
+            <div key={i} className={`${k.take} ${t.tone === "good" ? k.takeGood : k.takeWarn}`}>
+              <b>{t.head}</b>
+              <span>{t.text}</span>
             </div>
-            <div className={s.secMid}><Donut c={x.correct} w={x.wrong} u={x.unattempted + (x.pending || 0)} /><div className={s.secScore}>{x.score}<i>/{x.max}</i></div></div>
-            <div className={s.secStats}>
-              <span><b className={s.ok}>{x.correct}</b> correct</span>
-              <span><b className={s.no}>{x.wrong}</b> wrong</span>
-              <span><b>{x.unattempted}</b> skipped</span>
-              <span><b>{x.accuracy}%</b> accuracy</span>
-              <span>MCQ <b>{x.mcq?.correct || 0}/{x.mcq?.attempted || 0}</b></span>
-              <span>TITA <b>{x.tita?.correct || 0}/{x.tita?.attempted || 0}</b></span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {result.insights?.length > 0 && (
-        <>
-          <h2 className={s.h2}>What your score tells you 💡</h2>
-          <ul className={s.insights}>
-            {result.insights.map((ins, i) => (
-              <li key={i} className={`${s.insight} ${ins.tone === "good" ? s.insGood : ins.tone === "warn" ? s.insWarn : ""}`}>
-                <span>{ins.tone === "good" ? "✅" : ins.tone === "warn" ? "⚠️" : "📌"}</span><span>{ins.text}</span>
-              </li>
-            ))}
-          </ul>
-        </>
+          ))}
+        </div>
       )}
 
-      {answers.length > 0 && (
-        <>
-          <h2 className={s.h2}>Question-wise map 🧾</h2>
-          <div className={s.card}>
-            {SECTIONS.map((sec) => {
-              const list = answers.filter((a) => a.s === sec.key);
-              if (!list.length) return null;
-              return (
-                <div key={sec.key} className={s.qBlock}>
-                  <div className={s.qLabel}>{sec.short}</div>
-                  <div className={s.qGrid}>
-                    {list.map((a) => (
-                      <button type="button" key={a.n} onClick={() => setOpenQ(openQ === a.n ? null : a.n)} className={`${s.q} ${tileCls(a.r)} ${openQ === a.n ? s.qOpen : ""}`}
-                        aria-label={`Question ${a.n}`}>{a.n}{a.t === "TITA" ? "ᵀ" : ""}</button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-            {openQ != null && (() => { const a = answers.find((x) => x.n === openQ); if (!a) return null; const yours = a.t === "TITA" ? a.g : a.c; return <div className={s.qDetail}>Q{a.n} · {a.t === "TITA" ? "TITA" : "MCQ"} · your answer <b>{yours || "–"}</b> · key <b>{a.r === "N" ? "awaited" : a.k || "–"}</b> · {a.m > 0 ? `+${a.m}` : a.m}</div>; })()}
-            <div className={s.legend}><span><i style={{ background: "#4ade80" }} />Correct +3</span><span><i style={{ background: "#f87171" }} />Wrong (MCQ −1, TITA 0)</span><span><i style={{ background: "rgba(236,232,225,0.25)" }} />Skipped / key awaited</span><span>ᵀ = TITA</span></div>
-          </div>
-        </>
-      )}
-
-      <div className={s.cta}>
+      <div className={k.next}>
         <div>
-          <div className={s.ctaTitle}>Next up{first ? `, ${first}` : ""}: forms, calls and WAT-PI</div>
-          <div className={s.ctaText}>Track every MBA form deadline, check which IIMs your percentile clears, and get a WAT-PI plan from our mentors.</div>
+          <div className={k.nextTitle}>{pctOk ? `Which IIMs does ~${fmtPct(pred.overall.main)} percentile clear?` : "Which IIMs can you still target?"}</div>
+          <a className={k.nextLink} href={WHATSAPP_HELP} target="_blank" rel="noopener noreferrer">Or talk to a mentor on WhatsApp</a>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link className={s.btn} href="/mba-application-forms">🗓️ MBA forms</Link>
-          <a className={s.btnGold} href={WHATSAPP_HELP} target="_blank" rel="noopener noreferrer">📲 WhatsApp us</a>
-        </div>
+        <Link className={s.btnGold} href={callLink}>See my IIM calls</Link>
       </div>
-      <p className={s.note}>Raw score from your response sheet: +3 correct, −1 wrong MCQ, 0 wrong TITA. Official CAT scores are normalised across slots.{city ? ` · 📍 ${city}` : ""}</p>
+
+      <details className={k.full}>
+        <summary className={k.fullSum}>See full analysis <span className={k.chev}>▾</span></summary>
+        <div className={k.fullBody}>
+          <h3 className={k.h3}>Sectional percentile (estimate)</h3>
+          <div className={k.pctGrid}>
+            <div><span>Overall</span><b className={k.gold}>{pred.overall.below ? "<55" : fmtPct(pred.overall.main)}</b>{pred.rank ? <i>≈ rank {pred.rank.toLocaleString("en-IN")}</i> : null}</div>
+            {SECTIONS.map((sec) => <div key={sec.key}><span>{sec.short}</span><b>{pred[sec.key].below ? "<1" : fmtPct(pred[sec.key].main)}</b></div>)}
+          </div>
+          <p className={k.small}>Estimated from score-to-percentile data students reported after CAT 2025 (and 2024 for the range). The IIMs normalise each slot, so your official percentile can differ.</p>
+
+          <h3 className={k.h3}>Section by section</h3>
+          <div className={k.secTable}>
+            <div className={k.secTh}><span>Section</span><span>Score</span><span>Correct</span><span>Wrong</span><span>Skipped</span><span>Accuracy</span></div>
+            {secs.map((x) => (
+              <div key={x.key} className={k.secTr}>
+                <span>{x.short}</span><b>{x.score}/{x.max}</b><span>{x.correct}</span><span>{x.wrong}</span><span>{x.unattempted}</span><span>{x.accuracy}%</span>
+              </div>
+            ))}
+          </div>
+          <p className={k.small}>TITA: {tita.c} correct of {tita.a} attempted · {attempted} of 68 questions attempted.</p>
+
+          {answers.length > 0 && (
+            <>
+              <h3 className={k.h3}>Question-wise map</h3>
+              <div className={s.card}>
+                {SECTIONS.map((sec) => {
+                  const list = answers.filter((a) => a.s === sec.key);
+                  if (!list.length) return null;
+                  return (
+                    <div key={sec.key} className={s.qBlock}>
+                      <div className={s.qLabel}>{sec.short}</div>
+                      <div className={s.qGrid}>
+                        {list.map((a) => (
+                          <button type="button" key={a.n} onClick={() => setOpenQ(openQ === a.n ? null : a.n)} className={`${s.q} ${tileCls(a.r)} ${openQ === a.n ? s.qOpen : ""}`}
+                            aria-label={`Question ${a.n}`}>{a.n}{a.t === "TITA" ? "ᵀ" : ""}</button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+                {openQ != null && (() => { const a = answers.find((x) => x.n === openQ); if (!a) return null; const yours = a.t === "TITA" ? a.g : a.c; return <div className={s.qDetail}>Q{a.n} · {a.t === "TITA" ? "TITA" : "MCQ"} · your answer <b>{yours || "–"}</b> · key <b>{a.r === "N" ? "awaited" : a.k || "–"}</b> · {a.m > 0 ? `+${a.m}` : a.m}</div>; })()}
+                <div className={s.legend}><span><i style={{ background: "#4ade80" }} />Correct +3</span><span><i style={{ background: "#f87171" }} />Wrong (MCQ −1, TITA 0)</span><span><i style={{ background: "rgba(236,232,225,0.25)" }} />Skipped / key awaited</span><span>ᵀ = TITA</span></div>
+              </div>
+            </>
+          )}
+        </div>
+      </details>
+
+      <p className={s.note}>Raw score: +3 correct, −1 wrong MCQ, 0 wrong TITA. Official CAT scores are normalised across slots.</p>
     </div>
   );
 }
