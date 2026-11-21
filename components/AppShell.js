@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 const CatAlertsBell = dynamic(() => import('./CatAlerts'), { ssr: false });
 
 // Score-calculator pages use the ipmcareer.com theme (near-black, gold, Fraunces)
-const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres', '/cat-percentile-predictor', '/iim-call-predictor'];
+const DARK_ROUTES = ['/response', '/jipmat', '/response-v1', '/report', '/jipmat-report', '/iimb-report', '/cat-score-calculator', '/cat-report', '/mba-application-forms', '/cat-exam-day-planner', '/cat-exam-centres', '/cat-percentile-predictor', '/cat-percentile', '/iim-call-predictor'];
 
 // minimal: focused landing pages (Nov 2026, IIMB UG calculator bounce-rate fix) hide the
 // sidebar, the tool links in the top bar and the mobile menu; logo + one CTA only.
@@ -32,7 +32,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack, minim
   }, [router.asPath]);
 
   // CAT pages get their own, separate menu (CAT calculator + Contact Us only)
-  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms' || router.pathname.startsWith('/cat-exam-day-planner') || router.pathname.startsWith('/cat-exam-centres') || router.pathname === '/cat-percentile-predictor' || router.pathname === '/iim-call-predictor';
+  const isCatPage = router.pathname === '/cat-score-calculator' || router.pathname.startsWith('/cat-report') || router.pathname === '/mba-application-forms' || router.pathname.startsWith('/cat-exam-day-planner') || router.pathname.startsWith('/cat-exam-centres') || router.pathname === '/cat-percentile-predictor' || router.pathname === '/cat-percentile' || router.pathname.startsWith('/cat-percentile/') || router.pathname === '/iim-call-predictor';
 
   const handleBack = () => {
     if (canGoBack) {

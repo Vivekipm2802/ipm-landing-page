@@ -6,6 +6,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { CAT_CITIES } from '../lib/catCities';
+import { MARKS, marksPath } from '../lib/catMarks';
 
 const SITE = 'https://register.ipmcareer.com';
 
@@ -51,6 +52,8 @@ export async function getServerSideProps({ res }) {
     urlNode({ loc: `${SITE}/mba-application-forms`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
     urlNode({ loc: `${SITE}/cat-exam-day-planner`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
     urlNode({ loc: `${SITE}/cat-percentile-predictor`, lastmod: today, changefreq: 'weekly', priority: '0.9' }),
+    urlNode({ loc: `${SITE}/cat-percentile`, lastmod: today, changefreq: 'weekly', priority: '0.8' }),
+    ...MARKS.map((m) => urlNode({ loc: `${SITE}${marksPath(m)}`, lastmod: today, changefreq: 'weekly', priority: '0.7' })),
     urlNode({ loc: `${SITE}/iim-call-predictor`, lastmod: today, changefreq: 'weekly', priority: '0.9' }),
     urlNode({ loc: `${SITE}/cat-exam-centres`, lastmod: today, changefreq: 'daily', priority: '0.8' }),
     ...CAT_CITIES.map((c) => urlNode({ loc: `${SITE}/cat-exam-centres/${c.slug}`, lastmod: today, changefreq: 'daily', priority: '0.6' })),

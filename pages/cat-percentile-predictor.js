@@ -8,6 +8,9 @@ import s from "./CatPlanner.module.css";
 import { sendLeadToCrm } from "../lib/crm";
 import { PATTERN, MAX_TOTAL, APPEARED, CURVES, TARGETS, predictAll, marksNeeded } from "../lib/catPercentile";
 import { CATEGORIES, IIMS } from "../lib/iimCallData";
+import { marksInfo, marksPath, fmtPct as fmtP } from "../lib/catMarks";
+
+const QUICK = [50, 60, 70, 80, 90, 100].map((m) => ({ m, p: marksInfo(m).main }));
 
 const SITE = "https://register.ipmcareer.com";
 const PAGE_URL = `${SITE}/cat-percentile-predictor`;
@@ -114,8 +117,8 @@ export default function CatPercentilePredictor() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       </Head>
       <NextSeo
-        title="CAT Percentile Predictor 2026: Marks vs Percentile"
-        description={`Free CAT percentile predictor: enter your VARC, DILR and QA marks and get your expected overall and sectional percentile, from real CAT 2025 and 2024 results. 99 percentile needed about ${marksNeeded(2025, "overall", 99)} marks in CAT 2025.`}
+        title="CAT Percentile Predictor 2026: 60, 70, 80 Marks = ?"
+        description={`In CAT 2025, 60 marks ≈ ${fmtP(QUICK[1].p)}, 70 ≈ ${fmtP(QUICK[2].p)}, 80 ≈ ${fmtP(QUICK[3].p)} percentile, and 99 percentile needed about ${marksNeeded(2025, "overall", 99)} marks. Enter your VARC, DILR, QA marks for overall + sectional percentile. Free, no login.`}
         canonical={PAGE_URL}
         openGraph={{ url: PAGE_URL, title: "CAT Percentile Predictor 2026 | IPM Careers", description: "Your marks to CAT percentile, from real CAT 2025 and 2024 scorecards.", siteName: "IPM Careers" }}
         additionalMetaTags={[
@@ -128,6 +131,11 @@ export default function CatPercentilePredictor() {
           <span className={s.eyebrow}><span className={s.pulse} /> Built on real CAT 2025 and 2024 results</span>
           <h1 className={s.title}>CAT Percentile Predictor. <span className={s.accent}>Enter your marks, see your percentile.</span></h1>
           <p className={s.sub}>Overall and sectional percentile for VARC, DILR and QA, an approximate rank, and the IIMs whose minimum you clear.</p>
+          <p className={s.sub} style={{ marginTop: 10, fontSize: ".9rem" }}>
+            <b style={{ color: "#f4f1ea" }}>Quick answer (CAT 2025 data):</b>{" "}
+            {QUICK.map((q, i) => <span key={q.m}>{i ? " · " : ""}<Link href={marksPath(q.m)} className={s.link}>{q.m} marks ≈ {fmtP(q.p)}</Link></span>)}
+            {" · "}<Link href="/cat-percentile" className={s.link}>every score →</Link>
+          </p>
           <div className={s.stats}>
             <div className={s.stat}><div className={s.statNum}>{marksNeeded(2025, "overall", 99)}</div><div className={s.statLabel}>marks for 99%ile (2025)</div></div>
             <div className={s.stat}><div className={s.statNum}>{marksNeeded(2025, "overall", 95)}</div><div className={s.statLabel}>marks for 95%ile (2025)</div></div>
@@ -223,6 +231,8 @@ export default function CatPercentilePredictor() {
             </table>
           </div>
           <p className={s.note}>Sources: cracku.in CAT score vs percentile (2025 overall and VARC, DILR, QA pages; 2024 page), cross-checked with iquanta.in. Scores are scaled scores out of 204.</p>
+
+          <p>Looking for one score? See <Link href="/cat-percentile" className={s.link}>CAT marks vs percentile for every score from 20 to 130</Link>.</p>
 
           <h2>CAT score vs percentile: every data point (2025 and 2024)</h2>
           <p>All the overall score and percentile pairs in our data, from 99.99 down. Scores are scaled scores out of 204; a dash means no reported data point for that year.</p>
