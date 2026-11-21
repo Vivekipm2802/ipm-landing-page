@@ -1,0 +1,32 @@
+/* Plain header and calm result actions shared by the CAT percentile and IIM call predictors. */
+.head { max-width: 760px; margin: 0 auto; padding: 3rem 1.25rem 1.6rem; text-align: center; }
+.h1 {
+  margin: 0 0 .6rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  color: #fff;
+}
+.sub { margin: 0 auto; max-width: 560px; font-size: 1.02rem; line-height: 1.55; color: #a9a39a; }
+
+.meta { margin-top: 8px; font-size: .92rem; color: #a9a39a; }
+
+.next { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 20px; }
+.cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 48px; padding: 0 22px; border-radius: 12px;
+  background: #f9a01b; color: #0b0b0c; font-weight: 700; font-size: .98rem; text-decoration: none;
+}
+.cta:hover { filter: brightness(1.06); }
+.textLink { color: #cfc9bf; font-size: .92rem; text-decoration: underline; text-underline-offset: 3px; }
+.textLink:hover { color: #f9a01b; }
+
+.quick { font-size: .92rem; line-height: 1.7; color: #a9a39a; }
+.quick b { color: #f4f1ea; }
+
+@media (max-width: 600px) {
+  .head { padding: 2rem 1.1rem 1.2rem; }
+  .next { flex-direction: column; align-items: stretch; text-align: center; }
+}

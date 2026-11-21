@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
 import s from "./CatPlanner.module.css";
+import t from "./CatTools.module.css";
+import LeadPopup from "../components/LeadPopup";
 import { sendLeadToCrm } from "../lib/crm";
 import { PATTERN, MAX_TOTAL, APPEARED, CURVES, TARGETS, predictAll, marksNeeded } from "../lib/catPercentile";
 import { CATEGORIES, IIMS } from "../lib/iimCallData";
@@ -49,6 +51,8 @@ export default function CatPercentilePredictor() {
   const [res, setRes] = useState(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [popup, setPopup] = useState(false);
+  const [popupError, setPopupError] = useState("");
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -77,27 +81,38 @@ export default function CatPercentilePredictor() {
         if (c + w > PATTERN[k].questions) return `${k} has only ${PATTERN[k].questions} questions.`;
       }
     }
+    return "";
+  };
+  const leadError = () => {
     if (lead.name.trim().length < 2) return "Please enter your name.";
-    if (!/^[6-9]\d{9}$/.test(lead.phone)) return "Please enter a valid 10-digit mobile number (without +91 or 0).";
+    if (!/^[6-9]\d{9}$/.test(lead.phone)) return "Please enter a valid 10-digit WhatsApp number (without +91 or 0).";
     if (lead.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(lead.email.trim())) return "Please check your email address.";
     return "";
   };
-
-  const predict = async () => {
+  const start = () => {
     const v = validate();
     if (v) { setError(v); return; }
     setError("");
+    setPopupError("");
+    setPopup(true);
+  };
+
+  const predict = async () => {
+    const v = validate() || leadError();
+    if (v) { setPopupError(v); return; }
+    setPopupError("");
     setBusy(true);
     const r = predictAll(scores);
     setRes(r);
     sendLeadToCrm({ name: lead.name.trim(), phone: lead.phone, email: lead.email.trim() }, "register-cat-percentile-predictor");
-    try {
-      await fetch("/api/cat-predictor-lead", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: "percentile", ...lead, inputs: { mode, ...scores }, outputs: { total: r.total, overall: r.overall.main, VARC: r.VARC.main, DILR: r.DILR.main, QA: r.QA.main }, utm: pickUtm(router.query) }),
-      });
-    } catch {}
     setBusy(false);
+    setPopup(false);
+    try {
+      fetch("/api/cat-predictor-lead", {
+        method: "POST", keepalive: true, headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: "percentile", ...lead, inputs: { mode, ...scores }, outputs: { total: r.total, overall: r.overall.main, VARC: r.VARC.main, DILR: r.DILR.main, QA: r.QA.main }, utm: pickUtm(router.query) }),
+      }).catch(() => {});
+    } catch {}
     setTimeout(() => resRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
 
@@ -127,21 +142,10 @@ export default function CatPercentilePredictor() {
         ]}
       />
       <div className={s.page}>
-        <section className={s.hero}>
-          <span className={s.eyebrow}><span className={s.pulse} /> Built on real CAT 2025 and 2024 results</span>
-          <h1 className={s.title}>CAT Percentile Predictor. <span className={s.accent}>Enter your marks, see your percentile.</span></h1>
-          <p className={s.sub}>Overall and sectional percentile for VARC, DILR and QA, an approximate rank, and the IIMs whose minimum you clear.</p>
-          <p className={s.sub} style={{ marginTop: 10, fontSize: ".9rem" }}>
-            <b style={{ color: "#f4f1ea" }}>Quick answer (CAT 2025 data):</b>{" "}
-            {QUICK.map((q, i) => <span key={q.m}>{i ? " · " : ""}<Link href={marksPath(q.m)} className={s.link}>{q.m} marks ≈ {fmtP(q.p)}</Link></span>)}
-            {" · "}<Link href="/cat-percentile" className={s.link}>every score →</Link>
-          </p>
-          <div className={s.stats}>
-            <div className={s.stat}><div className={s.statNum}>{marksNeeded(2025, "overall", 99)}</div><div className={s.statLabel}>marks for 99%ile (2025)</div></div>
-            <div className={s.stat}><div className={s.statNum}>{marksNeeded(2025, "overall", 95)}</div><div className={s.statLabel}>marks for 95%ile (2025)</div></div>
-            <div className={s.stat}><div className={s.statNum}>Free</div><div className={s.statLabel}>no login</div></div>
-          </div>
-        </section>
+        <header className={t.head}>
+          <h1 className={t.h1}>CAT Percentile Predictor</h1>
+          <p className={t.sub}>Enter your marks. See your overall and sectional percentile, based on real CAT 2025 and 2024 results.</p>
+        </header>
 
         <div className={s.narrow}>
           <div className={`${s.card} ${s.cardGold}`}>
@@ -168,23 +172,8 @@ export default function CatPercentilePredictor() {
             </div>
             <div className={s.totalLine}><span>{mode === "attempts" ? "+3 per correct, −1 per wrong MCQ (wrong TITA: 0)" : "Total out of 204"}</span><b>{Math.round(total * 100) / 100}</b></div>
 
-            <div className={s.gate}>
-              <div className={s.row2}>
-                <label className={s.field}><span className={s.label}>Your name</span><input className={s.input} value={lead.name} onChange={(e) => setLead((x) => ({ ...x, name: e.target.value }))} autoComplete="name" /></label>
-                <label className={s.field}><span className={s.label}>WhatsApp number</span><input className={s.input} value={lead.phone} onChange={(e) => setLead((x) => ({ ...x, phone: e.target.value.replace(/\D/g, "").slice(-10) }))} inputMode="numeric" placeholder="10-digit mobile" /></label>
-              </div>
-              <div className={s.row2} style={{ marginTop: 10 }}>
-                <label className={s.field}><span className={s.label}>Email <span className={s.opt}>(optional)</span></span><input className={s.input} value={lead.email} onChange={(e) => setLead((x) => ({ ...x, email: e.target.value }))} type="email" /></label>
-                <div className={s.field}><span className={s.label}>Category <span className={s.opt}>(for IIM cutoffs)</span></span>
-                  <select className={s.select} value={lead.category} onChange={(e) => setLead((x) => ({ ...x, category: e.target.value }))}>
-                    <option value="">Choose</option>{CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
             {error && <div className={s.err} style={{ marginTop: 12 }}>{error}</div>}
-            <button type="button" className={`${s.btn} ${s.btnFull}`} style={{ marginTop: 14 }} onClick={predict} disabled={busy}>{busy ? "Calculating…" : "Predict my percentile →"}</button>
-            <p className={s.note} style={{ textAlign: "center", marginTop: 8 }}>Free. By continuing you agree to be contacted by IPM Careers about CAT and MBA admissions.</p>
+            <button type="button" className={`${s.btn} ${s.btnFull}`} style={{ marginTop: 14 }} onClick={start}>Predict my percentile</button>
           </div>
 
           {res && (
@@ -194,10 +183,7 @@ export default function CatPercentilePredictor() {
               <div className={s.pctRange}>
                 {res.overall.below ? "Our data starts at the 55th percentile (20 marks in CAT 2025)." : res.overall.low !== res.overall.high ? `Range ${fmtPct(res.overall.low)} to ${fmtPct(res.overall.high)} (CAT 2025 vs CAT 2024 results)` : "Based on CAT 2025 results"}
               </div>
-              <div className={s.pills} style={{ marginTop: 10 }}>
-                <span className={s.pill}>Score {res.total}/204</span>
-                {res.rank && <span className={`${s.pill} ${s.pillMute}`}>{res.overall.above ? `Top ${res.rank.toLocaleString("en-IN")}` : `About rank ${res.rank.toLocaleString("en-IN")}`} of {(APPEARED[2025] / 100000).toFixed(2)} lakh</span>}
-              </div>
+              <div className={t.meta}>Score {res.total}/204{res.rank ? ` · ${res.overall.above ? "top" : "about rank"} ${res.rank.toLocaleString("en-IN")} of ${(APPEARED[2025] / 100000).toFixed(2)} lakh` : ""}</div>
               <div className={s.secGrid}>
                 {SECS.map((k) => (
                   <div key={k} className={s.secCard}>
@@ -207,17 +193,35 @@ export default function CatPercentilePredictor() {
                   </div>
                 ))}
               </div>
-              <div className={s.actions} style={{ marginTop: 16 }}>
-                <Link className={s.action} href={callLink}><span className={s.actionIcon}>🎯</span><span className={s.actionTitle}>Which IIMs do I clear?</span><span className={s.actionSub}>IIM call predictor</span></Link>
-                <a className={s.action} href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"><span className={s.actionIcon}>💬</span><span className={s.actionTitle}>Share on WhatsApp</span><span className={s.actionSub}>With your CAT group</span></a>
-                <Link className={s.action} href="/cat-exam-day-planner"><span className={s.actionIcon}>🧭</span><span className={s.actionTitle}>Exam day planner</span><span className={s.actionSub}>Route, alarms, checklist</span></Link>
+              <div className={t.next}>
+                <Link className={t.cta} href={callLink}>See which IIMs I clear</Link>
+                <a className={t.textLink} href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
               </div>
-              <p className={s.note} style={{ marginTop: 12 }}>An estimate from real past results, not an official IIM conversion. Slot normalisation and this year’s paper decide your actual percentile.</p>
+              <p className={s.note} style={{ marginTop: 14 }}>An estimate from real past results, not an official IIM conversion. Slot normalisation and this year’s paper decide your actual percentile.</p>
             </div>
           )}
         </div>
 
+        <LeadPopup
+          open={popup}
+          onClose={() => setPopup(false)}
+          onSubmit={predict}
+          busy={busy}
+          error={popupError}
+          values={lead}
+          onChange={setLead}
+          sub="Tell us who you are and we will show your percentile right away."
+          cta="Show my percentile"
+          categories={CATEGORIES}
+          categoryLabel="Category (for IIM cutoffs)"
+        />
+
         <article className={s.article}>
+          <p className={t.quick}>
+            <b>Quick answer (CAT 2025 data):</b>{" "}
+            {QUICK.map((q, i) => <span key={q.m}>{i ? " · " : ""}<Link href={marksPath(q.m)} className={s.link}>{q.m} marks ≈ {fmtP(q.p)}</Link></span>)}
+            {" · "}<Link href="/cat-percentile" className={s.link}>every score</Link>
+          </p>
           <h2>CAT 2025 score vs percentile</h2>
           <p>Scaled scores students reported from their CAT 2025 and CAT 2024 scorecards, compiled after the results. A dash means no reported data point for that percentile. Use them as a guide: the IIMs do not publish this table.</p>
           <div className={s.tableWrap}>

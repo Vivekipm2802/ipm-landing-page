@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
 import s from "./CatPlanner.module.css";
+import t from "./CatTools.module.css";
+import LeadPopup from "../components/LeadPopup";
 import { sendLeadToCrm } from "../lib/crm";
 import { IIMS, CATEGORIES, STATUS, evaluate } from "../lib/iimCallData";
 
@@ -40,6 +42,8 @@ export default function IimCallPredictor() {
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [popup, setPopup] = useState(false);
+  const [popupError, setPopupError] = useState("");
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
 
   useEffect(() => {
@@ -69,29 +73,40 @@ export default function IimCallPredictor() {
     }
     const w = num(f.workex);
     if (f.workex !== "" && (w == null || w < 0 || w > 240)) return "Work experience should be in months.";
+    return "";
+  };
+  const leadError = () => {
     if (f.name.trim().length < 2) return "Please enter your name.";
-    if (!/^[6-9]\d{9}$/.test(f.phone)) return "Please enter a valid 10-digit mobile number (without +91 or 0).";
+    if (!/^[6-9]\d{9}$/.test(f.phone)) return "Please enter a valid 10-digit WhatsApp number (without +91 or 0).";
     if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())) return "Please check your email address.";
     return "";
   };
-
-  const run = async () => {
+  const start = () => {
     const v = validate();
     if (v) { setError(v); return; }
     setError("");
+    setPopupError("");
+    setPopup(true);
+  };
+
+  const run = async () => {
+    const v = validate() || leadError();
+    if (v) { setPopupError(v); return; }
+    setPopupError("");
     setBusy(true);
     const snap = { ...f, noCat };
     setShown(snap);
     sendLeadToCrm({ name: f.name.trim(), phone: f.phone, email: f.email.trim() }, "register-iim-call-predictor");
     const p = { category: f.category, gender: f.gender, o: noCat ? null : num(f.o), v: noCat ? null : num(f.v), d: noCat ? null : num(f.d), q: noCat ? null : num(f.q), x: num(f.x), xii: num(f.xii), ug: num(f.ug), workex: num(f.workex) || 0 };
     const out = IIMS.map((i) => evaluate(i, p));
-    try {
-      await fetch("/api/cat-predictor-lead", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: "call", name: f.name, phone: f.phone, email: f.email, category: f.category, inputs: { ...p, degree: f.degree, noCat }, outputs: { clears: out.filter((r) => !["below", "acad", "target"].includes(r.status)).map((r) => r.iim.id) }, utm: pickUtm(router.query) }),
-      });
-    } catch {}
     setBusy(false);
+    setPopup(false);
+    try {
+      fetch("/api/cat-predictor-lead", {
+        method: "POST", keepalive: true, headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: "call", name: f.name, phone: f.phone, email: f.email, category: f.category, inputs: { ...p, degree: f.degree, noCat }, outputs: { clears: out.filter((r) => !["below", "acad", "target"].includes(r.status)).map((r) => r.iim.id) }, utm: pickUtm(router.query) }),
+      }).catch(() => {});
+    } catch {}
     setTimeout(() => resRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
 
@@ -119,16 +134,10 @@ export default function IimCallPredictor() {
         ]}
       />
       <div className={s.page}>
-        <section className={s.hero}>
-          <span className={s.eyebrow}><span className={s.pulse} /> Official criteria from 22 IIMs</span>
-          <h1 className={s.title}>IIM Call Predictor. <span className={s.accent}>See which IIMs your CAT percentile and profile clear.</span></h1>
-          <p className={s.sub}>Checked against each IIM’s own admission policy: minimum cutoffs for your category, academic minimums, last year’s published call cutoffs, and how your profile scores.</p>
-          <div className={s.stats}>
-            <div className={s.stat}><div className={s.statNum}>{IIMS.length}</div><div className={s.statLabel}>IIMs covered</div></div>
-            <div className={s.stat}><div className={s.statNum}>{IIMS.filter((i) => i.status === "official").length}</div><div className={s.statLabel}>from official policies</div></div>
-            <div className={s.stat}><div className={s.statNum}>Free</div><div className={s.statLabel}>no login</div></div>
-          </div>
-        </section>
+        <header className={t.head}>
+          <h1 className={t.h1}>IIM Call Predictor</h1>
+          <p className={t.sub}>Enter your CAT percentile and profile. See which of {IIMS.length} IIMs' official cutoffs you clear.</p>
+        </header>
 
         <div className={s.narrow}>
           <div className={`${s.card} ${s.cardGold}`}>
@@ -160,16 +169,8 @@ export default function IimCallPredictor() {
                 <div className={s.field}><span className={s.label}>Graduation stream</span><select className={s.select} value={f.degree} onChange={set("degree")}><option value="">Choose</option><option value="engg">Engineering</option><option value="commerce">Commerce / Economics / BBA</option><option value="science">Science</option><option value="arts">Arts / Humanities / Law</option><option value="ca">CA / CS / CMA</option><option value="other">Other</option></select></div>
                 <label className={s.field}><span className={s.label}>Full-time work-ex (months)</span><input className={s.input} inputMode="numeric" value={f.workex} onChange={(e) => setF((x) => ({ ...x, workex: e.target.value.replace(/\D/g, "") }))} placeholder="0 if fresher" /></label>
               </div>
-              <div className={s.gate} style={{ marginTop: 4 }}>
-                <div className={s.row2}>
-                  <label className={s.field}><span className={s.label}>Your name</span><input className={s.input} value={f.name} onChange={set("name")} autoComplete="name" /></label>
-                  <label className={s.field}><span className={s.label}>WhatsApp number</span><input className={s.input} value={f.phone} onChange={(e) => setF((x) => ({ ...x, phone: e.target.value.replace(/\D/g, "").slice(-10) }))} inputMode="numeric" placeholder="10-digit mobile" /></label>
-                </div>
-                <label className={s.field} style={{ marginTop: 10 }}><span className={s.label}>Email <span className={s.opt}>(optional)</span></span><input className={s.input} value={f.email} onChange={set("email")} type="email" /></label>
-              </div>
               {error && <div className={s.err}>{error}</div>}
-              <button type="button" className={`${s.btn} ${s.btnFull}`} onClick={run} disabled={busy}>{busy ? "Checking 22 IIMs…" : noCat ? "Show what each IIM needs →" : "Check my IIM calls →"}</button>
-              <p className={s.note} style={{ textAlign: "center", margin: 0 }}>Free. By continuing you agree to be contacted by IPM Careers about CAT and MBA admissions.</p>
+              <button type="button" className={`${s.btn} ${s.btnFull}`} onClick={start}>{noCat ? "Show what each IIM needs" : "Check my IIM calls"}</button>
             </div>
           </div>
 
@@ -179,13 +180,7 @@ export default function IimCallPredictor() {
                 <div className={s.resLabel}>{shown.noCat ? "Your targets" : "Your result"}</div>
                 <div className={s.pctBig}>{shown.noCat ? IIMS.length : `${clears.length}/${IIMS.length}`}</div>
                 <div className={s.pctRange}>{shown.noCat ? `IIMs, with the minimum percentile each needs from a ${CATEGORIES.find((c) => c.key === shown.category)?.label} ${shown.gender === "male" ? "male" : "female/transgender"} candidate` : "IIMs whose official minimum cutoffs you clear"}</div>
-                {!shown.noCat && (
-                  <div className={s.summaryGrid}>
-                    <div className={s.secCard}><div className={s.secPct}>{results.filter((r) => r.status === "aboveCall").length}</div><div className={s.secSub}>above last year’s JAP call cutoff</div></div>
-                    <div className={s.secCard}><div className={s.secPct}>{results.filter((r) => r.status === "comfortable").length}</div><div className={s.secSub}>clear the minimum by 5+ points</div></div>
-                    <div className={s.secCard}><div className={s.secPct}>{results.filter((r) => r.status === "below" || r.status === "acad").length}</div><div className={s.secSub}>below a minimum</div></div>
-                  </div>
-                )}
+                {!shown.noCat && (() => { const above = results.filter((r) => r.status === "aboveCall").length; return above > 0 ? <div className={t.meta}>{above} of these are above last year's published call cutoff</div> : null; })()}
                 <p className={s.note} style={{ marginTop: 12 }}>Clearing a minimum makes you eligible, not shortlisted. Most IIMs then rank eligible candidates on a composite of CAT, academics, work-ex and diversity.</p>
               </div>
 
@@ -201,14 +196,25 @@ export default function IimCallPredictor() {
                 {list.map((r) => <IimCard key={r.iim.id} r={r} p={profile} />)}
               </div>
 
-              <div className={s.actions} style={{ marginTop: 16 }}>
-                <a className={s.action} href={`https://wa.me/?text=${encodeURIComponent(wa)}`} target="_blank" rel="noopener noreferrer"><span className={s.actionIcon}>💬</span><span className={s.actionTitle}>Share on WhatsApp</span><span className={s.actionSub}>With your CAT group</span></a>
-                <Link className={s.action} href="/mba-application-forms"><span className={s.actionIcon}>🗓️</span><span className={s.actionTitle}>MBA forms & deadlines</span><span className={s.actionSub}>Non-IIM forms to fill</span></Link>
-                <Link className={s.action} href="/cat-exam-day-planner"><span className={s.actionIcon}>🧭</span><span className={s.actionTitle}>Exam day planner</span><span className={s.actionSub}>Route, alarms, checklist</span></Link>
+              <div className={t.next}>
+                <a className={t.cta} href={`https://wa.me/?text=${encodeURIComponent(wa)}`} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
+                <Link className={t.textLink} href="/mba-application-forms">MBA forms and deadlines</Link>
               </div>
             </div>
           )}
         </div>
+
+        <LeadPopup
+          open={popup}
+          onClose={() => setPopup(false)}
+          onSubmit={run}
+          busy={busy}
+          error={popupError}
+          values={f}
+          onChange={setF}
+          sub={`Tell us who you are and we will check all ${IIMS.length} IIMs for you right away.`}
+          cta={noCat ? "Show what each IIM needs" : "Show my IIM calls"}
+        />
 
         <article className={s.article}>
           <h2>Minimum CAT percentile for each IIM (General category)</h2>
@@ -293,21 +299,22 @@ function IimCard({ r, p }) {
       <div className={s.iimTop}>
         <div>
           <div className={s.iimName}>{iim.name}</div>
-          <div className={s.iimMeta}>{iim.process ? `${iim.process} · ` : ""}{iim.policy} policy · {iim.status === "official" ? "official" : "reported, not verified"}</div>
+          <div className={s.iimMeta}>{iim.policy} policy{iim.status === "official" ? "" : " · reported, not verified"}</div>
         </div>
         <span className={`${s.tone} ${TONE[st.tone]}`}>{st.label}</span>
       </div>
       <div className={s.minRow}>{chip("o", "Overall")}{chip("v", "VARC")}{chip("d", "DILR")}{chip("q", "QA")}</div>
       {r.acadFails?.length > 0 && <div className={s.warn}>Academic minimum: {r.acadFails.join(", ")}.</div>}
-      {call && <p className={s.note} style={{ marginTop: 8 }}>Last year’s published call cutoff for your category: <b style={{ color: "#f4f1ea" }}>{call.o}</b> overall{call.v ? `, ${call.v} in each section` : ""}.</p>}
-      {profile && (
-        <p className={s.note} style={{ marginTop: 8 }}>
-          {profile.label}: <b style={{ color: "#ffbe5c" }}>{profile.total}/{profile.max}</b> ({profile.parts.map(([l, v, mx]) => `${l} ${v}/${mx}`).join(", ")})
-        </p>
-      )}
-      {iim.fact && <p className={s.note} style={{ marginTop: 6 }}>{iim.fact}</p>}
       <details className={s.iimMore}>
-        <summary>How {iim.name} shortlists</summary>
+        <summary>Details</summary>
+        {call && <p className={s.note} style={{ marginTop: 8 }}>Last year’s published call cutoff for your category: <b style={{ color: "#f4f1ea" }}>{call.o}</b> overall{call.v ? `, ${call.v} in each section` : ""}.</p>}
+        {profile && (
+          <p className={s.note} style={{ marginTop: 8 }}>
+            {profile.label}: <b style={{ color: "#ffbe5c" }}>{profile.total}/{profile.max}</b> ({profile.parts.map(([l, v, mx]) => `${l} ${v}/${mx}`).join(", ")})
+          </p>
+        )}
+        {iim.fact && <p className={s.note} style={{ marginTop: 6 }}>{iim.fact}</p>}
+        <p className={s.note} style={{ marginTop: 10, color: "#cfc9bf", fontWeight: 600 }}>How {iim.name} shortlists</p>
         <div className={s.weights}>
           {iim.shortlist.map(([l, w]) => (
             <div key={l} className={s.wRow}><span>{l}</span>{w != null ? <><div className={s.wBar}><div className={s.wFill} style={{ width: `${w}%` }} /></div><span>{w}</span></> : <><span className={s.opt}>weights not published</span><span /></>}</div>
