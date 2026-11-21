@@ -318,7 +318,7 @@ export default function CatScoreCalculator() {
             </div>
 
             <form className={c.card} onSubmit={start} noValidate>
-              {count > 0 && (
+              {count >= 25 && (
                 <div className={c.counter}>
                   <span className={c.counterLabel}>Total submissions</span>
                   <span className={c.counterNum}>{count.toLocaleString("en-IN")}</span>
@@ -419,7 +419,7 @@ export default function CatScoreCalculator() {
           </div>
         )}
 
-        {leaderboard.length > 0 && (
+        {leaderboard.length >= 5 && (
           <section className={c.board}>
             <h2 className={c.boardTitle}>Top scores so far</h2>
             <div className={c.boardList}>
