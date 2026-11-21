@@ -8,6 +8,7 @@ import AppShell from "../components/AppShell";
 import CatScorecard from "../components/CatScorecard";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
+import c from "./CatCalc.module.css";
 import { SECTIONS, MAX_SCORE, TOTAL_QUESTIONS, buildCatInsights } from "../lib/catScoring";
 
 const PAGE_URL = "https://register.ipmcareer.com/cat-score-calculator";
@@ -86,8 +87,12 @@ export default function CatScoreCalculator() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [boardLoading, setBoardLoading] = useState(true);
   const [count, setCount] = useState(0);
-  const [stepsOpen, setStepsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalError, setModalError] = useState("");
+  const [linkFailed, setLinkFailed] = useState(false);
   const fileInputRef = useRef(null);
+  const nameRef = useRef(null);
   const resultRef = useRef(null);
 
   const fetchLeaderboard = async () => {
@@ -148,28 +153,52 @@ export default function CatScoreCalculator() {
     if (e.type === "dragleave") setDragActive(false);
   };
 
-  const validate = () => {
-    if (form.name.trim().length < 2) return "Please enter your name.";
-    if (!/^[6-9]\d{9}$/.test(form.mobile)) return "Please enter a valid 10-digit mobile number (without +91 or 0).";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) return "Please enter a valid email address.";
-    if (!form.category) return "Please select your category.";
-    if (mode === "link") {
-      let u;
-      try { u = new URL(sheetUrl.trim()); } catch { return "Please paste the full response sheet link (it starts with https://cdn.digialm.com/...)."; }
-      if (!/(^|\.)digialm\.com$/i.test(u.hostname)) return "That is not a CAT response sheet link. It should start with https://cdn.digialm.com/";
-    } else if (!file) {
-      return "Please upload your saved response sheet (.html) file.";
-    }
+  const linkError = () => {
+    if (mode === "file") return file ? "" : "Please choose your saved response sheet (.html) file.";
+    const raw = sheetUrl.trim();
+    if (!raw) return "Paste your CAT response sheet link first.";
+    let u;
+    try { u = new URL(raw); } catch { return "Please paste the full link. It starts with https://cdn.digialm.com/ and ends with .html"; }
+    if (!/(^|\.)digialm\.com$/i.test(u.hostname)) return "That is not a CAT response sheet link. It should start with https://cdn.digialm.com/";
     return "";
   };
 
-  const analyse = async () => {
-    const v = validate();
+  const detailsError = () => {
+    if (form.name.trim().length < 2) return "Please enter your name.";
+    if (!/^[6-9]\d{9}$/.test(form.mobile)) return "Please enter a valid 10-digit WhatsApp number (without +91 or 0).";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) return "Please enter a valid email address.";
+    if (!form.category) return "Please pick your category.";
+    return "";
+  };
+
+  // Step 1: link only. Step 2: details in a popup.
+  const start = (e) => {
+    e && e.preventDefault();
+    const v = linkError();
     if (v) { setError(v); return; }
+    setError("");
+    setModalError("");
+    setModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (!modalOpen) return undefined;
+    const t = setTimeout(() => nameRef.current?.focus(), 60);
+    const esc = (e) => { if (e.key === "Escape" && !submitting) setModalOpen(false); };
+    window.addEventListener("keydown", esc);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { clearTimeout(t); window.removeEventListener("keydown", esc); document.body.style.overflow = prev; };
+  }, [modalOpen, submitting]);
+
+  const analyse = async (e) => {
+    e && e.preventDefault();
+    const v = detailsError();
+    if (v) { setModalError(v); return; }
     setSubmitting(true);
+    setModalError("");
     // CRM copy of this lead (fire-and-forget, never blocks the form)
     sendLeadToCrm({ name: form?.name, phone: form?.mobile, email: form?.email, city: form?.city }, "register-cat-score-calculator");
-    setError("");
     try {
       const payload = {
         name: form.name.trim(),
@@ -184,12 +213,17 @@ export default function CatScoreCalculator() {
       const res = await axios.post("/api/cat-score", payload);
       const d = res.data || {};
       setResult({ ...d, name: payload.name, category: payload.category, insights: buildCatInsights(d.result) });
+      setModalOpen(false);
+      try { window.gtag && window.gtag("event", "generate_lead", { form: "cat_score_calculator" }); } catch {}
       if (d.uid) toast.success("Scorecard ready!");
       else toast.error("Score calculated, but we could not save your report link. Try again in a minute.");
       fetchLeaderboard();
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    } catch (e) {
-      setError(e?.response?.data?.error || "Something went wrong. Check the link, or switch to 'Upload file' and upload the saved page.");
+    } catch (err) {
+      // Problems with the link are fixed on the main card, so close the popup and show it there
+      setModalOpen(false);
+      setLinkFailed(true);
+      setError(err?.response?.data?.error || "We could not read that link. Check it and try again, or upload the saved page instead.");
     } finally {
       setSubmitting(false);
     }
@@ -198,6 +232,8 @@ export default function CatScoreCalculator() {
   const reset = () => {
     setResult(null);
     setFile(null);
+    setMode("link");
+    setError("");
     setSheetUrl("");
     setForm({ name: "", mobile: "", email: "", category: "", city: "" });
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -215,7 +251,6 @@ export default function CatScoreCalculator() {
     catch { toast.error("Could not copy. Long-press the link to copy."); }
   };
 
-  const top3 = leaderboard.slice(0, 3);
 
   return (
     <AppShell activePage="/cat-score-calculator" pageTitle="CAT 2026 Score Calculator">
@@ -243,254 +278,162 @@ export default function CatScoreCalculator() {
         ]}
       />
 
-      <div className={styles.page}>
-        {/* ── Hero ── */}
-        <div className={styles.hero}>
-          <div className={`${styles.heroGlow} ${styles.heroGlow1}`}></div>
-          <div className={`${styles.heroGlow} ${styles.heroGlow2}`}></div>
-          <div className={`${styles.heroGlow} ${styles.heroGlow3}`}></div>
-          <div className={styles.heroEyebrow}>
-            <span className={styles.heroEyebrowDot}></span>
-            CAT 2026 · 29 November 2026
+      <div className={`${styles.page} ${c.page}`}>
+        {r ? (
+          <div className={c.resultWrap} ref={resultRef} style={{ scrollMarginTop: 90 }}>
+            <CatScorecard
+              name={result.candidate?.name || result.name}
+              category={result.category}
+              city={form.city}
+              slot={result.candidate?.slot}
+              examYear={result.examYear}
+              result={{ ...r, insights: result.insights }}
+              uid={result.uid}
+              rank={result.rank}
+              count={result.count}
+              warnings={result.warnings}
+              onReset={reset}
+            />
           </div>
-          <h1 className={styles.heroTitle}>
-            CAT 2026 Score Calculator.{" "}
-            <span className={styles.heroTitleAccent}>Paste your response sheet link, get your score in seconds.</span>
-          </h1>
-          <p className={styles.heroSubtitle}>
-            VARC, DILR and QA scores out of 204, MCQ and TITA accuracy, and a report link you can share.
-          </p>
-          <div className={styles.socialProof}>
-            {count > 0 && (
-              <>
-                <div className={styles.proofStat}><span className={styles.proofStatNum}>{count.toLocaleString("en-IN")}{count >= 10 ? "+" : ""}</span> {count === 1 ? "scorecard" : "scorecards"}</div>
-                <div className={styles.proofDot}></div>
-              </>
-            )}
-            <div className={styles.proofStat}><span className={styles.proofStatNum}>100%</span> free</div>
-            <div className={styles.proofDot}></div>
-            <div className={styles.proofStat}>No login needed</div>
-          </div>
-        </div>
+        ) : (
+          <section className={c.hero}>
+            <div className={c.left}>
+              <div className={c.eyebrow}>CAT 2026 · Free · No login</div>
+              <h1 className={c.title}>CAT 2026 Score Calculator</h1>
+              <p className={c.sub}>Paste your response sheet link. Get your VARC, DILR, QA and total score out of {MAX_SCORE} in under a minute.</p>
+              <ol className={c.steps}>
+                <li className={c.step}>
+                  <span className={c.stepNum}>1</span>
+                  <div className={c.stepText}><b>Open your response sheet</b><span>Log in at <a href={CAT_SITE} target="_blank" rel="noopener noreferrer">iimcat.ac.in</a> once it is released</span></div>
+                </li>
+                <li className={c.step}>
+                  <span className={c.stepNum}>2</span>
+                  <div className={c.stepText}><b>Copy the link</b><span>It starts with cdn.digialm.com and ends with .html</span></div>
+                </li>
+                <li className={c.step}>
+                  <span className={c.stepNum}>3</span>
+                  <div className={c.stepText}><b>Paste it here</b><span>Your section-wise score and report are ready in seconds</span></div>
+                </li>
+              </ol>
+            </div>
 
-        {/* ── Quick facts ── */}
-        <div className={ui.factStrip}>
-          <div className={ui.fact}><div className={ui.factNum}>{TOTAL_QUESTIONS}</div><div className={ui.factLabel}>Questions</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>120</div><div className={ui.factLabel}>Minutes</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>{MAX_SCORE}</div><div className={ui.factLabel}>Max marks</div></div>
-          <div className={ui.fact}><div className={ui.factNum}>+3 / -1</div><div className={ui.factLabel}>MCQ marking (TITA: no minus)</div></div>
-        </div>
+            <form className={c.card} onSubmit={start} noValidate>
+              {count > 0 && (
+                <div className={c.counter}>
+                  <span className={c.counterLabel}>Total submissions</span>
+                  <span className={c.counterNum}>{count.toLocaleString("en-IN")}</span>
+                </div>
+              )}
 
-        <div className={ui.layout}>
-          <div className={ui.mainCol}>
-            {top3.length > 0 && (
-              <div className={styles.topperRow}>
-                {top3.map((t, i) => (
-                  <div key={i} className={styles.topperBadge}>
-                    <span className={`${styles.topperRank} ${i === 0 ? styles.topperRank1 : i === 1 ? styles.topperRank2 : styles.topperRank3}`}>{i + 1}</span>
-                    {t.name}
-                    <span className={styles.topperScore}>{t.total}</span>
-                  </div>
+              {mode === "link" ? (
+                <>
+                  <label className={c.label} htmlFor="cat-url">Paste your response sheet URL</label>
+                  <input
+                    id="cat-url"
+                    className={c.input}
+                    type="url"
+                    inputMode="url"
+                    autoComplete="off"
+                    placeholder="https://cdn.digialm.com/..."
+                    value={sheetUrl}
+                    onChange={(e) => { setError(""); setLinkFailed(false); setSheetUrl(e.target.value); }}
+                  />
+                </>
+              ) : (
+                <>
+                  <span className={c.label}>Saved response sheet</span>
+                  <button type="button" className={c.fileBtn} onClick={() => fileInputRef.current?.click()}>
+                    {file ? `✅ ${file.name}` : "Choose the saved .html file"}
+                  </button>
+                  <input ref={fileInputRef} type="file" accept=".html,.htm,text/html" style={{ display: "none" }} onChange={(e) => acceptFile(e.target.files?.[0])} />
+                  <button type="button" className={c.textBtn} onClick={() => { setMode("link"); setFile(null); setError(""); }}>Use the link instead</button>
+                </>
+              )}
+
+              {error && (
+                <div className={c.error} role="alert">
+                  {error}
+                  {mode === "link" && linkFailed && (
+                    <button type="button" className={c.textBtn} onClick={() => { setMode("file"); setError(""); }}>Upload the saved page instead</button>
+                  )}
+                </div>
+              )}
+
+              <button type="submit" className={c.cta}>Calculate my score</button>
+
+              <button type="button" className={c.help} onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen}>
+                Where do I find the link? <span className={helpOpen ? c.chevOpen : c.chev}>▾</span>
+              </button>
+              {helpOpen && (
+                <div className={c.helpBody} id="how-to">
+                  <p>Open the response sheet after logging in at iimcat.ac.in and copy the address from the browser bar.</p>
+                  <p>If it opens inside the portal, press <kbd>Ctrl</kbd> + <kbd>U</kbd>, search for <kbd>digialm</kbd> and copy the link ending in .html.</p>
+                  <p>PDFs and screenshots do not work.</p>
+                </div>
+              )}
+
+              <p className={c.fine}>Free. Your phone and email are never shown publicly.</p>
+            </form>
+          </section>
+        )}
+
+        {/* ── Details popup ── */}
+        {modalOpen && (
+          <div className={c.back} role="dialog" aria-modal="true" aria-labelledby="cat-modal-title" onClick={(e) => { if (e.target === e.currentTarget && !submitting) setModalOpen(false); }}>
+            <form className={c.modal} onSubmit={analyse} noValidate>
+              <button type="button" className={c.x} onClick={() => setModalOpen(false)} disabled={submitting} aria-label="Close">×</button>
+              <h2 id="cat-modal-title" className={c.modalTitle}>Almost there</h2>
+              <p className={c.modalSub}>Tell us who you are so we can save your scorecard and send you the report link.</p>
+
+              <label className={c.label} htmlFor="cat-name">Full name</label>
+              <input id="cat-name" ref={nameRef} className={c.input} type="text" placeholder="Your full name" value={form.name} onChange={update("name")} autoComplete="name" />
+
+              <div className={c.row}>
+                <div>
+                  <label className={c.label} htmlFor="cat-mobile">WhatsApp number</label>
+                  <input id="cat-mobile" className={c.input} type="tel" inputMode="numeric" placeholder="10-digit number" value={form.mobile} onChange={update("mobile")} autoComplete="tel-national" />
+                </div>
+                <div>
+                  <label className={c.label} htmlFor="cat-email">Email</label>
+                  <input id="cat-email" className={c.input} type="email" placeholder="you@email.com" value={form.email} onChange={update("email")} autoComplete="email" />
+                </div>
+              </div>
+
+              <span className={c.label}>Category</span>
+              <div className={c.chips} role="radiogroup" aria-label="Category">
+                {CATEGORIES.map((cat) => (
+                  <button key={cat} type="button" role="radio" aria-checked={form.category === cat} className={`${c.chip} ${form.category === cat ? c.chipOn : ""}`} onClick={() => { setModalError(""); setForm((prev) => ({ ...prev, category: cat })); }}>{cat}</button>
                 ))}
               </div>
-            )}
 
-            {/* ── Result ── */}
-            {r && (
-              <div ref={resultRef} style={{ scrollMarginTop: 90 }}>
-                <CatScorecard
-                  name={result.candidate?.name || result.name}
-                  category={result.category}
-                  city={form.city}
-                  slot={result.candidate?.slot}
-                  examYear={result.examYear}
-                  result={{ ...r, insights: result.insights }}
-                  uid={result.uid}
-                  rank={result.rank}
-                  count={result.count}
-                  warnings={result.warnings}
-                  onReset={reset}
-                />
-              </div>
-            )}
+              <label className={c.label} htmlFor="cat-city">City <span className={c.optional}>(optional)</span></label>
+              <input id="cat-city" className={c.input} type="text" placeholder="e.g. Delhi" value={form.city} onChange={update("city")} autoComplete="address-level2" />
 
-            {/* ── Form ── */}
-            {!r && (
-              <div className={styles.formCard}>
-                <h2 className={styles.formTitle}>Calculate your CAT 2026 score</h2>
-                <div className={styles.formSubtitle}>Fill your details, then paste your response sheet link or upload the saved page</div>
+              {modalError && <div className={c.error} role="alert">{modalError}</div>}
 
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="cat-name">Full Name</label>
-                    <input id="cat-name" className={styles.formInput} type="text" placeholder="Your full name" value={form.name} onChange={update("name")} autoComplete="name" />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="cat-mobile">Mobile</label>
-                    <input id="cat-mobile" className={styles.formInput} type="tel" inputMode="numeric" placeholder="10-digit number" value={form.mobile} onChange={update("mobile")} autoComplete="tel-national" />
-                  </div>
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="cat-email">Email</label>
-                    <input id="cat-email" className={styles.formInput} type="email" placeholder="you@email.com" value={form.email} onChange={update("email")} autoComplete="email" />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel} htmlFor="cat-category">Category</label>
-                    <select id="cat-category" className={styles.formSelect} value={form.category} onChange={update("category")}>
-                      <option value="">Select category</option>
-                      {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={`${styles.formGroup} ${styles.formGroupFull}`}>
-                    <label className={styles.formLabel} htmlFor="cat-city">City</label>
-                    <input id="cat-city" className={styles.formInput} type="text" placeholder="e.g. Delhi" value={form.city} onChange={update("city")} autoComplete="address-level2" />
-                  </div>
-                </div>
-
-                <div className={ui.tabs} style={{ marginTop: 4, marginBottom: 12 }}>
-                  <button type="button" className={`${ui.tab} ${mode === "link" ? ui.tabActive : ""}`} onClick={() => { setMode("link"); setError(""); }}>🔗 Paste link</button>
-                  <button type="button" className={`${ui.tab} ${mode === "file" ? ui.tabActive : ""}`} onClick={() => { setMode("file"); setError(""); }}>📄 Upload file</button>
-                </div>
-
-                {mode === "link" ? (
-                  <div className={styles.formGroup} style={{ marginBottom: 12 }}>
-                    <label className={styles.formLabel} htmlFor="cat-url">CAT Response Sheet Link</label>
-                    <input
-                      id="cat-url"
-                      className={styles.formInput}
-                      type="url"
-                      inputMode="url"
-                      placeholder="https://cdn.digialm.com/per/g28/pub/.../....html"
-                      value={sheetUrl}
-                      onChange={(e) => { setError(""); setSheetUrl(e.target.value); }}
-                    />
-                    <span className={styles.urlHint}>
-                      Open your response sheet after logging in at iimcat.ac.in and copy the link.{" "}
-                      <a href="#how-to" onClick={() => setStepsOpen(true)} style={{ color: "#f9a01b", fontWeight: 600 }}>How?</a>
-                    </span>
-                  </div>
-                ) : (
-                  <div className={styles.formGroup} style={{ marginBottom: 12 }}>
-                    <span className={styles.formLabel}>Response Sheet File</span>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      className={`${ui.uploadBox} ${dragActive ? ui.uploadBoxActive : ""} ${file ? ui.uploadBoxDone : ""}`}
-                      onClick={() => fileInputRef.current?.click()}
-                      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && fileInputRef.current?.click()}
-                      onDragEnter={onDrag}
-                      onDragOver={onDrag}
-                      onDragLeave={onDrag}
-                      onDrop={onDrop}
-                    >
-                      <div className={ui.uploadIcon}>{file ? "✅" : "📄"}</div>
-                      <div className={ui.uploadTitle}>{file ? file.name : "Tap to upload or drag your HTML file here"}</div>
-                      <div className={ui.uploadSub}>{file ? `${(file.size / 1024).toFixed(1)} KB · tap to change` : ".html or .htm, up to 4 MB"}</div>
-                      {!file && <span className={ui.uploadWarn}>NOT A PDF</span>}
-                      <input ref={fileInputRef} type="file" accept=".html,.htm,text/html" style={{ display: "none" }} onChange={(e) => acceptFile(e.target.files?.[0])} />
-                    </div>
-                  </div>
-                )}
-
-                <button className={`${styles.generateBtn} ${submitting ? styles.generateBtnLoading : ""}`} onClick={analyse} disabled={submitting}>
-                  {submitting ? "Reading your response sheet..." : "🎯 Calculate My CAT Score"}
-                </button>
-
-                {error && (
-                  <div className={styles.errorMsg} role="alert">
-                    <span className={styles.errorIcon}>⚠️</span>
-                    {error}
-                  </div>
-                )}
-                <div className={ui.privacyNote}>🔒 Your phone and email are never shown publicly.</div>
-              </div>
-            )}
-
-            {/* ── How-to ── */}
-            <div className={styles.stepsCard} id="how-to" style={{ scrollMarginTop: 90 }}>
-              <div className={styles.stepsToggle} onClick={() => setStepsOpen(!stepsOpen)}>
-                <h2 className={styles.stepsTitle} style={{ margin: 0 }}>📖 How to get your CAT 2026 response sheet link</h2>
-                <div className={`${styles.stepsArrow} ${stepsOpen ? styles.stepsArrowOpen : ""}`}>▼</div>
-              </div>
-              {stepsOpen && (
-                <div className={styles.stepsList}>
-                  <div className={styles.step}>
-                    <div className={styles.stepNum}>1</div>
-                    <div className={styles.stepText}>
-                      Log in at <a className={styles.stepLink} href={CAT_SITE} target="_blank" rel="noopener noreferrer">iimcat.ac.in</a> with your user ID and password once the response sheet is released.
-                    </div>
-                  </div>
-                  <div className={styles.step}>
-                    <div className={styles.stepNum}>2</div>
-                    <div className={styles.stepText}>
-                      Open the <span className={styles.stepBold}>Response Sheet</span>. It opens from the TCS iON server, so the address starts with{" "}
-                      <span className={ui.kbd}>https://cdn.digialm.com/</span> and ends with <span className={ui.kbd}>.html</span>
-                    </div>
-                  </div>
-                  <div className={styles.step}>
-                    <div className={styles.stepNum}>3</div>
-                    <div className={styles.stepText}>
-                      Copy the link from the address bar and paste it in the <span className={styles.stepBold}>Paste link</span> tab above.
-                      If the sheet opens inside the portal, press <span className={ui.kbd}>Ctrl</span> + <span className={ui.kbd}>U</span>, search for{" "}
-                      <span className={ui.kbd}>digialm</span> and copy the link that ends with .html.
-                    </div>
-                  </div>
-                  <div className={styles.step}>
-                    <div className={styles.stepNum}>4</div>
-                    <div className={styles.stepText}>
-                      <span className={styles.stepBold}>Link not working?</span> Press <span className={ui.kbd}>Ctrl</span> + <span className={ui.kbd}>S</span> (or Download on mobile),
-                      save as <span className={styles.stepBold}>Webpage, HTML</span> and use the <span className={styles.stepBold}>Upload file</span> tab. PDFs and screenshots do not work.
-                    </div>
-                  </div>
-                  <div className={styles.step}>
-                    <div className={styles.stepNum}>5</div>
-                    <div className={styles.stepText}>Tap <span className={styles.stepBold}>Calculate My CAT Score</span>. Your VARC, DILR, QA and total appear in seconds.</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
+              <button type="submit" className={c.cta} disabled={submitting}>
+                {submitting ? "Reading your response sheet..." : "Show my score"}
+              </button>
+              <p className={c.fine}>Your phone and email are never shown publicly.</p>
+            </form>
           </div>
+        )}
 
-          {/* ── Side column ── */}
-          <aside className={ui.sideCol}>
-            <div className={ui.board}>
-              <h2 className={ui.boardTitle}>🏆 CAT 2026 Leaderboard (Top 10)</h2>
-              {boardLoading ? (
-                <>
-                  <div className={ui.skeleton}></div>
-                  <div className={ui.skeleton}></div>
-                  <div className={ui.skeleton}></div>
-                </>
-              ) : leaderboard.length === 0 ? (
-                <div className={ui.boardEmpty}>No scores yet. Be the first!</div>
-              ) : (
-                leaderboard.map((s, i) => (
-                  <div key={i} className={ui.boardRow}>
-                    <span className={`${ui.boardRank} ${i === 0 ? ui.boardRank1 : i === 1 ? ui.boardRank2 : i === 2 ? ui.boardRank3 : ""}`}>{i + 1}</span>
-                    <span className={ui.boardName}>
-                      {s.name}
-                      {s.city && <span className={ui.boardCity}>{s.city}</span>}
-                    </span>
-                    <span className={ui.boardScore} title={s.provisional ? "Provisional: part of the answer key is awaited" : undefined}>{s.total}{s.provisional ? "*" : ""}</span>
-                  </div>
-                ))
-              )}
-              <div className={ui.boardNote}>Raw score out of {MAX_SCORE}, from response sheets checked on this tool. * Provisional: some answers are waiting for the official key.</div>
+        {leaderboard.length > 0 && (
+          <section className={c.board}>
+            <h2 className={c.boardTitle}>Top scores so far</h2>
+            <div className={c.boardList}>
+              {leaderboard.slice(0, 10).map((s, i) => (
+                <div key={i} className={c.boardRow}>
+                  <span className={c.boardRank}>{i + 1}</span>
+                  <span className={c.boardName}>{s.name}{s.city && <span className={c.boardCity}> · {s.city}</span>}</span>
+                  <span className={c.boardScore} title={s.provisional ? "Provisional: part of the answer key is awaited" : undefined}>{s.total}{s.provisional ? "*" : ""}</span>
+                </div>
+              ))}
             </div>
-
-            <div className={ui.ctaCard}>
-              <h3 className={ui.ctaTitle}>Got your score? Plan the next step.</h3>
-              <p className={ui.ctaText}>Talk to our IIM alumni mentors about calls, WAT-PI prep and which colleges to target.</p>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className={ui.ctaBtn}>📲 WhatsApp "CAT"</a>
-            </div>
-          </aside>
-        </div>
+            <p className={c.boardNote}>Raw score out of {MAX_SCORE} from response sheets checked here. * Provisional until the official key is out.</p>
+          </section>
+        )}
 
         {/* ════════ SEO ARTICLE ════════ */}
         <article className={ui.article}>
