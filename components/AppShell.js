@@ -322,7 +322,7 @@ const AppShell = ({ activePage, children, pageTitle, breadcrumb, showBack, minim
         <main className={`${styles.main} ${!sidebarOpen && !isMobile ? styles.mainExpanded : ''}`}>
           {children}
         </main>
-        {isCatPage && router.pathname !== '/mba-application-forms' && <CatAlertsBell />}
+        {isCatPage && router.pathname !== '/mba-application-forms' && router.pathname !== '/cat-score-calculator' && <CatAlertsBell />}
       </div>
     </div>
   );
