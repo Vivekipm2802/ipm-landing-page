@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { sharedMailer } from "../../lib/mail";
 import { iimbDb, iimbStats, loadIimbKeys } from "../../lib/iimbServer";
 import { SECTIONS, MAX_SCORE, scoreAnswers, applyOfficialKey } from "../../utils/iimbScoring";
 
@@ -113,12 +113,7 @@ export default async function handler(req, res) {
 
   // Internal notification. Never blocks the student's result.
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.ZEPTOMAIL_SERVER || "smtp.zeptomail.in",
-      port: 465,
-      secure: true,
-      auth: { user: "emailapikey", pass: process.env.ZEPTOMAIL_API_KEY },
-    });
+    const transporter = sharedMailer();
     const reportUrl = `https://register.ipmcareer.com/iimb-report/${uid}`;
     await transporter.sendMail({
       from: { name: "IIMB Response Analyzer", address: process.env.MAIL_FROM_NOREPLY || "noreply@ipmcareer.com" },
