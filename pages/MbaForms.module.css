@@ -208,3 +208,61 @@
 .mBtn:disabled { opacity: .6; cursor: wait; }
 .mNote { margin: 0; font-size: .72rem; color: #9a958c; text-align: center; line-height: 1.45; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 70; max-width: 92vw; padding: 11px 18px; border-radius: 999px; background: #f4f1ea; color: #0b0b0c; font-weight: 700; font-size: .86rem; text-align: center; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6); }
+
+/* ═══════════ mobile polish ═══════════ */
+/* grid items must be allowed to shrink, or long one-line text pushes cards off screen */
+.grid { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)) !important; }
+.card, .dl, .toolbar, .strip, .pills { min-width: 0; }
+.name { overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 .85rem; }
+  .hero { padding: 1.1rem .9rem .6rem; }
+  .eyebrow { font-size: .7rem; padding: 5px 11px; }
+  .title { font-size: 1.6rem !important; margin: .7rem auto .3rem; }
+  .accent { display: block; font-size: 1.25rem; margin-top: 2px; }
+  .sub { display: none; }
+  .stats { margin-top: .9rem; gap: 6px; }
+  .stat { padding: 9px 6px; border-radius: 14px; }
+  .statNum { font-size: 1.25rem !important; }
+  .statLabel { font-size: .68rem; }
+  .alertCta { width: 100%; justify-content: center; height: 44px; margin-top: .9rem; font-size: .9rem; padding: 0 14px; }
+  .alertHint { font-size: .72rem; }
+
+  .strip { margin-top: .9rem; }
+  .stripHead { font-size: .72rem; margin-bottom: 6px; }
+  .stripItem { min-width: 168px; max-width: 220px; padding: 9px 11px; }
+  .stripName { font-size: .84rem; }
+  .stripMeta { font-size: .72rem; }
+
+  .toolbar { top: 56px; margin: .9rem -.25rem .8rem; padding: 8px; gap: 6px; border-radius: 14px; }
+  .search { flex: 1 1 100%; height: 40px; font-size: 16px; } /* 16px stops iOS zooming into the field */
+  .pills { width: 100%; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .pill { height: 32px; padding: 0 11px; font-size: .78rem; }
+  .count { display: none; }
+
+  .grid { gap: 10px !important; }
+  .card { padding: 14px !important; gap: 9px !important; border-radius: 16px !important; }
+  .card:hover { transform: none; }
+  .badge { font-size: .7rem; padding: 3px 9px; }
+  .type { font-size: .64rem; }
+  .name { font-size: 1.02rem !important; }
+  .prog { font-size: .78rem !important; margin-top: -6px !important; }
+  .dl { padding: 9px 12px !important; border-radius: 12px; }
+  .dlLabel { font-size: .64rem; }
+  .dlDate { font-size: .96rem !important; }
+  .daysNum { font-size: 1.15rem; }
+  .days { font-size: .7rem; }
+  .examLine { font-size: .74rem; }
+  .apply { padding: 11px 14px !important; font-size: .9rem !important; }
+  .cal { width: 44px; min-height: 42px; }
+  .more { padding-top: 8px; }
+
+  .article { padding: 0 1rem; font-size: .92rem; margin-top: 2rem; }
+  .article h2 { font-size: 1.15rem; }
+  .table { font-size: .8rem; }
+  .table th, .table td { padding: 8px 10px; }
+  .disclaimer { margin: 1.5rem 0 0; font-size: .84rem; padding: 14px; }
+  .modal { padding: 20px 16px 16px; border-radius: 18px; }
+  .mInput { font-size: 16px; }
+}
