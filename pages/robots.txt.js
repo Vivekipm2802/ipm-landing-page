@@ -3,6 +3,7 @@
 export async function getServerSideProps({ res }) {
   const txt = `User-agent: *
 Allow: /
+Disallow: /go/
 
 User-agent: GPTBot
 Allow: /

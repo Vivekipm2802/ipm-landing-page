@@ -7,6 +7,7 @@ import AppShell from "../components/AppShell";
 import s from "./CatPlanner.module.css";
 import t from "./CatTools.module.css";
 import LeadPopup from "../components/LeadPopup";
+import OpenMbaForms from "../components/OpenMbaForms";
 import { sendLeadToCrm } from "../lib/crm";
 import { PATTERN, MAX_TOTAL, APPEARED, CURVES, TARGETS, predictAll, marksNeeded } from "../lib/catPercentile";
 import { CATEGORIES, IIMS } from "../lib/iimCallData";
@@ -198,6 +199,9 @@ export default function CatPercentilePredictor() {
                 <a className={t.textLink} href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
               </div>
               <p className={s.note} style={{ marginTop: 14 }}>An estimate from real past results, not an official IIM conversion. Slot normalisation and this year’s paper decide your actual percentile.</p>
+              <div style={{ marginTop: 18, textAlign: "left" }}>
+                <OpenMbaForms percentile={res.overall.below ? null : res.overall.main} src="pct-predictor" />
+              </div>
             </div>
           )}
         </div>

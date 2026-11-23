@@ -5,6 +5,7 @@ import AppShell from "../components/AppShell";
 import s from "./MbaForms.module.css";
 import { MBA_FORMS, TYPES, CHECKED_ON, computeStatus, fmtDate } from "../lib/mbaForms";
 import { sendLeadToCrm } from "../lib/crm";
+import { goHref, isPartner } from "../lib/partnerLinks";
 
 const ALERT_KEY = "mba-alerts-v1";
 
@@ -156,6 +157,9 @@ export default function MbaApplicationForms({ builtAt }) {
   }, [rows]);
 
   // Next date that matters for each open form: an earlier round (e.g. lower-fee round) or the last date
+  const quickApply = useMemo(() => rows
+    .filter((r) => isPartner(r.ref) && (r.st.key === "open" || r.st.key === "closing"))
+    .sort((a, b) => String(a.deadline || "9999").localeCompare(String(b.deadline || "9999"))), [rows]);
   const closingSoon = useMemo(() => {
     const DAY = 86400000;
     return rows
@@ -261,6 +265,20 @@ export default function MbaApplicationForms({ builtAt }) {
             </div>
           )}
 
+          {quickApply.length > 0 && !q && (status === "all" || status === "open") && (type === "all" || type === "bschool") && (
+            <div className={s.strip}>
+              <div className={s.stripHead}><span className={`${s.dot} ${s.dotOpen}`}></span>Applications open · apply in 10 minutes</div>
+              <div className={s.stripRow}>
+                {quickApply.map((r) => (
+                  <a key={r.id} className={s.stripItem} href={goHref(r.ref, "mba-forms-strip")} target="_blank" rel="noopener noreferrer nofollow" style={{ textDecoration: "none" }}>
+                    <div className={s.stripName}>{r.name.replace(/ \(.*\)/, "")}</div>
+                    <div className={s.stripMeta}>{r.deadline ? `Last date ${fmtDate(r.deadline)}` : "Open · no fixed last date"} · Apply ↗</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className={s.toolbar}>
             <input className={s.search} type="search" placeholder="Search a college or exam (e.g. MDI, XAT, IIT)" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search forms" />
             <div className={s.pills} role="tablist" aria-label="Status">
@@ -318,11 +336,11 @@ export default function MbaApplicationForms({ builtAt }) {
                     )}
 
                     <div className={s.examLine}>
-                      {(r.exams || []).slice(0, 3).join(" · ")}{(r.exams || []).length > 3 ? ` +${r.exams.length - 3}` : ""}
+                      {(r.exams || []).length ? <>{r.exams.slice(0, 3).join(" · ")}{r.exams.length > 3 ? ` +${r.exams.length - 3}` : ""}</> : "Accepted exams: see the official portal"}
                     </div>
 
                     <div className={s.actions}>
-                      <a className={s.apply} href={r.link} target="_blank" rel="noopener noreferrer nofollow">{st.key === "soon" || st.key === "closed" ? "Official site ↗" : "Apply ↗"}</a>
+                      <a className={s.apply} href={isPartner(r.ref) && st.key !== "soon" && st.key !== "closed" ? goHref(r.ref, "mba-forms-card") : r.link} target="_blank" rel="noopener noreferrer nofollow">{st.key === "soon" || st.key === "closed" ? "Official site ↗" : "Apply ↗"}</a>
                       {st.key !== "closed" && (
                         <button type="button" className={`${s.cal} ${s.bell} ${followed || alerts?.all ? s.bellOn : ""}`} onClick={() => bell(r, st.key === "soon")}
                           title={followed ? "Alerts on: tap to turn off" : st.key === "soon" ? "Email me when this form opens" : "Email me 7 days and 1 day before the last date"}
@@ -346,6 +364,7 @@ export default function MbaApplicationForms({ builtAt }) {
                           </ul>
                         )}
                         {r.note && <div className={s.meta}>{r.note}</div>}
+                        {isPartner(r.ref) && <div className={s.meta}>Tip: if the form asks how you heard about the college, mention IPM Careers.</div>}
                         {r.lastCycle && <div className={s.last}>{r.lastCycle} (for reference only)</div>}
                         <div className={`${s.src} ${r.source === "official" ? s.srcOk : s.srcWait}`}>
                           {r.source === "official" ? "✔ Checked on the official website" : "⏳ Official 2027 notice awaited"}
@@ -490,7 +509,7 @@ export default function MbaApplicationForms({ builtAt }) {
             <b>Please cross-check before you apply.</b> We compile these dates from official exam and college websites and update them
             regularly, but institutes can extend, change or close forms at any time and we may not catch every change immediately. Do not rely
             on this page alone: always confirm the last date, fee and eligibility on the official website linked on each card before you pay
-            or submit. Last checked: {fmtDate(CHECKED_ON)}.
+            or submit. Some Apply buttons are referral links: you still apply on the college's own form, at the same fee. Last checked: {fmtDate(CHECKED_ON)}.
           </div>
         </div>
       </div>

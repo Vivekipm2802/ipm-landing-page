@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import s from "./IimbScorecard.module.css";
 import k from "./CatScorecard.module.css";
+import OpenMbaForms from "./OpenMbaForms";
 import { SECTIONS, MAX_SCORE } from "../lib/catScoring";
 import { predictAll } from "../lib/catPercentile";
 
@@ -218,6 +219,8 @@ export default function CatScorecard({ name: rawName, category, city, slot, exam
         </div>
         <Link className={s.btnGold} href={callLink}>See my IIM calls</Link>
       </div>
+
+      <OpenMbaForms percentile={pctOk ? pred.overall.main : null} src={isReportPage ? "cat-report" : "cat-scorecard"} />
 
       <details className={k.full}>
         <summary className={k.fullSum}>See full analysis <span className={k.chev}>▾</span></summary>

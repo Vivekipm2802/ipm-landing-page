@@ -7,6 +7,7 @@ import AppShell from "../components/AppShell";
 import s from "./CatPlanner.module.css";
 import t from "./CatTools.module.css";
 import LeadPopup from "../components/LeadPopup";
+import OpenMbaForms from "../components/OpenMbaForms";
 import { sendLeadToCrm } from "../lib/crm";
 import { IIMS, CATEGORIES, STATUS, evaluate } from "../lib/iimCallData";
 
@@ -194,6 +195,10 @@ export default function IimCallPredictor() {
 
               <div className={s.iimList}>
                 {list.map((r) => <IimCard key={r.iim.id} r={r} p={profile} />)}
+              </div>
+
+              <div style={{ marginTop: 18 }}>
+                <OpenMbaForms percentile={shown.noCat ? null : num(shown.o)} src="call-predictor" title="Non-IIM MBA forms open now" />
               </div>
 
               <div className={t.next}>
