@@ -47,7 +47,8 @@ export default function CatSheetLanding({ path, pageTitle, seoTitle, seoDesc, h1
         description={seoDesc}
         canonical={url}
         openGraph={{ url, title: seoTitle, description: seoDesc, siteName: "IPM Careers" }}
-        additionalMetaTags={[{ name: "keywords", content: keywords }, { name: "robots", content: "index, follow, max-image-preview:large" }]}
+        additionalMetaTags={[{ name: "keywords", content: keywords }]}
+        robotsProps={{ maxImagePreview: "large" }}
       />
       <div className={s.page}>
         <header className={t.head}>

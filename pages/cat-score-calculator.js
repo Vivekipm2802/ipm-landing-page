@@ -6,10 +6,13 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import AppShell from "../components/AppShell";
 import CatScorecard from "../components/CatScorecard";
+import { CatAlertsInline } from "../components/CatAlerts";
 import styles from "./Response.module.css";
 import ui from "./IimbUg.module.css";
 import c from "./CatCalc.module.css";
 import { SECTIONS, MAX_SCORE, TOTAL_QUESTIONS, buildCatInsights } from "../lib/catScoring";
+
+const BUILD_DATE = new Date().toISOString().slice(0, 10); // refreshed on every deploy
 
 const PAGE_URL = "https://register.ipmcareer.com/cat-score-calculator";
 const CAT_SITE = "https://iimcat.ac.in";
@@ -88,6 +91,7 @@ export default function CatScoreCalculator() {
   const [boardLoading, setBoardLoading] = useState(true);
   const [count, setCount] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [notifyOpen, setNotifyOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalError, setModalError] = useState("");
   const [linkFailed, setLinkFailed] = useState(false);
@@ -287,8 +291,8 @@ export default function CatScoreCalculator() {
             content:
               "CAT score calculator, CAT score calculator 2026, CAT score calculator response sheet, CAT response sheet calculator, CAT response sheet 2026, CAT response sheet release date, CAT 2026 answer key, CAT score vs percentile, CAT marks vs percentile, CAT marks calculator, CAT raw score vs scaled score, how to calculate CAT score",
           },
-          { name: "robots", content: "index, follow, max-image-preview:large" },
         ]}
+        robotsProps={{ maxImagePreview: "large" }}
       />
 
       <div className={`${styles.page} ${c.page}`}>
@@ -386,6 +390,16 @@ export default function CatScoreCalculator() {
               )}
 
               <p className={c.fine}>Free. Your phone and email are never shown publicly.</p>
+              {!notifyOpen && (
+                <button type="button" className={c.notifyLink} onClick={() => setNotifyOpen(true)}>
+                  Response sheet not out yet? Get an email the minute it is →
+                </button>
+              )}
+              {notifyOpen && (
+                <div style={{ marginTop: 16 }}>
+                  <CatAlertsInline title="We'll email you the minute it's out" text="The CAT 2026 response sheet usually comes out about a week after the exam (last year: 4 Dec). One email with a 1-minute score check, then the answer key and result." />
+                </div>
+              )}
             </form>
           </section>
         )}
@@ -611,6 +625,8 @@ export default function CatScoreCalculator() {
                 offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
                 description: "Free CAT 2026 score calculator. Paste your CAT response sheet link to get VARC, DILR, QA and total score out of 204 with MCQ and TITA analysis.",
                 creator: { "@type": "Organization", name: "IPM Careers", url: "https://ipmcareer.com" },
+                datePublished: "2026-10-20",
+                dateModified: BUILD_DATE,
               },
               {
                 "@type": "HowTo",
