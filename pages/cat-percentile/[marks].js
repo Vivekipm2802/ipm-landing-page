@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import AppShell from "../../components/AppShell";
+import ScoreCheckLink from "../../components/ScoreCheckLink";
 import { CatAlertsInline } from "../../components/CatAlerts";
 import OpenMbaForms from "../../components/OpenMbaForms";
 import s from "../CatPlanner.module.css";
@@ -96,6 +97,7 @@ export default function MarksPage({ info }) {
             <Link href="/iim-call-predictor" className={s.link}>Check your IIM calls with your full profile →</Link>
           </div>
 
+          <ScoreCheckLink />
           <OpenMbaForms percentile={main} src="cat-marks" title={`MBA forms open now${main != null ? ` for ~${Math.floor(main)} percentile` : ""}`} />
 
           <CatAlertsInline title="Wrote CAT 2026? Get your exact score on day one" text="We email you the minute the response sheet is out, with a 1-minute score check, then the answer key and result." />

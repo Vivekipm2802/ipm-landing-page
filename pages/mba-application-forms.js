@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
+import ScoreCheckLink from "../components/ScoreCheckLink";
 import s from "./MbaForms.module.css";
 import { MBA_FORMS, TYPES, CHECKED_ON, computeStatus, fmtDate } from "../lib/mbaForms";
 import { sendLeadToCrm } from "../lib/crm";
@@ -454,6 +455,7 @@ export default function MbaApplicationForms({ builtAt }) {
         </div>
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>MBA application forms 2026 for the 2027-29 batch: how to use this tracker</h2>
           <p>
             This page lists the <strong>MBA application forms for the 2027-29 batch</strong>: national entrance exams like XAT, SNAP, NMAT,

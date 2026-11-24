@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import AppShell from "../../../components/AppShell";
+import ScoreCheckLink from "../../../components/ScoreCheckLink";
 import s from "../../CatPlanner.module.css";
 import { CAT_CITIES } from "../../../lib/catCities";
 import { SLOTS, CENTRES_PATH, PLANNER_PATH, SITE, cityBySlug, fmtHHMM } from "../../../lib/catPlanner";
@@ -149,6 +150,7 @@ export default function CityPage({ city, centres, plans, weather, admitOut = fal
         </div>
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>Reporting time and gate closing time</h2>
           <div className={s.tableWrap}>
             <table className={s.table}>

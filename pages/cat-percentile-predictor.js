@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
+import ScoreCheckLink from "../components/ScoreCheckLink";
 import s from "./CatPlanner.module.css";
 import t from "./CatTools.module.css";
 import LeadPopup from "../components/LeadPopup";
@@ -221,6 +222,7 @@ export default function CatPercentilePredictor() {
         />
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <p className={t.quick}>
             <b>Quick answer (CAT 2025 data):</b>{" "}
             {QUICK.map((q, i) => <span key={q.m}>{i ? " · " : ""}<Link href={marksPath(q.m)} className={s.link}>{q.m} marks ≈ {fmtP(q.p)}</Link></span>)}

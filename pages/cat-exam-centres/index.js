@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import AppShell from "../../components/AppShell";
+import ScoreCheckLink from "../../components/ScoreCheckLink";
 import s from "../CatPlanner.module.css";
 import { CAT_CITIES } from "../../lib/catCities";
 import { STATES, CENTRES_PATH, PLANNER_PATH, SITE } from "../../lib/catPlanner";
@@ -103,6 +104,7 @@ export default function CatExamCentres({ counts }) {
         </div>
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>How CAT 2026 test centres work</h2>
           <p>When you registered for CAT 2026 you chose your preferred test cities. The IIMs then allot a centre in one of them, and you see it for the first time on your admit card on 4 November 2026. Centres are mostly TCS iON Digital Zones and college computer labs. The exam is on Sunday, 29 November 2026, in three slots, and the centre cannot be changed once allotted.</p>
           <h2>CAT exam centre: frequently asked questions</h2>

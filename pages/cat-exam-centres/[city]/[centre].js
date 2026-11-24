@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import AppShell from "../../../components/AppShell";
+import ScoreCheckLink from "../../../components/ScoreCheckLink";
 import s from "../../CatPlanner.module.css";
 import { sendLeadToCrm } from "../../../lib/crm";
 import { CatAlertsInline } from "../../../components/CatAlerts";
@@ -157,6 +158,7 @@ export default function CentrePage({ centre, counts, reviews, others }) {
         </div>
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>CAT 2026 timings at {centre.name}</h2>
           <div className={s.tableWrap}>
             <table className={s.table}>

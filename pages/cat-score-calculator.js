@@ -109,6 +109,19 @@ export default function CatScoreCalculator() {
 
   useEffect(() => { fetchLeaderboard(); }, []);
 
+  // Links from the response sheet / answer key pages arrive as ?url=<response sheet link>: prefill and open the details step
+  useEffect(() => {
+    try {
+      const u = new URLSearchParams(window.location.search).get("url");
+      if (!u) return;
+      const parsed = new URL(u);
+      if (!/(^|\.)digialm\.com$/i.test(parsed.hostname)) return;
+      setSheetUrl(u);
+      setModalError("");
+      setModalOpen(true);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (!error) return;
     const t = setTimeout(() => setError(""), 8000);
@@ -258,7 +271,7 @@ export default function CatScoreCalculator() {
         <link rel="icon" href="/favicon_ipm.svg" />
       </Head>
       <NextSeo
-        title="CAT Score Calculator 2026: Score + Percentile in 1 Min"
+        title="CAT Score Calculator 2026 from Response Sheet + Percentile"
         description="Paste your CAT 2026 response sheet link and get VARC, DILR, QA and total out of 204, your estimated percentile and rank among students. Free, no login. Works the day the response sheet is out."
         canonical={PAGE_URL}
         openGraph={{

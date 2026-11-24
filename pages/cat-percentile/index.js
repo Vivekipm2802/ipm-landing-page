@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import AppShell from "../../components/AppShell";
+import ScoreCheckLink from "../../components/ScoreCheckLink";
 import s from "../CatPlanner.module.css";
 import { MARKS, marksPath, marksInfo, fmtPct } from "../../lib/catMarks";
 
@@ -34,6 +35,7 @@ export default function MarksHub({ rows }) {
               <Link href="/cat-percentile-predictor" className={s.btn}>Percentile predictor →</Link>
             </div>
           </div>
+          <ScoreCheckLink />
           <div className={s.card}>
             <div className={s.tableWrap}>
               <table className={s.table}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import AppShell from "../../components/AppShell";
+import ScoreCheckLink from "../../components/ScoreCheckLink";
 import s from "../CatPlanner.module.css";
 import { sendLeadToCrm } from "../../lib/crm";
 import { readAdmitCardPdf } from "../../lib/catAdmitParse";
@@ -267,6 +268,7 @@ export default function CatExamDayPlanner() {
         </div>
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>CAT 2026 exam day: the timings that matter</h2>
           <p>CAT 2026 is on <b>Sunday, 29 November 2026</b> in three slots across 162 test cities. Admit cards can be downloaded from <b>4 November 2026</b> on iimcat.ac.in. Below are the timings from last year’s pattern; your admit card shows the exact reporting and gate-closing time for your slot, and the planner uses those.</p>
           <div className={s.tableWrap}>

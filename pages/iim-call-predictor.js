@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import AppShell from "../components/AppShell";
+import ScoreCheckLink from "../components/ScoreCheckLink";
 import s from "./CatPlanner.module.css";
 import t from "./CatTools.module.css";
 import LeadPopup from "../components/LeadPopup";
@@ -222,6 +223,7 @@ export default function IimCallPredictor() {
         />
 
         <article className={s.article}>
+          <ScoreCheckLink style={{ marginTop: 0 }} />
           <h2>Minimum CAT percentile for each IIM (General category)</h2>
           <p>From each IIM’s official admission policy. These make you eligible to be considered; calls usually go well above them.</p>
           <div className={s.tableWrap}>
