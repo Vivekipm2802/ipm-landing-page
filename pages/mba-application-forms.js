@@ -8,6 +8,31 @@ import { sendLeadToCrm } from "../lib/crm";
 import { goHref, isPartner } from "../lib/partnerLinks";
 
 const ALERT_KEY = "mba-alerts-v1";
+const APPLIED_KEY = "mba-applied-v1";
+const SITE = "https://register.ipmcareer.com";
+
+// Share taps and visits from shared links are logged (no personal data) so we can see what spreads
+function logShare(kind, src, channel, form) {
+  try {
+    const body = JSON.stringify({ page: "mba-forms", kind, src, channel, form: form || null });
+    if (!(navigator.sendBeacon && navigator.sendBeacon("/api/share-event", body))) fetch("/api/share-event", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true });
+  } catch {}
+}
+// Phones: the system share sheet (WhatsApp, Telegram, Instagram...). Laptops: WhatsApp with the message ready.
+async function shareText({ text, url, src, form }) {
+  const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+  if (isPhone && navigator.share) {
+    try { await navigator.share({ text: `${text}\n${url}` }); logShare("share", src, "native", form); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  logShare("share", src, "whatsapp", form);
+  window.open(`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`, "_blank", "noopener");
+}
+const shortName = (n) => n.replace(/\s*\(.*?\)/g, "").replace(/ \/ .*$/, "");
+const dayMonth = (iso) => fmtDate(iso).replace(/ \d{4}$/, "");
+const ShareIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
+);
 
 const PAGE_URL = "https://register.ipmcareer.com/mba-application-forms";
 
@@ -83,10 +108,21 @@ export default function MbaApplicationForms({ builtAt }) {
   const [aBusy, setABusy] = useState(false);
   const [aErr, setAErr] = useState("");
   const [toast, setToast] = useState("");
+  const [applied, setApplied] = useState([]);
 
   useEffect(() => {
     try { const a = JSON.parse(localStorage.getItem(ALERT_KEY) || "null"); if (a && a.token) setAlerts(a); } catch {}
+    try { const ap = JSON.parse(localStorage.getItem(APPLIED_KEY) || "[]"); if (Array.isArray(ap)) setApplied(ap.filter((id) => MBA_FORMS.some((f) => f.id === id))); } catch {}
+    try { const src = new URLSearchParams(window.location.search).get("src"); if (src) logShare("visit", src, null, (window.location.hash || "").replace(/^#f-/, "") || null); } catch {}
   }, []);
+  const toggleApplied = (id) => {
+    setApplied((cur) => {
+      const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+      try { localStorage.setItem(APPLIED_KEY, JSON.stringify(next)); } catch {}
+      if (!next.length && status === "applied") setStatus("all");
+      return next;
+    });
+  };
   const saveAlerts = (a) => { setAlerts(a); try { a ? localStorage.setItem(ALERT_KEY, JSON.stringify(a)) : localStorage.removeItem(ALERT_KEY); } catch {} };
   const flash = (m) => { setToast(m); setTimeout(() => setToast(""), 3200); };
   const formName = (id) => MBA_FORMS.find((x) => x.id === id)?.name || "this form";
@@ -174,14 +210,30 @@ export default function MbaApplicationForms({ builtAt }) {
       .slice(0, 8);
   }, [rows, now]);
 
+  const sharePage = () => {
+    const top = closingSoon.slice(0, 4).map((r) => `${shortName(r.name)} (${dayMonth(r.stripDate)})`).join(", ");
+    shareText({ text: `MBA forms closing soon: ${top}.\nAll ${counts.open} open MBA forms with last dates, plus free deadline reminders:`, url: `${PAGE_URL}?src=wa-page`, src: "wa-page" });
+  };
+  const shareCard = (r) => {
+    const st = r.st;
+    const when = r.deadline && (st.key === "open" || st.key === "closing")
+      ? `last date ${fmtDate(r.deadline)}${typeof st.days === "number" ? ` (${st.days === 0 ? "today" : st.days === 1 ? "1 day left" : `${st.days} days left`})` : ""}`
+      : st.key === "soon" && r.opens ? `opens ${fmtDate(r.opens)}` : st.key === "closed" ? "closed" : "open, no fixed last date";
+    shareText({ text: `${shortName(r.name)} ${r.programme ? `${r.programme}: ` : ": "}${when}.\nEvery MBA form deadline in one place:`, url: `${PAGE_URL}?src=wa-card#f-${r.id}`, src: "wa-card", form: r.id });
+  };
+  const shareList = () => {
+    const names = rows.filter((r) => applied.includes(r.id)).map((r) => shortName(r.name));
+    shareText({ text: `I've applied to ${names.length} MBA form${names.length === 1 ? "" : "s"} so far: ${names.join(", ")}.\nWhich ones are you filling? Track every last date here:`, url: `${PAGE_URL}?src=wa-list`, src: "wa-list" });
+  };
+
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
     return rows
-      .filter((r) => status === "all" || (status === "open" ? r.st.key === "open" || r.st.key === "closing" : r.st.key === status))
+      .filter((r) => status === "all" || (status === "applied" ? applied.includes(r.id) : status === "open" ? r.st.key === "open" || r.st.key === "closing" : r.st.key === status))
       .filter((r) => type === "all" || r.type === type)
       .filter((r) => !term || `${r.name} ${r.programme} ${(r.exams || []).join(" ")}`.toLowerCase().includes(term))
       .sort((a, b) => (ORDER[a.st.key] - ORDER[b.st.key]) || String(a.deadline || "9999").localeCompare(String(b.deadline || "9999")) || a.name.localeCompare(b.name));
-  }, [rows, status, type, q]);
+  }, [rows, status, type, q, applied]);
 
   const jump = (id) => {
     setStatus("all"); setType("all"); setQ("");
@@ -220,9 +272,11 @@ export default function MbaApplicationForms({ builtAt }) {
         openGraph={{
           url: PAGE_URL,
           title: "MBA Application Forms 2026: Which Forms Are Open Now (Live)",
-          description: "Live tracker of MBA entrance exam and B-school application deadlines for the 2027-29 batch.",
+          description: "Live tracker of MBA entrance exam and B-school application deadlines for the 2027-29 batch, with free reminders.",
           siteName: "IPM Careers",
+          images: [{ url: `${SITE}/api/og-mba?d=${todayIST}`, width: 1200, height: 630, alt: "MBA application forms closing soon" }],
         }}
+        twitter={{ cardType: "summary_large_image" }}
         additionalMetaTags={[
           { name: "keywords", content: "MBA application form 2026, MBA application form 2026 last date, MBA form last date 2026, MBA application form 2027, MBA forms open now, which MBA forms are out, upcoming MBA forms, MBA admission 2027, MBA application deadlines 2026, MBA application form fees, non IIM MBA form 2027, IIT MBA application form 2027, IIFT MBA application form 2027, FMS application form 2027, SPJIMR application deadline, MDI application last date, XAT registration last date, SNAP registration last date, NMAT registration last date" },
           { name: "robots", content: "index, follow, max-image-preview:large" },
@@ -248,6 +302,7 @@ export default function MbaApplicationForms({ builtAt }) {
             {alerts?.all ? "🔔 Alerts on for every deadline · turn off" : "🔔 Email me before every MBA deadline"}
           </button>
           <p className={s.alertHint}>Or tap the 🔔 on any college. Reminders 7 days and 1 day before the last date.</p>
+          <button type="button" className={s.shareLink} onClick={sharePage}><ShareIcon />Share with your CAT group</button>
         </section>
 
         <div className={s.wrap}>
@@ -285,6 +340,9 @@ export default function MbaApplicationForms({ builtAt }) {
               {STATUS_FILTERS.map((f) => (
                 <button key={f.key} type="button" role="tab" aria-selected={status === f.key} className={`${s.pill} ${status === f.key ? s.pillOn : ""}`} onClick={() => setStatus(f.key)}>{f.label}</button>
               ))}
+              {applied.length > 0 && (
+                <button type="button" role="tab" aria-selected={status === "applied"} className={`${s.pill} ${s.pillMine} ${status === "applied" ? s.pillOn : ""}`} onClick={() => setStatus("applied")}>✓ Applied ({applied.length})</button>
+              )}
             </div>
             <div className={s.pills} role="tablist" aria-label="Type">
               {TYPES.map((t) => (
@@ -294,6 +352,13 @@ export default function MbaApplicationForms({ builtAt }) {
             <span className={s.count}>{list.length} of {MBA_FORMS.length} shown</span>
           </div>
 
+          {status === "applied" && applied.length > 0 && (
+            <div className={s.mineBar}>
+              <span>You've marked {applied.length} form{applied.length === 1 ? "" : "s"} as applied. Saved on this device.</span>
+              <button type="button" className={s.shareLink} onClick={shareList}><ShareIcon />Share my list</button>
+            </div>
+          )}
+
           {list.length === 0 ? (
             <div className={s.empty}>Nothing matches these filters. Try "All".</div>
           ) : (
@@ -302,10 +367,17 @@ export default function MbaApplicationForms({ builtAt }) {
                 const st = r.st;
                 const followed = Boolean(alerts && ((alerts.follows || []).includes(r.id)));
                 return (
-                  <article key={r.id} id={`f-${r.id}`} className={`${s.card} ${st.key === "closing" ? s.cardClosing : ""} ${st.key === "closed" ? s.cardClosed : ""}`}>
+                  <article key={r.id} id={`f-${r.id}`} className={`${s.card} ${st.key === "closing" ? s.cardClosing : ""} ${st.key === "closed" ? s.cardClosed : ""} ${applied.includes(r.id) ? s.cardApplied : ""}`}>
                     <div className={s.cardTop}>
                       <span className={`${s.badge} ${BADGE[st.key]}`}><span className={`${s.dot} ${DOT[st.key]}`}></span>{st.label}</span>
-                      <span className={s.type}>{TYPE_LABEL[r.type]}</span>
+                      {st.key === "soon" ? (
+                        <span className={s.type}>{TYPE_LABEL[r.type]}</span>
+                      ) : (
+                        <button type="button" className={`${s.mark} ${applied.includes(r.id) ? s.markOn : ""}`} onClick={() => toggleApplied(r.id)} aria-pressed={applied.includes(r.id)}
+                          title={applied.includes(r.id) ? "Tap to unmark" : "Keep track of the forms you have filled"}>
+                          {applied.includes(r.id) ? "✓ Applied" : "Mark applied"}
+                        </button>
+                      )}
                     </div>
                     <h3 className={s.name}>{r.name}</h3>
                     <p className={s.prog}>{r.programme}</p>
@@ -348,6 +420,9 @@ export default function MbaApplicationForms({ builtAt }) {
                           🔔
                         </button>
                       )}
+                      <button type="button" className={`${s.cal} ${s.shareBtn}`} onClick={() => shareCard(r)} aria-label={`Share ${r.name} deadline`} title="Share this deadline">
+                        <ShareIcon />
+                      </button>
                     </div>
 
                     <details className={s.more}>
