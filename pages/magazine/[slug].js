@@ -13,6 +13,7 @@ import MagazineInquiryForm from '../../components/MagazineInquiryForm';
 import AuthorByline from '../../components/AuthorByline';
 import AuthorBio from '../../components/AuthorBio';
 import LastReviewedFooter from '../../components/LastReviewedFooter';
+import MuUgCard from '../../components/MuUgCard';
 import { gradientCss, gradientFor } from '../../lib/gradients';
 
 export async function getServerSideProps({ params, res }) {
@@ -191,6 +192,10 @@ export default function BlogReader({ blog, related }) {
                 ))}
               </div>
             </section>
+          )}
+
+          {!/\b(cat|mba|clat|pgdm|gmat|xat)\b/i.test(`${blog.category || ''} ${blog.title || ''}`) && (
+            <MuUgCard src="magazine" style={{ marginTop: 40 }} />
           )}
 
           <AuthorBio blog={blog} />

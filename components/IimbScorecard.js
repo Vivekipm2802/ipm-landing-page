@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import s from "./IimbScorecard.module.css";
 import { SECTIONS, MAX_SCORE, KEY_DATES } from "../utils/iimbScoring";
+import MuUgCard from "./MuUgCard";
 
 const SITE = "https://register.ipmcareer.com";
 const WHATSAPP_PI = "https://wa.me/918299470392?text=" + encodeURIComponent("IIMB - I just checked my IIM Bangalore UG score. Help me plan PI prep.");
@@ -304,6 +305,12 @@ export default function IimbScorecard({ name, category, city, testDate, scores, 
           <a className={s.btn} href={WHATSAPP_PI} target="_blank" rel="noopener noreferrer">📲 WhatsApp &quot;IIMB&quot;</a>
         </div>
       </div>
+      <MuUgCard
+        src={isReportPage ? "iimb-report" : "iimb-scorecard"}
+        style={{ marginTop: 16 }}
+        title="Want a backup before the IIMB result?"
+        text={`IIMB results are expected on ${KEY_DATES[1].when.replace(" (tentative)", "")}, the same day Masters' Union UG Round 1 closes. If you want a second option in hand, apply before the result.`}
+      />
       <p className={s.note}>Raw score using +3 / −1 / 0. IIMB standardises scores and uses percentiles for shortlisting, so official results can differ.{city ? ` · 📍 ${city}` : ""}</p>
     </div>
   );
