@@ -126,7 +126,12 @@
   },
   {
     "source": "/ipmat-coaching",
-    "destination": "https://ipmcareer.com/ipmat-coaching/",
+    "destination": "https://ipmcareer.com/",
+    "permanent": true
+  },
+  {
+    "source": "/ipmat-online-coaching",
+    "destination": "https://ipmcareer.com/courses_group/online-ipm-coaching-india/",
     "permanent": true
   }
 ]
