@@ -26,7 +26,7 @@ function createTransporter() {
 }
 
 // ── Email template ───────────────────────────────────────────────────────────
-function buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl }) {
+function buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl, extraHtml = '' }) {
   const urgencyColor = daysLeft === 0 ? '#ef4444' : daysLeft === 1 ? '#f97316' : '#f9a01b';
   const urgencyLabel =
     daysLeft === 0 ? '🚨 TODAY is the Last Day!'
@@ -101,6 +101,8 @@ function buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl }) {
               </tr>`).join('')}
             </table>
 
+            ${extraHtml}
+
             <!-- CTA -->
             <div style="text-align:center;margin-bottom:24px;">
               <a href="${commandCenterUrl}"
@@ -135,6 +137,18 @@ function buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl }) {
 </html>`;
 }
 
+// Masters' Union only: discount code + tracked programme links (code from MU, for IPM Careers students)
+function muCouponHtml(examName, src) {
+  if (!/masters'? ?union/i.test(String(examName || ''))) return '';
+  const progs = [['mu-tbm', 'Tech & Business Mgmt'], ['mu-fne', 'Finance & Economics'], ['mu-psm', 'Psychology & Marketing'], ['mu-dsai', 'Data Science & AI'], ['mu-robotics', 'Robotics & AI']];
+  const links = progs.map(([g, l]) => `<a href="https://register.ipmcareer.com/go/${g}?src=${src}" style="display:inline-block;margin:4px 4px 0 0;padding:6px 12px;border-radius:999px;border:1px solid #334155;color:#e2e8f0;font-size:12px;font-weight:600;text-decoration:none;">${l}</a>`).join('');
+  return `<div style="background:#1a1306;border:1px dashed #f9a01b88;border-radius:14px;padding:16px 18px;margin-bottom:24px;">
+              <div style="color:#f1f5f9;font-size:14px;font-weight:700;">🎟️ 20% off for IPM Careers students</div>
+              <div style="color:#cbd5e1;font-size:13px;margin-top:4px;">Use code <b style="color:#f9a01b;letter-spacing:.06em;">UGIPO</b> while applying.</div>
+              <div style="margin-top:8px;">${links}</div>
+            </div>`;
+}
+
 // ── Send one email ────────────────────────────────────────────────────────────
 async function sendReminderEmail({ to, examName, lastDate, daysLeft }) {
   const transporter = createTransporter();
@@ -151,7 +165,7 @@ async function sendReminderEmail({ to, examName, lastDate, daysLeft }) {
     from: { name: 'IPM Careers', address: 'info@ipmcareer.com' },
     to,
     subject: subjects[daysLeft] || `Deadline Reminder: ${examName}`,
-    html: buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl }),
+    html: buildEmailHTML({ examName, lastDate, daysLeft, commandCenterUrl, extraHtml: muCouponHtml(examName, `email-${daysLeft}d`) }),
   });
 }
 

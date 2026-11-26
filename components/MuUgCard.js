@@ -2,10 +2,12 @@
 // Countdown is worked out in the browser so cached pages never show a stale number.
 import { useEffect, useState } from "react";
 import s from "./MuUgCard.module.css";
-import { MU_PROGRAMMES, muHref, muDeadline } from "../lib/muUg";
+import { MU_PROGRAMMES, MU_COUPON, muHref, muDeadline } from "../lib/muUg";
 
 export default function MuUgCard({ src = "site", title, text, style }) {
   const [dl, setDl] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const copy = () => { try { navigator.clipboard.writeText(MU_COUPON.code); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} };
   useEffect(() => { setDl(muDeadline()); }, []);
   return (
     <aside className={s.box} style={style}>
@@ -14,6 +16,11 @@ export default function MuUgCard({ src = "site", title, text, style }) {
         {dl && <span className={dl.open && dl.days <= 7 ? s.dateHot : s.date}>{dl.line}</span>}
       </div>
       <p className={s.text}>{text || "Masters' Union, Gurugram has 4-year UG programmes with its own online test. Apply now so you have an option in hand when IPMAT results come."}</p>
+      <div className={s.coupon}>
+        <span>🎟️ {MU_COUPON.off} off for IPM Careers students: use code</span>
+        <button type="button" className={s.code} onClick={copy} aria-label={`Copy code ${MU_COUPON.code}`}>{copied ? "Copied ✓" : MU_COUPON.code}</button>
+        <span className={s.when}>while applying</span>
+      </div>
       <div className={s.chips}>
         {MU_PROGRAMMES.map((p) => (
           <a key={p.slug} className={s.chip} href={muHref(p.slug, src)} target="_blank" rel="noopener sponsored">{p.label} ↗</a>
