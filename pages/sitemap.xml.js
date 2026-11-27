@@ -49,6 +49,7 @@ export async function getServerSideProps({ res }) {
     urlNode({ loc: `${SITE}/air1commandcenter`, lastmod: today, changefreq: 'weekly', priority: '0.7' }),
     urlNode({ loc: `${SITE}/response`,             lastmod: today, changefreq: 'weekly', priority: '0.8' }),
     urlNode({ loc: `${SITE}/cat-score-calculator`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
+    urlNode({ loc: `${SITE}/cat-2026-analysis`, lastmod: today, changefreq: 'hourly', priority: '0.9' }),
     urlNode({ loc: `${SITE}/cat-response-sheet-2026`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
     urlNode({ loc: `${SITE}/cat-answer-key-2026`, lastmod: today, changefreq: 'daily', priority: '0.9' }),
     urlNode({ loc: `${SITE}/mba-application-forms`, lastmod: today, changefreq: 'daily', priority: '0.8' }),

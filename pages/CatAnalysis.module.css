@@ -1,0 +1,28 @@
+.label { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #9a958c; margin: 0 0 8px; }
+.row { display: grid; grid-template-columns: 110px 1fr 1fr; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid rgba(236,232,225,0.08); }
+.secHead { display: flex; flex-direction: column; }
+.secName { font-weight: 800; color: #f4f1ea; }
+.secMax { font-size: .74rem; color: #9a958c; }
+.levels { display: flex; gap: 6px; flex-wrap: wrap; }
+.lvl { flex: 1 1 0; min-width: 0; height: 36px; padding: 0 8px; border-radius: 999px; border: 1px solid rgba(236,232,225,0.16); background: transparent; color: rgba(236,232,225,0.8); font: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; }
+.lvlOn { background: rgba(249,160,27,0.14); border-color: #f9a01b; color: #f9a01b; }
+.nums { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fine { margin: 10px 0 0; text-align: center; font-size: .76rem; color: #77716a; }
+.board { margin-top: 22px; }
+.boardHead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.boardTitle { margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.25rem; color: #f4f1ea; }
+.boardMeta { font-size: .8rem; color: #9a958c; }
+.boardEmpty { font-size: .88rem; color: #9a958c; margin: 8px 0 0; }
+.slotGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.slotCard { padding: 14px; border-radius: 16px; background: rgba(15,17,23,0.55); border: 1px solid rgba(236,232,225,0.10); }
+.slotName { font-weight: 800; color: #f4f1ea; margin-bottom: 8px; }
+.slotName span { font-weight: 500; font-size: .76rem; color: #9a958c; margin-left: 6px; }
+.slotWait { font-size: .82rem; color: #77716a; }
+.slotRow { display: grid; grid-template-columns: 44px 1fr auto; gap: 6px; font-size: .84rem; color: #cfc9bf; padding: 3px 0; }
+.slotSec { font-weight: 700; color: #f4f1ea; }
+.slotAtt { color: #9a958c; font-size: .78rem; }
+@media (max-width: 640px) {
+  .row { grid-template-columns: 1fr; gap: 8px; }
+  .secHead { flex-direction: row; gap: 8px; align-items: baseline; }
+  .slotGrid { grid-template-columns: 1fr; }
+}

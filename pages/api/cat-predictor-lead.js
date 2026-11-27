@@ -15,7 +15,7 @@ const small = (o) => {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
   const b = req.body || {};
-  const tool = b.tool === "call" ? "call" : b.tool === "percentile" ? "percentile" : null;
+  const tool = ["call", "percentile", "analysis"].includes(b.tool) ? b.tool : null;
   const name = cleanText(b.name, 80);
   const phone = normPhone(b.phone);
   const email = cleanText(b.email, 120).toLowerCase();
@@ -24,7 +24,10 @@ export default async function handler(req, res) {
   if (!validPhone(phone)) return res.status(400).json({ error: "Please enter a valid 10-digit mobile number." });
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: "Please check your email address." });
   const o = small(b.outputs) || {}, inp = small(b.inputs) || {};
-  const notify = tool === "percentile"
+  const sec = (k) => (inp[k] ? `${k} ${inp[k].att ?? "?"} att / ${inp[k].ok ?? "?"} right${inp[k].lvl ? ` (${inp[k].lvl})` : ""}` : "");
+  const notify = tool === "analysis"
+    ? notifyLead("CAT 2026 Exam Analysis", { name, phone, email, Category: cleanText(b.category, 10), Slot: inp.slot ? `Slot ${inp.slot}` : "", Attempts: ["VARC", "DILR", "QA"].map(sec).filter(Boolean).join(", "), "Expected score": o.low != null ? `${o.low} to ${o.high}` : "", "Expected percentile": o.pctLow != null ? `${o.pctLow} to ${o.pctHigh}` : "" }, "https://register.ipmcareer.com/cat-2026-analysis")
+    : tool === "percentile"
     ? notifyLead("CAT Percentile Predictor", { name, phone, email, Category: cleanText(b.category, 10), Marks: inp.VARC != null ? `VARC ${inp.VARC}, DILR ${inp.DILR}, QA ${inp.QA} (total ${o.total})` : "", "Predicted percentile": o.overall != null ? `${o.overall} (VARC ${o.VARC}, DILR ${o.DILR}, QA ${o.QA})` : "" }, "https://register.ipmcareer.com/cat-percentile-predictor")
     : notifyLead("IIM Call Predictor", { name, phone, email, Category: cleanText(b.category, 10), Percentile: inp.noCat ? "Not taken CAT yet" : `${inp.o} (VARC ${inp.v}, DILR ${inp.d}, QA ${inp.q})`, Academics: `10th ${inp.x}, 12th ${inp.xii}, grad ${inp.ug} (${inp.degree || "stream not given"})`, "Work-ex (months)": inp.workex, "IIM minimums cleared": Array.isArray(o.clears) ? `${o.clears.length}: ${o.clears.join(", ")}` : "" }, "https://register.ipmcareer.com/iim-call-predictor");
   try {

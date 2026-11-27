@@ -395,6 +395,7 @@ export default function CatScoreCalculator() {
                   Response sheet not out yet? Get an email the minute it is →
                 </button>
               )}
+              <a href="/cat-2026-analysis" className={c.notifyLink} style={{ marginTop: 4, color: "#cfc9bf", fontWeight: 500 }}>Just wrote CAT? See your expected percentile from attempts →</a>
               {notifyOpen && (
                 <div style={{ marginTop: 16 }}>
                   <CatAlertsInline title="We'll email you the minute it's out" text="The CAT 2026 response sheet usually comes out about a week after the exam (last year: 4 Dec). One email with a 1-minute score check, then the answer key and result." />
