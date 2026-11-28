@@ -6,7 +6,7 @@ import ScoreCheckLink from "../components/ScoreCheckLink";
 import s from "./MbaForms.module.css";
 import { MBA_FORMS, TYPES, CHECKED_ON, computeStatus, fmtDate } from "../lib/mbaForms";
 import { sendLeadToCrm } from "../lib/crm";
-import { goHref, isPartner } from "../lib/partnerLinks";
+import { goHref, isPartner, partnerCoupon, partnerTip } from "../lib/partnerLinks";
 
 const ALERT_KEY = "mba-alerts-v1";
 const APPLIED_KEY = "mba-applied-v1";
@@ -328,7 +328,7 @@ export default function MbaApplicationForms({ builtAt }) {
                 {quickApply.map((r) => (
                   <a key={r.id} className={s.stripItem} href={goHref(r.ref, "mba-forms-strip")} target="_blank" rel="noopener noreferrer nofollow" style={{ textDecoration: "none" }}>
                     <div className={s.stripName}>{r.name.replace(/ \(.*\)/, "")}</div>
-                    <div className={s.stripMeta}>{r.deadline ? `Last date ${fmtDate(r.deadline)}` : "Open · no fixed last date"} · Apply ↗</div>
+                    <div className={s.stripMeta}>{partnerCoupon(r.ref) ? `Code ${partnerCoupon(r.ref).code}` : r.deadline ? `Last date ${fmtDate(r.deadline)}` : "Open · no fixed last date"} · Apply ↗</div>
                   </a>
                 ))}
               </div>
@@ -440,7 +440,8 @@ export default function MbaApplicationForms({ builtAt }) {
                           </ul>
                         )}
                         {r.note && <div className={s.meta}>{r.note}</div>}
-                        {isPartner(r.ref) && <div className={s.meta}>Tip: if the form asks how you heard about the college, mention IPM Careers.</div>}
+                        {partnerCoupon(r.ref) && st.key !== "closed" && <div className={s.meta}>🎟️ Use code <b style={{ color: "#f9a01b", letterSpacing: ".04em" }}>{partnerCoupon(r.ref).code}</b> while applying{partnerCoupon(r.ref).text && partnerCoupon(r.ref).text !== "use it while applying" ? ` (${partnerCoupon(r.ref).text})` : ""}.</div>}
+                        {partnerTip(r.ref) && <div className={s.meta}>Tip: if the form asks how you heard about the college, mention IPM Careers.</div>}
                         {r.lastCycle && <div className={s.last}>{r.lastCycle} (for reference only)</div>}
                         <div className={`${s.src} ${r.source === "official" ? s.srcOk : s.srcWait}`}>
                           {r.source === "official" ? "✔ Checked on the official website" : "⏳ Official 2027 notice awaited"}

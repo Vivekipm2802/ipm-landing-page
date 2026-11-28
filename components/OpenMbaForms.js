@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MBA_FORMS, computeStatus, fmtDate } from "../lib/mbaForms";
-import { goHref, isPartner } from "../lib/partnerLinks";
+import { goHref, isPartner, partnerCoupon } from "../lib/partnerLinks";
 import c from "./OpenMbaForms.module.css";
 
 export default function OpenMbaForms({ percentile = null, src = "cat-tool", title = "MBA applications open now" }) {
@@ -34,7 +34,7 @@ export default function OpenMbaForms({ percentile = null, src = "cat-tool", titl
                 <div className={c.name}>{f.name.replace(/ \(.*?\)/, "")}</div>
                 <div className={c.meta}>
                   {f.deadline ? <span className={f.st.key === "closing" ? c.urgent : ""}>Last date {fmtDate(f.deadline)}</span> : <span>Open · no fixed last date</span>}
-                  {f.catNote && <span> · {f.catNote}</span>}
+                  {partnerCoupon(f.ref) ? <span> · Code <b className={c.code}>{partnerCoupon(f.ref).code}</b>{partnerCoupon(f.ref).text && partnerCoupon(f.ref).text !== "use it while applying" && partnerCoupon(f.ref).text !== "source code" ? ` (${partnerCoupon(f.ref).text})` : ""}</span> : f.catNote && <span> · {f.catNote}</span>}
                 </div>
               </div>
               {fits && <span className={c.fit}>Fits ~{Math.floor(p)}</span>}

@@ -11,6 +11,7 @@
 .meta { margin-top: 2px; font-size: .8rem; color: #9a958c; line-height: 1.45; }
 .urgent { color: #fbbf24; font-weight: 700; }
 .fit { flex: 0 0 auto; font-size: .72rem; font-weight: 700; color: #4ade80; background: rgba(74,222,128,0.10); border-radius: 999px; padding: 3px 8px; }
+.code { color: #f9a01b; letter-spacing: .04em; }
 .go { flex: 0 0 auto; font-size: .84rem; font-weight: 800; color: #f9a01b; }
 .fine { margin: 10px 0 0; font-size: .74rem; color: #77716a; }
 @media (max-width: 520px) {
